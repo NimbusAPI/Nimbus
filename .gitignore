@@ -1,0 +1,6 @@
+*.user
+*.suo
+[Oo]bj
+[Bb]in
+_ReSharper.*
+[Ll]ogs
