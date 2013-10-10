@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace Nimbus
 {
-    public interface IBus
-    {
-        
-    }
-
     public class Bus : IBus
     {
 

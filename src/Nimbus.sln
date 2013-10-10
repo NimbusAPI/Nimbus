@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Tests", "Nimbus.Tests\Nimbus.Tests.csproj", "{3A562499-3DA9-469E-88B6-2437FC23DD24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.ConsoleRunner", "Nimbus.Console\Nimbus.ConsoleRunner.csproj", "{B48F60E1-50AB-4CBD-9C7A-ECF6BE0ED94E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{3A562499-3DA9-469E-88B6-2437FC23DD24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A562499-3DA9-469E-88B6-2437FC23DD24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A562499-3DA9-469E-88B6-2437FC23DD24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B48F60E1-50AB-4CBD-9C7A-ECF6BE0ED94E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B48F60E1-50AB-4CBD-9C7A-ECF6BE0ED94E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B48F60E1-50AB-4CBD-9C7A-ECF6BE0ED94E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B48F60E1-50AB-4CBD-9C7A-ECF6BE0ED94E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
