@@ -4,7 +4,7 @@ namespace Nimbus
 {
     public static class RequestBrokerHandlerExtensions
     {
-        public static object HandleAwful(this IRequestBroker requestBroker, object request)
+        public static object InvokeGenericHandleMethod(this IRequestBroker requestBroker, object request)
         {
             var handleMethod = ExtractHandlerMethodInfo(request);
             var response = handleMethod.Invoke(requestBroker, new object[] { request });

@@ -12,7 +12,6 @@ namespace Nimbus.MessagePumps
         private MessageReceiver _reciever;
         private bool _haveBeenToldToStop;
 
-
         public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType)
         {
             _messagingFactory = messagingFactory;
@@ -37,9 +36,10 @@ namespace Nimbus.MessagePumps
             while (! _haveBeenToldToStop)
             {
                 var requestMessage = _reciever.Receive(TimeSpan.FromSeconds(1));
+                if (requestMessage == null) continue;
 
                 var request = requestMessage.GetBody(_messageType);
-                var response = _requestBroker.HandleAwful(request);
+                var response = _requestBroker.InvokeGenericHandleMethod(request);
 
                 var replyQueueName = requestMessage.ReplyTo;
                 var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
