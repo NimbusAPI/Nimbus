@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -11,21 +10,29 @@ namespace Nimbus
 {
     public class Bus : IBus
     {
-        private readonly string _connectionString;
+        private readonly NamespaceManager _namespaceManager;
+        private readonly MessagingFactory _messagingFactory;
         private readonly ICommandBroker _commandBroker;
         private readonly IRequestBroker _requestBroker;
         private readonly IEventBroker _eventBroker;
         private readonly Type[] _commandTypes;
         private readonly Type[] _requestTypes;
         private readonly Type[] _eventTypes;
-        private MessagingFactory _messagingFactory;
         private readonly IList<IMessagePump> _messagePumps = new List<IMessagePump>();
         private IRequestResponseCorrelator _correlator;
         private string _replyQueueName;
 
-        public Bus(string connectionString, ICommandBroker commandBroker, IRequestBroker requestBroker, IEventBroker eventBroker, Type[] commandTypes, Type[] requestTypes, Type[] eventTypes)
+        public Bus(NamespaceManager namespaceManager,
+                   MessagingFactory messagingFactory,
+                   ICommandBroker commandBroker,
+                   IRequestBroker requestBroker,
+                   IEventBroker eventBroker,
+                   Type[] commandTypes,
+                   Type[] requestTypes,
+                   Type[] eventTypes)
         {
-            _connectionString = connectionString;
+            _namespaceManager = namespaceManager;
+            _messagingFactory = messagingFactory;
             _commandBroker = commandBroker;
             _requestBroker = requestBroker;
             _eventBroker = eventBroker;
@@ -36,7 +43,7 @@ namespace Nimbus
 
         public async Task Send<TBusCommand>(TBusCommand busCommand)
         {
-            var sender = _messagingFactory.CreateMessageSender(typeof(TBusCommand).FullName);
+            var sender = _messagingFactory.CreateMessageSender(typeof (TBusCommand).FullName);
             var message = new BrokeredMessage(busCommand);
             await sender.SendAsync(message);
         }
@@ -49,14 +56,13 @@ namespace Nimbus
 
         public async Task Publish<TBusEvent>(TBusEvent busEvent)
         {
-            var client = _messagingFactory.CreateTopicClient(typeof(TBusEvent).FullName);
+            var client = _messagingFactory.CreateTopicClient(typeof (TBusEvent).FullName);
             var brokeredMessage = new BrokeredMessage(busEvent);
             await client.SendAsync(brokeredMessage);
         }
 
         public void Start()
         {
-            _messagingFactory = MessagingFactory.CreateFromConnectionString(_connectionString);
             var customQueueName = "DefaultQueue";
             _replyQueueName = string.Format("{0}.{1}.{2}", Environment.MachineName, Process.GetCurrentProcess().ProcessName, customQueueName);
             _correlator = new RequestResponseCorrelator(_messagingFactory, _replyQueueName);
@@ -83,7 +89,6 @@ namespace Nimbus
 
             _correlator.Start();
 
-
             foreach (var eventType in _eventTypes)
             {
                 EnsureTopicExists(eventType);
@@ -94,28 +99,24 @@ namespace Nimbus
                 _messagePumps.Add(pump);
                 pump.Start();
             }
-
         }
 
         private void EnsureSubscriptionExists(Type eventType, string subscriptionName)
         {
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
-            if (! namespaceManager.SubscriptionExists(eventType.FullName,subscriptionName))
+            if (! _namespaceManager.SubscriptionExists(eventType.FullName, subscriptionName))
             {
-                namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
+                _namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
             }
-
         }
 
         private void EnsureTopicExists(Type eventType)
         {
             var topicName = eventType.FullName;
 
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
 
-            if (!namespaceManager.TopicExists(topicName))
+            if (!_namespaceManager.TopicExists(topicName))
             {
-                namespaceManager.CreateTopic(topicName);
+                _namespaceManager.CreateTopic(topicName);
             }
         }
 
@@ -126,10 +127,9 @@ namespace Nimbus
 
         private void EnsureQueueExists(string queueName)
         {
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
-            if (!namespaceManager.QueueExists(queueName))
+            if (!_namespaceManager.QueueExists(queueName))
             {
-                namespaceManager.CreateQueue(queueName);
+                _namespaceManager.CreateQueue(queueName);
             }
         }
 
@@ -141,7 +141,6 @@ namespace Nimbus
             {
                 messagePump.Stop();
             }
-
         }
     }
 }

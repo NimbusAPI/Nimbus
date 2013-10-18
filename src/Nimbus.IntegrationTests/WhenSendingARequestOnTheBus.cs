@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
 using NSubstitute;
 using Shouldly;
 
@@ -18,20 +20,30 @@ namespace Nimbus.IntegrationTests
             }
         }
 
+        private SomeResponse _response;
+        private NamespaceManager _namespaceManager;
+        private MessagingFactory _messagingFactory;
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
         private IEventBroker _eventBroker;
-        private SomeResponse _response;
 
         public override Bus Given()
         {
-            var connectionString = CommonResources.ConnectionString;
+            _namespaceManager = NamespaceManager.CreateFromConnectionString(CommonResources.ConnectionString);
+            _messagingFactory = MessagingFactory.CreateFromConnectionString(CommonResources.ConnectionString);
 
             _commandBroker = Substitute.For<ICommandBroker>();
             _requestBroker = new FakeBroker();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] {typeof (SomeCommand)}, new[] {typeof (SomeRequest)}, new[] {typeof (SomeEvent)});
+            var bus = new Bus(_namespaceManager,
+                              _messagingFactory,
+                              _commandBroker,
+                              _requestBroker,
+                              _eventBroker,
+                              new[] {typeof (SomeCommand)},
+                              new[] {typeof (SomeRequest)},
+                              new[] {typeof (SomeEvent)});
             bus.Start();
             return bus;
         }
