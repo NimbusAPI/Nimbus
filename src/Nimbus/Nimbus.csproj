@@ -67,7 +67,6 @@
     <Compile Include="MessagePumps\TopicMessagePump.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="Nimbus.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

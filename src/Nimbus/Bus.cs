@@ -34,17 +34,24 @@ namespace Nimbus
             _eventTypes = eventTypes;
         }
 
-        public void Send(object busCommand)
+        public async Task Send<TBusCommand>(TBusCommand busCommand)
         {
-            var sender = _messagingFactory.CreateMessageSender(busCommand.GetType().FullName);
+            var sender = _messagingFactory.CreateMessageSender(typeof(TBusCommand).FullName);
             var message = new BrokeredMessage(busCommand);
-            sender.Send(message);
+            await sender.SendAsync(message);
         }
 
         public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
         {
             var response = await _correlator.MakeCorrelatedRequest(busRequest);
             return response;
+        }
+
+        public async Task Publish<TBusEvent>(TBusEvent busEvent)
+        {
+            var client = _messagingFactory.CreateTopicClient(typeof(TBusEvent).FullName);
+            var brokeredMessage = new BrokeredMessage(busEvent);
+            await client.SendAsync(brokeredMessage);
         }
 
         public void Start()
@@ -134,15 +141,6 @@ namespace Nimbus
             {
                 messagePump.Stop();
             }
-
-        }
-
-        public void Publish(object busEvent)
-        {
-            var client = _messagingFactory.CreateTopicClient(busEvent.GetType().FullName);
-
-            var brokeredMessage = new BrokeredMessage(busEvent);
-            client.Send(brokeredMessage);
 
         }
     }

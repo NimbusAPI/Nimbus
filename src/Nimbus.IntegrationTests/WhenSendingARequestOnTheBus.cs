@@ -6,20 +6,15 @@ namespace Nimbus.IntegrationTests
 {
     public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
     {
-
-
         public class FakeBroker : IRequestBroker
         {
             public bool DidGetCalled;
 
             public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse>
             {
-
                 DidGetCalled = true;
 
                 return Activator.CreateInstance<TBusResponse>();
-
-
             }
         }
 
@@ -36,17 +31,16 @@ namespace Nimbus.IntegrationTests
             _requestBroker = new FakeBroker();
             _eventBroker = Substitute.For<IEventBroker>();
 
-
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new[] { typeof(SomeEvent) });
+            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] {typeof (SomeCommand)}, new[] {typeof (SomeRequest)}, new[] {typeof (SomeEvent)});
             bus.Start();
             return bus;
         }
 
-        public override  void When()
+        public override void When()
         {
             var request = new SomeRequest();
             var task = Subject.Request(request);
-            task.Wait();
+            task.Wait(TimeSpan.FromSeconds(2));
 
             _response = task.Result;
 
