@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Shouldly</id>
+    <version>1.1.1.1</version>
+    <authors>Dave Newman,  Xerxes Battiwalla,  Anthony Egerton,  Peter van der Woude</authors>
+    <owners>Dave Newman,  Xerxes Battiwalla,  Anthony Egerton,  Peter van der Woude</owners>
+    <licenseUrl>https://github.com/shouldly/shouldly/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://shouldly.github.com/</projectUrl>
+    <iconUrl>http://shouldly.github.com/images/nuget_logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Shouldly - Assertion framework for .NET. The way asserting *Should* be</description>
+    <tags>testing unit TDD AAA shoulda testunit rspec</tags>
+  </metadata>
+</package>
