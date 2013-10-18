@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using System;
+using NSubstitute;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests
@@ -9,15 +10,32 @@ namespace Nimbus.IntegrationTests
         private IRequestBroker _requestBroker;
         private SomeResponse _response;
 
+        public class FakeBroker : IRequestBroker
+        {
+            public bool DidGetCalled;
+
+            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            {
+
+                DidGetCalled = true;
+
+                return Activator.CreateInstance<TBusResponse>();
+
+
+            }
+        }
+
         public override Bus Given()
         {
             var connectionString =
                 @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
 
             _commandBroker = Substitute.For<ICommandBroker>();
-            _requestBroker = Substitute.For<IRequestBroker>();
+            //_requestBroker = Substitute.For<IRequestBroker>();
 
-            _requestBroker.Handle<SomeRequest, SomeResponse>(Arg.Any<SomeRequest>()).Returns(ci => new SomeResponse());
+            _requestBroker = new FakeBroker();
+
+            //_requestBroker.Handle<SomeRequest, SomeResponse>(Arg.Any<SomeRequest>()).Returns(ci => new SomeResponse());
 
             var bus = new Bus(connectionString, _commandBroker, _requestBroker, new[] {typeof (SomeCommand)}, new [] {typeof(SomeRequest)});
             bus.Start();
@@ -32,6 +50,8 @@ namespace Nimbus.IntegrationTests
             task.Wait();
 
             _response = task.Result;
+
+            Subject.Stop();
         }
 
         [Then]

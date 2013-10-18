@@ -6,5 +6,6 @@ namespace Nimbus
     {
         Task<TResponse> MakeCorrelatedRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest);
         void Start();
+        void Stop();
     }
 }

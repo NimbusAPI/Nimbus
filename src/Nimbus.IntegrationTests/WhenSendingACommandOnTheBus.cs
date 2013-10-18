@@ -26,6 +26,8 @@ namespace Nimbus.IntegrationTests
             var someCommand = new SomeCommand();
             Subject.Send(someCommand);
             Thread.Sleep(TimeSpan.FromSeconds(1));
+
+            Subject.Stop();
         }
 
         [Then]

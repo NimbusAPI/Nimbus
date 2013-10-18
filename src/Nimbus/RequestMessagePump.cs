@@ -10,6 +10,8 @@ namespace Nimbus
         private readonly IRequestBroker _requestBroker;
         private readonly Type _messageType;
         private MessageReceiver _reciever;
+        private bool _haveBeenToldToStop;
+
 
         public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType)
         {
@@ -27,14 +29,14 @@ namespace Nimbus
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            _haveBeenToldToStop = true;
         }
 
         private void DoWork()
         {
-            while (true)
+            while (! _haveBeenToldToStop)
             {
-                var requestMessage = _reciever.Receive();
+                var requestMessage = _reciever.Receive(TimeSpan.FromSeconds(1));
 
                 var request = requestMessage.GetBody(_messageType);
                 var response = _requestBroker.HandleAwful(request);

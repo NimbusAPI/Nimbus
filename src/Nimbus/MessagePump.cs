@@ -10,6 +10,7 @@ namespace Nimbus
         private readonly ICommandBroker _commandBroker;
         private readonly Type _messageType;
         private MessageReceiver _reciever;
+        private bool _haveBeenToldToStop;
 
         public MessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType)
         {
@@ -27,14 +28,14 @@ namespace Nimbus
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            _haveBeenToldToStop = true;
         }
 
         private void DoWork()
         {
-            while (true)
+            while (! _haveBeenToldToStop)
             {
-                var message = _reciever.Receive();
+                var message = _reciever.Receive(TimeSpan.FromSeconds(1));
                 if (message == null) continue;
 
                 var body = message.GetBody(_messageType);

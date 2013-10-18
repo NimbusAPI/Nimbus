@@ -88,7 +88,13 @@ namespace Nimbus
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            _correlator.Stop();
+
+            foreach (var messagePump in _messagePumps)
+            {
+                messagePump.Stop();
+            }
+
         }
     }
 }

@@ -12,6 +12,8 @@ namespace Nimbus
 
         private readonly IDictionary<Guid, IRequestResponseWrapper> _requestWrappers = new Dictionary<Guid, IRequestResponseWrapper>();
 
+        private bool _haveBeenToldToShutUp;
+
         public RequestResponseCorrelator(MessagingFactory messagingFactory, string replyQueueName)
         {
             _messagingFactory = messagingFactory;
@@ -44,17 +46,26 @@ namespace Nimbus
             Task.Run(() => InternalMessagePump());
         }
 
+        public void Stop()
+        {
+            _haveBeenToldToShutUp = true;
+        }
+
         private void InternalMessagePump()
         {
             var receiver = _messagingFactory.CreateMessageReceiver(_replyQueueName);
 
-            while (true)
+            while (! _haveBeenToldToShutUp)
             {
-                var message = receiver.Receive();
+                var message = receiver.Receive(TimeSpan.FromSeconds(1));
                 if (message == null) continue;
 
                 var correlationId = Guid.Parse(message.CorrelationId);
-                var wrapper = _requestWrappers[correlationId];
+                IRequestResponseWrapper wrapper;
+                if (! _requestWrappers.TryGetValue(correlationId, out wrapper))
+                    continue;
+
+
 
                 var responseType = wrapper.ResponseType;
                 var response = message.GetBody(responseType);
