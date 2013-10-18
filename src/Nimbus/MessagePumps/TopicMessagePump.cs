@@ -28,7 +28,7 @@ namespace Nimbus.MessagePumps
         private void HandleIt(BrokeredMessage brokeredMessage)
         {
             _eventBroker.Publish(brokeredMessage.GetBody(_eventType));
-
+            brokeredMessage.Complete();
         }
 
         public void Stop()
