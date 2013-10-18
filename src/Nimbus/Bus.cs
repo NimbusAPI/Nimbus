@@ -14,20 +14,24 @@ namespace Nimbus
         private readonly string _connectionString;
         private readonly ICommandBroker _commandBroker;
         private readonly IRequestBroker _requestBroker;
+        private readonly IEventBroker _eventBroker;
         private readonly Type[] _commandTypes;
         private readonly Type[] _requestTypes;
+        private readonly Type[] _eventTypes;
         private MessagingFactory _messagingFactory;
         private readonly IList<IMessagePump> _messagePumps = new List<IMessagePump>();
         private IRequestResponseCorrelator _correlator;
         private string _replyQueueName;
 
-        public Bus(string connectionString, ICommandBroker commandBroker, IRequestBroker requestBroker, Type[] commandTypes, Type[] requestTypes)
+        public Bus(string connectionString, ICommandBroker commandBroker, IRequestBroker requestBroker, IEventBroker eventBroker, Type[] commandTypes, Type[] requestTypes, Type[] eventTypes)
         {
             _connectionString = connectionString;
             _commandBroker = commandBroker;
             _requestBroker = requestBroker;
+            _eventBroker = eventBroker;
             _commandTypes = commandTypes;
             _requestTypes = requestTypes;
+            _eventTypes = eventTypes;
         }
 
         public void Send(object busCommand)
@@ -71,6 +75,41 @@ namespace Nimbus
             }
 
             _correlator.Start();
+
+
+            foreach (var eventType in _eventTypes)
+            {
+                EnsureTopicExists(eventType);
+                var subscriptionName = String.Format("{0}.{1}", Environment.MachineName, "MyApp");
+                EnsureSubscriptionExists(eventType, subscriptionName);
+
+                var pump = new TopicMessagePump(_messagingFactory, _eventBroker, eventType, subscriptionName);
+                _messagePumps.Add(pump);
+                pump.Start();
+            }
+
+        }
+
+        private void EnsureSubscriptionExists(Type eventType, string subscriptionName)
+        {
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
+            if (! namespaceManager.SubscriptionExists(eventType.FullName,subscriptionName))
+            {
+                namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
+            }
+
+        }
+
+        private void EnsureTopicExists(Type eventType)
+        {
+            var topicName = eventType.FullName;
+
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
+
+            if (!namespaceManager.TopicExists(topicName))
+            {
+                namespaceManager.CreateTopic(topicName);
+            }
         }
 
         private void EnsureQueueExists(Type commandType)
@@ -95,6 +134,15 @@ namespace Nimbus
             {
                 messagePump.Stop();
             }
+
+        }
+
+        public void Publish(object busEvent)
+        {
+            var client = _messagingFactory.CreateTopicClient(busEvent.GetType().FullName);
+
+            var brokeredMessage = new BrokeredMessage(busEvent);
+            client.Send(brokeredMessage);
 
         }
     }

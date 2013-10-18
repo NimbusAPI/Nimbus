@@ -52,6 +52,7 @@
     <Compile Include="BusRequest.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="ICommandBroker.cs" />
+    <Compile Include="IEventBroker.cs" />
     <Compile Include="IHandleCommand.cs" />
     <Compile Include="IMessagePump.cs" />
     <Compile Include="IRequestBroker.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="MessagePumps\RequestMessagePump.cs" />
     <Compile Include="RequestResponseCorrelator.cs" />
     <Compile Include="RequestResponseWrapper.cs" />
+    <Compile Include="MessagePumps\TopicMessagePump.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Nimbus.nuspec" />

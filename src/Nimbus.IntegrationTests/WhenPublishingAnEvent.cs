@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using NSubstitute;
 
 namespace Nimbus.IntegrationTests
 {
-    public class WhenSendingACommandOnTheBus : SpecificationFor<Bus>
+    public class WhenPublishingAnEvent : SpecificationFor<Bus>
     {
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
@@ -18,24 +17,28 @@ namespace Nimbus.IntegrationTests
             _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new[] { typeof(SomeEvent) });
+            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new [] {typeof(SomeEvent)});
             bus.Start();
             return bus;
         }
 
         public override void When()
         {
-            var someCommand = new SomeCommand();
-            Subject.Send(someCommand);
-            Thread.Sleep(TimeSpan.FromSeconds(1));
+
+            var myEvent = new SomeEvent();
+            Subject.Publish(myEvent);
+
+            Thread.Sleep(2000);
 
             Subject.Stop();
         }
 
+
         [Then]
         public void SomethingShouldHappen()
         {
-            _commandBroker.Received().Dispatch(Arg.Any<SomeCommand>());
+            _eventBroker.Received().Publish(Arg.Any<SomeEvent>());
         }
+
     }
 }

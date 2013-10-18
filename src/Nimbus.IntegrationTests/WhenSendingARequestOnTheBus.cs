@@ -6,9 +6,7 @@ namespace Nimbus.IntegrationTests
 {
     public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
     {
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private SomeResponse _response;
+
 
         public class FakeBroker : IRequestBroker
         {
@@ -25,21 +23,22 @@ namespace Nimbus.IntegrationTests
             }
         }
 
+        private ICommandBroker _commandBroker;
+        private IRequestBroker _requestBroker;
+        private IEventBroker _eventBroker;
+        private SomeResponse _response;
+
         public override Bus Given()
         {
-            var connectionString =
-                @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
+            var connectionString = CommonResources.ConnectionString;
 
             _commandBroker = Substitute.For<ICommandBroker>();
-            //_requestBroker = Substitute.For<IRequestBroker>();
-
             _requestBroker = new FakeBroker();
+            _eventBroker = Substitute.For<IEventBroker>();
 
-            //_requestBroker.Handle<SomeRequest, SomeResponse>(Arg.Any<SomeRequest>()).Returns(ci => new SomeResponse());
 
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, new[] {typeof (SomeCommand)}, new [] {typeof(SomeRequest)});
+            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new[] { typeof(SomeEvent) });
             bus.Start();
-
             return bus;
         }
 
