@@ -6,15 +6,17 @@ namespace Nimbus.IntegrationTests
 {
     public class WhenSendingACommandOnTheBus : SpecificationFor<Bus>
     {
-        private IEventBroker _eventBroker;
+        private ICommandBroker _commandBroker;
+        private IRequestBroker _requestBroker;
 
         public override Bus Given()
         {
             var connectionString =
                 @"Endpoint=sb://bazaario.servicebus.windows.net/;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
 
-            _eventBroker = Substitute.For<IEventBroker>();
-            var bus = new Bus(connectionString, _eventBroker, new[] {typeof (SomeCommand)});
+            _commandBroker = Substitute.For<ICommandBroker>();
+            _requestBroker = Substitute.For<IRequestBroker>();
+            var bus = new Bus(connectionString, _commandBroker, _requestBroker, new[] {typeof (SomeCommand)}, new []{typeof(SomeRequest)});
             bus.Start();
             return bus;
         }
@@ -29,7 +31,7 @@ namespace Nimbus.IntegrationTests
         [Then]
         public void SomethingShouldHappen()
         {
-            _eventBroker.Received().Publish(Arg.Any<SomeCommand>());
+            _commandBroker.Received().Dispatch(Arg.Any<SomeCommand>());
         }
     }
 }

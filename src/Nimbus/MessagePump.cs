@@ -7,14 +7,14 @@ namespace Nimbus
     public class MessagePump : IMessagePump
     {
         private readonly MessagingFactory _messagingFactory;
-        private readonly IEventBroker _eventBroker;
+        private readonly ICommandBroker _commandBroker;
         private readonly Type _messageType;
         private MessageReceiver _reciever;
 
-        public MessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type messageType)
+        public MessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType)
         {
             _messagingFactory = messagingFactory;
-            _eventBroker = eventBroker;
+            _commandBroker = commandBroker;
             _messageType = messageType;
         }
 
@@ -37,10 +37,9 @@ namespace Nimbus
                 var message = _reciever.Receive();
 
                 var body = message.GetBody(_messageType);
-                _eventBroker.Publish((dynamic) body);
+                _commandBroker.Dispatch((dynamic) body);
                 message.Complete();
             }
         }
     }
-
 }

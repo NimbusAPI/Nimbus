@@ -51,13 +51,15 @@
     <Compile Include="Bus.cs" />
     <Compile Include="BusRequest.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="IEventBroker.cs" />
+    <Compile Include="ICommandBroker.cs" />
     <Compile Include="IHandleCommand.cs" />
     <Compile Include="IMessagePump.cs" />
+    <Compile Include="IRequestBroker.cs" />
     <Compile Include="IRequestResponseCorrelator.cs" />
     <Compile Include="IRequestResponseWrapper.cs" />
     <Compile Include="MessagePump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestMessagePump.cs" />
     <Compile Include="RequestResponseCorrelator.cs" />
     <Compile Include="RequestResponseWrapper.cs" />
   </ItemGroup>
