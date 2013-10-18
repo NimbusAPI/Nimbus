@@ -50,9 +50,9 @@
     <Compile Include="Bus.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IEventBroker.cs" />
+    <Compile Include="IHandleCommand.cs" />
     <Compile Include="MessagePump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SomeCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

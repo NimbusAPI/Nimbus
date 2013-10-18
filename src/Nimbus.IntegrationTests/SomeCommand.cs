@@ -1,4 +1,4 @@
-﻿namespace Nimbus.IntegrationTests
+﻿namespace Nimbus
 {
     public class SomeCommand
     {

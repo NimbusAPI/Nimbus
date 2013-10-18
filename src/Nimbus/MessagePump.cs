@@ -1,20 +1,33 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus
 {
-    public class MessagePump<TMessage>
+    public interface IMessagePump
+    {
+        void Start();
+        void Stop();
+    }
+
+    public class MessagePump : IMessagePump
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly IEventBroker _eventBroker;
+        private readonly Type _messageType;
         private MessageReceiver _reciever;
+        private readonly MethodInfo _getBodyMethod;
 
-        public MessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker)
+        public MessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type messageType)
         {
             _messagingFactory = messagingFactory;
             _eventBroker = eventBroker;
-        }
+            _messageType = messageType;
 
+            var getBodyOpenGenericMethod = typeof (BrokeredMessage).GetMethod("GetBody", new Type[0]);
+            _getBodyMethod = getBodyOpenGenericMethod.MakeGenericMethod(_messageType);
+        }
 
         public void Start()
         {
@@ -23,14 +36,19 @@ namespace Nimbus
             Task.Run(() => DoWork());
         }
 
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
+
         private void DoWork()
         {
-
             while (true)
             {
                 var message = _reciever.Receive();
 
-                _eventBroker.Publish(message.GetBody<TMessage>());
+                var body = (dynamic) _getBodyMethod.Invoke(message, null);
+                _eventBroker.Publish(body);
                 message.Complete();
             }
         }
