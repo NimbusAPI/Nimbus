@@ -31,7 +31,7 @@ namespace Nimbus
 
         public void Start()
         {
-            _reciever = _messagingFactory.CreateMessageReceiver("queue1");
+            _reciever = _messagingFactory.CreateMessageReceiver(_messageType.FullName);
 
             Task.Run(() => DoWork());
         }

@@ -11,7 +11,7 @@ namespace Nimbus.IntegrationTests
         public override Bus Given()
         {
             var connectionString =
-                @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=Main;SharedAccessKey=tTELgEQD4v7XvHpgkNDXwETKX4izhUhIoPTCtj/zOO8=;TransportType=Amqp";
+                @"Endpoint=sb://bazaario.servicebus.windows.net/;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
 
             _eventBroker = Substitute.For<IEventBroker>();
             var bus = new Bus(connectionString, _eventBroker, new[] {typeof (SomeCommand)});
@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests
         {
             var someCommand = new SomeCommand();
             Subject.Send(someCommand);
-            Thread.Sleep(TimeSpan.FromSeconds(10));
+            Thread.Sleep(TimeSpan.FromSeconds(1));
         }
 
         [Then]

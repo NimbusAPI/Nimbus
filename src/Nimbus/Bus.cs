@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus
@@ -21,12 +22,10 @@ namespace Nimbus
 
         public void Send(object busCommand)
         {
-            var sender = _messagingFactory.CreateMessageSender("queue1");
-            for (var i = 0; i < 100; i++)
-            {
-                var message = new BrokeredMessage(busCommand);
-                sender.Send(message);
-            }
+            var sender = _messagingFactory.CreateMessageSender(busCommand.GetType().FullName);
+            var message = new BrokeredMessage(busCommand);
+            sender.Send(message);
+
         }
 
         public void Start()
@@ -35,11 +34,25 @@ namespace Nimbus
 
             foreach (var commandType in _commandTypes)
             {
+                EnsureQueueExists(commandType);
+
                 var pump = new MessagePump(_messagingFactory, _eventBroker, commandType);
                 _messagePumps.Add(pump);
                 pump.Start();
             }
         }
+
+        private void EnsureQueueExists(Type commandType)
+        {
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
+            var queueName = commandType.FullName;
+
+            if (! namespaceManager.QueueExists(queueName))
+            {
+                namespaceManager.CreateQueue(queueName);
+            }
+        }
+
 
         public void Stop()
         {
