@@ -36,8 +36,8 @@ namespace Nimbus
             {
                 var requestMessage = _reciever.Receive();
 
-                var body = requestMessage.GetBody(_messageType);
-                var response = ((dynamic)_requestBroker).Handle((dynamic)body);
+                var request = requestMessage.GetBody(_messageType);
+                var response = _requestBroker.HandleAwful(request);
 
                 var replyQueueName = requestMessage.ReplyTo;
                 var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);

@@ -35,6 +35,7 @@ namespace Nimbus
             while (true)
             {
                 var message = _reciever.Receive();
+                if (message == null) continue;
 
                 var body = message.GetBody(_messageType);
                 _commandBroker.Dispatch((dynamic) body);

@@ -59,6 +59,7 @@
     <Compile Include="IRequestResponseWrapper.cs" />
     <Compile Include="MessagePump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestBrokerHandlerExtensions.cs" />
     <Compile Include="RequestMessagePump.cs" />
     <Compile Include="RequestResponseCorrelator.cs" />
     <Compile Include="RequestResponseWrapper.cs" />

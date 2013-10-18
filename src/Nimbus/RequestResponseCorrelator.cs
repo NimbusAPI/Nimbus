@@ -29,10 +29,11 @@ namespace Nimbus
                 CorrelationId = correlationId.ToString(),
                 ReplyTo = _replyQueueName,
             };
-            await sender.SendAsync(message);
 
             var wrapper = new RequestResponseWrapper<TResponse>();
             _requestWrappers[correlationId] = wrapper;
+
+            await sender.SendAsync(message);
             wrapper.Semaphore.WaitOne();
 
             return wrapper.Response;
@@ -50,6 +51,8 @@ namespace Nimbus
             while (true)
             {
                 var message = receiver.Receive();
+                if (message == null) continue;
+
                 var correlationId = Guid.Parse(message.CorrelationId);
                 var wrapper = _requestWrappers[correlationId];
 
