@@ -12,12 +12,12 @@ namespace Nimbus.IntegrationTests
         public override Bus Given()
         {
             var connectionString =
-                @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=Main;SharedAccessKey=tTELgEQD4v7XvHpgkNDXwETKX4izhUhIoPTCtj/zOO8=;TransportType=Amqp";
+                @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
 
             _commandBroker = Substitute.For<ICommandBroker>();
             _requestBroker = Substitute.For<IRequestBroker>();
 
-            _requestBroker.Handle<SomeRequest, SomeResponse>(Arg.Any<SomeRequest>()).Returns(new SomeResponse());
+            _requestBroker.Handle<SomeRequest, SomeResponse>(Arg.Any<SomeRequest>()).Returns(ci => new SomeResponse());
 
             var bus = new Bus(connectionString, _commandBroker, _requestBroker, new[] {typeof (SomeCommand)}, new [] {typeof(SomeRequest)});
             bus.Start();
@@ -25,10 +25,13 @@ namespace Nimbus.IntegrationTests
             return bus;
         }
 
-        public override async void When()
+        public override  void When()
         {
             var request = new SomeRequest();
-            _response = await Subject.Request(request);
+            var task = Subject.Request(request);
+            task.Wait();
+
+            _response = task.Result;
         }
 
         [Then]

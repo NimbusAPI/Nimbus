@@ -8,12 +8,14 @@ namespace Nimbus
     public class RequestResponseCorrelator : IRequestResponseCorrelator
     {
         private readonly MessagingFactory _messagingFactory;
+        private readonly string _replyQueueName;
 
         private readonly IDictionary<Guid, IRequestResponseWrapper> _requestWrappers = new Dictionary<Guid, IRequestResponseWrapper>();
 
-        public RequestResponseCorrelator(MessagingFactory messagingFactory)
+        public RequestResponseCorrelator(MessagingFactory messagingFactory, string replyQueueName)
         {
             _messagingFactory = messagingFactory;
+            _replyQueueName = replyQueueName;
         }
 
         public async Task<TResponse> MakeCorrelatedRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
@@ -25,7 +27,7 @@ namespace Nimbus
             var message = new BrokeredMessage(busRequest)
             {
                 CorrelationId = correlationId.ToString(),
-                ReplyTo = "MyVeryOwnInputQueue",
+                ReplyTo = _replyQueueName,
             };
             await sender.SendAsync(message);
 
@@ -43,7 +45,7 @@ namespace Nimbus
 
         private void InternalMessagePump()
         {
-            var receiver = _messagingFactory.CreateMessageReceiver("MyVeryOwnInputQueue");
+            var receiver = _messagingFactory.CreateMessageReceiver(_replyQueueName);
 
             while (true)
             {

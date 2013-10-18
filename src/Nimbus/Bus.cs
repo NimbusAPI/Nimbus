@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -16,6 +18,7 @@ namespace Nimbus
         private MessagingFactory _messagingFactory;
         private readonly IList<IMessagePump> _messagePumps = new List<IMessagePump>();
         private IRequestResponseCorrelator _correlator;
+        private string _replyQueueName;
 
         public Bus(string connectionString, ICommandBroker commandBroker, IRequestBroker requestBroker, Type[] commandTypes, Type[] requestTypes)
         {
@@ -42,7 +45,11 @@ namespace Nimbus
         public void Start()
         {
             _messagingFactory = MessagingFactory.CreateFromConnectionString(_connectionString);
-            _correlator = new RequestResponseCorrelator(_messagingFactory);
+            var customQueueName = "DefaultQueue";
+            _replyQueueName = string.Format("{0}.{1}.{2}", Environment.MachineName, Process.GetCurrentProcess().ProcessName, customQueueName);
+            _correlator = new RequestResponseCorrelator(_messagingFactory, _replyQueueName);
+
+            EnsureQueueExists(_replyQueueName);
 
             foreach (var commandType in _commandTypes)
             {
@@ -67,10 +74,13 @@ namespace Nimbus
 
         private void EnsureQueueExists(Type commandType)
         {
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
-            var queueName = commandType.FullName;
+            EnsureQueueExists(commandType.FullName);
+        }
 
-            if (! namespaceManager.QueueExists(queueName))
+        private void EnsureQueueExists(string queueName)
+        {
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
+            if (!namespaceManager.QueueExists(queueName))
             {
                 namespaceManager.CreateQueue(queueName);
             }
