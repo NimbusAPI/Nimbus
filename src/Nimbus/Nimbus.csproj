@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Bus.cs" />
     <Compile Include="IBus.cs" />
+    <Compile Include="IEventBroker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
