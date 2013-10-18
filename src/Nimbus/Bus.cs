@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.MessagePumps;
 
 namespace Nimbus
 {
@@ -55,7 +56,7 @@ namespace Nimbus
             {
                 EnsureQueueExists(commandType);
 
-                var pump = new MessagePump(_messagingFactory, _commandBroker, commandType);
+                var pump = new CommandMessagePump(_messagingFactory, _commandBroker, commandType);
                 _messagePumps.Add(pump);
                 pump.Start();
             }
