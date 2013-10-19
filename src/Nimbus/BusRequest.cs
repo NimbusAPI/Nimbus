@@ -1,6 +1,6 @@
 ﻿namespace Nimbus
 {
-    public abstract class BusRequest<TRequest, TResponse>
+    public abstract class BusRequest<TRequest, TResponse> : IBusRequest
     {
     }
 }

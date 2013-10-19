@@ -1,6 +1,6 @@
 ﻿namespace Nimbus.IntegrationTests
 {
-    public class SomeEvent
+    public class SomeEvent : IBusEvent
     {
          
     }

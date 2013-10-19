@@ -18,7 +18,9 @@ namespace Nimbus.IntegrationTests
             _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new[] { typeof(SomeEvent) });
+            var queueManager = new QueueManager(connectionString);
+
+            var bus = new Bus(connectionString, queueManager, _commandBroker, _requestBroker, _eventBroker, new[] { typeof(SomeCommand) }, new[] { typeof(SomeRequest) }, new[] { typeof(SomeEvent) });
             bus.Start();
             return bus;
         }
@@ -27,7 +29,7 @@ namespace Nimbus.IntegrationTests
         {
             var someCommand = new SomeCommand();
             Subject.Send(someCommand);
-            Thread.Sleep(TimeSpan.FromSeconds(1));
+            Thread.Sleep(TimeSpan.FromSeconds(2));
 
             Subject.Stop();
         }

@@ -1,6 +1,6 @@
 ﻿namespace Nimbus
 {
-    public class SomeCommand
+    public class SomeCommand : IBusCommand
     {
     }
 }

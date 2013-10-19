@@ -31,7 +31,9 @@ namespace Nimbus.IntegrationTests
             _requestBroker = new FakeBroker();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var bus = new Bus(connectionString, _commandBroker, _requestBroker, _eventBroker, new[] {typeof (SomeCommand)}, new[] {typeof (SomeRequest)}, new[] {typeof (SomeEvent)});
+            var queueManager = new QueueManager(connectionString);
+
+            var bus = new Bus(connectionString, queueManager, _commandBroker, _requestBroker, _eventBroker, new[] {typeof (SomeCommand)}, new[] {typeof (SomeRequest)}, new[] {typeof (SomeEvent)});
             bus.Start();
             return bus;
         }
