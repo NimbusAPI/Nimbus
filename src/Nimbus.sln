@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.ConsoleRunner", "Nim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.IntegrationTests", "Nimbus.IntegrationTests\Nimbus.IntegrationTests.csproj", "{5BAAC418-8993-48FB-994B-2F06A4B5A26B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.ThroughputTests", "Nimbus.ThroughputTests\Nimbus.ThroughputTests.csproj", "{C4FA1C4D-5904-4DA2-8633-656A66FFF800}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{5BAAC418-8993-48FB-994B-2F06A4B5A26B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BAAC418-8993-48FB-994B-2F06A4B5A26B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BAAC418-8993-48FB-994B-2F06A4B5A26B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
