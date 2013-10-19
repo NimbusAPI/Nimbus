@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
 {
-    public class RequestMessagePump : IMessagePump
+    public class RequestMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly IRequestBroker _requestBroker;
         private readonly Type _messageType;
         private MessageReceiver _reciever;
-        private bool _haveBeenToldToStop;
 
         public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType)
         {
@@ -19,40 +17,37 @@ namespace Nimbus.MessagePumps
             _messageType = messageType;
         }
 
-        public void Start()
+        public override void Start()
         {
             _reciever = _messagingFactory.CreateMessageReceiver(_messageType.FullName);
-
-            Task.Run(() => DoWork());
+            base.Start();
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            _haveBeenToldToStop = true;
+            if (_reciever != null) _reciever.Close();
+            base.Stop();
         }
 
-        private void DoWork()
+        protected override void PumpMessage()
         {
-            while (! _haveBeenToldToStop)
+            var requestMessage = _reciever.Receive(TimeSpan.FromSeconds(1));
+            if (requestMessage == null) return;
+
+            var request = requestMessage.GetBody(_messageType);
+            var response = _requestBroker.InvokeGenericHandleMethod(request);
+
+            var replyQueueName = requestMessage.ReplyTo;
+            var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
+
+            var responseMessage = new BrokeredMessage(response)
             {
-                var requestMessage = _reciever.Receive(TimeSpan.FromSeconds(1));
-                if (requestMessage == null) continue;
+                CorrelationId = requestMessage.CorrelationId,
+            };
 
-                var request = requestMessage.GetBody(_messageType);
-                var response = _requestBroker.InvokeGenericHandleMethod(request);
+            replyQueueClient.Send(responseMessage);
 
-                var replyQueueName = requestMessage.ReplyTo;
-                var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
-
-                var responseMessage = new BrokeredMessage(response)
-                {
-                    CorrelationId = requestMessage.CorrelationId,
-                };
-
-                replyQueueClient.Send(responseMessage);
-
-                requestMessage.Complete();
-            }
+            requestMessage.Complete();
         }
     }
 }

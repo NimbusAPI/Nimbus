@@ -54,6 +54,7 @@
     <Compile Include="SomeEvent.cs" />
     <Compile Include="SomeRequest.cs" />
     <Compile Include="SomeResponse.cs" />
+    <Compile Include="ThenAttribute.cs" />
     <Compile Include="WhenPublishingAnEvent.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

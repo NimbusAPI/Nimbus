@@ -1,4 +1,4 @@
-﻿namespace Nimbus
+﻿namespace Nimbus.IntegrationTests
 {
     public class SomeResponse
     {

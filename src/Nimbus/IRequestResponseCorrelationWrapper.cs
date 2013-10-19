@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Threading;
 
 namespace Nimbus
 {
-    internal interface IRequestResponseWrapper
+    internal interface IRequestResponseCorrelationWrapper
     {
-        Semaphore Semaphore { get; }
         Type ResponseType { get; }
         void SetResponse(object response);
     }

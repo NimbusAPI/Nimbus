@@ -49,21 +49,30 @@
   <ItemGroup>
     <Compile Include="BrokeredMessageExtensions.cs" />
     <Compile Include="Bus.cs" />
+    <Compile Include="BusBuilder.cs" />
+    <Compile Include="BusCommandSender.cs" />
+    <Compile Include="BusEventSender.cs" />
     <Compile Include="BusRequest.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="ICommandBroker.cs" />
+    <Compile Include="ICommandSender.cs" />
     <Compile Include="IEventBroker.cs" />
+    <Compile Include="IEventSender.cs" />
     <Compile Include="IHandleCommand.cs" />
+    <Compile Include="IHandleRequest.cs" />
     <Compile Include="IMessagePump.cs" />
     <Compile Include="IRequestBroker.cs" />
-    <Compile Include="IRequestResponseCorrelator.cs" />
-    <Compile Include="IRequestResponseWrapper.cs" />
+    <Compile Include="IRequestResponseCorrelationWrapper.cs" />
+    <Compile Include="IRequestSender.cs" />
+    <Compile Include="MessagePumps\BusRequestSender.cs" />
     <Compile Include="MessagePumps\CommandMessagePump.cs" />
+    <Compile Include="MessagePumps\MessagePump.cs" />
+    <Compile Include="MessagePumps\RequestResponseCorrelator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestBrokerHandlerExtensions.cs" />
     <Compile Include="MessagePumps\RequestMessagePump.cs" />
-    <Compile Include="RequestResponseCorrelator.cs" />
-    <Compile Include="RequestResponseWrapper.cs" />
+    <Compile Include="MessagePumps\ResponseMessagePump.cs" />
+    <Compile Include="RequestResponseCorrelationWrapper.cs" />
     <Compile Include="MessagePumps\TopicMessagePump.cs" />
   </ItemGroup>
   <ItemGroup>

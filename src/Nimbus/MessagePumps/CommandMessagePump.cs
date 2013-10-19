@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
 {
-    public class CommandMessagePump : IMessagePump
+    public class CommandMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly ICommandBroker _commandBroker;
         private readonly Type _messageType;
         private MessageReceiver _reciever;
-        private bool _haveBeenToldToStop;
 
         public CommandMessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType)
         {
@@ -19,29 +17,26 @@ namespace Nimbus.MessagePumps
             _messageType = messageType;
         }
 
-        public void Start()
+        public override void Start()
         {
             _reciever = _messagingFactory.CreateMessageReceiver(_messageType.FullName);
-
-            Task.Run(() => DoWork());
+            base.Start();
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            _haveBeenToldToStop = true;
+            if (_reciever != null) _reciever.Close();
+            base.Stop();
         }
 
-        private void DoWork()
+        protected override void PumpMessage()
         {
-            while (! _haveBeenToldToStop)
-            {
-                var message = _reciever.Receive(TimeSpan.FromSeconds(1));
-                if (message == null) continue;
+            var message = _reciever.Receive(TimeSpan.FromSeconds(1));
+            if (message == null) return;
 
-                var body = message.GetBody(_messageType);
-                _commandBroker.Dispatch((dynamic) body);
-                message.Complete();
-            }
+            var body = message.GetBody(_messageType);
+            _commandBroker.Dispatch((dynamic) body);
+            message.Complete();
         }
     }
 }

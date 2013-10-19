@@ -33,7 +33,7 @@ namespace Nimbus.MessagePumps
 
         public void Stop()
         {
-            _client.Close();
+            if (_client != null) _client.Close();
         }
     }
 }
