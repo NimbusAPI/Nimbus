@@ -1,39 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests;
 
 namespace Nimbus.ThroughputTests
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
             var connstring = CommonResources.ConnectionString;
 
             var messageCount = 50;
 
-
             var broker = new FakeBroker(messageCount);
 
-            var bus = new Bus(connstring, new QueueManager(connstring), broker, broker, broker, new Type[] {},
-                              new Type[] {}, new Type[] {typeof (MyEvent)});
-
+            var bus = new BusBuilder(connstring, broker, broker, broker, new Type[] {}, new Type[] {}, new[] {typeof (MyEvent)}).Build();
 
             Console.WriteLine("Press any key to start");
-
             Console.ReadKey();
 
             bus.Start();
 
-
             var startTime = DateTime.Now;
 
-            for (int i = 0; i < messageCount; i++)
+            for (var i = 0; i < messageCount; i++)
             {
                 Task.Run(() => bus.Publish(new MyEvent()));
             }
@@ -44,12 +34,10 @@ namespace Nimbus.ThroughputTests
 
             var endTime = DateTime.Now;
 
-            var timeTaken = (TimeSpan) (endTime - startTime);
+            var timeTaken = (endTime - startTime);
 
-            Console.WriteLine("All done, took {0} milliseconds to process {1} messages", timeTaken.TotalMilliseconds, messageCount);
-
+            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", timeTaken.TotalMilliseconds, messageCount);
             Console.ReadLine();
-
         }
     }
 
@@ -67,7 +55,7 @@ namespace Nimbus.ThroughputTests
             return _seenMessages == _expectedMessages;
         }
 
-        private int _seenMessages = 0;
+        private int _seenMessages;
 
         public void Dispatch<TBusCommand>(TBusCommand busEvent)
         {
@@ -75,9 +63,8 @@ namespace Nimbus.ThroughputTests
 
         public void Publish<TBusEvent>(TBusEvent busEvent)
         {
-
             _seenMessages++;
-            if (_seenMessages % 10 == 0)
+            if (_seenMessages%10 == 0)
                 Console.WriteLine("Seen {0} messages", _seenMessages);
         }
 
@@ -89,8 +76,5 @@ namespace Nimbus.ThroughputTests
 
     public class MyEvent : IBusEvent
     {
-        
     }
-
-
 }
