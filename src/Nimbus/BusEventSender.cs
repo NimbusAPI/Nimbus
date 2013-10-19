@@ -1,22 +1,43 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus
 {
-    class BusEventSender : IEventSender
+    internal class BusEventSender : IEventSender
     {
-        private readonly MessagingFactory _messagingFactory;
+        private readonly ITopicClientFactory _topicClientFactory;
 
-        public BusEventSender(MessagingFactory messagingFactory)
+        public BusEventSender(ITopicClientFactory topicClientFactory)
         {
-            _messagingFactory = messagingFactory;
+            _topicClientFactory = topicClientFactory;
         }
 
         public async Task Publish<TBusEvent>(TBusEvent busEvent)
         {
-            var client = _messagingFactory.CreateTopicClient(typeof(TBusEvent).FullName);
+            var client = _topicClientFactory.GetTopicClient(typeof (TBusEvent));
             var brokeredMessage = new BrokeredMessage(busEvent);
-            await client.SendAsync(brokeredMessage);
+            await client.SendBatchAsync(new[] {brokeredMessage});
+        }
+    }
+
+    public interface ITopicClientFactory
+    {
+        TopicClient GetTopicClient(Type busEventType);
+    }
+
+    public class TopicClientFactory : ITopicClientFactory
+    {
+        private readonly MessagingFactory _messagingFactory;
+
+        public TopicClientFactory(MessagingFactory messagingFactory)
+        {
+            _messagingFactory = messagingFactory;
+        }
+
+        public TopicClient GetTopicClient(Type busEventType)
+        {
+            return _messagingFactory.CreateTopicClient(busEventType.FullName);
         }
     }
 }

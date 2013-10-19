@@ -6,21 +6,20 @@ namespace Nimbus.MessagePumps
 {
     public class BusRequestSender : IRequestSender
     {
-        private readonly MessagingFactory _messagingFactory;
+        private readonly IMessageSenderFactory _messageSenderFactory;
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
 
-        public BusRequestSender(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator)
+        public BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator)
         {
-            _messagingFactory = messagingFactory;
+            _messageSenderFactory = messageSenderFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
         }
 
         public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
         {
-            var queueName = busRequest.GetType().FullName;
-            var sender = _messagingFactory.CreateMessageSender(queueName);
+            var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
             var message = new BrokeredMessage(busRequest)

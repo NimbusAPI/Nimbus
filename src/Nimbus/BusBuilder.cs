@@ -44,9 +44,11 @@ namespace Nimbus
             var queueManager = new QueueManager(namespaceManager);
             var messagePumps = new List<IMessagePump>();
             var requestResponseCorrelator = new RequestResponseCorrelator();
-            var commandSender = new BusCommandSender(messagingFactory);
-            var requestSender = new BusRequestSender(messagingFactory, replyQueueName, requestResponseCorrelator);
-            var eventSender = new BusEventSender(messagingFactory);
+            var messageSenderFactory = new MessageSenderFactory(messagingFactory);
+            var topicClientFactory = new TopicClientFactory(messagingFactory);
+            var commandSender = new BusCommandSender(messageSenderFactory);
+            var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator);
+            var eventSender = new BusEventSender(topicClientFactory);
 
             CreateRequestResponseMessagePump(messagingFactory, queueManager, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(queueManager, messagingFactory, messagePumps);
