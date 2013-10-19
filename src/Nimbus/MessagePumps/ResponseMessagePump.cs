@@ -34,18 +34,19 @@ namespace Nimbus.MessagePumps
 
         protected override void PumpMessage()
         {
-            var message = _receiver.Receive(TimeSpan.FromSeconds(1));
-            if (message == null) return;
+            var messages = _receiver.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1));
+            foreach (var message in messages)
+            {
+                var correlationId = Guid.Parse(message.CorrelationId);
+                var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
+                if (responseCorrelationWrapper == null) return;
 
-            var correlationId = Guid.Parse(message.CorrelationId);
-            var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
-            if (responseCorrelationWrapper == null) return;
+                var responseType = responseCorrelationWrapper.ResponseType;
+                var response = message.GetBody(responseType);
 
-            var responseType = responseCorrelationWrapper.ResponseType;
-            var response = message.GetBody(responseType);
-
-            responseCorrelationWrapper.SetResponse(response);
-            message.Complete();
+                responseCorrelationWrapper.SetResponse(response);
+                message.Complete();
+            }
         }
     }
 }

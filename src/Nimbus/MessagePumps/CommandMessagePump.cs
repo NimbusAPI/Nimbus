@@ -31,12 +31,14 @@ namespace Nimbus.MessagePumps
 
         protected override void PumpMessage()
         {
-            var message = _reciever.Receive(TimeSpan.FromSeconds(1));
-            if (message == null) return;
+            var messages = _reciever.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1));
 
-            var body = message.GetBody(_messageType);
-            _commandBroker.Dispatch((dynamic) body);
-            message.Complete();
+            foreach (var message in messages)
+            {
+                var body = message.GetBody(_messageType);
+                _commandBroker.Dispatch((dynamic) body);
+                message.Complete();
+            }
         }
     }
 }

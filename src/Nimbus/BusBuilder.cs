@@ -78,7 +78,7 @@ namespace Nimbus
                 var subscriptionName = String.Format("{0}.{1}", Environment.MachineName, "MyApp");
                 queueManager.EnsureSubscriptionExists(eventType, subscriptionName);
 
-                var pump = new TopicMessagePump(messagingFactory, _eventBroker, eventType, subscriptionName);
+                var pump = new EventMessagePump(messagingFactory, _eventBroker, eventType, subscriptionName);
                 messagePumps.Add(pump);
             }
         }

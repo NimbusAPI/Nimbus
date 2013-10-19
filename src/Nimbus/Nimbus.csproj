@@ -81,7 +81,7 @@
     <Compile Include="MessagePumps\RequestMessagePump.cs" />
     <Compile Include="MessagePumps\ResponseMessagePump.cs" />
     <Compile Include="RequestResponseCorrelationWrapper.cs" />
-    <Compile Include="MessagePumps\TopicMessagePump.cs" />
+    <Compile Include="MessagePumps\EventMessagePump.cs" />
     <Compile Include="TopicClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>

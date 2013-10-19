@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
 {
-    public class TopicMessagePump : MessagePump
+    public class EventMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly IEventBroker _eventBroker;
@@ -11,7 +11,7 @@ namespace Nimbus.MessagePumps
         private readonly string _subscriptionName;
         private SubscriptionClient _client;
 
-        public TopicMessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type eventType, string subscriptionName)
+        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type eventType, string subscriptionName)
         {
             _messagingFactory = messagingFactory;
             _eventBroker = eventBroker;

@@ -31,23 +31,24 @@ namespace Nimbus.MessagePumps
 
         protected override void PumpMessage()
         {
-            var requestMessage = _reciever.Receive(TimeSpan.FromSeconds(1));
-            if (requestMessage == null) return;
-
-            var request = requestMessage.GetBody(_messageType);
-            var response = _requestBroker.InvokeGenericHandleMethod(request);
-
-            var replyQueueName = requestMessage.ReplyTo;
-            var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
-
-            var responseMessage = new BrokeredMessage(response)
+            var requestMessages = _reciever.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1));
+            foreach (var requestMessage in requestMessages)
             {
-                CorrelationId = requestMessage.CorrelationId,
-            };
+                var request = requestMessage.GetBody(_messageType);
+                var response = _requestBroker.InvokeGenericHandleMethod(request);
 
-            replyQueueClient.Send(responseMessage);
+                var replyQueueName = requestMessage.ReplyTo;
+                var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
 
-            requestMessage.Complete();
+                var responseMessage = new BrokeredMessage(response)
+                {
+                    CorrelationId = requestMessage.CorrelationId,
+                };
+
+                replyQueueClient.Send(responseMessage);
+
+                requestMessage.Complete();
+            }
         }
     }
 }
