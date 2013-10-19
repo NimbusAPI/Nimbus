@@ -1,6 +1,6 @@
 ﻿namespace Nimbus.IntegrationTests
 {
-    public class SomeCommand
+    public class SomeCommand : IBusCommand
     {
     }
 }
