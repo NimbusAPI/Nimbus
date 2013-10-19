@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Nimbus.MessagePumps
 {
     public class RequestResponseCorrelator
     {
-        private readonly IDictionary<Guid, IRequestResponseCorrelationWrapper> _requestWrappers = new Dictionary<Guid, IRequestResponseCorrelationWrapper>();
+        private readonly ConcurrentDictionary<Guid, IRequestResponseCorrelationWrapper> _requestWrappers = new ConcurrentDictionary<Guid, IRequestResponseCorrelationWrapper>();
 
         internal RequestResponseCorrelationWrapper<TResponse> RecordRequest<TResponse>(Guid correlationId)
         {
@@ -17,7 +17,7 @@ namespace Nimbus.MessagePumps
         internal IRequestResponseCorrelationWrapper TryGetWrapper(Guid correlationId)
         {
             IRequestResponseCorrelationWrapper wrapper;
-            return _requestWrappers.TryGetValue(correlationId, out wrapper) ? wrapper : null;
+            return _requestWrappers.TryRemove(correlationId, out wrapper) ? wrapper : null;
         }
     }
 }
