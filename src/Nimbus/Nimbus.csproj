@@ -53,6 +53,7 @@
     <Compile Include="BusCommandSender.cs" />
     <Compile Include="BusEventSender.cs" />
     <Compile Include="BusRequest.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IBusCommand.cs" />
     <Compile Include="IBusEvent.cs" />

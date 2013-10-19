@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests;
 
@@ -28,18 +29,20 @@ namespace Nimbus.ThroughputTests
             bus.Start();
 
             var sw = Stopwatch.StartNew();
-            for (var i = 0; i < messageCount; i++)
-            {
-                await bus.Publish(new MyEvent());
-                Console.Write(".");
-            }
+            var tasks = Enumerable.Range(0, messageCount)
+                                  .AsParallel()
+                                  .Select(i => bus.Publish(new MyEvent()))
+                                  .Do(t => Console.Write("."))
+                                  .ToArray();
+            Task.WaitAll(tasks);
+
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
             broker.WaitUntilDone();
             sw.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", sw.ElapsedMilliseconds, messageCount);
-            var messagesPerSecond = (double) messageCount/sw.Elapsed.TotalSeconds;
+            var messagesPerSecond = messageCount/sw.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", messagesPerSecond);
             Console.ReadKey();
         }
