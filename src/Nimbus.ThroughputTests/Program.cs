@@ -10,11 +10,6 @@ namespace Nimbus.ThroughputTests
     {
         private static void Main(string[] args)
         {
-            MainAsync().Wait();
-        }
-
-        private static async Task MainAsync()
-        {
             var connstring = CommonResources.ConnectionString;
 
             var messageCount = 50;
