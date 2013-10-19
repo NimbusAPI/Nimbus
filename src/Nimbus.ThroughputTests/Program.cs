@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests;
 
@@ -7,6 +8,11 @@ namespace Nimbus.ThroughputTests
     internal class Program
     {
         private static void Main(string[] args)
+        {
+            MainAsync().Wait();
+        }
+
+        private static async Task MainAsync()
         {
             var connstring = CommonResources.ConnectionString;
 
@@ -21,60 +27,21 @@ namespace Nimbus.ThroughputTests
 
             bus.Start();
 
-            var startTime = DateTime.Now;
-
+            var sw = Stopwatch.StartNew();
             for (var i = 0; i < messageCount; i++)
             {
-                Task.Run(() => bus.Publish(new MyEvent()));
+                await bus.Publish(new MyEvent());
+                Console.Write(".");
             }
+            Console.WriteLine();
+            Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
+            broker.WaitUntilDone();
+            sw.Stop();
 
-            while (! broker.AllDone())
-            {
-            }
-
-            var endTime = DateTime.Now;
-
-            var timeTaken = (endTime - startTime);
-
-            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", timeTaken.TotalMilliseconds, messageCount);
-            Console.ReadLine();
+            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", sw.ElapsedMilliseconds, messageCount);
+            var messagesPerSecond = (double) messageCount/sw.Elapsed.TotalSeconds;
+            Console.WriteLine("Average throughput: {0} messages/second", messagesPerSecond);
+            Console.ReadKey();
         }
-    }
-
-    public class FakeBroker : ICommandBroker, IEventBroker, IRequestBroker
-    {
-        private readonly int _expectedMessages;
-
-        public FakeBroker(int expectedMessages)
-        {
-            _expectedMessages = expectedMessages;
-        }
-
-        public bool AllDone()
-        {
-            return _seenMessages == _expectedMessages;
-        }
-
-        private int _seenMessages;
-
-        public void Dispatch<TBusCommand>(TBusCommand busEvent)
-        {
-        }
-
-        public void Publish<TBusEvent>(TBusEvent busEvent)
-        {
-            _seenMessages++;
-            if (_seenMessages%10 == 0)
-                Console.WriteLine("Seen {0} messages", _seenMessages);
-        }
-
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse>
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class MyEvent : IBusEvent
-    {
     }
 }

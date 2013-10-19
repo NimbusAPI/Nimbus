@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
 {
-    public class TopicMessagePump : IMessagePump
+    public class TopicMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly IEventBroker _eventBroker;
@@ -19,21 +19,27 @@ namespace Nimbus.MessagePumps
             _subscriptionName = subscriptionName;
         }
 
-        public void Start()
+        public override void Start()
         {
             _client = _messagingFactory.CreateSubscriptionClient(_eventType.FullName, _subscriptionName);
-            _client.OnMessage(HandleIt);
+            base.Start();
         }
 
-        private void HandleIt(BrokeredMessage brokeredMessage)
-        {
-            _eventBroker.Publish(brokeredMessage.GetBody(_eventType));
-            brokeredMessage.Complete();
-        }
-
-        public void Stop()
+        public override void Stop()
         {
             if (_client != null) _client.Close();
+            base.Stop();
+        }
+
+        protected override void PumpMessage()
+        {
+            var messages = _client.ReceiveBatch(int.MaxValue);
+
+            foreach (var message in messages)
+            {
+                _eventBroker.Publish(message.GetBody(_eventType));
+                message.Complete();
+            }
         }
     }
 }
