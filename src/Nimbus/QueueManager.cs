@@ -7,27 +7,24 @@ namespace Nimbus
     {
         private readonly NamespaceManager _namespaceManager;
 
-        public QueueManager(string connectionString)
+        public QueueManager(NamespaceManager namespaceManager)
         {
-            _namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
+            _namespaceManager = namespaceManager;
         }
 
         public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
         {
-            if (!_namespaceManager.SubscriptionExists(eventType.FullName, subscriptionName))
-            {
-                _namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
-            }
+            if (_namespaceManager.SubscriptionExists(eventType.FullName, subscriptionName)) return;
+
+            _namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
         }
 
         public void EnsureTopicExists(Type eventType)
         {
             var topicName = eventType.FullName;
+            if (_namespaceManager.TopicExists(topicName)) return;
 
-            if (!_namespaceManager.TopicExists(topicName))
-            {
-                _namespaceManager.CreateTopic(topicName);
-            }
+            _namespaceManager.CreateTopic(topicName);
         }
 
         public void EnsureQueueExists(Type commandType)
@@ -37,10 +34,9 @@ namespace Nimbus
 
         public void EnsureQueueExists(string queueName)
         {
-            if (!_namespaceManager.QueueExists(queueName))
-            {
-                _namespaceManager.CreateQueue(queueName);
-            }
+            if (_namespaceManager.QueueExists(queueName)) return;
+
+            _namespaceManager.CreateQueue(queueName);
         }
     }
 }

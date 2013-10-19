@@ -41,98 +41,65 @@ namespace Nimbus
 
             var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
             var messagingFactory = MessagingFactory.CreateFromConnectionString(_connectionString);
-
+            var queueManager = new QueueManager(namespaceManager);
             var messagePumps = new List<IMessagePump>();
-
             var requestResponseCorrelator = new RequestResponseCorrelator();
-
             var commandSender = new BusCommandSender(messagingFactory);
             var requestSender = new BusRequestSender(messagingFactory, replyQueueName, requestResponseCorrelator);
             var eventSender = new BusEventSender(messagingFactory);
 
-            CreateRequestResponseMessagePump(messagingFactory, namespaceManager, replyQueueName, requestResponseCorrelator, messagePumps);
-            CreateCommandMessagePumps(namespaceManager, messagingFactory, messagePumps);
-            CreateRequestMessagePumps(namespaceManager, messagingFactory, messagePumps);
-            CreateEventMessagePumps(namespaceManager, messagingFactory, messagePumps);
+            CreateRequestResponseMessagePump(messagingFactory, queueManager, replyQueueName, requestResponseCorrelator, messagePumps);
+            CreateCommandMessagePumps(queueManager, messagingFactory, messagePumps);
+            CreateRequestMessagePumps(queueManager, messagingFactory, messagePumps);
+            CreateEventMessagePumps(queueManager, messagingFactory, messagePumps);
 
             var bus = new Bus(commandSender, requestSender, eventSender, messagePumps);
             return bus;
         }
 
         private void CreateRequestResponseMessagePump(MessagingFactory messagingFactory,
-                                                      NamespaceManager namespaceManager,
+                                                      IQueueManager queueManager,
                                                       string replyQueueName,
                                                       RequestResponseCorrelator requestResponseCorrelator,
                                                       List<IMessagePump> messagePumps)
         {
-            EnsureQueueExists(replyQueueName, namespaceManager);
+            queueManager.EnsureQueueExists(replyQueueName);
             var requestResponseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator);
             messagePumps.Add(requestResponseMessagePump);
         }
 
-        private void CreateEventMessagePumps(NamespaceManager namespaceManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private void CreateEventMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
             foreach (var eventType in _eventTypes)
             {
-                EnsureTopicExists(eventType, namespaceManager);
+                queueManager.EnsureTopicExists(eventType);
                 var subscriptionName = String.Format("{0}.{1}", Environment.MachineName, "MyApp");
-                EnsureSubscriptionExists(eventType, subscriptionName, namespaceManager);
+                queueManager.EnsureSubscriptionExists(eventType, subscriptionName);
 
                 var pump = new TopicMessagePump(messagingFactory, _eventBroker, eventType, subscriptionName);
                 messagePumps.Add(pump);
             }
         }
 
-        private void CreateRequestMessagePumps(NamespaceManager namespaceManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private void CreateRequestMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
             foreach (var requestType in _requestTypes)
             {
-                EnsureQueueExists(requestType, namespaceManager);
+                queueManager.EnsureQueueExists(requestType);
 
                 var pump = new RequestMessagePump(messagingFactory, _requestBroker, requestType);
                 messagePumps.Add(pump);
             }
         }
 
-        private void CreateCommandMessagePumps(NamespaceManager namespaceManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private void CreateCommandMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
             foreach (var commandType in _commandTypes)
             {
-                EnsureQueueExists(commandType, namespaceManager);
+                queueManager.EnsureQueueExists(commandType);
 
                 var pump = new CommandMessagePump(messagingFactory, _commandBroker, commandType);
                 messagePumps.Add(pump);
-            }
-        }
-
-        private void EnsureSubscriptionExists(Type eventType, string subscriptionName, NamespaceManager namespaceManager)
-        {
-            if (!namespaceManager.SubscriptionExists(eventType.FullName, subscriptionName))
-            {
-                namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
-            }
-        }
-
-        private void EnsureTopicExists(Type eventType, NamespaceManager namespaceManager)
-        {
-            var topicName = eventType.FullName;
-
-            if (!namespaceManager.TopicExists(topicName))
-            {
-                namespaceManager.CreateTopic(topicName);
-            }
-        }
-
-        private void EnsureQueueExists(Type commandType, NamespaceManager namespaceManager)
-        {
-            EnsureQueueExists(commandType.FullName, namespaceManager);
-        }
-
-        private void EnsureQueueExists(string queueName, NamespaceManager namespaceManager)
-        {
-            if (!namespaceManager.QueueExists(queueName))
-            {
-                namespaceManager.CreateQueue(queueName);
             }
         }
     }
