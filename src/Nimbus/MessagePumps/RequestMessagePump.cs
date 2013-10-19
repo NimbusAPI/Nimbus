@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
@@ -29,26 +31,30 @@ namespace Nimbus.MessagePumps
             base.Stop();
         }
 
-        protected override void PumpMessage()
+        protected override BrokeredMessage[] ReceiveMessages()
         {
-            var requestMessages = _reciever.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1));
-            foreach (var requestMessage in requestMessages)
+            return _reciever.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1)).ToArray();
+        }
+
+        protected override void PumpMessage(BrokeredMessage message)
+        {
+            Task.Run(() => HandleRequest(message));
+        }
+
+        private void HandleRequest(BrokeredMessage requestMessage)
+        {
+            var request = requestMessage.GetBody(_messageType);
+            var response = _requestBroker.InvokeGenericHandleMethod(request);
+
+            var replyQueueName = requestMessage.ReplyTo;
+            var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
+
+            var responseMessage = new BrokeredMessage(response)
             {
-                var request = requestMessage.GetBody(_messageType);
-                var response = _requestBroker.InvokeGenericHandleMethod(request);
+                CorrelationId = requestMessage.CorrelationId,
+            };
 
-                var replyQueueName = requestMessage.ReplyTo;
-                var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
-
-                var responseMessage = new BrokeredMessage(response)
-                {
-                    CorrelationId = requestMessage.CorrelationId,
-                };
-
-                replyQueueClient.Send(responseMessage);
-
-                requestMessage.Complete();
-            }
+            replyQueueClient.Send(responseMessage);
         }
     }
 }

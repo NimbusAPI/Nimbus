@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Nimbus
 {
@@ -22,6 +23,11 @@ namespace Nimbus
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             items.ToArray();
             // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+        }
+
+        public static void WaitAll(this IEnumerable<Task> tasks)
+        {
+            Task.WaitAll(tasks.ToArray());
         }
     }
 }

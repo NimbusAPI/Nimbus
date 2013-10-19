@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.MessagePumps
@@ -32,21 +33,21 @@ namespace Nimbus.MessagePumps
             base.Stop();
         }
 
-        protected override void PumpMessage()
+        protected override BrokeredMessage[] ReceiveMessages()
         {
-            var messages = _receiver.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1));
-            foreach (var message in messages)
-            {
-                var correlationId = Guid.Parse(message.CorrelationId);
-                var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
-                if (responseCorrelationWrapper == null) return;
+            return _receiver.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1)).ToArray();
+        }
 
-                var responseType = responseCorrelationWrapper.ResponseType;
-                var response = message.GetBody(responseType);
+        protected override void PumpMessage(BrokeredMessage message)
+        {
+            var correlationId = Guid.Parse(message.CorrelationId);
+            var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
+            if (responseCorrelationWrapper == null) return;
 
-                responseCorrelationWrapper.SetResponse(response);
-                message.Complete();
-            }
+            var responseType = responseCorrelationWrapper.ResponseType;
+            var response = message.GetBody(responseType);
+
+            responseCorrelationWrapper.SetResponse(response);
         }
     }
 }
