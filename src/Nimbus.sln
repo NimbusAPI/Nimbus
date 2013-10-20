@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.IntegrationTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.ThroughputTests", "Nimbus.ThroughputTests\Nimbus.ThroughputTests.csproj", "{C4FA1C4D-5904-4DA2-8633-656A66FFF800}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "Nimbus.Autofac\Nimbus.Autofac.csproj", "{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4FA1C4D-5904-4DA2-8633-656A66FFF800}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

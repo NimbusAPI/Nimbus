@@ -63,6 +63,7 @@
     <Compile Include="IEventBroker.cs" />
     <Compile Include="IEventSender.cs" />
     <Compile Include="IHandleCommand.cs" />
+    <Compile Include="IHandleEvent.cs" />
     <Compile Include="IHandleRequest.cs" />
     <Compile Include="IMessagePump.cs" />
     <Compile Include="IMessageSenderFactory.cs" />
