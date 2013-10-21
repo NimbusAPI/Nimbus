@@ -9,13 +9,14 @@ namespace Nimbus
 {
     public class BusBuilder
     {
-        private readonly string _connectionString;
-        private readonly ICommandBroker _commandBroker;
-        private readonly IRequestBroker _requestBroker;
-        private readonly IEventBroker _eventBroker;
-        private readonly Type[] _commandTypes;
-        private readonly Type[] _requestTypes;
-        private readonly Type[] _eventTypes;
+        private string _instanceName;
+        private string _connectionString;
+        private ICommandBroker _commandBroker;
+        private IRequestBroker _requestBroker;
+        private IEventBroker _eventBroker;
+        private Type[] _commandTypes;
+        private Type[] _requestTypes;
+        private Type[] _eventTypes;
 
         public BusBuilder(string connectionString,
                           ICommandBroker commandBroker,
@@ -32,6 +33,11 @@ namespace Nimbus
             _commandTypes = commandTypes;
             _requestTypes = requestTypes;
             _eventTypes = eventTypes;
+        }
+
+        public BusBuilder()
+        {
+            
         }
 
         public Bus Build()
@@ -58,6 +64,19 @@ namespace Nimbus
             var bus = new Bus(commandSender, requestSender, eventSender, messagePumps);
             return bus;
         }
+
+
+        public string ConnectionString 
+        {
+            set { _connectionString = value; }
+        }
+
+        public string InstanceName
+        {
+            set { _instanceName = value; }
+        }
+
+
 
         private void CreateRequestResponseMessagePump(MessagingFactory messagingFactory,
                                                       IQueueManager queueManager,
@@ -103,6 +122,11 @@ namespace Nimbus
                 var pump = new CommandMessagePump(messagingFactory, _commandBroker, commandType);
                 messagePumps.Add(pump);
             }
+        }
+
+        public void RegisterHandlers(IRegisterHandlers registrar)
+        {
+            throw new NotImplementedException();
         }
     }
 }

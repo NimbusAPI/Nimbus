@@ -50,6 +50,7 @@
     <Compile Include="BrokeredMessageExtensions.cs" />
     <Compile Include="Bus.cs" />
     <Compile Include="BusBuilder.cs" />
+    <Compile Include="BusBuilderConfigurationExtensions.cs" />
     <Compile Include="BusCommandSender.cs" />
     <Compile Include="BusEventSender.cs" />
     <Compile Include="BusRequest.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="IMessagePump.cs" />
     <Compile Include="IMessageSenderFactory.cs" />
     <Compile Include="IQueueManager.cs" />
+    <Compile Include="IRegisterHandlers.cs" />
     <Compile Include="IRequestBroker.cs" />
     <Compile Include="IRequestResponseCorrelationWrapper.cs" />
     <Compile Include="IRequestSender.cs" />
