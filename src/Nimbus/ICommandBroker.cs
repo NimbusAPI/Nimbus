@@ -2,6 +2,6 @@
 {
     public interface ICommandBroker
     {
-        void Dispatch<TBusCommand>(TBusCommand busEvent);
+        void Dispatch<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand;
     }
 }

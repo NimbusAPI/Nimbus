@@ -1,10 +1,26 @@
-﻿namespace Nimbus.Autofac
+﻿using Autofac;
+
+namespace Nimbus.Autofac
 {
     public class AutofacCommandBroker : ICommandBroker
     {
-        public void Dispatch<TBusCommand>(TBusCommand busEvent)
+        private readonly ILifetimeScope _lifetimeScope;
+
+        public AutofacCommandBroker(ILifetimeScope lifetimeScope)
         {
-            throw new System.NotImplementedException();
+            _lifetimeScope = lifetimeScope;
+        }
+
+        public void Dispatch<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
+        {
+            using (var scope = _lifetimeScope.BeginLifetimeScope())
+            {
+                var type = typeof (IHandleCommand<TBusCommand>);
+
+                var handler = (IHandleCommand<IBusCommand>) scope.Resolve(type);
+                handler.Handle(busCommand);
+
+            }
         }
     }
 }

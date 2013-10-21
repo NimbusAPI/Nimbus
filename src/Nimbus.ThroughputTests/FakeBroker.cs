@@ -28,11 +28,11 @@ namespace Nimbus.ThroughputTests
 
         private int _seenMessages;
 
-        public void Dispatch<TBusCommand>(TBusCommand busEvent)
+        public void Dispatch<TBusCommand>(TBusCommand busEvent) where TBusCommand : IBusCommand
         {
         }
 
-        public void Publish<TBusEvent>(TBusEvent busEvent)
+        public void Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             _seenMessages++;
             _semaphore.Release();

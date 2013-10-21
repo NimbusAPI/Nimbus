@@ -1,10 +1,28 @@
-﻿namespace Nimbus.Autofac
+﻿using Autofac;
+
+namespace Nimbus.Autofac
 {
     public class AutofacRequestBroker : IRequestBroker
     {
+        private readonly ILifetimeScope _lifetimeScope;
+
+        public AutofacRequestBroker(ILifetimeScope lifetimeScope)
+        {
+            _lifetimeScope = lifetimeScope;
+        }
+
         public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse>
         {
-            throw new System.NotImplementedException();
+            using (var scope = _lifetimeScope.BeginLifetimeScope())
+            {
+                var type = typeof(IHandleRequest<TBusRequest,TBusResponse>);
+
+                var handler = (IHandleRequest<TBusRequest,TBusResponse>)scope.Resolve(type);
+                var response = handler.Handle(request);
+
+                return response;
+            }
+
         }
     }
 }
