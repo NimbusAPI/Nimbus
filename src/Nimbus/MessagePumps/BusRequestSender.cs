@@ -11,12 +11,14 @@ namespace Nimbus.MessagePumps
         private readonly IMessageSenderFactory _messageSenderFactory;
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
+        private readonly TimeSpan _responseTimeout;
 
-        public BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator)
+        public BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, TimeSpan responseTimeout)
         {
             _messageSenderFactory = messageSenderFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
+            _responseTimeout = responseTimeout;
         }
 
         public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
@@ -33,7 +35,7 @@ namespace Nimbus.MessagePumps
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId);
 
             await sender.SendAsync(message);
-            var response = responseCorrelationWrapper.WaitForResponse();
+            var response = responseCorrelationWrapper.WaitForResponse(_responseTimeout);
 
             return response;
         }

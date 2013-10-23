@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
@@ -41,6 +42,12 @@ namespace Nimbus.Configuration
             configuration.RequestHandlerTypes = typeProvider.RequestHandlerTypes.ToArray();
             configuration.EventHandlerTypes = typeProvider.EventHandlerTypes.ToArray();
 
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
+        {
+            configuration.DefaultTimeout = defaultTimeout;
             return configuration;
         }
     }

@@ -36,7 +36,7 @@ namespace Nimbus.Configuration
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory);
-            var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator);
+            var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, _configuration.DefaultTimeout);
             var eventSender = new BusEventSender(topicClientFactory);
 
             CreateRequestResponseMessagePump(messagingFactory, queueManager, replyQueueName, requestResponseCorrelator, messagePumps);

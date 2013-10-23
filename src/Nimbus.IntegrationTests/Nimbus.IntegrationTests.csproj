@@ -50,10 +50,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
-    <Compile Include="SomeCommand.cs" />
-    <Compile Include="SomeEvent.cs" />
-    <Compile Include="SomeRequest.cs" />
-    <Compile Include="SomeResponse.cs" />
+    <Compile Include="MessageContracts\SomeCommand.cs" />
+    <Compile Include="Handlers\SomeCommandHandler.cs" />
+    <Compile Include="MessageContracts\SomeEvent.cs" />
+    <Compile Include="Handlers\SomeEventHandler.cs" />
+    <Compile Include="MessageContracts\SomeRequest.cs" />
+    <Compile Include="Handlers\SomeRequestHandler.cs" />
+    <Compile Include="MessageContracts\SomeResponse.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="WhenPublishingAnEvent.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
@@ -70,6 +73,7 @@
       <Name>Nimbus</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

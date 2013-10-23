@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Reflection;
 using NSubstitute;
+using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.MessageContracts;
 using Nimbus.MessageContracts;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests
 {
+    [TestFixture]
     public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
     {
         public class FakeBroker : IRequestBroker
@@ -59,7 +62,7 @@ namespace Nimbus.IntegrationTests
             Subject.Stop();
         }
 
-        [Then]
+        [Test]
         public void WeShouldGetSomethingNiceBack()
         {
             _response.ShouldNotBe(null);

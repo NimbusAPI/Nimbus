@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.IntegrationTests.MessageContracts
 {
     public class SomeRequest : BusRequest<SomeRequest, SomeResponse>
     {

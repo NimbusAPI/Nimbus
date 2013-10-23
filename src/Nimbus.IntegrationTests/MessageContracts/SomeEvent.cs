@@ -1,9 +1,8 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.IntegrationTests.MessageContracts
 {
     public class SomeEvent : IBusEvent
     {
-         
     }
 }

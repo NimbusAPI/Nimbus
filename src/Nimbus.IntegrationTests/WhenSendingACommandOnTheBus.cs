@@ -2,11 +2,14 @@
 using System.Reflection;
 using System.Threading;
 using NSubstitute;
+using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests
 {
+    [TestFixture]
     public class WhenSendingACommandOnTheBus : SpecificationFor<Bus>
     {
         private ICommandBroker _commandBroker;
@@ -42,7 +45,7 @@ namespace Nimbus.IntegrationTests
             Subject.Stop();
         }
 
-        [Then]
+        [Test]
         public void SomethingShouldHappen()
         {
             _commandBroker.Received().Dispatch(Arg.Any<SomeCommand>());

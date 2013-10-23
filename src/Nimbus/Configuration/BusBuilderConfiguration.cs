@@ -15,10 +15,13 @@ namespace Nimbus.Configuration
         internal Type[] EventHandlerTypes { get; set; }
         internal Type[] CommandHandlerTypes { get; set; }
         internal Type[] RequestHandlerTypes { get; set; }
+        internal TimeSpan DefaultTimeout { get; set; }
 
         internal BusBuilderConfiguration(BusBuilder busBuilder)
         {
             _busBuilder = busBuilder;
+
+            DefaultTimeout = TimeSpan.FromSeconds(1);
         }
 
         public Bus Build()
