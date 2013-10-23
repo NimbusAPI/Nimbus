@@ -5,12 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
     public abstract class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
+        private readonly ILogger _logger;
+
+        protected MessagePump(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public virtual void Start()
         {
@@ -39,10 +46,10 @@ namespace Nimbus.MessagePumps
                             PumpMessage(message);
                             completedMessages.Add(message);
                         }
-                        catch (Exception)
+                        catch (Exception exc)
                         {
                             abandonedMessages.Add(message);
-                            //FIXME log
+                            _logger.Error(exc, "Message dispatch failed.");
                         }
                     }
 
@@ -56,7 +63,7 @@ namespace Nimbus.MessagePumps
                 }
                 catch (Exception exc)
                 {
-                    //FIXME log.
+                    _logger.Error(exc, "Message dispatch failed.");
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
@@ -14,7 +15,7 @@ namespace Nimbus.MessagePumps
         private readonly string _subscriptionName;
         private SubscriptionClient _client;
 
-        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type eventType, string subscriptionName)
+        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type eventType, string subscriptionName, ILogger logger) : base(logger)
         {
             _messagingFactory = messagingFactory;
             _eventBroker = eventBroker;
@@ -42,7 +43,7 @@ namespace Nimbus.MessagePumps
         protected override void PumpMessage(BrokeredMessage message)
         {
             var busEvent = message.GetBody(_eventType);
-            _eventBroker.Publish((dynamic)busEvent);
+            _eventBroker.Publish((dynamic) busEvent);
         }
     }
 }

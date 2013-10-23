@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
@@ -14,7 +15,7 @@ namespace Nimbus.MessagePumps
         private readonly Type _messageType;
         private MessageReceiver _reciever;
 
-        public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType)
+        public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType, ILogger logger) : base(logger)
         {
             _messagingFactory = messagingFactory;
             _requestBroker = requestBroker;

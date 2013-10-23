@@ -55,7 +55,7 @@ namespace Nimbus.Configuration
                                                       List<IMessagePump> messagePumps)
         {
             queueManager.EnsureQueueExists(replyQueueName);
-            var requestResponseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator);
+            var requestResponseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, _configuration.Logger);
             messagePumps.Add(requestResponseMessagePump);
         }
 
@@ -67,7 +67,7 @@ namespace Nimbus.Configuration
                 var subscriptionName = String.Format("{0}.{1}", Environment.MachineName, "MyApp");
                 queueManager.EnsureSubscriptionExists(eventType, subscriptionName);
 
-                var pump = new EventMessagePump(messagingFactory, _configuration.EventBroker, eventType, subscriptionName);
+                var pump = new EventMessagePump(messagingFactory, _configuration.EventBroker, eventType, subscriptionName, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }
@@ -78,7 +78,7 @@ namespace Nimbus.Configuration
             {
                 queueManager.EnsureQueueExists(requestType);
 
-                var pump = new RequestMessagePump(messagingFactory, _configuration.RequestBroker, requestType);
+                var pump = new RequestMessagePump(messagingFactory, _configuration.RequestBroker, requestType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }
@@ -89,7 +89,7 @@ namespace Nimbus.Configuration
             {
                 queueManager.EnsureQueueExists(commandType);
 
-                var pump = new CommandMessagePump(messagingFactory, _configuration.CommandBroker, commandType);
+                var pump = new CommandMessagePump(messagingFactory, _configuration.CommandBroker, commandType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }

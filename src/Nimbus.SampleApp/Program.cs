@@ -3,6 +3,7 @@ using System.Reflection;
 using Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Logger;
 
 namespace Nimbus.SampleApp
 {
@@ -24,6 +25,10 @@ namespace Nimbus.SampleApp
 
             builder.RegisterType<DeepThought>();
 
+            builder.RegisterType<ConsoleLogger>()
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
+
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             builder.RegisterNimbus(handlerTypesProvider);
@@ -35,6 +40,7 @@ namespace Nimbus.SampleApp
                                       .WithEventBroker(c.Resolve<IEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
                                       .WithRequestBroker(c.Resolve<IRequestBroker>())
+                                      .WithLogger(c.Resolve<ILogger>())
                                       .Build())
                    .As<IBus>()
                    .AutoActivate()

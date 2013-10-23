@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
@@ -13,7 +14,7 @@ namespace Nimbus.MessagePumps
 
         private MessageReceiver _receiver;
 
-        public ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator)
+        public ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, ILogger logger) : base(logger)
         {
             _messagingFactory = messagingFactory;
             _replyQueueName = replyQueueName;

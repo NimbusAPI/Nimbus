@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Logger;
 
 namespace Nimbus.Configuration
 {
@@ -48,6 +49,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
             configuration.DefaultTimeout = defaultTimeout;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithLogger(this BusBuilderConfiguration configuration, ILogger logger)
+        {
+            configuration.Logger = logger;
             return configuration;
         }
     }

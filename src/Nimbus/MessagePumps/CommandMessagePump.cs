@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
@@ -13,7 +14,7 @@ namespace Nimbus.MessagePumps
         private readonly Type _messageType;
         private MessageReceiver _reciever;
 
-        public CommandMessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType)
+        public CommandMessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType, ILogger logger) : base(logger)
         {
             _messagingFactory = messagingFactory;
             _commandBroker = commandBroker;
