@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Infrastructure;
+using Nimbus.MessageContracts;
 
 namespace Nimbus
 {

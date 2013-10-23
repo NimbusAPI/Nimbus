@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.MessagePumps
 {

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
 using NSubstitute;
+using Nimbus.Configuration;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.IntegrationTests
 {
@@ -16,14 +19,16 @@ namespace Nimbus.IntegrationTests
             _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var bus = new BusBuilder(CommonResources.ConnectionString,
-                                     _commandBroker,
-                                     _requestBroker,
-                                     _eventBroker,
-                                     new[] {typeof (SomeCommand)},
-                                     new[] {typeof (SomeRequest)},
-                                     new[] {typeof (SomeEvent)})
-                .Build();
+            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+
+            var bus = new BusBuilder().Configure()
+                                      .WithInstanceName(Environment.MachineName + ".MyTestSuite")
+                                      .WithConnectionString(CommonResources.ConnectionString)
+                                      .WithHandlerTypesFrom(typeProvider)
+                                      .WithCommandBroker(_commandBroker)
+                                      .WithRequestBroker(_requestBroker)
+                                      .WithEventBroker(_eventBroker)
+                                      .Build();
             bus.Start();
             return bus;
         }

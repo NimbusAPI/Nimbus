@@ -1,49 +1,65 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Autofac;
 using Nimbus.Autofac;
+using Nimbus.Configuration;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.SampleApp
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
+        {
+            using (var container = CreateContainer())
+            {
+                var deepThought = container.Resolve<DeepThought>();
+                deepThought.ComputeTheAnswer().Wait();
+                Console.ReadKey();
+            }
+        }
+
+        private static IContainer CreateContainer()
         {
             var builder = new ContainerBuilder();
 
-            var bus = new BusBuilder()
-                .WithConnectionString("foo")
-                .WithInstanceName("MyApp")
-                //.WithEventBroker(() => new FakeBroker())
-                .WithAutofac(builder)
-                .Build();
+            builder.RegisterType<DeepThought>();
 
-            builder.RegisterInstance(bus).As<IBus>().SingleInstance();
+            var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+
+            builder.RegisterTypes(handlerTypesProvider.AllHandlerTypes())
+                   .AsImplementedInterfaces()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<AutofacEventBroker>()
+                   .As<IEventBroker>()
+                   .SingleInstance();
+
+            builder.RegisterType<AutofacCommandBroker>()
+                   .As<ICommandBroker>()
+                   .SingleInstance();
+
+            builder.RegisterType<AutofacRequestBroker>()
+                   .As<IRequestBroker>()
+                   .SingleInstance();
+
+            builder.Register(c => new BusBuilder()
+                                      .Configure()
+                                      .WithConnectionString(@"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
+                                      .WithInstanceName(Environment.MachineName + ".MyApp")
+                                      .WithHandlerTypesFrom(handlerTypesProvider)
+                                      .WithEventBroker(c.Resolve<IEventBroker>())
+                                      .WithCommandBroker(c.Resolve<ICommandBroker>())
+                                      .WithRequestBroker(c.Resolve<IRequestBroker>())
+                                      .Build())
+                   .As<IBus>()
+                   .AutoActivate()
+                   .OnActivated(c => c.Instance.Start())
+                   .SingleInstance();
 
             var container = builder.Build();
-            bus.Start();
-
+            return container;
         }
     }
 
-    public static class AutofacBusBuilderExtensions
-    {
-        public static BusBuilder WithAutofac(this BusBuilder busBuilder, ContainerBuilder containerBuilder)
-        {
-
-            var registrar = new AutofacHandlerRegistration(containerBuilder);
-            busBuilder.RegisterHandlers(registrar);
-
-            containerBuilder.RegisterType<AutofacEventBroker>().As<IEventBroker>();
-            containerBuilder.RegisterType<AutofacCommandBroker>().As<ICommandBroker>();
-            containerBuilder.RegisterType<AutofacRequestBroker>().As<IRequestBroker>();
-
-            
-            return busBuilder;
-        }
-    }
 }

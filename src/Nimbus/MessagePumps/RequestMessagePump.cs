@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.MessagePumps
 {

@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="AutofacCommandBroker.cs" />
     <Compile Include="AutofacEventBroker.cs" />
-    <Compile Include="AutofacHandlerRegistration.cs" />
     <Compile Include="AutofacRequestBroker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

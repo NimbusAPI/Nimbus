@@ -47,51 +47,58 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BrokeredMessageExtensions.cs" />
+    <Compile Include="Configuration\AssemblyScanningTypeProvider.cs" />
+    <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
+    <Compile Include="Configuration\ITypeProvider.cs" />
+    <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="Bus.cs" />
-    <Compile Include="BusBuilder.cs" />
-    <Compile Include="BusBuilderConfigurationExtensions.cs" />
-    <Compile Include="BusCommandSender.cs" />
-    <Compile Include="BusEventSender.cs" />
-    <Compile Include="BusRequest.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Configuration\BusBuilder.cs" />
+    <Compile Include="Configuration\BusBuilderConfiguration.cs" />
+    <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Infrastructure\BusCommandSender.cs" />
+    <Compile Include="Infrastructure\BusEventSender.cs" />
+    <Compile Include="Infrastructure\DefaultEventBroker.cs" />
+    <Compile Include="MessageContracts\BusRequest.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="IBusCommand.cs" />
-    <Compile Include="IBusEvent.cs" />
-    <Compile Include="IBusRequest.cs" />
-    <Compile Include="ICommandBroker.cs" />
-    <Compile Include="ICommandSender.cs" />
-    <Compile Include="IEventBroker.cs" />
-    <Compile Include="IEventSender.cs" />
-    <Compile Include="IHandleCommand.cs" />
-    <Compile Include="IHandleEvent.cs" />
-    <Compile Include="IHandleRequest.cs" />
-    <Compile Include="IMessagePump.cs" />
-    <Compile Include="IMessageSenderFactory.cs" />
-    <Compile Include="IQueueManager.cs" />
+    <Compile Include="MessageContracts\IBusCommand.cs" />
+    <Compile Include="MessageContracts\IBusEvent.cs" />
+    <Compile Include="MessageContracts\IBusRequest.cs" />
+    <Compile Include="InfrastructureContracts\ICommandBroker.cs" />
+    <Compile Include="Infrastructure\ICommandSender.cs" />
+    <Compile Include="InfrastructureContracts\IEventBroker.cs" />
+    <Compile Include="Infrastructure\IEventSender.cs" />
+    <Compile Include="InfrastructureContracts\IHandleCommand.cs" />
+    <Compile Include="InfrastructureContracts\IHandleEvent.cs" />
+    <Compile Include="InfrastructureContracts\IHandleRequest.cs" />
+    <Compile Include="Infrastructure\IMessagePump.cs" />
+    <Compile Include="Infrastructure\IMessageSenderFactory.cs" />
+    <Compile Include="Infrastructure\IQueueManager.cs" />
     <Compile Include="IRegisterHandlers.cs" />
-    <Compile Include="IRequestBroker.cs" />
-    <Compile Include="IRequestResponseCorrelationWrapper.cs" />
-    <Compile Include="IRequestSender.cs" />
-    <Compile Include="ITopicClientFactory.cs" />
+    <Compile Include="InfrastructureContracts\IRequestBroker.cs" />
+    <Compile Include="Infrastructure\IRequestResponseCorrelationWrapper.cs" />
+    <Compile Include="Infrastructure\IRequestSender.cs" />
+    <Compile Include="Infrastructure\ITopicClientFactory.cs" />
     <Compile Include="MessagePumps\BusRequestSender.cs" />
     <Compile Include="MessagePumps\CommandMessagePump.cs" />
     <Compile Include="MessagePumps\MessagePump.cs" />
     <Compile Include="MessagePumps\RequestResponseCorrelator.cs" />
-    <Compile Include="MessageSenderFactory.cs" />
+    <Compile Include="Infrastructure\MessageSenderFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueueManager.cs" />
-    <Compile Include="RequestBrokerHandlerExtensions.cs" />
+    <Compile Include="Infrastructure\QueueManager.cs" />
+    <Compile Include="Extensions\RequestBrokerHandlerExtensions.cs" />
     <Compile Include="MessagePumps\RequestMessagePump.cs" />
     <Compile Include="MessagePumps\ResponseMessagePump.cs" />
-    <Compile Include="RequestResponseCorrelationWrapper.cs" />
+    <Compile Include="Infrastructure\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="MessagePumps\EventMessagePump.cs" />
-    <Compile Include="TopicClientFactory.cs" />
+    <Compile Include="Infrastructure\TopicClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Nimbus.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

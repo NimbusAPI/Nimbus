@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading;
+using Nimbus.InfrastructureContracts;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.ThroughputTests
 {

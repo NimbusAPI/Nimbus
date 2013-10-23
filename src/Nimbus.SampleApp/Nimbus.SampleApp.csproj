@@ -44,8 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeepThought.cs" />
+    <Compile Include="Handlers\WhatIsTheAnswerRequestHandler.cs" />
+    <Compile Include="OtherProgramWithoutAutofac.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MessageContracts\WhatIsTheAnswerRequest.cs" />
+    <Compile Include="MessageContracts\WhatIsTheAnswerResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

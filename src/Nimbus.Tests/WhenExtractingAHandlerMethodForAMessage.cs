@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using Nimbus.Extensions;
+using Nimbus.MessageContracts;
 using Shouldly;
 
 namespace Nimbus.Tests

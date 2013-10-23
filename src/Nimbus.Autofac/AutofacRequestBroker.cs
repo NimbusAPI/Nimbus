@@ -1,4 +1,6 @@
 ﻿using Autofac;
+using Nimbus.InfrastructureContracts;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.Autofac
 {

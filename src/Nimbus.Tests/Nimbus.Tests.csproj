@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationTests\WhenLookingForClosedTypesOfAnOpenGeneric.cs" />
+    <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="ThenAttribute.cs" />

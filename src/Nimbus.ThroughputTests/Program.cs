@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
+using Nimbus.Extensions;
 using Nimbus.IntegrationTests;
 
 namespace Nimbus.ThroughputTests
@@ -16,7 +18,17 @@ namespace Nimbus.ThroughputTests
 
             var broker = new FakeBroker(messageCount);
 
-            var bus = new BusBuilder(connstring, broker, broker, broker, new Type[] {}, new Type[] {}, new[] {typeof (MyEvent)}).Build();
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (Program).Assembly);
+
+            var bus = new BusBuilder()
+                .Configure()
+                .WithConnectionString(connstring)
+                .WithInstanceName(Environment.MachineName + ".ThroughputTests")
+                .WithEventBroker(broker)
+                .WithCommandBroker(broker)
+                .WithRequestBroker(broker)
+                .WithHandlerTypesFrom(typeProvider)
+                .Build();
 
             Console.WriteLine("Press any key to start");
             Console.ReadKey();
