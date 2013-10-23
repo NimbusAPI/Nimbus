@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.SampleApp
+namespace Nimbus.SampleApp.MessageContracts
 {
     public class WhatIsTheAnswerRequest : BusRequest<WhatIsTheAnswerRequest, WhatIsTheAnswerResponse>
     {

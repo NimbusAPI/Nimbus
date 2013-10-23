@@ -1,4 +1,4 @@
-﻿namespace Nimbus.SampleApp
+﻿namespace Nimbus.SampleApp.MessageContracts
 {
     public class WhatIsTheAnswerResponse
     {

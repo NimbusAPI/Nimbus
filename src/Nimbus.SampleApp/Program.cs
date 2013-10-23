@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using Autofac;
-using Nimbus.Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 
@@ -27,22 +26,7 @@ namespace Nimbus.SampleApp
 
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
-            builder.RegisterTypes(handlerTypesProvider.AllHandlerTypes())
-                   .AsImplementedInterfaces()
-                   .InstancePerLifetimeScope();
-
-            builder.RegisterType<AutofacEventBroker>()
-                   .As<IEventBroker>()
-                   .SingleInstance();
-
-            builder.RegisterType<AutofacCommandBroker>()
-                   .As<ICommandBroker>()
-                   .SingleInstance();
-
-            builder.RegisterType<AutofacRequestBroker>()
-                   .As<IRequestBroker>()
-                   .SingleInstance();
-
+            builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(c => new BusBuilder()
                                       .Configure()
                                       .WithConnectionString(@"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
@@ -61,5 +45,4 @@ namespace Nimbus.SampleApp
             return container;
         }
     }
-
 }

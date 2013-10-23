@@ -1,5 +1,6 @@
 ﻿using System;
 using Nimbus.InfrastructureContracts;
+using Nimbus.SampleApp.MessageContracts;
 
 namespace Nimbus.SampleApp.Handlers
 {
