@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="DeepThought.cs" />
     <Compile Include="Handlers\WhatIsTheAnswerRequestHandler.cs" />
-    <Compile Include="NimbusContainerBuilderExtensions.cs" />
     <Compile Include="OtherProgramWithoutAutofac.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

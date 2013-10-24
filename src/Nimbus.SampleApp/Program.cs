@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Autofac;
+using Nimbus.Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
