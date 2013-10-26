@@ -4,7 +4,7 @@ using Autofac;
 using Nimbus.Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Logger;
+using Serilog;
 
 namespace Nimbus.SampleApp
 {
@@ -26,9 +26,11 @@ namespace Nimbus.SampleApp
 
             builder.RegisterType<DeepThought>();
 
-            builder.RegisterType<ConsoleLogger>()
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
+            builder.Register(i => new LoggerConfiguration()
+                                    .MinimumLevel.Information()
+                                    .WriteTo.ColoredConsole().CreateLogger())
+                .As<ILogger>()
+                .SingleInstance();
 
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 

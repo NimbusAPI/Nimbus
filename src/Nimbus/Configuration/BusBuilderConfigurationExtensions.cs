@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Logger;
+using Serilog;
 
 namespace Nimbus.Configuration
 {

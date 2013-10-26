@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Logger;
+using Serilog;
 
 namespace Nimbus.MessagePumps
 {
