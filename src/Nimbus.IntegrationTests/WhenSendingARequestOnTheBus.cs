@@ -56,7 +56,7 @@ namespace Nimbus.IntegrationTests
         {
             var request = new SomeRequest();
             var task = Subject.Request(request);
-            _response = task.WaitForResult(TimeSpan.FromSeconds(2));
+            _response = task.WaitForResult(TimeSpan.FromSeconds(10));
 
             Subject.Stop();
         }
