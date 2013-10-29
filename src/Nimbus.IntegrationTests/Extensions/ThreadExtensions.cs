@@ -1,19 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.IntegrationTests.Extensions
 {
-    public static class TaskExtensions
-    {
-        public static T WaitForResult<T>(this Task<T> task)
-        {
-            task.Wait();
-            return task.Result;
-        }
-    }
-
     public static class ThreadExtensions
     {
         public static void SleepUntil(this TimeSpan timeout, Func<bool> exitCondition)

@@ -59,10 +59,11 @@
     <Compile Include="MessageContracts\SomeResponse.cs" />
     <Compile Include="PoisonMessages\TestCommand.cs" />
     <Compile Include="PoisonMessages\TestCommandHandler.cs" />
-    <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="TestTypesProvider.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="PoisonMessages\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
+    <Compile Include="Extensions\ThreadExtensions.cs" />
     <Compile Include="WhenPublishingAnEvent.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.Extensions;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.PoisonMessages
