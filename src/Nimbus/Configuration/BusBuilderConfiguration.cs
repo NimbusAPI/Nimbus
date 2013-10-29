@@ -1,5 +1,4 @@
 ﻿using System;
-using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
 
@@ -18,13 +17,15 @@ namespace Nimbus.Configuration
         internal Type[] CommandHandlerTypes { get; set; }
         internal Type[] RequestHandlerTypes { get; set; }
         internal TimeSpan DefaultTimeout { get; set; }
+        internal int MaxDeliveryAttempts { get; set; }
         internal ILogger Logger { get; set; }
 
         internal BusBuilderConfiguration(BusBuilder busBuilder)
         {
             _busBuilder = busBuilder;
 
-            DefaultTimeout = TimeSpan.FromSeconds(1);
+            DefaultTimeout = TimeSpan.FromSeconds(10);
+            MaxDeliveryAttempts = 5;
             Logger = new NullLogger();
         }
 
