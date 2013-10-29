@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CE2943F0-20FA-4685-AC11-9504C0517929}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.SampleApp</RootNamespace>
-    <AssemblyName>Nimbus.SampleApp</AssemblyName>
+    <RootNamespace>Nimbus.Serilog</RootNamespace>
+    <AssemblyName>Nimbus.Serilog</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,11 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\packages\Autofac.3.1.3\lib\net40\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog, Version=1.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serilog">
       <HintPath>..\packages\Serilog.1.0.2\lib\net45\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="Serilog.FullNetFx">
@@ -51,31 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeepThought.cs" />
-    <Compile Include="Handlers\WhatIsTheAnswerRequestHandler.cs" />
-    <Compile Include="OtherProgramWithoutAutofac.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
+    <Compile Include="SeriLogWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MessageContracts\WhatIsTheAnswerRequest.cs" />
-    <Compile Include="MessageContracts\WhatIsTheAnswerResponse.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Nimbus.Autofac\Nimbus.Autofac.csproj">
-      <Project>{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}</Project>
-      <Name>Nimbus.Autofac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.Serilog\Nimbus.Serilog.csproj">
-      <Project>{CE2943F0-20FA-4685-AC11-9504C0517929}</Project>
-      <Name>Nimbus.Serilog</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -36,12 +36,6 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.1.0\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog">
-      <HintPath>..\packages\Serilog.1.0.2\lib\net45\Serilog.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.FullNetFx">
-      <HintPath>..\packages\Serilog.1.0.2\lib\net45\Serilog.FullNetFx.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -65,6 +59,9 @@
     <Compile Include="Infrastructure\BusCommandSender.cs" />
     <Compile Include="Infrastructure\BusEventSender.cs" />
     <Compile Include="Infrastructure\DefaultEventBroker.cs" />
+    <Compile Include="Logger\NullLogger.cs" />
+    <Compile Include="Logger\ConsoleLogger.cs" />
+    <Compile Include="Logger\ILogger.cs" />
     <Compile Include="MessageContracts\BusRequest.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />

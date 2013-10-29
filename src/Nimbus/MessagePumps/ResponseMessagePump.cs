@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Serilog;
+using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {

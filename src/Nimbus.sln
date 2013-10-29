@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "Nimbus.Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.SampleApp", "Nimbus.SampleApp\Nimbus.SampleApp.csproj", "{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serilog", "Nimbus.Serilog\Nimbus.Serilog.csproj", "{CE2943F0-20FA-4685-AC11-9504C0517929}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE2943F0-20FA-4685-AC11-9504C0517929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2943F0-20FA-4685-AC11-9504C0517929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2943F0-20FA-4685-AC11-9504C0517929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2943F0-20FA-4685-AC11-9504C0517929}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

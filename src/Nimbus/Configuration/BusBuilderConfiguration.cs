@@ -1,7 +1,7 @@
 ﻿using System;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
-using Serilog;
+using Nimbus.Logger;
 
 namespace Nimbus.Configuration
 {
@@ -25,7 +25,7 @@ namespace Nimbus.Configuration
             _busBuilder = busBuilder;
 
             DefaultTimeout = TimeSpan.FromSeconds(1);
-            Logger = new LoggerConfiguration().CreateLogger();
+            Logger = new NullLogger();
         }
 
         public Bus Build()
