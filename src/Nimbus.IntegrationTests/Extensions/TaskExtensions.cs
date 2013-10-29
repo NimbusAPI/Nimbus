@@ -7,7 +7,8 @@ namespace Nimbus.IntegrationTests.Extensions
     {
         public static T WaitForResult<T>(this Task<T> task)
         {
-            return task.WaitForResult(TimeSpan.MaxValue);
+            task.Wait();
+            return task.Result;
         }
 
         public static T WaitForResult<T>(this Task<T> task, TimeSpan timeout)

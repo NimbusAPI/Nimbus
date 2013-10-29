@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
-using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests
@@ -40,7 +41,7 @@ namespace Nimbus.IntegrationTests
         {
             var someCommand = new SomeCommand();
             Subject.Send(someCommand).Wait();
-            Thread.Sleep(TimeSpan.FromSeconds(1));
+            TimeSpan.FromSeconds(1).SleepUntil(() => _commandBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }

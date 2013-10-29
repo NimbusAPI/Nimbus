@@ -19,7 +19,7 @@ namespace Nimbus.IntegrationTests.PoisonMessages
         private IEventBroker _eventBroker;
         private TestCommand _testCommand;
         private string _someContent;
-        private List<TestCommand> _deadLetterMessages;
+        private List<TestCommand> _deadLetterMessages = new List<TestCommand>();
 
         private const int _maxDeliveryAttempts = 7;
 
