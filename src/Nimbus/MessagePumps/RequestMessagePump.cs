@@ -41,7 +41,7 @@ namespace Nimbus.MessagePumps
 
         protected override void PumpMessage(BrokeredMessage message)
         {
-            Task.Run(() => HandleRequest(message));
+            HandleRequest(message);
         }
 
         private void HandleRequest(BrokeredMessage requestMessage)
