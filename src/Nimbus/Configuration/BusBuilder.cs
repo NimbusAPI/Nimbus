@@ -7,6 +7,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessagePumps;
+using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
 {
@@ -30,7 +31,7 @@ namespace Nimbus.Configuration
 
             var namespaceManager = NamespaceManager.CreateFromConnectionString(_configuration.ConnectionString);
             var messagingFactory = MessagingFactory.CreateFromConnectionString(_configuration.ConnectionString);
-            var queueManager = new QueueManager(namespaceManager);
+            var queueManager = new QueueManager(namespaceManager, messagingFactory, _configuration.MaxDeliveryAttempts);
             var messagePumps = new List<IMessagePump>();
             var requestResponseCorrelator = new RequestResponseCorrelator();
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
@@ -44,7 +45,10 @@ namespace Nimbus.Configuration
             CreateRequestMessagePumps(queueManager, messagingFactory, messagePumps);
             CreateEventMessagePumps(queueManager, messagingFactory, messagePumps);
 
-            var bus = new Bus(commandSender, requestSender, eventSender, messagePumps);
+            var commandDeadLetterQueue = new DeadLetterQueue(queueManager);
+            var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
+            var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
+            var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 

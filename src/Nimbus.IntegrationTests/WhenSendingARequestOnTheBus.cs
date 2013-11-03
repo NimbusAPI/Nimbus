@@ -4,6 +4,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.MessageContracts;
 using Nimbus.MessageContracts;
 using Shouldly;
@@ -55,9 +56,7 @@ namespace Nimbus.IntegrationTests
         {
             var request = new SomeRequest();
             var task = Subject.Request(request);
-            task.Wait(TimeSpan.FromSeconds(2));
-
-            _response = task.Result;
+            _response = task.WaitForResult(TimeSpan.FromSeconds(10));
 
             Subject.Stop();
         }

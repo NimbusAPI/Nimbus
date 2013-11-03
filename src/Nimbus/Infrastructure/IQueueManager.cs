@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
@@ -8,5 +9,7 @@ namespace Nimbus.Infrastructure
         void EnsureTopicExists(Type eventType);
         void EnsureQueueExists(Type commandType);
         void EnsureQueueExists(string queueName);
+
+        QueueClient CreateDeadLetterQueueClient<T>();
     }
 }

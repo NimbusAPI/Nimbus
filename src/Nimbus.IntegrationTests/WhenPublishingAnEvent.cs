@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Reflection;
-using System.Threading;
+using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests
@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests
             _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var typeProvider = new AssemblyScanningTypeProvider(typeof(SomeEvent).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (SomeEvent).Assembly);
 
             var bus = new BusBuilder().Configure()
                                       .WithInstanceName(Environment.MachineName + ".MyTestSuite")
@@ -41,7 +41,7 @@ namespace Nimbus.IntegrationTests
             var myEvent = new SomeEvent();
             Subject.Publish(myEvent).Wait();
 
-            Thread.Sleep(2000);
+            TimeSpan.FromSeconds(2).SleepUntil(() => _eventBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }
