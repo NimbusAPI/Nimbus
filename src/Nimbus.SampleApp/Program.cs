@@ -40,6 +40,7 @@ namespace Nimbus.SampleApp
                                       .WithHandlerTypesFrom(handlerTypesProvider)
                                       .WithEventBroker(c.Resolve<IEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
+                                      .WithTimeoutBroker(c.Resolve<ITimeoutBroker>())
                                       .WithRequestBroker(c.Resolve<IRequestBroker>())
                                       .WithLogger(c.Resolve<ILogger>())
                                       .Build())
