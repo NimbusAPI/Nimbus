@@ -37,18 +37,21 @@ namespace Nimbus.Configuration
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory);
+            var timeoutSender = new BusTimeoutSender(messageSenderFactory);
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, _configuration.DefaultTimeout);
             var eventSender = new BusEventSender(topicClientFactory);
 
             CreateRequestResponseMessagePump(messagingFactory, queueManager, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(queueManager, messagingFactory, messagePumps);
+            CreateTimeoutMessagePumps(queueManager, messagingFactory, messagePumps);
             CreateRequestMessagePumps(queueManager, messagingFactory, messagePumps);
             CreateEventMessagePumps(queueManager, messagingFactory, messagePumps);
 
             var commandDeadLetterQueue = new DeadLetterQueue(queueManager);
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
-            var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
+
+            var bus = new Bus(commandSender, timeoutSender, requestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 
@@ -94,6 +97,17 @@ namespace Nimbus.Configuration
                 queueManager.EnsureQueueExists(commandType);
 
                 var pump = new CommandMessagePump(messagingFactory, _configuration.CommandBroker, commandType, _configuration.Logger);
+                messagePumps.Add(pump);
+            }
+        }
+        
+        private void CreateTimeoutMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        {
+            foreach (var timeoutType in ExtractDistinctGenericTypeArguments(_configuration.TimeoutHandlerTypes, typeof (IHandleTimeout<>)))
+            {
+                queueManager.EnsureQueueExists(timeoutType);
+
+                var pump = new TimeoutMessagePump(messagingFactory, _configuration.TimeoutBroker, timeoutType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }
