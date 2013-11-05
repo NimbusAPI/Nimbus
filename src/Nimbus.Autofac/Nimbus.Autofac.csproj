@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutofacTimeoutBroker.cs" />
     <Compile Include="AutofacCommandBroker.cs" />
     <Compile Include="AutofacEventBroker.cs" />
     <Compile Include="AutofacRequestBroker.cs" />
