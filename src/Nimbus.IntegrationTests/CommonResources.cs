@@ -1,10 +1,35 @@
-﻿namespace Nimbus.IntegrationTests
+﻿using System;
+using System.IO;
+
+namespace Nimbus.IntegrationTests
 {
     public class CommonResources
     {
-        //public static string ConnectionString = @"Endpoint=sb://bazaario.servicebus.windows.net;SharedAccessKeyName=ApplicationKey;SharedAccessKey=9+cooCqwistQKhrOQDUwCADCTLYFQc6q7qsWyZ8gxJo=;TransportType=Amqp";
-        //public static string ConnectionString = @"Endpoint=sb://koala/ServiceBusDefaultNamespace;StsEndpoint=https://koala:9355/ServiceBusDefaultNamespace;RuntimePort=9354;ManagementPort=9355;TransportType=Amqp";
-        public static string ConnectionString = @"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=";
+        private static readonly Lazy<string> _connectionString = new Lazy<string>(FetchConnectionString);
 
+        public static string ConnectionString
+        {
+            get { return _connectionString.Value; }
+        }
+
+        private static string FetchConnectionString()
+        {
+            return LocalFilesystemConnectionString() ?? FallbackConnectionString();
+        }
+
+        private static string LocalFilesystemConnectionString()
+        {
+            // this file can (and usually does) have passwords in it so it's important to have it NOT under source control anywhere
+            const string filename = @"C:\Temp\NimbusConnectionString.txt";
+
+            return !File.Exists(filename)
+                       ? null
+                       : File.ReadAllText(filename).Trim();
+        }
+
+        private static string FallbackConnectionString()
+        {
+            return @"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=";
+        }
     }
 }

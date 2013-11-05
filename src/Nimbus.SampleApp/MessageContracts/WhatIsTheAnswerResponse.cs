@@ -1,6 +1,8 @@
-﻿namespace Nimbus.SampleApp.MessageContracts
+﻿using Nimbus.MessageContracts;
+
+namespace Nimbus.SampleApp.MessageContracts
 {
-    public class WhatIsTheAnswerResponse
+    public class WhatIsTheAnswerResponse : IBusResponse
     {
         public string TheAnswer { get; set; }
     }

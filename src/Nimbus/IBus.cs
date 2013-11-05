@@ -6,9 +6,13 @@ namespace Nimbus
 {
     public interface IBus
     {
-        Task Send<TBusCommand>(TBusCommand busCommand);
-        Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest);
-        Task Publish<TBusEvent>(TBusEvent busEvent);
+        Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand;
+
+        Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+            where TRequest : IBusRequest
+            where TResponse : IBusResponse;
+
+        Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent;
 
         IDeadLetterQueues DeadLetterQueues { get; }
     }

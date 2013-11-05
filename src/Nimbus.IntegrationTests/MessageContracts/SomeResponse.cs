@@ -1,6 +1,8 @@
-﻿namespace Nimbus.IntegrationTests.MessageContracts
+﻿using Nimbus.MessageContracts;
+
+namespace Nimbus.IntegrationTests.MessageContracts
 {
-    public class SomeResponse
+    public class SomeResponse: IBusResponse
     {
     }
 }
