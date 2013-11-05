@@ -31,10 +31,12 @@ namespace Nimbus.IntegrationTests
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
         private IEventBroker _eventBroker;
+        private ITimeoutBroker _timeoutBroker;
 
         public override Bus Given()
         {
             _commandBroker = Substitute.For<ICommandBroker>();
+            _timeoutBroker = Substitute.For<ITimeoutBroker>();
             _requestBroker = new FakeBroker();
             _eventBroker = Substitute.For<IEventBroker>();
 
@@ -45,6 +47,7 @@ namespace Nimbus.IntegrationTests
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithHandlerTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
+                                      .WithTimeoutBroker(_timeoutBroker)
                                       .WithRequestBroker(_requestBroker)
                                       .WithEventBroker(_eventBroker)
                                       .Build();
