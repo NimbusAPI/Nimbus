@@ -5,6 +5,6 @@ namespace Nimbus.Infrastructure
 {
     public interface IRequestSender
     {
-        Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest);
+        Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse;
     }
 }

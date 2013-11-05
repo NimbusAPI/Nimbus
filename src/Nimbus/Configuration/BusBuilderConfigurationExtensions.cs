@@ -43,12 +43,16 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithHandlerTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
+        public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
             configuration.CommandHandlerTypes = typeProvider.CommandHandlerTypes.ToArray();
             configuration.TimeoutHandlerTypes = typeProvider.TimeoutHandlerTypes.ToArray();
+            configuration.CommandTypes = typeProvider.CommandTypes.ToArray();
             configuration.RequestHandlerTypes = typeProvider.RequestHandlerTypes.ToArray();
+            configuration.RequestTypes = typeProvider.RequestTypes.ToArray();
+
             configuration.EventHandlerTypes = typeProvider.EventHandlerTypes.ToArray();
+            configuration.EventTypes = typeProvider.EventTypes.ToArray();
 
             return configuration;
         }

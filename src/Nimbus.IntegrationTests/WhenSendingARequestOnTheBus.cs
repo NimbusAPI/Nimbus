@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests
         {
             public bool DidGetCalled;
 
-            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
             {
                 DidGetCalled = true;
 
@@ -32,6 +32,7 @@ namespace Nimbus.IntegrationTests
         private IRequestBroker _requestBroker;
         private IEventBroker _eventBroker;
         private ITimeoutBroker _timeoutBroker;
+        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
 
         public override Bus Given()
         {
@@ -45,11 +46,12 @@ namespace Nimbus.IntegrationTests
             var bus = new BusBuilder().Configure()
                                       .WithInstanceName(Environment.MachineName + ".MyTestSuite")
                                       .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithHandlerTypesFrom(typeProvider)
+                                      .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithTimeoutBroker(_timeoutBroker)
                                       .WithRequestBroker(_requestBroker)
                                       .WithEventBroker(_eventBroker)
+                                      .WithDefaultTimeout(_defaultTimeout)
                                       .Build();
             bus.Start();
             return bus;
@@ -59,7 +61,7 @@ namespace Nimbus.IntegrationTests
         {
             var request = new SomeRequest();
             var task = Subject.Request(request);
-            _response = task.WaitForResult(TimeSpan.FromSeconds(10));
+            _response = task.WaitForResult(_defaultTimeout);
 
             Subject.Stop();
         }

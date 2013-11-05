@@ -7,7 +7,12 @@ namespace Nimbus.Configuration
     {
         IEnumerable<Type> CommandHandlerTypes { get; }
         IEnumerable<Type> TimeoutHandlerTypes { get; }
+        IEnumerable<Type> CommandTypes { get; }
+
         IEnumerable<Type> EventHandlerTypes { get; }
+        IEnumerable<Type> EventTypes { get; }
+
         IEnumerable<Type> RequestHandlerTypes { get; }
+        IEnumerable<Type> RequestTypes { get; }
     }
 }

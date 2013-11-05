@@ -29,7 +29,7 @@ namespace Nimbus.IntegrationTests
             var bus = new BusBuilder().Configure()
                                       .WithInstanceName(Environment.MachineName + ".MyTestSuite")
                                       .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithHandlerTypesFrom(typeProvider)
+                                      .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithTimeoutBroker(_timeoutBroker)
                                       .WithRequestBroker(_requestBroker)
@@ -44,7 +44,7 @@ namespace Nimbus.IntegrationTests
             var myEvent = new SomeEvent();
             Subject.Publish(myEvent).Wait();
 
-            TimeSpan.FromSeconds(2).SleepUntil(() => _eventBroker.ReceivedCalls().Any());
+            TimeSpan.FromSeconds(5).SleepUntil(() => _eventBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }

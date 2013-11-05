@@ -28,7 +28,7 @@ namespace Nimbus.IntegrationTests
             var bus = new BusBuilder().Configure()
                                       .WithInstanceName(Environment.MachineName + ".MyTestSuite")
                                       .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithHandlerTypesFrom(typeProvider)
+                                      .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
                                       .WithEventBroker(_eventBroker)

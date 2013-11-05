@@ -55,6 +55,9 @@
     <Compile Include="Infrastructure\ITimeoutSender.cs" />
     <Compile Include="MessageContracts\IBusTimeout.cs" />
     <Compile Include="MessagePumps\TimeoutMessagePump.cs" />
+    <Compile Include="Exceptions\BusException.cs" />
+    <Compile Include="MessageContracts\IBusResponse.cs" />
+    <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />

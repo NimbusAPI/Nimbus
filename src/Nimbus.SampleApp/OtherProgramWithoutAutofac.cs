@@ -15,7 +15,7 @@ namespace Nimbus.SampleApp
             var bus = new BusBuilder().Configure()
                                       .WithConnectionString("foo")
                                       .WithInstanceName("MyApp")
-                                      .WithHandlerTypesFrom(typeProvider)
+                                      .WithTypesFrom(typeProvider)
                                       .WithEventBroker(eventBroker)
                                       .Build();
         }

@@ -37,7 +37,7 @@ namespace Nimbus.SampleApp
                                       .Configure()
                                       .WithConnectionString(@"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
                                       .WithInstanceName(Environment.MachineName + ".MyApp")
-                                      .WithHandlerTypesFrom(handlerTypesProvider)
+                                      .WithTypesFrom(handlerTypesProvider)
                                       .WithEventBroker(c.Resolve<IEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
                                       .WithTimeoutBroker(c.Resolve<ITimeoutBroker>())
