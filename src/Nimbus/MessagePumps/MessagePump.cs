@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
@@ -37,7 +38,7 @@ namespace Nimbus.MessagePumps
                 {
                     var messages = ReceiveMessages();
                     var completedMessages = new List<BrokeredMessage>();
-                    var abandonedMessages = new List<BrokeredMessage>();
+                    var abandonedMessages = new List<AbandonedMessage>();
 
                     foreach (var message in messages)
                     {
@@ -48,7 +49,7 @@ namespace Nimbus.MessagePumps
                         }
                         catch (Exception exc)
                         {
-                            abandonedMessages.Add(message);
+                            abandonedMessages.Add(new AbandonedMessage(message, exc));
                             _logger.Error(exc, "Message dispatch failed.");
                         }
                     }
@@ -58,7 +59,7 @@ namespace Nimbus.MessagePumps
                         .WaitAll();
 
                     abandonedMessages
-                        .Select(m => m.AbandonAsync())
+                        .Select(am => am.Message.AbandonAsync(ExceptionDetailsAsProperties(am.Exception)))
                         .WaitAll();
                 }
                 catch (Exception exc)
@@ -68,7 +69,30 @@ namespace Nimbus.MessagePumps
             }
         }
 
+        private static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
+        {
+            if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException);
+            return new Dictionary<string, object>
+            {
+                {"ExceptionType", exception.GetType().FullName},
+                {"ExceptionMessage", exception.Message},
+                {"ExceptionStackTrace", exception.StackTrace},
+            };
+        }
+
         protected abstract BrokeredMessage[] ReceiveMessages();
         protected abstract void PumpMessage(BrokeredMessage message);
+
+        protected class AbandonedMessage
+        {
+            public AbandonedMessage(BrokeredMessage message, Exception exception)
+            {
+                Message = message;
+                Exception = exception;
+            }
+
+            public BrokeredMessage Message { get; set; }
+            public Exception Exception { get; set; }
+        }
     }
 }
