@@ -5,7 +5,6 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 using Nimbus.MessagePumps;
 using Nimbus.PoisonMessages;
 
@@ -31,6 +30,7 @@ namespace Nimbus.Configuration
 
             var namespaceManager = NamespaceManager.CreateFromConnectionString(_configuration.ConnectionString);
             var messagingFactory = MessagingFactory.CreateFromConnectionString(_configuration.ConnectionString);
+
             var queueManager = new QueueManager(namespaceManager, messagingFactory, _configuration.MaxDeliveryAttempts);
             var messagePumps = new List<IMessagePump>();
             var requestResponseCorrelator = new RequestResponseCorrelator();
@@ -40,34 +40,66 @@ namespace Nimbus.Configuration
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, _configuration.DefaultTimeout);
             var eventSender = new BusEventSender(topicClientFactory);
 
-            CreateRequestResponseMessagePump(messagingFactory, queueManager, replyQueueName, requestResponseCorrelator, messagePumps);
-            CreateCommandMessagePumps(queueManager, messagingFactory, messagePumps);
-            CreateRequestMessagePumps(queueManager, messagingFactory, messagePumps);
+            CreateMyInputQueue(queueManager, replyQueueName);
+            CreateCommandQueues(queueManager);
+            CreateRequestQueues(queueManager);
+            CreateEventTopics(queueManager);
+
+            CreateRequestResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
+            CreateCommandMessagePumps(messagingFactory, messagePumps);
+            CreateRequestMessagePumps(messagingFactory, messagePumps);
             CreateEventMessagePumps(queueManager, messagingFactory, messagePumps);
 
             var commandDeadLetterQueue = new DeadLetterQueue(queueManager);
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
+
             var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 
-        private void CreateRequestResponseMessagePump(MessagingFactory messagingFactory,
-                                                      IQueueManager queueManager,
-                                                      string replyQueueName,
-                                                      RequestResponseCorrelator requestResponseCorrelator,
-                                                      List<IMessagePump> messagePumps)
+        private void CreateMyInputQueue(QueueManager queueManager, string replyQueueName)
         {
             queueManager.EnsureQueueExists(replyQueueName);
+        }
+
+        private void CreateCommandQueues(QueueManager queueManager)
+        {
+            _configuration.CommandTypes
+                          .AsParallel()
+                          .Do(queueManager.EnsureQueueExists)
+                          .Done();
+        }
+
+        private void CreateRequestQueues(QueueManager queueManager)
+        {
+            _configuration.RequestTypes
+                          .AsParallel()
+                          .Do(queueManager.EnsureQueueExists)
+                          .Done();
+        }
+
+        private void CreateEventTopics(QueueManager queueManager)
+        {
+            _configuration.EventTypes
+                          .AsParallel()
+                          .Do(queueManager.EnsureTopicExists)
+                          .Done();
+        }
+
+        private void CreateRequestResponseMessagePump(MessagingFactory messagingFactory,
+                                                      string replyQueueName,
+                                                      RequestResponseCorrelator requestResponseCorrelator,
+                                                      ICollection<IMessagePump> messagePumps)
+        {
             var requestResponseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, _configuration.Logger);
             messagePumps.Add(requestResponseMessagePump);
         }
 
         private void CreateEventMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
-            foreach (var eventType in ExtractDistinctGenericTypeArguments(_configuration.EventHandlerTypes, typeof (IHandleEvent<>)))
+            foreach (var eventType in _configuration.EventTypes)
             {
-                queueManager.EnsureTopicExists(eventType);
                 var subscriptionName = String.Format("{0}.{1}", Environment.MachineName, "MyApp");
                 queueManager.EnsureSubscriptionExists(eventType, subscriptionName);
 
@@ -76,35 +108,22 @@ namespace Nimbus.Configuration
             }
         }
 
-        private void CreateRequestMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private void CreateRequestMessagePumps(MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
-            foreach (var requestType in ExtractDistinctGenericTypeArguments(_configuration.RequestHandlerTypes, typeof (IHandleRequest<,>)))
+            foreach (var requestType in _configuration.RequestTypes)
             {
-                queueManager.EnsureQueueExists(requestType);
-
                 var pump = new RequestMessagePump(messagingFactory, _configuration.RequestBroker, requestType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }
 
-        private void CreateCommandMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private void CreateCommandMessagePumps(MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
         {
-            foreach (var commandType in ExtractDistinctGenericTypeArguments(_configuration.CommandHandlerTypes, typeof (IHandleCommand<>)))
+            foreach (var commandType in _configuration.CommandTypes)
             {
-                queueManager.EnsureQueueExists(commandType);
-
                 var pump = new CommandMessagePump(messagingFactory, _configuration.CommandBroker, commandType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
-        }
-
-        private static IEnumerable<Type> ExtractDistinctGenericTypeArguments(IEnumerable<Type> handlerTypes, Type openGenericType)
-        {
-            return handlerTypes.SelectMany(t => t.GetInterfaces())
-                               .Where(interfaceType => interfaceType.IsClosedTypeOf(openGenericType))
-                               .Select(genericInterfaceType => genericInterfaceType.GetGenericArguments()[0])
-                               .Distinct()
-                               .ToArray();
         }
     }
 }

@@ -24,18 +24,18 @@ namespace Nimbus
             _messagePumps = messagePumps.ToArray();
         }
 
-        public async Task Send<TBusCommand>(TBusCommand busCommand)
+        public async Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
             await _commandSender.Send(busCommand);
         }
 
-        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest);
             return response;
         }
 
-        public async Task Publish<TBusEvent>(TBusEvent busEvent)
+        public async Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             await _eventSender.Publish(busEvent);
         }

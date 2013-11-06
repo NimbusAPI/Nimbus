@@ -49,6 +49,9 @@
   <ItemGroup>
     <Compile Include="Configuration\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
+    <Compile Include="Exceptions\BusException.cs" />
+    <Compile Include="MessageContracts\IBusResponse.cs" />
+    <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />

@@ -39,7 +39,7 @@ namespace Nimbus.SampleApp
                                       .Configure()
                                       .WithConnectionString(@"Endpoint=sb://cacofonix/NimbusTest;StsEndpoint=https://cacofonix:9355/NimbusTest;RuntimePort=9354;ManagementPort=9355;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=YwlCk9bO9PS8VUZJizoq1ILa9v7I0IM9cnvLEaH15Kc=")
                                       .WithInstanceName(Environment.MachineName + ".MyApp")
-                                      .WithHandlerTypesFrom(handlerTypesProvider)
+                                      .WithTypesFrom(handlerTypesProvider)
                                       .WithEventBroker(c.Resolve<IEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
                                       .WithRequestBroker(c.Resolve<IRequestBroker>())

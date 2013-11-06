@@ -50,6 +50,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="FakeBroker.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarCommand.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarEvent.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BazEvent.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BazCommand.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\FooCommand.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\FooEvent.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\QuxCommand.cs" />
+    <Compile Include="ThroughputTests\ThroughputTestMessageContracts\QuxEvent.cs" />
     <Compile Include="MessageContracts\SomeCommand.cs" />
     <Compile Include="Handlers\SomeCommandHandler.cs" />
     <Compile Include="MessageContracts\SomeEvent.cs" />
@@ -64,7 +73,11 @@
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="PoisonMessages\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />
+    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
     <Compile Include="WhenPublishingAnEvent.cs" />
+    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationFor.cs" />

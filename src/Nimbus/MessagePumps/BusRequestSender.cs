@@ -21,7 +21,7 @@ namespace Nimbus.MessagePumps
             _responseTimeout = responseTimeout;
         }
 
-        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
         {
             var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
 

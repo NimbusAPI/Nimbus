@@ -13,9 +13,12 @@ namespace Nimbus.Configuration
         internal ICommandBroker CommandBroker { get; set; }
         internal IRequestBroker RequestBroker { get; set; }
         internal IEventBroker EventBroker { get; set; }
-        internal Type[] EventHandlerTypes { get; set; }
         internal Type[] CommandHandlerTypes { get; set; }
+        internal Type[] CommandTypes { get; set; }
         internal Type[] RequestHandlerTypes { get; set; }
+        internal Type[] RequestTypes { get; set; }
+        internal Type[] EventHandlerTypes { get; set; }
+        internal Type[] EventTypes { get; set; }
         internal TimeSpan DefaultTimeout { get; set; }
         internal int MaxDeliveryAttempts { get; set; }
         internal ILogger Logger { get; set; }

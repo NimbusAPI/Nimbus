@@ -20,7 +20,7 @@ namespace Nimbus.Tests
         {
         }
 
-        public class SomeInternalResponse
+        public class SomeInternalResponse : IBusResponse
         {
         }
     }
