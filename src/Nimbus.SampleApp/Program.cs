@@ -4,7 +4,7 @@ using Autofac;
 using Nimbus.Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Logger;
+using Serilog;
 
 namespace Nimbus.SampleApp
 {
@@ -26,22 +26,24 @@ namespace Nimbus.SampleApp
 
             builder.RegisterType<DeepThought>();
 
-            builder.RegisterType<ConsoleLogger>()
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
-
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+
+            builder.Register(i => new LoggerConfiguration()
+                                    .MinimumLevel.Debug()
+                                    .WriteTo.ColoredConsole()
+                                    .CreateLogger())
+                   .As<ILogger>();
 
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(c => new BusBuilder()
                                       .Configure()
-                                      .WithConnectionString(@"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
+                                      .WithConnectionString(@"Endpoint=sb://cacofonix/NimbusTest;StsEndpoint=https://cacofonix:9355/NimbusTest;RuntimePort=9354;ManagementPort=9355;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=YwlCk9bO9PS8VUZJizoq1ILa9v7I0IM9cnvLEaH15Kc=")
                                       .WithInstanceName(Environment.MachineName + ".MyApp")
                                       .WithTypesFrom(handlerTypesProvider)
                                       .WithEventBroker(c.Resolve<IEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
                                       .WithRequestBroker(c.Resolve<IRequestBroker>())
-                                      .WithLogger(c.Resolve<ILogger>())
+                                      .WithSeriLogger(c.Resolve<ILogger>())
                                       .Build())
                    .As<IBus>()
                    .AutoActivate()
