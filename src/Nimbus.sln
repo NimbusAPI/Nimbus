@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "Nimbus.Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.SampleApp", "Nimbus.SampleApp\Nimbus.SampleApp.csproj", "{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{3A9D386C-12D5-4A21-9292-60C0C5B3A7C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0942FED4-86C1-468A-85DE-98B88DF22384}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,5 +44,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8} = {3A9D386C-12D5-4A21-9292-60C0C5B3A7C2}
+		{3A562499-3DA9-469E-88B6-2437FC23DD24} = {0942FED4-86C1-468A-85DE-98B88DF22384}
+		{5BAAC418-8993-48FB-994B-2F06A4B5A26B} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 	EndGlobalSection
 EndGlobal
