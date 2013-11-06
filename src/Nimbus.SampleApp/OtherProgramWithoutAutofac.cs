@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
@@ -9,14 +10,14 @@ namespace Nimbus.SampleApp
     {
         public void DoFoo()
         {
-            IEventBroker eventBroker = new DefaultEventBroker(Assembly.GetExecutingAssembly());
+            IMulticastEventBroker multicastEventBroker = new DefaultMulticastEventBroker(Assembly.GetExecutingAssembly());
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             var bus = new BusBuilder().Configure()
                                       .WithConnectionString("foo")
-                                      .WithInstanceName("MyApp")
+                                      .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
-                                      .WithEventBroker(eventBroker)
+                                      .WithMulticastEventBroker(multicastEventBroker)
                                       .Build();
         }
     }

@@ -2,9 +2,8 @@
 
 namespace Nimbus.InfrastructureContracts
 {
-    public interface IHandleEvent<TBusEvent> where TBusEvent : IBusEvent
+    public interface IHandleMulticastEvent<TBusEvent> where TBusEvent : IBusEvent
     {
         void Handle(TBusEvent busEvent);
-
     }
 }

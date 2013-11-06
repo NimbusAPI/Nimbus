@@ -58,12 +58,24 @@ namespace Nimbus.Configuration
             }
         }
 
-        public IEnumerable<Type> EventHandlerTypes
+        public IEnumerable<Type> MulticastEventHandlerTypes
         {
             get
             {
                 var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => t.IsClosedTypeOf(typeof (IHandleEvent<>)))
+                    .Where(t => t.IsClosedTypeOf(typeof (IHandleMulticastEvent<>)))
+                    .ToArray();
+
+                return types;
+            }
+        }
+
+        public IEnumerable<Type> CompetingEventHandlerTypes
+        {
+            get
+            {
+                var types = AllInstantiableTypesInScannedAssemblies
+                    .Where(t => t.IsClosedTypeOf(typeof (IHandleCompetingEvent<>)))
                     .ToArray();
 
                 return types;

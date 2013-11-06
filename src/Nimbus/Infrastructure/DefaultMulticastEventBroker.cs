@@ -5,11 +5,11 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultEventBroker : IEventBroker
+    public class DefaultMulticastEventBroker : IMulticastEventBroker
     {
         private readonly Assembly[] _assemblies;
 
-        public DefaultEventBroker(params Assembly[] assemblies)
+        public DefaultMulticastEventBroker(params Assembly[] assemblies)
         {
             _assemblies = assemblies;
         }

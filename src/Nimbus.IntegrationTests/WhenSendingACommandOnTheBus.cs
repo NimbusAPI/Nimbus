@@ -15,23 +15,26 @@ namespace Nimbus.IntegrationTests
     {
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
-        private IEventBroker _eventBroker;
+        private IMulticastEventBroker _multicastEventBroker;
+        private ICompetingEventBroker _competingEventBroker;
 
         public override Bus Given()
         {
             _commandBroker = Substitute.For<ICommandBroker>();
             _requestBroker = Substitute.For<IRequestBroker>();
-            _eventBroker = Substitute.For<IEventBroker>();
+            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
+            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             var bus = new BusBuilder().Configure()
-                                      .WithInstanceName(Environment.MachineName + ".MyTestSuite")
+                                      .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
-                                      .WithEventBroker(_eventBroker)
+                                      .WithMulticastEventBroker(_multicastEventBroker)
+                                      .WithCompetingEventBroker(_competingEventBroker)
                                       .Build();
             bus.Start();
             return bus;
@@ -47,7 +50,7 @@ namespace Nimbus.IntegrationTests
         }
 
         [Test]
-        public void SomethingShouldHappen()
+        public void TheCommandBrokerShouldReceiveThatCommand()
         {
             _commandBroker.Received().Dispatch(Arg.Any<SomeCommand>());
         }

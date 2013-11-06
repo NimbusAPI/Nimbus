@@ -43,7 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutofacCommandBroker.cs" />
-    <Compile Include="AutofacEventBroker.cs" />
+    <Compile Include="AutofacCompetingEventBroker.cs" />
+    <Compile Include="AutofacMulticastEventBroker.cs" />
     <Compile Include="AutofacRequestBroker.cs" />
     <Compile Include="NimbusContainerBuilderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

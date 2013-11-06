@@ -16,7 +16,8 @@ namespace Nimbus.IntegrationTests.PoisonMessages
     {
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
-        private IEventBroker _eventBroker;
+        private IMulticastEventBroker _multicastEventBroker;
+        private ICompetingEventBroker _competingEventBroker;
         private TestCommand _testCommand;
         private string _someContent;
         private List<TestCommand> _deadLetterMessages = new List<TestCommand>();
@@ -30,17 +31,19 @@ namespace Nimbus.IntegrationTests.PoisonMessages
                           .Do(callInfo => new TestCommandHandler().Handle(callInfo.Arg<TestCommand>()));
 
             _requestBroker = Substitute.For<IRequestBroker>();
-            _eventBroker = Substitute.For<IEventBroker>();
+            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
+            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
-            var typeProvider = new TestTypesProvider(new[] {typeof (TestCommandHandler)}, new[] {typeof (TestCommand)}, new Type[0], new Type[0], new Type[0], new Type[0]);
+            var typeProvider = new TestTypesProvider(new[] { typeof(TestCommandHandler) }, new[] { typeof(TestCommand) }, new Type[0], new Type[0], new Type[0], new Type[0], new Type[0]);
 
             var bus = new BusBuilder().Configure()
-                                      .WithInstanceName(Environment.MachineName + ".MyTestSuite")
+                                      .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
-                                      .WithEventBroker(_eventBroker)
+                                      .WithMulticastEventBroker(_multicastEventBroker)
+                                      .WithCompetingEventBroker(_competingEventBroker)
                                       .WithMaxDeliveryAttempts(_maxDeliveryAttempts)
                                       .Build();
             bus.Start();

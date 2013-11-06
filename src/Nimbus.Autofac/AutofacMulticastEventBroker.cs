@@ -1,19 +1,17 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autofac;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Autofac
 {
-    public class AutofacEventBroker : IEventBroker
+    public class AutofacMulticastEventBroker : IMulticastEventBroker
     {
         private readonly ILifetimeScope _lifetimeScope;
 
-        public AutofacEventBroker(ILifetimeScope lifetimeScope)
+        public AutofacMulticastEventBroker(ILifetimeScope lifetimeScope)
         {
             _lifetimeScope = lifetimeScope;
         }
@@ -22,10 +20,9 @@ namespace Nimbus.Autofac
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof(IHandleEvent<TBusEvent>);
-
-                var handler = (IHandleEvent<IBusEvent>)scope.Resolve(type);
-                handler.Handle(busEvent);
+                var type = typeof (IEnumerable<IHandleMulticastEvent<TBusEvent>>);
+                var handlers = (IEnumerable) scope.Resolve(type);
+                foreach (var handler in handlers.Cast<IHandleMulticastEvent<IBusEvent>>()) handler.Handle(busEvent);
             }
         }
     }

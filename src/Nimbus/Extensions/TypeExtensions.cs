@@ -17,5 +17,12 @@ namespace Nimbus.Extensions
 
             return assignableGenericTypes.Any();
         }
+
+        public static Type[] GetGenericTypeParametersFor(this Type type, Type genericInterface)
+        {
+            var gi = type.GetInterfaces().Where(i => i.IsClosedTypeOf(genericInterface)).Single();
+            var typeParameters = gi.GetGenericArguments();
+            return typeParameters;
+        }
     }
 }

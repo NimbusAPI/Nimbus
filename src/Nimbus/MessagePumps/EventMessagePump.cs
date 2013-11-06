@@ -10,15 +10,15 @@ namespace Nimbus.MessagePumps
     public class EventMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
-        private readonly IEventBroker _eventBroker;
+        private readonly IEventBroker _multicastEventBroker;
         private readonly Type _eventType;
         private readonly string _subscriptionName;
         private SubscriptionClient _client;
 
-        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker eventBroker, Type eventType, string subscriptionName, ILogger logger) : base(logger)
+        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker multicastEventBroker, Type eventType, string subscriptionName, ILogger logger) : base(logger)
         {
             _messagingFactory = messagingFactory;
-            _eventBroker = eventBroker;
+            _multicastEventBroker = multicastEventBroker;
             _eventType = eventType;
             _subscriptionName = subscriptionName;
         }
@@ -43,7 +43,7 @@ namespace Nimbus.MessagePumps
         protected override void PumpMessage(BrokeredMessage message)
         {
             var busEvent = message.GetBody(_eventType);
-            _eventBroker.Publish((dynamic) busEvent);
+            _multicastEventBroker.Publish((dynamic) busEvent);
         }
     }
 }

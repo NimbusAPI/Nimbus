@@ -8,7 +8,8 @@ namespace Nimbus.Configuration
         IEnumerable<Type> CommandHandlerTypes { get; }
         IEnumerable<Type> CommandTypes { get; }
 
-        IEnumerable<Type> EventHandlerTypes { get; }
+        IEnumerable<Type> MulticastEventHandlerTypes { get; }
+        IEnumerable<Type> CompetingEventHandlerTypes { get; }
         IEnumerable<Type> EventTypes { get; }
 
         IEnumerable<Type> RequestHandlerTypes { get; }

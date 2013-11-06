@@ -26,12 +26,12 @@ namespace Nimbus.IntegrationTests.ThroughputTests
             var typeProvider = new AssemblyScanningTypeProvider(typeof(FooEvent).Assembly);
 
             var bus = new BusBuilder().Configure()
-                                      .WithInstanceName(Environment.MachineName + ".MyTestSuite")
+                                      .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_broker)
                                       .WithRequestBroker(_broker)
-                                      .WithEventBroker(_broker)
+                                      .WithMulticastEventBroker(_broker)
                                       .Build();
             bus.Start();
             return bus;

@@ -13,15 +13,28 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithInstanceName(this BusBuilderConfiguration configuration, string instanceName)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="applicationName">This should be unique for your application (e.g. Foo.exe) but should be the same across all instances of your application.</param>
+        /// <param name="instanceName">This should be unique across ALL instances of your application. Use your hostname if you're stuck.</param>
+        /// <returns></returns>
+        public static BusBuilderConfiguration WithNames(this BusBuilderConfiguration configuration, string applicationName, string instanceName)
         {
+            configuration.ApplicationName = applicationName;
             configuration.InstanceName = instanceName;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithEventBroker(this BusBuilderConfiguration configuration, IEventBroker eventBroker)
+        public static BusBuilderConfiguration WithMulticastEventBroker(this BusBuilderConfiguration configuration, IMulticastEventBroker multicastEventBroker)
         {
-            configuration.EventBroker = eventBroker;
+            configuration.MulticastEventBroker = multicastEventBroker;
+            return configuration;
+        }
+        public static BusBuilderConfiguration WithCompetingEventBroker(this BusBuilderConfiguration configuration, ICompetingEventBroker competingEventBroker)
+        {
+            configuration.CompetingEventBroker = competingEventBroker;
             return configuration;
         }
 
@@ -45,7 +58,8 @@ namespace Nimbus.Configuration
             configuration.RequestHandlerTypes = typeProvider.RequestHandlerTypes.ToArray();
             configuration.RequestTypes = typeProvider.RequestTypes.ToArray();
 
-            configuration.EventHandlerTypes = typeProvider.EventHandlerTypes.ToArray();
+            configuration.MulticastEventHandlerTypes = typeProvider.MulticastEventHandlerTypes.ToArray();
+            configuration.CompetingEventHandlerTypes = typeProvider.CompetingEventHandlerTypes.ToArray();
             configuration.EventTypes = typeProvider.EventTypes.ToArray();
 
             return configuration;

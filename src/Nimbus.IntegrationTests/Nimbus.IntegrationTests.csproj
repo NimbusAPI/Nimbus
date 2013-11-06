@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="EventTests\EventHandlers\SomeCombinedEventHandler.cs" />
+    <Compile Include="EventTests\EventHandlers\SomeCompetingEventHandler.cs" />
+    <Compile Include="EventTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
+    <Compile Include="EventTests\MessageContracts\SomeEventWeOnlyHandleViaCompetition.cs" />
+    <Compile Include="EventTests\WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast.cs" />
+    <Compile Include="EventTests\WhenPublishingAnEventThatWeOnlyHandleViaCompetition.cs" />
     <Compile Include="ExceptionPropagation\WhenSendingARequestThatWillThrow.cs" />
     <Compile Include="FakeBroker.cs" />
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarCommand.cs" />
@@ -62,8 +68,8 @@
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\QuxEvent.cs" />
     <Compile Include="MessageContracts\SomeCommand.cs" />
     <Compile Include="Handlers\SomeCommandHandler.cs" />
-    <Compile Include="MessageContracts\SomeEvent.cs" />
-    <Compile Include="Handlers\SomeEventHandler.cs" />
+    <Compile Include="EventTests\MessageContracts\SomeEventWeOnlyHandleViaMulticast.cs" />
+    <Compile Include="EventTests\EventHandlers\SomeMulticastEventHandler.cs" />
     <Compile Include="MessageContracts\SomeRequest.cs" />
     <Compile Include="Handlers\SomeRequestHandler.cs" />
     <Compile Include="MessageContracts\SomeResponse.cs" />
@@ -77,7 +83,7 @@
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
-    <Compile Include="WhenPublishingAnEvent.cs" />
+    <Compile Include="EventTests\WhenPublishingAnEventThatWeOnlyHandleViaMulticast.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

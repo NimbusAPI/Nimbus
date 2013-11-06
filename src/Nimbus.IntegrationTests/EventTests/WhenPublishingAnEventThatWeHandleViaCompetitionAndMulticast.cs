@@ -1,47 +1,30 @@
-﻿using System;
-using System.Reflection;
+using System;
+using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.EventTests.MessageContracts;
 using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.MessageContracts;
-using Nimbus.MessageContracts;
-using Shouldly;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.IntegrationTests.EventTests
 {
     [TestFixture]
-    public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
+    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast: SpecificationFor<Bus>
     {
-        public class FakeBroker : IRequestBroker
-        {
-            public bool DidGetCalled;
-
-            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
-            {
-                DidGetCalled = true;
-
-                return Activator.CreateInstance<TBusResponse>();
-            }
-        }
-
-        private SomeResponse _response;
-
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
         private IMulticastEventBroker _multicastEventBroker;
         private ICompetingEventBroker _competingEventBroker;
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
 
         public override Bus Given()
         {
             _commandBroker = Substitute.For<ICommandBroker>();
-            _requestBroker = new FakeBroker();
+            _requestBroker = Substitute.For<IRequestBroker>();
             _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
             _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
-            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+            var typeProvider = new AssemblyScanningTypeProvider(typeof(SomeEventWeOnlyHandleViaMulticast).Assembly);
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -51,7 +34,6 @@ namespace Nimbus.IntegrationTests
                                       .WithRequestBroker(_requestBroker)
                                       .WithMulticastEventBroker(_multicastEventBroker)
                                       .WithCompetingEventBroker(_competingEventBroker)
-                                      .WithDefaultTimeout(_defaultTimeout)
                                       .Build();
             bus.Start();
             return bus;
@@ -59,17 +41,24 @@ namespace Nimbus.IntegrationTests
 
         public override void When()
         {
-            var request = new SomeRequest();
-            var task = Subject.Request(request);
-            _response = task.WaitForResult(_defaultTimeout);
+            var myEvent = new SomeEventWeHandleViaMulticastAndCompetition();
+            Subject.Publish(myEvent).Wait();
+
+            TimeSpan.FromSeconds(5).SleepUntil(() => _competingEventBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }
 
         [Test]
-        public void WeShouldGetSomethingNiceBack()
+        public void TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            _response.ShouldNotBe(null);
+            _competingEventBroker.Received().Publish(Arg.Any<SomeEventWeHandleViaMulticastAndCompetition>());
+        }
+
+        [Test]
+        public void TheMulticastEventBrokerShouldReceiveTheEvent()
+        {
+            _multicastEventBroker.Received().Publish(Arg.Any<SomeEventWeHandleViaMulticastAndCompetition>());
         }
     }
 }

@@ -49,8 +49,13 @@
   <ItemGroup>
     <Compile Include="Configuration\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
+    <Compile Include="Exceptions\BusConfigurationException.cs" />
     <Compile Include="Exceptions\BusException.cs" />
     <Compile Include="Exceptions\RequestFailedException.cs" />
+    <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
+    <Compile Include="InfrastructureContracts\IEventBroker.cs" />
+    <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
+    <Compile Include="InfrastructureContracts\IHandleUniqueEvent.cs" />
     <Compile Include="MessageContracts\IBusResponse.cs" />
     <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
     <Compile Include="MessagePumps\MessagePropertyKeys.cs" />
@@ -70,7 +75,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\BusCommandSender.cs" />
     <Compile Include="Infrastructure\BusEventSender.cs" />
-    <Compile Include="Infrastructure\DefaultEventBroker.cs" />
+    <Compile Include="Infrastructure\DefaultMulticastEventBroker.cs" />
     <Compile Include="MessageContracts\BusRequest.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />
@@ -79,10 +84,10 @@
     <Compile Include="MessageContracts\IBusRequest.cs" />
     <Compile Include="InfrastructureContracts\ICommandBroker.cs" />
     <Compile Include="Infrastructure\ICommandSender.cs" />
-    <Compile Include="InfrastructureContracts\IEventBroker.cs" />
+    <Compile Include="InfrastructureContracts\IMulticastEventBroker.cs" />
     <Compile Include="Infrastructure\IEventSender.cs" />
     <Compile Include="InfrastructureContracts\IHandleCommand.cs" />
-    <Compile Include="InfrastructureContracts\IHandleEvent.cs" />
+    <Compile Include="InfrastructureContracts\IHandleMulticastEvent.cs" />
     <Compile Include="InfrastructureContracts\IHandleRequest.cs" />
     <Compile Include="Infrastructure\IMessagePump.cs" />
     <Compile Include="Infrastructure\IMessageSenderFactory.cs" />

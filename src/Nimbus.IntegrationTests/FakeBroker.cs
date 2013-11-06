@@ -5,7 +5,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests
 {
-    public class FakeBroker : ICommandBroker, IEventBroker, IRequestBroker
+    public class FakeBroker : ICommandBroker, IMulticastEventBroker, IRequestBroker
     {
         private readonly int _expectedMessages;
         private readonly Semaphore _semaphore = new Semaphore(0, int.MaxValue);

@@ -18,9 +18,10 @@ namespace Nimbus.IntegrationTests.ExceptionPropagation
     {
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
-        private IEventBroker _eventBroker;
+        private IMulticastEventBroker _multicastEventBroker;
         private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
         private SomeResponse _response;
+        private ICompetingEventBroker _competingEventBroker;
 
         public class BrokenRequestBroker : IRequestBroker
         {
@@ -37,17 +38,19 @@ namespace Nimbus.IntegrationTests.ExceptionPropagation
         {
             _commandBroker = Substitute.For<ICommandBroker>();
             _requestBroker = new BrokenRequestBroker();
-            _eventBroker = Substitute.For<IEventBroker>();
+            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
+            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             var bus = new BusBuilder().Configure()
-                                      .WithInstanceName(Environment.MachineName + ".MyTestSuite")
+                                      .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
-                                      .WithEventBroker(_eventBroker)
+                                      .WithMulticastEventBroker(_multicastEventBroker)
+                                      .WithCompetingEventBroker(_competingEventBroker)
                                       .WithDefaultTimeout(_defaultTimeout)
                                       .Build();
             bus.Start();
