@@ -23,6 +23,11 @@ namespace Nimbus.MessagePumps
 
         public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
         {
+            return await SendRequest(busRequest, _responseTimeout);
+        }
+
+        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest where TResponse : IBusResponse
+        {
             var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
@@ -35,7 +40,7 @@ namespace Nimbus.MessagePumps
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId);
 
             await sender.SendAsync(message);
-            var response = responseCorrelationWrapper.WaitForResponse(_responseTimeout);
+            var response = responseCorrelationWrapper.WaitForResponse(timeout);
 
             return response;
         }

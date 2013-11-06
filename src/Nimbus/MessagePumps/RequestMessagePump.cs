@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
@@ -46,20 +45,27 @@ namespace Nimbus.MessagePumps
 
         private void HandleRequest(BrokeredMessage requestMessage)
         {
-            var request = requestMessage.GetBody(_messageType);
-            var response = _requestBroker.InvokeGenericHandleMethod(request);
-
             var replyQueueName = requestMessage.ReplyTo;
             var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
 
-            var responseMessage = new BrokeredMessage(response)
-            {
-                CorrelationId = requestMessage.CorrelationId,
-            };
+            var request = requestMessage.GetBody(_messageType);
 
+            BrokeredMessage responseMessage;
+            try
+            {
+                var response = _requestBroker.InvokeGenericHandleMethod(request);
+                responseMessage = new BrokeredMessage(response);
+                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
+            }
+            catch (Exception exc)
+            {
+                responseMessage = new BrokeredMessage();
+                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, false);
+                foreach (var prop in ExceptionDetailsAsProperties(exc)) responseMessage.Properties.Add(prop.Key, prop.Value);
+            }
+
+            responseMessage.CorrelationId = requestMessage.CorrelationId;
             replyQueueClient.Send(responseMessage);
         }
     }
-
-  
 }

@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="ExceptionPropagation\WhenSendingARequestThatWillThrow.cs" />
     <Compile Include="FakeBroker.cs" />
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarCommand.cs" />
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarEvent.cs" />

@@ -69,14 +69,15 @@ namespace Nimbus.MessagePumps
             }
         }
 
-        private static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
+        protected static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
         {
             if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException);
+
             return new Dictionary<string, object>
             {
-                {"ExceptionType", exception.GetType().FullName},
-                {"ExceptionMessage", exception.Message},
-                {"ExceptionStackTrace", exception.StackTrace},
+                {MessagePropertyKeys.ExceptionTypeKey, exception.GetType().FullName},
+                {MessagePropertyKeys.ExceptionMessageKey, exception.Message},
+                {MessagePropertyKeys.ExceptionStackTraceKey, exception.StackTrace},
             };
         }
 

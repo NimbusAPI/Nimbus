@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
@@ -32,6 +33,12 @@ namespace Nimbus
         public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest);
+            return response;
+        }
+
+        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest where TResponse : IBusResponse
+        {
+            var response = await _requestSender.SendRequest(busRequest, timeout);
             return response;
         }
 

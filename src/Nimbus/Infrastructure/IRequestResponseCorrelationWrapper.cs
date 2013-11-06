@@ -6,5 +6,6 @@ namespace Nimbus.Infrastructure
     {
         Type ResponseType { get; }
         void SetResponse(object response);
+        void Throw(string exceptionMessage, string exceptionStackTrace);
     }
 }

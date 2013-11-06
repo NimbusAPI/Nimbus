@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Logger;
 
@@ -14,7 +15,8 @@ namespace Nimbus.MessagePumps
 
         private MessageReceiver _receiver;
 
-        public ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, ILogger logger) : base(logger)
+        public ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, ILogger logger)
+            : base(logger)
         {
             _messagingFactory = messagingFactory;
             _replyQueueName = replyQueueName;
@@ -46,10 +48,19 @@ namespace Nimbus.MessagePumps
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
             if (responseCorrelationWrapper == null) return;
 
-            var responseType = responseCorrelationWrapper.ResponseType;
-            var response = message.GetBody(responseType);
-
-            responseCorrelationWrapper.SetResponse(response);
+            var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessfulKey];
+            if (success)
+            {
+                var responseType = responseCorrelationWrapper.ResponseType;
+                var response = message.GetBody(responseType);
+                responseCorrelationWrapper.SetResponse(response);
+            }
+            else
+            {
+                var exceptionMessage = (string) message.Properties[MessagePropertyKeys.ExceptionMessageKey];
+                var exceptionStackTrace = (string) message.Properties[MessagePropertyKeys.ExceptionStackTraceKey];
+                responseCorrelationWrapper.Throw(exceptionMessage, exceptionStackTrace);
+            }
         }
     }
 }
