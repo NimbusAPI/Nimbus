@@ -16,14 +16,18 @@ namespace Nimbus.Autofac
                    .As<IMulticastEventBroker>()
                    .SingleInstance();
 
+            builder.RegisterType<AutofacCompetingEventBroker>()
+                   .As<ICompetingEventBroker>()
+                   .SingleInstance();
+
             builder.RegisterType<AutofacCommandBroker>()
                    .As<ICommandBroker>()
                    .SingleInstance();
 
             builder.RegisterType<AutofacRequestBroker>()
                    .As<IRequestBroker>()
-                   .SingleInstance(); 
-            
+                   .SingleInstance();
+
             return builder;
         }
     }

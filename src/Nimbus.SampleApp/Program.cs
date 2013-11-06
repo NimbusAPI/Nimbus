@@ -39,6 +39,7 @@ namespace Nimbus.SampleApp
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(handlerTypesProvider)
                                       .WithMulticastEventBroker(c.Resolve<IMulticastEventBroker>())
+                                      .WithCompetingEventBroker(c.Resolve<ICompetingEventBroker>())
                                       .WithCommandBroker(c.Resolve<ICommandBroker>())
                                       .WithRequestBroker(c.Resolve<IRequestBroker>())
                                       .WithLogger(c.Resolve<ILogger>())

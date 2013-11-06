@@ -20,9 +20,9 @@ namespace Nimbus.Autofac
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof(IEnumerable<IHandleMulticastEvent<TBusEvent>>);
+                var type = typeof(IEnumerable<IHandleCompetingEvent<TBusEvent>>);
                 var handlers = (IEnumerable)scope.Resolve(type);
-                foreach (var handler in handlers.Cast<IHandleMulticastEvent<IBusEvent>>()) handler.Handle(busEvent);
+                foreach (var handler in handlers.Cast<IHandleCompetingEvent<IBusEvent>>()) handler.Handle(busEvent);
             }
         }
     }
