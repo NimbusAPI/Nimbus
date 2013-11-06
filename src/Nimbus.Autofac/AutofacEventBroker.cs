@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Autofac;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -22,10 +18,11 @@ namespace Nimbus.Autofac
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof(IHandleEvent<TBusEvent>);
-
-                var handler = (IHandleEvent<IBusEvent>)scope.Resolve(type);
-                handler.Handle(busEvent);
+                var handlers = scope.Resolve<IEnumerable<IHandleEvent<TBusEvent>>>();
+                foreach (var handler in handlers)
+                {
+                    handler.Handle(busEvent);
+                }
             }
         }
     }
