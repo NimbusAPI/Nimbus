@@ -6,6 +6,7 @@ namespace Nimbus.Configuration
     public interface ITypeProvider
     {
         IEnumerable<Type> CommandHandlerTypes { get; }
+        IEnumerable<Type> TimeoutHandlerTypes { get; }
         IEnumerable<Type> CommandTypes { get; }
 
         IEnumerable<Type> EventHandlerTypes { get; }

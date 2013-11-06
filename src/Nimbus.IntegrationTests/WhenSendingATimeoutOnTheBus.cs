@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
@@ -6,39 +7,22 @@ using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.MessageContracts;
-using Nimbus.MessageContracts;
-using Shouldly;
 
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
+    public class WhenSendingATimeoutOnTheBus : SpecificationFor<Bus>
     {
-        public class FakeBroker : IRequestBroker
-        {
-            public bool DidGetCalled;
-
-            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
-            {
-                DidGetCalled = true;
-
-                return Activator.CreateInstance<TBusResponse>();
-            }
-        }
-
-        private SomeResponse _response;
-
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
         private IEventBroker _eventBroker;
         private ITimeoutBroker _timeoutBroker;
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
 
         public override Bus Given()
         {
             _commandBroker = Substitute.For<ICommandBroker>();
             _timeoutBroker = Substitute.For<ITimeoutBroker>();
-            _requestBroker = new FakeBroker();
+            _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
@@ -51,7 +35,6 @@ namespace Nimbus.IntegrationTests
                                       .WithTimeoutBroker(_timeoutBroker)
                                       .WithRequestBroker(_requestBroker)
                                       .WithEventBroker(_eventBroker)
-                                      .WithDefaultTimeout(_defaultTimeout)
                                       .Build();
             bus.Start();
             return bus;
@@ -59,17 +42,17 @@ namespace Nimbus.IntegrationTests
 
         public override void When()
         {
-            var request = new SomeRequest();
-            var task = Subject.Request(request);
-            _response = task.WaitForResult(_defaultTimeout);
+            var someTimeout = new SomeTimeout();
+            Subject.Defer(TimeSpan.FromSeconds(1),someTimeout).Wait();
+            TimeSpan.FromSeconds(2).SleepUntil(() => _timeoutBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }
 
         [Test]
-        public void WeShouldGetSomethingNiceBack()
+        public void SomethingShouldHappen()
         {
-            _response.ShouldNotBe(null);
+            _timeoutBroker.Received().Dispatch(Arg.Any<SomeTimeout>());
         }
     }
 }

@@ -12,14 +12,18 @@ namespace Nimbus.IntegrationTests
     public class TestTypesProvider : ITypeProvider
     {
         private readonly Type[] _commandHandlerTypes;
+        private readonly Type[] _timeoutHandlerTypes;
         private readonly Type[] _eventHandlerTypes;
         private readonly Type[] _requestHandlerTypes;
         private readonly Type[] _commandTypes;
+        private readonly Type[] _timeoutTypes;
         private readonly Type[] _eventTypes;
         private readonly Type[] _requestTypes;
 
         public TestTypesProvider(IEnumerable<Type> commandHandlerTypes,
                                  IEnumerable<Type> commandTypes,
+                                 IEnumerable<Type> timeoutHandlerTypes,
+                                 IEnumerable<Type> timeoutTypes,
                                  IEnumerable<Type> requestHandlerTypes,
                                  IEnumerable<Type> requestTypes,
                                  IEnumerable<Type> eventHandlerTypes,
@@ -27,6 +31,8 @@ namespace Nimbus.IntegrationTests
         {
             _commandHandlerTypes = commandHandlerTypes.ToArray();
             _commandTypes = commandTypes.ToArray();
+            _timeoutHandlerTypes = timeoutHandlerTypes.ToArray();
+            _timeoutTypes = timeoutTypes.ToArray();
             _requestHandlerTypes = requestHandlerTypes.ToArray();
             _requestTypes = requestTypes.ToArray();
             _eventHandlerTypes = eventHandlerTypes.ToArray();
@@ -34,6 +40,9 @@ namespace Nimbus.IntegrationTests
 
             _commandHandlerTypes.All(t => t.IsClosedTypeOf(typeof (IHandleCommand<>))).ShouldBe(true);
             _commandTypes.All(t => typeof (IBusCommand).IsAssignableFrom(t)).ShouldBe(true);
+
+            _timeoutHandlerTypes.All(t => t.IsClosedTypeOf(typeof(IHandleTimeout<>))).ShouldBe(true);
+            _timeoutTypes.All(t => typeof(IBusTimeout).IsAssignableFrom(t)).ShouldBe(true);
 
             _requestHandlerTypes.All(t => t.IsClosedTypeOf(typeof (IHandleRequest<,>))).ShouldBe(true);
             _requestTypes.All(t => typeof (IBusRequest).IsAssignableFrom(t)).ShouldBe(true);
@@ -50,6 +59,16 @@ namespace Nimbus.IntegrationTests
         public IEnumerable<Type> CommandTypes
         {
             get { return _commandTypes; }
+        }
+
+        public IEnumerable<Type> TimeoutHandlerTypes
+        {
+            get { return _timeoutHandlerTypes; }
+        }
+
+        public IEnumerable<Type> TimeoutTypes
+        {
+            get { return _timeoutTypes; }
         }
 
         public IEnumerable<Type> EventHandlerTypes

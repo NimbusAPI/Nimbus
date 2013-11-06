@@ -37,16 +37,19 @@ namespace Nimbus.Configuration
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory);
+            var timeoutSender = new BusTimeoutSender(messageSenderFactory);
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, _configuration.DefaultTimeout);
             var eventSender = new BusEventSender(topicClientFactory);
 
             CreateMyInputQueue(queueManager, replyQueueName);
             CreateCommandQueues(queueManager);
+            CreateTimeoutQueues(queueManager);
             CreateRequestQueues(queueManager);
             CreateEventTopics(queueManager);
 
             CreateRequestResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(messagingFactory, messagePumps);
+            CreateTimeoutMessagePumps(queueManager, messagingFactory, messagePumps);
             CreateRequestMessagePumps(messagingFactory, messagePumps);
             CreateEventMessagePumps(queueManager, messagingFactory, messagePumps);
 
@@ -54,7 +57,7 @@ namespace Nimbus.Configuration
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
 
-            var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
+            var bus = new Bus(commandSender, timeoutSender, requestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 
@@ -66,6 +69,14 @@ namespace Nimbus.Configuration
         private void CreateCommandQueues(QueueManager queueManager)
         {
             _configuration.CommandTypes
+                          .AsParallel()
+                          .Do(queueManager.EnsureQueueExists)
+                          .Done();
+        }
+
+        private void CreateTimeoutQueues(QueueManager queueManager)
+        {
+            _configuration.TimeoutTypes
                           .AsParallel()
                           .Do(queueManager.EnsureQueueExists)
                           .Done();
@@ -122,6 +133,15 @@ namespace Nimbus.Configuration
             foreach (var commandType in _configuration.CommandTypes)
             {
                 var pump = new CommandMessagePump(messagingFactory, _configuration.CommandBroker, commandType, _configuration.Logger);
+                messagePumps.Add(pump);
+            }
+        }
+        
+        private void CreateTimeoutMessagePumps(IQueueManager queueManager, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        {
+            foreach (var timeoutType in _configuration.TimeoutTypes)
+            {
+                var pump = new TimeoutMessagePump(messagingFactory, _configuration.TimeoutBroker, timeoutType, _configuration.Logger);
                 messagePumps.Add(pump);
             }
         }

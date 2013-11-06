@@ -45,6 +45,19 @@ namespace Nimbus.Configuration
                 return types;
             }
         }
+        
+        public IEnumerable<Type> TimeoutHandlerTypes
+        {
+            get
+            {
+                var types = _assemblies
+                    .SelectMany(a => a.GetExportedTypes())
+                    .Where(t => t.IsClosedTypeOf(typeof (IHandleTimeout<>)))
+                    .ToArray();
+
+                return types;
+            }
+        }
 
         public IEnumerable<Type> CommandTypes
         {

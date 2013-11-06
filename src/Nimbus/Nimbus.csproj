@@ -49,6 +49,12 @@
   <ItemGroup>
     <Compile Include="Configuration\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
+    <Compile Include="InfrastructureContracts\IHandleTimeout.cs" />
+    <Compile Include="InfrastructureContracts\ITimeoutBroker.cs" />
+    <Compile Include="Infrastructure\BusTimeoutSender.cs" />
+    <Compile Include="Infrastructure\ITimeoutSender.cs" />
+    <Compile Include="MessageContracts\IBusTimeout.cs" />
+    <Compile Include="MessagePumps\TimeoutMessagePump.cs" />
     <Compile Include="Exceptions\BusException.cs" />
     <Compile Include="MessageContracts\IBusResponse.cs" />
     <Compile Include="Exceptions\InvalidRequestTypeException.cs" />

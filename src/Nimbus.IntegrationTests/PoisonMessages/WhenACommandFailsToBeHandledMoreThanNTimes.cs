@@ -32,7 +32,7 @@ namespace Nimbus.IntegrationTests.PoisonMessages
             _requestBroker = Substitute.For<IRequestBroker>();
             _eventBroker = Substitute.For<IEventBroker>();
 
-            var typeProvider = new TestTypesProvider(new[] {typeof (TestCommandHandler)}, new[] {typeof (TestCommand)}, new Type[0], new Type[0], new Type[0], new Type[0]);
+            var typeProvider = new TestTypesProvider(new[] { typeof(TestCommandHandler) }, new[] { typeof(TestCommand) }, new Type[0], new Type[0], new Type[0], new Type[0], new Type[0], new Type[0]);
 
             var bus = new BusBuilder().Configure()
                                       .WithInstanceName(Environment.MachineName + ".MyTestSuite")

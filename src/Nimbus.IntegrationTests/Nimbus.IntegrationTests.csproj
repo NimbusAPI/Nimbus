@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="Handlers\SomeTimeoutHandler.cs" />
     <Compile Include="FakeBroker.cs" />
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarCommand.cs" />
     <Compile Include="ThroughputTests\ThroughputTestMessageContracts\BarEvent.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="MessageContracts\SomeRequest.cs" />
     <Compile Include="Handlers\SomeRequestHandler.cs" />
     <Compile Include="MessageContracts\SomeResponse.cs" />
+    <Compile Include="MessageContracts\SomeTimeout.cs" />
     <Compile Include="PoisonMessages\TestCommand.cs" />
     <Compile Include="PoisonMessages\TestCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
     <Compile Include="WhenPublishingAnEvent.cs" />
+    <Compile Include="WhenSendingATimeoutOnTheBus.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

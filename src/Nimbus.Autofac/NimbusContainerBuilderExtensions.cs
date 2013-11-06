@@ -19,6 +19,10 @@ namespace Nimbus.Autofac
             builder.RegisterType<AutofacCommandBroker>()
                    .As<ICommandBroker>()
                    .SingleInstance();
+            
+            builder.RegisterType<AutofacTimeoutBroker>()
+                   .As<ITimeoutBroker>()
+                   .SingleInstance();
 
             builder.RegisterType<AutofacRequestBroker>()
                    .As<IRequestBroker>()
