@@ -5,7 +5,6 @@ namespace Nimbus.Tests
     [TestFixture]
     public abstract class SpecificationFor<T>
     {
-
         public T Subject;
 
         public abstract T Given();
@@ -17,7 +16,5 @@ namespace Nimbus.Tests
             Subject = Given();
             When();
         }
-
-
     }
 }

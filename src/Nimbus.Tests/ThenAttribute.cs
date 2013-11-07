@@ -4,6 +4,5 @@ namespace Nimbus.Tests
 {
     public class ThenAttribute : TestAttribute
     {
-        
     }
 }

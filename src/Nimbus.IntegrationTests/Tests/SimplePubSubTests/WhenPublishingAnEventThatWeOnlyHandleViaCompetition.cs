@@ -15,7 +15,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             Subject.Publish(myEvent).Wait();
 
-            TimeSpan.FromSeconds(5).SleepUntil(() => _competingEventBroker.ReceivedCalls().Any());
+            TimeSpan.FromSeconds(10).SleepUntil(() => CompetingEventBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }
@@ -23,13 +23,13 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public void TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            _competingEventBroker.Received().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
+            CompetingEventBroker.Received().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
         }
 
         [Test]
         public void TheMulticastEventBrokerShouldNotReceiveTheEvent()
         {
-            _multicastEventBroker.DidNotReceive().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
+            MulticastEventBroker.DidNotReceive().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         {
             var someCommand = new SomeCommand();
             Subject.Send(someCommand).Wait();
-            TimeSpan.FromSeconds(1).SleepUntil(() => _commandBroker.ReceivedCalls().Any());
+            TimeSpan.FromSeconds(10).SleepUntil(() => CommandBroker.ReceivedCalls().Any());
 
             Subject.Stop();
         }
@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         [Test]
         public void TheCommandBrokerShouldReceiveThatCommand()
         {
-            _commandBroker.Received().Dispatch(Arg.Any<SomeCommand>());
+            CommandBroker.Received().Dispatch(Arg.Any<SomeCommand>());
         }
     }
 }

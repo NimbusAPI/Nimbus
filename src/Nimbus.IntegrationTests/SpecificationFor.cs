@@ -3,7 +3,7 @@
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    public abstract class SpecificationFor<T>
+    public abstract class SpecificationFor<T> where T : class
     {
         public T Subject;
 
@@ -15,6 +15,12 @@ namespace Nimbus.IntegrationTests
         {
             Subject = Given();
             When();
+        }
+
+        [TearDown]
+        public virtual void TearDown()
+        {
+            Subject = null;
         }
     }
 }

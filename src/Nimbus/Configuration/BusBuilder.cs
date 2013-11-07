@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
@@ -20,7 +21,7 @@ namespace Nimbus.Configuration
 
         internal static Bus Build(BusBuilderConfiguration configuration)
         {
-            var replyQueueName = configuration.InstanceName;
+            var replyQueueName = string.Format("InputQueue.{0}.{1}", configuration.ApplicationName, configuration.InstanceName);
 
             var namespaceManager = NamespaceManager.CreateFromConnectionString(configuration.ConnectionString);
             var messagingFactory = MessagingFactory.CreateFromConnectionString(configuration.ConnectionString);
@@ -39,10 +40,14 @@ namespace Nimbus.Configuration
                 RemoveAllExistingNamespaceElements(namespaceManager);
             }
 
-            CreateMyInputQueue(queueManager, replyQueueName);
-            CreateCommandQueues(configuration, queueManager);
-            CreateRequestQueues(configuration, queueManager);
-            CreateEventTopics(configuration, queueManager);
+            var queueCreationTasks = new List<Task>
+            {
+                Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName)),
+                Task.Run(() => CreateCommandQueues(configuration, queueManager)),
+                Task.Run(() => CreateRequestQueues(configuration, queueManager)),
+                Task.Run(() => CreateEventTopics(configuration, queueManager))
+            };
+            queueCreationTasks.WaitAll();
 
             CreateRequestResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(configuration, messagingFactory, messagePumps);
@@ -63,17 +68,19 @@ namespace Nimbus.Configuration
         /// </summary>
         private static void RemoveAllExistingNamespaceElements(NamespaceManager namespaceManager)
         {
+            var tasks = new List<Task>();
+
             var queuePaths = namespaceManager.GetQueues().Select(q => q.Path).ToArray();
             queuePaths
-                .AsParallel()
-                .Do(namespaceManager.DeleteQueue)
+                .Do(queuePath => tasks.Add(Task.Run(() => namespaceManager.DeleteQueue(queuePath))))
                 .Done();
 
             var topicPaths = namespaceManager.GetTopics().Select(t => t.Path).ToArray();
             topicPaths
-                .AsParallel()
-                .Do(namespaceManager.DeleteTopic)
+                .Do(topicPath => tasks.Add(Task.Run(() => namespaceManager.DeleteTopic(topicPath))))
                 .Done();
+
+            tasks.WaitAll();
         }
 
         private static void CreateMyInputQueue(QueueManager queueManager, string replyQueueName)

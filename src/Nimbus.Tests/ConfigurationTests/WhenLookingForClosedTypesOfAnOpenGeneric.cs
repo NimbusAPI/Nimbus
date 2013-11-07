@@ -13,20 +13,20 @@ namespace Nimbus.Tests.ConfigurationTests
     public class WhenLookingForClosedTypesOfAnOpenGeneric
     {
         [Test]
-        [TestCaseSource(typeof(TestCases))]
+        [TestCaseSource(typeof (TestCases))]
         public void WeShouldGetTheRightAnswer(Type candidateType, Type openGenericType, bool expectedResult)
         {
             candidateType.IsClosedTypeOf(openGenericType).ShouldBe(expectedResult);
         }
 
-        public class TestCases: IEnumerable<TestCaseData>
+        public class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {
-                yield return new TestCaseData(typeof(IHandleCommand<>), typeof(IHandleCommand<>), false);
-                yield return new TestCaseData(typeof(IHandleCommand<MyCommand>), typeof(IHandleCommand<>), true);
+                yield return new TestCaseData(typeof (IHandleCommand<>), typeof (IHandleCommand<>), false);
+                yield return new TestCaseData(typeof (IHandleCommand<MyCommand>), typeof (IHandleCommand<>), true);
                 yield return new TestCaseData(typeof (MyCommandHandler), typeof (IHandleCommand<>), true);
-                yield return new TestCaseData(typeof(MyDerivedCommandHandler), typeof(IHandleCommand<>), true);
+                yield return new TestCaseData(typeof (MyDerivedCommandHandler), typeof (IHandleCommand<>), true);
             }
 
             IEnumerator IEnumerable.GetEnumerator()
