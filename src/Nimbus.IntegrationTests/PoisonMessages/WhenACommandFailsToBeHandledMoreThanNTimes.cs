@@ -14,7 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.PoisonMessages
 {
     [TestFixture]
-    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationForBus
+    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationFor<Bus>
     {
         private TestCommand _testCommand;
         private string _someContent;
@@ -22,10 +22,10 @@ namespace Nimbus.IntegrationTests.PoisonMessages
 
         private const int _maxDeliveryAttempts = 7;
 
-        protected ICommandBroker _commandBroker;
-        protected IRequestBroker _requestBroker;
-        protected IMulticastEventBroker _multicastEventBroker;
-        protected ICompetingEventBroker _competingEventBroker;
+        private ICommandBroker _commandBroker;
+        private IRequestBroker _requestBroker;
+        private IMulticastEventBroker _multicastEventBroker;
+        private ICompetingEventBroker _competingEventBroker;
 
         public override Bus Given()
         {

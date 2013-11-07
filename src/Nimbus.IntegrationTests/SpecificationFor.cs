@@ -11,7 +11,7 @@ namespace Nimbus.IntegrationTests
         public abstract void When();
 
         [SetUp]
-        public async void SetUp()
+        public void SetUp()
         {
             Subject = Given();
             When();

@@ -13,16 +13,9 @@ namespace Nimbus.Configuration
 {
     public class BusBuilder
     {
-        private readonly BusBuilderConfiguration _configuration;
-
-        public BusBuilder()
-        {
-            _configuration = new BusBuilderConfiguration();
-        }
-
         public BusBuilderConfiguration Configure()
         {
-            return _configuration;
+            return new BusBuilderConfiguration();
         }
 
         internal static Bus Build(BusBuilderConfiguration configuration)
@@ -125,12 +118,16 @@ namespace Nimbus.Configuration
         private static void CreateMulticastEventMessagePumps(BusBuilderConfiguration configuration,
                                                              IQueueManager queueManager,
                                                              MessagingFactory messagingFactory,
-                                                             List<IMessagePump> messagePumps)
+                                                             ICollection<IMessagePump> messagePumps)
         {
-            foreach (var handlerType in configuration.MulticastEventHandlerTypes)
-            {
-                var eventType = handlerType.GetGenericTypeParametersFor(typeof (IHandleMulticastEvent<>)).Single();
+            var eventTypes = configuration.MulticastEventHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>)))
+                                          .Select(gi => gi.GetGenericArguments().Single())
+                                          .OrderBy(t => t.FullName)
+                                          .Distinct()
+                                          .ToArray();
 
+            foreach (var eventType in eventTypes)
+            {
                 var myInstanceSubscriptionName = String.Format("{0}.{1}", configuration.InstanceName, configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, myInstanceSubscriptionName);
                 var pump = new EventMessagePump(messagingFactory, configuration.MulticastEventBroker, eventType, myInstanceSubscriptionName, configuration.Logger);
@@ -141,12 +138,16 @@ namespace Nimbus.Configuration
         private static void CreateCompetingEventMessagePumps(BusBuilderConfiguration configuration,
                                                              IQueueManager queueManager,
                                                              MessagingFactory messagingFactory,
-                                                             List<IMessagePump> messagePumps)
+                                                             ICollection<IMessagePump> messagePumps)
         {
-            foreach (var handlerType in configuration.CompetingEventHandlerTypes)
-            {
-                var eventType = handlerType.GetGenericTypeParametersFor(typeof (IHandleCompetingEvent<>)).Single();
+            var eventTypes = configuration.CompetingEventHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>)))
+                                          .Select(gi => gi.GetGenericArguments().Single())
+                                          .OrderBy(t => t.FullName)
+                                          .Distinct()
+                                          .ToArray();
 
+            foreach (var eventType in eventTypes)
+            {
                 var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, applicationSharedSubscriptionName);
                 var pump = new EventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger);

@@ -1,31 +1,39 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests
 {
-    public class FakeBroker : ICommandBroker, IMulticastEventBroker, IRequestBroker
+    public class FakeBroker : ICommandBroker, IMulticastEventBroker, ICompetingEventBroker, IRequestBroker
     {
-        private readonly int _expectedMessages;
-        private readonly Semaphore _semaphore = new Semaphore(0, int.MaxValue);
-        private int _seenMessages;
+        private readonly int _expectedNumMessagesReceived;
+        private int _actualNumMessagesReceived;
 
-        public FakeBroker(int expectedMessages)
+        public FakeBroker(int expectedNumMessagesReceived)
         {
-            _expectedMessages = expectedMessages;
+            _expectedNumMessagesReceived = expectedNumMessagesReceived;
         }
 
-        public bool AllDone()
+        public int ActualNumMessagesReceived
         {
-            return _seenMessages == _expectedMessages;
+            get { return _actualNumMessagesReceived; }
         }
 
-        public void WaitUntilDone()
+        public int ExpectedNumMessagesReceived
         {
-            for (var i = 0; i < _expectedMessages; i++)
+            get { return _expectedNumMessagesReceived; }
+        }
+
+        public void WaitUntilDone(TimeSpan timeout)
+        {
+            var sw = Stopwatch.StartNew();
+            while (true)
             {
-                _semaphore.WaitOne();
+                if (sw.Elapsed >= timeout) return;
+                if (_actualNumMessagesReceived >= ExpectedNumMessagesReceived) return;
+                Thread.Sleep(TimeSpan.FromSeconds(1));
             }
         }
 
@@ -46,12 +54,11 @@ namespace Nimbus.IntegrationTests
 
         private void RecordMessageReceipt()
         {
-            Interlocked.Increment(ref _seenMessages);
-            _semaphore.Release();
+            Interlocked.Increment(ref _actualNumMessagesReceived);
 
-            if (_seenMessages%10 == 0)
+            if (_actualNumMessagesReceived % 10 == 0)
             {
-                Console.WriteLine("Seen {0} messages", _seenMessages);
+                Console.WriteLine("Seen {0} messages", _actualNumMessagesReceived);
             }
         }
     }
