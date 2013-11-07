@@ -41,6 +41,11 @@ namespace Nimbus.Configuration
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, configuration.DefaultTimeout);
             var eventSender = new BusEventSender(topicClientFactory);
 
+            if (configuration.Debugging.RemoveAllExistingNamespaceElements)
+            {
+                RemoveAllExistingNamespaceElements(namespaceManager);
+            }
+
             CreateMyInputQueue(queueManager, replyQueueName);
             CreateCommandQueues(configuration, queueManager);
             CreateRequestQueues(configuration, queueManager);
@@ -58,6 +63,24 @@ namespace Nimbus.Configuration
 
             var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
+        }
+
+        /// <summary>
+        ///     Danger! Danger, Will Robinson!
+        /// </summary>
+        private static void RemoveAllExistingNamespaceElements(NamespaceManager namespaceManager)
+        {
+            var queuePaths = namespaceManager.GetQueues().Select(q => q.Path).ToArray();
+            queuePaths
+                .AsParallel()
+                .Do(namespaceManager.DeleteQueue)
+                .Done();
+
+            var topicPaths = namespaceManager.GetTopics().Select(t => t.Path).ToArray();
+            topicPaths
+                .AsParallel()
+                .Do(namespaceManager.DeleteTopic)
+                .Done();
         }
 
         private static void CreateMyInputQueue(QueueManager queueManager, string replyQueueName)
@@ -122,7 +145,7 @@ namespace Nimbus.Configuration
         {
             foreach (var handlerType in configuration.CompetingEventHandlerTypes)
             {
-                var eventType = handlerType.GetGenericTypeParametersFor(typeof(IHandleCompetingEvent<>)).Single();
+                var eventType = handlerType.GetGenericTypeParametersFor(typeof (IHandleCompetingEvent<>)).Single();
 
                 var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, applicationSharedSubscriptionName);

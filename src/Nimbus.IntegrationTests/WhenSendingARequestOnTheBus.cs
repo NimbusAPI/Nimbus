@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Reflection;
-using NSubstitute;
 using NUnit.Framework;
-using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.EventTests;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.MessageContracts;
 using Nimbus.MessageContracts;
@@ -12,7 +10,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    public class WhenSendingARequestOnTheBus : SpecificationFor<Bus>
+    public class WhenSendingARequestOnTheBus : SpecificationForBus
     {
         public class FakeBroker : IRequestBroker
         {
@@ -28,40 +26,13 @@ namespace Nimbus.IntegrationTests
 
         private SomeResponse _response;
 
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private IMulticastEventBroker _multicastEventBroker;
-        private ICompetingEventBroker _competingEventBroker;
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
-
-        public override Bus Given()
-        {
-            _commandBroker = Substitute.For<ICommandBroker>();
-            _requestBroker = new FakeBroker();
-            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
-            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
-
-            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
-
-            var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(_commandBroker)
-                                      .WithRequestBroker(_requestBroker)
-                                      .WithMulticastEventBroker(_multicastEventBroker)
-                                      .WithCompetingEventBroker(_competingEventBroker)
-                                      .WithDefaultTimeout(_defaultTimeout)
-                                      .Build();
-            bus.Start();
-            return bus;
-        }
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
 
         public override void When()
         {
             var request = new SomeRequest();
-            var task = Subject.Request(request);
-            _response = task.WaitForResult(_defaultTimeout);
+            var task = Subject.Request(request, _timeout);
+            _response = task.WaitForResult(_timeout);
 
             Subject.Stop();
         }

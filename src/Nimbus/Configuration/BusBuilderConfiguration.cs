@@ -24,12 +24,15 @@ namespace Nimbus.Configuration
         internal TimeSpan DefaultTimeout { get; set; }
         internal int MaxDeliveryAttempts { get; set; }
         internal ILogger Logger { get; set; }
+        internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal BusBuilderConfiguration()
         {
             DefaultTimeout = TimeSpan.FromSeconds(10);
             MaxDeliveryAttempts = 5;
             Logger = new NullLogger();
+
+            Debugging = new BusDebuggingConfiguration();
         }
 
         public Bus Build()

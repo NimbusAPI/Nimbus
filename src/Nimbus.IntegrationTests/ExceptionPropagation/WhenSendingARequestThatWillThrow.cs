@@ -52,6 +52,9 @@ namespace Nimbus.IntegrationTests.ExceptionPropagation
                                       .WithMulticastEventBroker(_multicastEventBroker)
                                       .WithCompetingEventBroker(_competingEventBroker)
                                       .WithDefaultTimeout(_defaultTimeout)
+                                      .WithDebugOptions(dc =>
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;

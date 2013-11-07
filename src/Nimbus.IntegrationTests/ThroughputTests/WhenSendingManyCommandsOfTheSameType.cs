@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.ThroughputTests
     [Ignore("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public class WhenSendingManyCommandsOfTheSameType : SpecificationFor<Bus>
     {
-        private const int _messageCount = 10 * 1000;
+        private const int _messageCount = 10*1000;
 
         private FakeBroker _broker;
         private Stopwatch _stopwatch;
@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.ThroughputTests
         {
             _broker = new FakeBroker(_messageCount);
 
-            var typeProvider = new AssemblyScanningTypeProvider(typeof(FooCommand).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (FooCommand).Assembly);
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -55,7 +55,7 @@ namespace Nimbus.IntegrationTests.ThroughputTests
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, _messageCount);
-            _messagesPerSecond = _messageCount / _stopwatch.Elapsed.TotalSeconds;
+            _messagesPerSecond = _messageCount/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 

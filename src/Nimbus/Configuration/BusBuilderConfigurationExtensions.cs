@@ -84,5 +84,12 @@ namespace Nimbus.Configuration
             configuration.Logger = logger;
             return configuration;
         }
+
+        public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
+                                                               Func<BusDebuggingConfiguration, BusDebuggingConfiguration> debugConfiguration)
+        {
+            debugConfiguration(configuration.Debugging);
+            return configuration;
+        }
     }
 }

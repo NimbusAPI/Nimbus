@@ -2,7 +2,7 @@
 
 namespace Nimbus.IntegrationTests.MessageContracts
 {
-    public class SomeResponse: IBusResponse
+    public class SomeResponse : IBusResponse
     {
     }
 }

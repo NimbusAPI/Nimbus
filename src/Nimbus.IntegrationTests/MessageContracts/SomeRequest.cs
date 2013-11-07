@@ -2,7 +2,7 @@
 
 namespace Nimbus.IntegrationTests.MessageContracts
 {
-    public class SomeRequest : BusRequest<SomeRequest, SomeResponse> 
+    public class SomeRequest : BusRequest<SomeRequest, SomeResponse>
     {
     }
 }

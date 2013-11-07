@@ -9,13 +9,12 @@ using Nimbus.IntegrationTests.Extensions;
 
 namespace Nimbus.IntegrationTests.EventTests
 {
-    [TestFixture]
-    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast: SpecificationFor<Bus>
+    public abstract class SpecificationForBus : SpecificationFor<Bus>
     {
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private IMulticastEventBroker _multicastEventBroker;
-        private ICompetingEventBroker _competingEventBroker;
+        protected ICommandBroker _commandBroker;
+        protected IRequestBroker _requestBroker;
+        protected IMulticastEventBroker _multicastEventBroker;
+        protected ICompetingEventBroker _competingEventBroker;
 
         public override Bus Given()
         {
@@ -24,7 +23,7 @@ namespace Nimbus.IntegrationTests.EventTests
             _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
             _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
-            var typeProvider = new AssemblyScanningTypeProvider(typeof(SomeEventWeOnlyHandleViaMulticast).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (SomeEventWeOnlyHandleViaMulticast).Assembly);
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -34,11 +33,19 @@ namespace Nimbus.IntegrationTests.EventTests
                                       .WithRequestBroker(_requestBroker)
                                       .WithMulticastEventBroker(_multicastEventBroker)
                                       .WithCompetingEventBroker(_competingEventBroker)
+                                      .WithDebugOptions(
+                                          dc =>
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;
         }
+    }
 
+    [TestFixture]
+    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : SpecificationForBus
+    {
         public override void When()
         {
             var myEvent = new SomeEventWeHandleViaMulticastAndCompetition();

@@ -6,45 +6,51 @@ using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.EventTests;
+using Nimbus.IntegrationTests.EventTests.MessageContracts;
 using Nimbus.IntegrationTests.Extensions;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.PoisonMessages
 {
     [TestFixture]
-    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationFor<Bus>
+    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationForBus
     {
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private IMulticastEventBroker _multicastEventBroker;
-        private ICompetingEventBroker _competingEventBroker;
         private TestCommand _testCommand;
         private string _someContent;
         private List<TestCommand> _deadLetterMessages = new List<TestCommand>();
 
         private const int _maxDeliveryAttempts = 7;
 
+        protected ICommandBroker _commandBroker;
+        protected IRequestBroker _requestBroker;
+        protected IMulticastEventBroker _multicastEventBroker;
+        protected ICompetingEventBroker _competingEventBroker;
+
         public override Bus Given()
         {
             _commandBroker = Substitute.For<ICommandBroker>();
             _commandBroker.When(cb => cb.Dispatch(Arg.Any<TestCommand>()))
                           .Do(callInfo => new TestCommandHandler().Handle(callInfo.Arg<TestCommand>()));
-
             _requestBroker = Substitute.For<IRequestBroker>();
             _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
             _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
-            var typeProvider = new TestTypesProvider(new[] { typeof(TestCommandHandler) }, new[] { typeof(TestCommand) }, new Type[0], new Type[0], new Type[0], new Type[0], new Type[0]);
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (SomeEventWeOnlyHandleViaMulticast).Assembly);
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
+                                      .WithMaxDeliveryAttempts(_maxDeliveryAttempts)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
                                       .WithMulticastEventBroker(_multicastEventBroker)
                                       .WithCompetingEventBroker(_competingEventBroker)
-                                      .WithMaxDeliveryAttempts(_maxDeliveryAttempts)
+                                      .WithDebugOptions(
+                                          dc =>
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;

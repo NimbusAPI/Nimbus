@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AssemblyScanningTypeProvider.cs" />
+    <Compile Include="Configuration\BusDebuggingConfiguration.cs" />
+    <Compile Include="Configuration\BusDebuggingConfigurationExtensions.cs" />
     <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
     <Compile Include="Exceptions\BusConfigurationException.cs" />
     <Compile Include="Exceptions\BusException.cs" />

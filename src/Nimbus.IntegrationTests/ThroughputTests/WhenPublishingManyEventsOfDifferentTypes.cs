@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using NSubstitute;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.ThroughputTests.ThroughputTestMessageContracts;
 using Shouldly;
 
@@ -13,9 +15,10 @@ namespace Nimbus.IntegrationTests.ThroughputTests
     [Ignore("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public class WhenPublishingManyEventsOfDifferentTypes : SpecificationFor<Bus>
     {
-        private const int _messageCount = 10 * 1000;
+        private const int _messageCount = 10*1000;
 
         private FakeBroker _broker;
+        private ICompetingEventBroker _competingEventBroker;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
 
@@ -23,7 +26,8 @@ namespace Nimbus.IntegrationTests.ThroughputTests
         {
             _broker = new FakeBroker(_messageCount);
 
-            var typeProvider = new AssemblyScanningTypeProvider(typeof(FooEvent).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(typeof (FooEvent).Assembly);
+            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -32,6 +36,11 @@ namespace Nimbus.IntegrationTests.ThroughputTests
                                       .WithCommandBroker(_broker)
                                       .WithRequestBroker(_broker)
                                       .WithMulticastEventBroker(_broker)
+                                      .WithCompetingEventBroker(_competingEventBroker)
+                                      .WithDebugOptions(
+                                          dc =>
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;
@@ -43,7 +52,7 @@ namespace Nimbus.IntegrationTests.ThroughputTests
 
             Console.WriteLine("Starting to send messages...");
             _stopwatch = Stopwatch.StartNew();
-            Enumerable.Range(0, _messageCount/4)    // we're publishing 4 messages per iteration
+            Enumerable.Range(0, _messageCount/4) // we're publishing 4 messages per iteration
                       .AsParallel()
                       .Do(i => bus.Publish(new FooEvent()))
                       .Do(i => bus.Publish(new BarEvent()))
@@ -58,7 +67,7 @@ namespace Nimbus.IntegrationTests.ThroughputTests
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, _messageCount);
-            _messagesPerSecond = _messageCount / _stopwatch.Elapsed.TotalSeconds;
+            _messagesPerSecond = _messageCount/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 
