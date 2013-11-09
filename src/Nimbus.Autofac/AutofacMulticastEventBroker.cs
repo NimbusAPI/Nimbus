@@ -16,7 +16,7 @@ namespace Nimbus.Autofac
             _lifetimeScope = lifetimeScope;
         }
 
-        public void Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        public void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {

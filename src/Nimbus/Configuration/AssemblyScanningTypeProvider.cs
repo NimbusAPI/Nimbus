@@ -12,6 +12,13 @@ namespace Nimbus.Configuration
     {
         private readonly Assembly[] _assemblies;
         private readonly Lazy<Type[]> _allInstantiableTypesInScannedAssemblies;
+        private readonly Lazy<Type[]> _commandHandlerTypes;
+        private readonly Lazy<Type[]> _commandTypes;
+        private readonly Lazy<Type[]> _multicastEventHandlerTypes;
+        private readonly Lazy<Type[]> _competingEventHandlerTypes;
+        private readonly Lazy<Type[]> _eventTypes;
+        private readonly Lazy<Type[]> _requestHandlerTypes;
+        private readonly Lazy<Type[]> _requestTypes;
 
         private IEnumerable<Type> AllInstantiableTypesInScannedAssemblies
         {
@@ -23,99 +30,119 @@ namespace Nimbus.Configuration
             _assemblies = assemblies;
 
             _allInstantiableTypesInScannedAssemblies = new Lazy<Type[]>(ScanAssembliesForInterestingTypes);
-        }
-
-        private Type[] ScanAssembliesForInterestingTypes()
-        {
-            return _assemblies
-                .SelectMany(a => a.GetExportedTypes())
-                .Where(t => !t.IsInterface)
-                .Where(t => !t.IsAbstract)
-                .ToArray();
+            _commandHandlerTypes = new Lazy<Type[]>(ScanForCommandHandlerTypes);
+            _commandTypes = new Lazy<Type[]>(ScanForCommandTypes);
+            _multicastEventHandlerTypes = new Lazy<Type[]>(ScanForMulticastEventHandlerTypes);
+            _competingEventHandlerTypes = new Lazy<Type[]>(ScanForCompetingEventHandlerTypes);
+            _eventTypes = new Lazy<Type[]>(ScanForEventTypes);
+            _requestHandlerTypes = new Lazy<Type[]>(ScanForRequestHandlerTypes);
+            _requestTypes = new Lazy<Type[]>(ScanForRequestTypes);
         }
 
         public IEnumerable<Type> CommandHandlerTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => t.IsClosedTypeOf(typeof (IHandleCommand<>)))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _commandHandlerTypes.Value; }
         }
 
         public IEnumerable<Type> CommandTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => typeof (IBusCommand).IsAssignableFrom(t))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _commandTypes.Value; }
         }
 
         public IEnumerable<Type> MulticastEventHandlerTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => t.IsClosedTypeOf(typeof (IHandleMulticastEvent<>)))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _multicastEventHandlerTypes.Value; }
         }
 
         public IEnumerable<Type> CompetingEventHandlerTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => t.IsClosedTypeOf(typeof (IHandleCompetingEvent<>)))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _competingEventHandlerTypes.Value; }
         }
 
         public IEnumerable<Type> EventTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => typeof (IBusEvent).IsAssignableFrom(t))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _eventTypes.Value; }
         }
 
         public IEnumerable<Type> RequestHandlerTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => t.IsClosedTypeOf(typeof (IHandleRequest<,>)))
-                    .ToArray();
-
-                return types;
-            }
+            get { return _requestHandlerTypes.Value; }
         }
 
         public IEnumerable<Type> RequestTypes
         {
-            get
-            {
-                var types = AllInstantiableTypesInScannedAssemblies
-                    .Where(t => typeof (IBusRequest).IsAssignableFrom(t))
-                    .ToArray();
+            get { return _requestTypes.Value; }
+        }
 
-                return types;
-            }
+        protected virtual Type[] ScanAssembliesForInterestingTypes()
+        {
+            return _assemblies
+                .SelectMany(a => a.GetExportedTypes())
+                .Where(t => t.IsInstantiable())
+                .ToArray();
+        }
+
+        private Type[] ScanForCommandHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleCommand<>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForCommandTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof (IBusCommand).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForMulticastEventHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleMulticastEvent<>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForCompetingEventHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleCompetingEvent<>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForEventTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof (IBusEvent).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForRequestHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleRequest<,>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForRequestTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof (IBusRequest).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
         }
     }
 }

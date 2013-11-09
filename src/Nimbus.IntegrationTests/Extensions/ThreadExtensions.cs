@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.Extensions
             {
                 if (exitCondition()) return;
                 if (sw.Elapsed >= timeout) return;
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
         }
     }

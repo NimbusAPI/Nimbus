@@ -7,7 +7,8 @@ using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers;
+using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
@@ -35,7 +36,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
             _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
-            var typeProvider = new AssemblyScanningTypeProvider(typeof (SomeEventWeOnlyHandleViaMulticast).Assembly);
+            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
+            // deleting queues and topics is slow.
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)

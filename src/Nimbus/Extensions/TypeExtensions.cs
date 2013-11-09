@@ -18,6 +18,15 @@ namespace Nimbus.Extensions
             return assignableGenericTypes.Any();
         }
 
+        public static bool IsInstantiable(this Type type)
+        {
+            if (type.IsInterface) return false;
+            if (type.IsAbstract) return false;
+            if (type.IsGenericType) return false;
+
+            return true;
+        }
+
         public static Type[] GetGenericInterfacesClosing(this Type type, Type genericInterface)
         {
             var genericInterfaces = type.GetInterfaces()

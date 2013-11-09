@@ -1,35 +1,56 @@
 using System;
 using System.Linq;
-using NSubstitute;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
     [TestFixture]
     public class WhenPublishingAnEventThatWeOnlyHandleViaCompetition : SpecificationForBus
     {
-        public override void When()
+        public override async Task WhenAsync()
         {
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
-            Subject.Publish(myEvent).Wait();
+            await Subject.Publish(myEvent);
 
-            TimeSpan.FromSeconds(10).SleepUntil(() => CompetingEventBroker.ReceivedCalls().Any());
-
-            Subject.Stop();
+            TimeSpan.FromSeconds(5).SleepUntil(() => MessageBroker.AllReceivedMessages.Any());
         }
 
         [Test]
         public void TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            CompetingEventBroker.Received().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
+            MessageBroker.ReceivedCallsWithAnyArg(mb => mb.PublishCompeting<SomeEventWeOnlyHandleViaCompetition>(null))
+                         .Count()
+                         .ShouldBe(1);
         }
 
         [Test]
         public void TheMulticastEventBrokerShouldNotReceiveTheEvent()
         {
-            MulticastEventBroker.DidNotReceive().Publish(Arg.Any<SomeEventWeOnlyHandleViaCompetition>());
+            MessageBroker.ReceivedCallsWithAnyArg(mb => mb.PublishMulticast<SomeEventWeOnlyHandleViaCompetition>(null))
+                         .Count()
+                         .ShouldBe(0);
+        }
+
+
+        [Test]
+        public void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
+        {
+            MessageBroker.AllReceivedMessages
+                         .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
+                         .Count()
+                         .ShouldBe(1);
+        }
+
+        [Test]
+        public void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        {
+            MessageBroker.AllReceivedMessages
+                         .Count()
+                         .ShouldBe(1);
         }
     }
 }

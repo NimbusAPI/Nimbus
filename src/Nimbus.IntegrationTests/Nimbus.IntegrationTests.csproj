@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="TestHarnessMessageBroker.cs" />
+    <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\RequestThatWillThrowHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCombinedEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
@@ -75,8 +81,8 @@
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequest.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\RequestHandlers\SomeRequestHandler.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeResponse.cs" />
-    <Compile Include="Tests\PoisonMessageTests\TestCommand.cs" />
-    <Compile Include="Tests\PoisonMessageTests\TestCommandHandler.cs" />
+    <Compile Include="Tests\PoisonMessageTests\MessageContracts\TestCommand.cs" />
+    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\TestCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
@@ -90,7 +96,7 @@
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationFor.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingARequestOnTheBus.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestOnTheBus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

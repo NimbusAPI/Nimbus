@@ -1,36 +1,31 @@
 using System;
-using NSubstitute;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Nimbus.Configuration;
-using Nimbus.InfrastructureContracts;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests
 {
+    [TestFixture]
     public abstract class SpecificationForBus : SpecificationFor<Bus>
     {
-        protected ICommandBroker CommandBroker;
-        protected IRequestBroker RequestBroker;
-        protected IMulticastEventBroker MulticastEventBroker;
-        protected ICompetingEventBroker CompetingEventBroker;
+        protected TestHarnessMessageBroker MessageBroker { get; private set; }
 
         public override Bus Given()
         {
-            CommandBroker = Substitute.For<ICommandBroker>();
-            RequestBroker = Substitute.For<IRequestBroker>();
-            MulticastEventBroker = Substitute.For<IMulticastEventBroker>();
-            CompetingEventBroker = Substitute.For<ICompetingEventBroker>();
-
-            var typeProvider = new AssemblyScanningTypeProvider(typeof (SomeEventWeOnlyHandleViaMulticast).Assembly);
+            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
+            // deleting queues and topics is slow.
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            MessageBroker = new TestHarnessMessageBroker(typeProvider);
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(CommandBroker)
-                                      .WithRequestBroker(RequestBroker)
-                                      .WithMulticastEventBroker(MulticastEventBroker)
-                                      .WithCompetingEventBroker(CompetingEventBroker)
+                                      .WithCommandBroker(MessageBroker)
+                                      .WithRequestBroker(MessageBroker)
+                                      .WithMulticastEventBroker(MessageBroker)
+                                      .WithCompetingEventBroker(MessageBroker)
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithDebugOptions(
                                           dc =>
                                           dc.RemoveAllExistingNamespaceElementsOnStartup(
@@ -40,16 +35,20 @@ namespace Nimbus.IntegrationTests.Tests
             return bus;
         }
 
+        public sealed override void When()
+        {
+            WhenAsync().Wait();
+        }
+
+        public abstract Task WhenAsync();
+
         [TearDown]
         public override void TearDown()
         {
             var bus = Subject;
             if (bus != null) bus.Stop();
 
-            CommandBroker = null;
-            RequestBroker = null;
-            MulticastEventBroker = null;
-            CompetingEventBroker = null;
+            MessageBroker = null;
 
             base.TearDown();
         }

@@ -1,7 +1,8 @@
 ﻿using System;
 using Nimbus.InfrastructureContracts;
+using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
+namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers
 {
     public class TestCommandHandler : IHandleCommand<TestCommand>
     {

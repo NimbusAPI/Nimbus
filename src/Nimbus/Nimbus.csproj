@@ -54,12 +54,13 @@
     <Compile Include="Exceptions\BusConfigurationException.cs" />
     <Compile Include="Exceptions\BusException.cs" />
     <Compile Include="Exceptions\RequestFailedException.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
-    <Compile Include="InfrastructureContracts\IEventBroker.cs" />
     <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
     <Compile Include="InfrastructureContracts\IHandleUniqueEvent.cs" />
     <Compile Include="MessageContracts\IBusResponse.cs" />
     <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
+    <Compile Include="MessagePumps\CompetingEventMessagePump.cs" />
     <Compile Include="MessagePumps\MessagePropertyKeys.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
@@ -77,7 +78,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\BusCommandSender.cs" />
     <Compile Include="Infrastructure\BusEventSender.cs" />
-    <Compile Include="Infrastructure\DefaultMulticastEventBroker.cs" />
+    <Compile Include="Infrastructure\DefaultMessageBroker.cs" />
     <Compile Include="MessageContracts\BusRequest.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="MessagePumps\RequestMessagePump.cs" />
     <Compile Include="MessagePumps\ResponseMessagePump.cs" />
     <Compile Include="Infrastructure\RequestResponseCorrelationWrapper.cs" />
-    <Compile Include="MessagePumps\EventMessagePump.cs" />
+    <Compile Include="MessagePumps\MulticastEventMessagePump.cs" />
     <Compile Include="Infrastructure\TopicClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>

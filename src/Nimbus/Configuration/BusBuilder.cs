@@ -137,7 +137,7 @@ namespace Nimbus.Configuration
             {
                 var myInstanceSubscriptionName = String.Format("{0}.{1}", configuration.InstanceName, configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, myInstanceSubscriptionName);
-                var pump = new EventMessagePump(messagingFactory, configuration.MulticastEventBroker, eventType, myInstanceSubscriptionName, configuration.Logger);
+                var pump = new MulticastEventMessagePump(messagingFactory, configuration.MulticastEventBroker, eventType, myInstanceSubscriptionName, configuration.Logger);
                 messagePumps.Add(pump);
             }
         }
@@ -157,7 +157,7 @@ namespace Nimbus.Configuration
             {
                 var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, applicationSharedSubscriptionName);
-                var pump = new EventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger);
+                var pump = new CompetingEventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger);
                 messagePumps.Add(pump);
             }
         }

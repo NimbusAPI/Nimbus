@@ -1,5 +1,4 @@
-﻿using System;
-using Nimbus.InfrastructureContracts;
+﻿using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers
@@ -8,7 +7,6 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandler
     {
         public void Handle(SomeCommand busCommand)
         {
-            throw new NotImplementedException();
         }
     }
 }

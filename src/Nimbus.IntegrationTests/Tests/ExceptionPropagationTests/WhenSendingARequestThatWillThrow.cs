@@ -1,92 +1,53 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using NSubstitute;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using Nimbus.Configuration;
 using Nimbus.Exceptions;
-using Nimbus.InfrastructureContracts;
-using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
-using Nimbus.MessageContracts;
+using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
+using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 {
-    public class WhenSendingARequestThatWillThrow : SpecificationFor<Bus>
+    public class WhenSendingARequestThatWillThrow : SpecificationForBus
     {
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private IMulticastEventBroker _multicastEventBroker;
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(10);
-        private SomeResponse _response;
-        private ICompetingEventBroker _competingEventBroker;
+        private RequestThatWillThrowResponse _response;
+        private Exception _exception;
 
-        public class BrokenRequestBroker : IRequestBroker
+        public override async Task WhenAsync()
         {
-            public const string ExceptionMessage = "This is supposed to go bang.";
-
-            [DebuggerStepThrough]
-            public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+            try
             {
-                throw new Exception(ExceptionMessage);
+                var request = new RequestThatWillThrow();
+                _response = await Subject.Request(request);
+            }
+            catch (RequestFailedException exc)
+            {
+                _exception = exc;
             }
         }
 
-        public override Bus Given()
+        [Test]
+        public void TheResponseShouldNotBeSet()
         {
-            _commandBroker = Substitute.For<ICommandBroker>();
-            _requestBroker = new BrokenRequestBroker();
-            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
-            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
-
-            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
-
-            var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(_commandBroker)
-                                      .WithRequestBroker(_requestBroker)
-                                      .WithMulticastEventBroker(_multicastEventBroker)
-                                      .WithCompetingEventBroker(_competingEventBroker)
-                                      .WithDefaultTimeout(_defaultTimeout)
-                                      .WithDebugOptions(dc =>
-                                                        dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                            "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                      .Build();
-            bus.Start();
-            return bus;
-        }
-
-        public override void When()
-        {
+            _response.ShouldBe(null);
         }
 
         [Test]
         public void AnExceptionShouldBeReThrownOnTheClient()
         {
-            var timeout = TimeSpan.FromSeconds(60);
-            var request = new SomeRequest();
-            var task = Subject.Request(request, timeout);
-
-            try
-            {
-                _response = task.WaitForResult(timeout);
-            }
-            catch (AggregateException aexc)
-            {
-                var exc = aexc.Flatten().InnerExceptions.Single();
-                exc.ShouldBeTypeOf<RequestFailedException>();
-                exc.Message.ShouldBe(BrokenRequestBroker.ExceptionMessage);
-            }
+            _exception.ShouldNotBe(null);
         }
 
-        [TearDown]
-        public void TearDown()
+        [Test]
+        public void TheExceptionShouldBeARequestFailedException()
         {
-            Subject.Stop();
+            _exception.ShouldBeTypeOf<RequestFailedException>();
+        }
+
+        [Test]
+        public void TheExceptionShouldHaveTheMessageThatWasThrownOnTheServer()
+        {
+            _exception.Message.ShouldBe(RequestThatWillThrowHandler.ExceptionMessage);
         }
     }
 }

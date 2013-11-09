@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
+namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts
 {
     public class TestCommand : IBusCommand
     {

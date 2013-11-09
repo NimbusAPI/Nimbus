@@ -7,15 +7,16 @@ using Nimbus.Logger;
 
 namespace Nimbus.MessagePumps
 {
-    public class EventMessagePump : MessagePump
+    public class MulticastEventMessagePump : MessagePump
     {
         private readonly MessagingFactory _messagingFactory;
-        private readonly IEventBroker _multicastEventBroker;
+        private readonly IMulticastEventBroker _multicastEventBroker;
         private readonly Type _eventType;
         private readonly string _subscriptionName;
         private SubscriptionClient _client;
 
-        public EventMessagePump(MessagingFactory messagingFactory, IEventBroker multicastEventBroker, Type eventType, string subscriptionName, ILogger logger) : base(logger)
+        public MulticastEventMessagePump(MessagingFactory messagingFactory, IMulticastEventBroker multicastEventBroker, Type eventType, string subscriptionName, ILogger logger)
+            : base(logger)
         {
             _messagingFactory = messagingFactory;
             _multicastEventBroker = multicastEventBroker;
@@ -43,7 +44,7 @@ namespace Nimbus.MessagePumps
         protected override void PumpMessage(BrokeredMessage message)
         {
             var busEvent = message.GetBody(_eventType);
-            _multicastEventBroker.Publish((dynamic) busEvent);
+            _multicastEventBroker.PublishMulticast((dynamic) busEvent);
         }
     }
 }

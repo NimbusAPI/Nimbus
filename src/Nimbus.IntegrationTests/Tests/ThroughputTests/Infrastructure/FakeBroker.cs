@@ -42,7 +42,12 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             RecordMessageReceipt();
         }
 
-        public void Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        public void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        {
+            RecordMessageReceipt();
+        }
+
+        public void PublishCompeting<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             RecordMessageReceipt();
         }

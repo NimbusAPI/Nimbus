@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests
@@ -29,7 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         {
             _broker = new FakeBroker(NumMessagesToSend);
             _timeout = TimeSpan.FromSeconds(30);
-            _typeProvider = new AssemblyScanningTypeProvider(typeof (FooEvent).Assembly);
+            _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -80,7 +79,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
             Subject.Stop();
             _broker = null;

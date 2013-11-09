@@ -10,8 +10,8 @@ namespace Nimbus.SampleApp
     {
         public void DoFoo()
         {
-            IMulticastEventBroker multicastEventBroker = new DefaultMulticastEventBroker(Assembly.GetExecutingAssembly());
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+            IMulticastEventBroker multicastEventBroker = new DefaultMessageBroker(typeProvider);
 
             var bus = new BusBuilder().Configure()
                                       .WithConnectionString("foo")
