@@ -24,9 +24,25 @@ namespace Nimbus.Infrastructure
         public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
         {
             var topicPath = PathFactory.TopicPathFor(eventType);
-            if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName)) return;
 
-            _namespaceManager.CreateSubscription(topicPath, subscriptionName);
+            var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
+            {
+                MaxDeliveryCount = _maxDeliveryAttempts,
+                DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                EnableDeadLetteringOnMessageExpiration = true,
+                EnableBatchedOperations = true,
+                LockDuration = TimeSpan.FromSeconds(30),
+                RequiresSession = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
+            };
+            if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
+            {
+                _namespaceManager.UpdateSubscription(subscriptionDescription);
+            }
+            else
+            {
+                _namespaceManager.CreateSubscription(subscriptionDescription);
+            }
         }
 
         public void EnsureTopicExists(Type eventType)
@@ -37,8 +53,23 @@ namespace Nimbus.Infrastructure
 
         private void EnsureTopicExists(string topicPath)
         {
-            if (_namespaceManager.TopicExists(topicPath)) return;
-            _namespaceManager.CreateTopic(topicPath);
+            var topicDescription = new TopicDescription(topicPath)
+            {
+                DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                EnableBatchedOperations = true,
+                RequiresDuplicateDetection = false,
+                SupportOrdering = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
+            };
+
+            if (_namespaceManager.TopicExists(topicPath))
+            {
+                _namespaceManager.UpdateTopic(topicDescription);
+            }
+            else
+            {
+                _namespaceManager.CreateTopic(topicDescription);
+            }
         }
 
         public void EnsureQueueExists(Type commandType)
@@ -54,9 +85,9 @@ namespace Nimbus.Infrastructure
             return deadLetterQueueName;
         }
 
-        public void EnsureQueueExists(string queueName)
+        public void EnsureQueueExists(string queuePath)
         {
-            var queueDescription = new QueueDescription(queueName)
+            var queueDescription = new QueueDescription(queuePath)
             {
                 MaxDeliveryCount = _maxDeliveryAttempts,
                 DefaultMessageTimeToLive = TimeSpan.MaxValue,
@@ -66,9 +97,10 @@ namespace Nimbus.Infrastructure
                 RequiresDuplicateDetection = false,
                 RequiresSession = false,
                 SupportOrdering = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
             };
 
-            if (_namespaceManager.QueueExists(queueName))
+            if (_namespaceManager.QueueExists(queuePath))
             {
                 _namespaceManager.UpdateQueue(queueDescription);
             }

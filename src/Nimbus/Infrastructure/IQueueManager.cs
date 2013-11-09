@@ -8,7 +8,7 @@ namespace Nimbus.Infrastructure
         void EnsureSubscriptionExists(Type eventType, string subscriptionName);
         void EnsureTopicExists(Type eventType);
         void EnsureQueueExists(Type commandType);
-        void EnsureQueueExists(string queueName);
+        void EnsureQueueExists(string queuePath);
 
         QueueClient CreateDeadLetterQueueClient<T>();
     }
