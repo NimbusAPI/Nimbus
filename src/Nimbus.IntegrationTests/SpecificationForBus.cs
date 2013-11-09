@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Nimbus.Configuration;
 
-namespace Nimbus.IntegrationTests.Tests
+namespace Nimbus.IntegrationTests
 {
     [TestFixture]
     public abstract class SpecificationForBus : SpecificationFor<Bus>
@@ -35,7 +35,7 @@ namespace Nimbus.IntegrationTests.Tests
             return bus;
         }
 
-        public sealed override void When()
+        public override sealed void When()
         {
             WhenAsync().Wait();
         }

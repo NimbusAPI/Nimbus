@@ -36,7 +36,8 @@ namespace Nimbus
             return response;
         }
 
-        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest where TResponse : IBusResponse
+        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest
+            where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest, timeout);
             return response;

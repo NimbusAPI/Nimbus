@@ -44,7 +44,7 @@ namespace Nimbus.MessagePumps
         protected override void PumpMessage(BrokeredMessage message)
         {
             var busEvent = message.GetBody(_eventType);
-            _multicastEventBroker.PublishCompeting((dynamic)busEvent);
+            _multicastEventBroker.PublishCompeting((dynamic) busEvent);
         }
     }
 }

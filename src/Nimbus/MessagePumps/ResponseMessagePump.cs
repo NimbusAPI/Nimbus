@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Logger;
 

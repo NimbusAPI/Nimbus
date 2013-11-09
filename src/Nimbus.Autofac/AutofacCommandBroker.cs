@@ -21,7 +21,6 @@ namespace Nimbus.Autofac
 
                 var handler = (IHandleCommand<IBusCommand>) scope.Resolve(type);
                 handler.Handle(busCommand);
-
             }
         }
     }

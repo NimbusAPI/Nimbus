@@ -8,7 +8,7 @@ namespace Nimbus.Extensions
         public static object InvokeGenericHandleMethod(this IRequestBroker requestBroker, object request)
         {
             var handleMethod = ExtractHandlerMethodInfo(request);
-            var response = handleMethod.Invoke(requestBroker, new object[] { request });
+            var response = handleMethod.Invoke(requestBroker, new[] {request});
             return response;
         }
 

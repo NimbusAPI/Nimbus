@@ -35,7 +35,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
                          .ShouldBe(0);
         }
 
-
         [Test]
         public void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {

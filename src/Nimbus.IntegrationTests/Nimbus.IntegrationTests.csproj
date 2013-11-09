@@ -60,7 +60,7 @@
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaCompetition.cs" />
-    <Compile Include="Tests\SpecificationForBus.cs" />
+    <Compile Include="SpecificationForBus.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaCompetition.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
@@ -107,7 +107,6 @@
       <Name>Nimbus</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

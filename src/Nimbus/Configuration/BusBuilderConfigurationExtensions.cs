@@ -14,7 +14,6 @@ namespace Nimbus.Configuration
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="applicationName">This should be unique for your application (e.g. Foo.exe) but should be the same across all instances of your application.</param>
@@ -32,6 +31,7 @@ namespace Nimbus.Configuration
             configuration.MulticastEventBroker = multicastEventBroker;
             return configuration;
         }
+
         public static BusBuilderConfiguration WithCompetingEventBroker(this BusBuilderConfiguration configuration, ICompetingEventBroker competingEventBroker)
         {
             configuration.CompetingEventBroker = competingEventBroker;

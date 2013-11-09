@@ -35,7 +35,8 @@ namespace Nimbus.SampleApp
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(c => new BusBuilder()
                                       .Configure()
-                                      .WithConnectionString(@"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
+                                      .WithConnectionString(
+                                          @"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(handlerTypesProvider)
                                       .WithMulticastEventBroker(c.Resolve<IMulticastEventBroker>())

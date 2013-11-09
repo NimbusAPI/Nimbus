@@ -7,7 +7,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Autofac
 {
-    public class AutofacCompetingEventBroker: ICompetingEventBroker
+    public class AutofacCompetingEventBroker : ICompetingEventBroker
     {
         private readonly ILifetimeScope _lifetimeScope;
 
@@ -20,8 +20,8 @@ namespace Nimbus.Autofac
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof(IEnumerable<IHandleCompetingEvent<TBusEvent>>);
-                var handlers = (IEnumerable)scope.Resolve(type);
+                var type = typeof (IEnumerable<IHandleCompetingEvent<TBusEvent>>);
+                var handlers = (IEnumerable) scope.Resolve(type);
                 foreach (var handler in handlers.Cast<IHandleCompetingEvent<IBusEvent>>()) handler.Handle(busEvent);
             }
         }

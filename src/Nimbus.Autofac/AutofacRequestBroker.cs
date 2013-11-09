@@ -17,14 +17,13 @@ namespace Nimbus.Autofac
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof(IHandleRequest<TBusRequest,TBusResponse>);
+                var type = typeof (IHandleRequest<TBusRequest, TBusResponse>);
 
-                var handler = (IHandleRequest<TBusRequest,TBusResponse>)scope.Resolve(type);
+                var handler = (IHandleRequest<TBusRequest, TBusResponse>) scope.Resolve(type);
                 var response = handler.Handle(request);
 
                 return response;
             }
-
         }
     }
 }
