@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Nimbus.Configuration;
-using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {

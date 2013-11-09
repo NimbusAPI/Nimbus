@@ -1,4 +1,4 @@
-﻿using Nimbus.Exceptions;
+﻿using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.MessageContracts
 {

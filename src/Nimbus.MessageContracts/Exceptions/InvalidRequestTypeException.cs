@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Nimbus.Exceptions
+namespace Nimbus.MessageContracts.Exceptions
 {
     [Serializable]
     public class InvalidRequestTypeException : BusException

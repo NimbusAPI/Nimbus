@@ -52,14 +52,11 @@
     <Compile Include="Configuration\BusDebuggingConfigurationExtensions.cs" />
     <Compile Include="Configuration\HandlerTypesProviderExtensions.cs" />
     <Compile Include="Exceptions\BusConfigurationException.cs" />
-    <Compile Include="Exceptions\BusException.cs" />
     <Compile Include="Exceptions\RequestFailedException.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
     <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
     <Compile Include="InfrastructureContracts\IHandleUniqueEvent.cs" />
-    <Compile Include="MessageContracts\IBusResponse.cs" />
-    <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
     <Compile Include="MessagePumps\CompetingEventMessagePump.cs" />
     <Compile Include="MessagePumps\MessagePropertyKeys.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
@@ -79,12 +76,8 @@
     <Compile Include="Infrastructure\BusCommandSender.cs" />
     <Compile Include="Infrastructure\BusEventSender.cs" />
     <Compile Include="Infrastructure\DefaultMessageBroker.cs" />
-    <Compile Include="MessageContracts\BusRequest.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="MessageContracts\IBusCommand.cs" />
-    <Compile Include="MessageContracts\IBusEvent.cs" />
-    <Compile Include="MessageContracts\IBusRequest.cs" />
     <Compile Include="InfrastructureContracts\ICommandBroker.cs" />
     <Compile Include="Infrastructure\ICommandSender.cs" />
     <Compile Include="InfrastructureContracts\IMulticastEventBroker.cs" />
@@ -118,7 +111,12 @@
     <None Include="Nimbus.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
+      <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
+      <Name>Nimbus.MessageContracts</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

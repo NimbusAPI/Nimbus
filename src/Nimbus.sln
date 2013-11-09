@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{3A9D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0942FED4-86C1-468A-85DE-98B88DF22384}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.MessageContracts", "Nimbus.MessageContracts\Nimbus.MessageContracts.csproj", "{702A4F7E-97C5-4651-B704-65C6D0D70C1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{702A4F7E-97C5-4651-B704-65C6D0D70C1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{702A4F7E-97C5-4651-B704-65C6D0D70C1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{702A4F7E-97C5-4651-B704-65C6D0D70C1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{702A4F7E-97C5-4651-B704-65C6D0D70C1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
