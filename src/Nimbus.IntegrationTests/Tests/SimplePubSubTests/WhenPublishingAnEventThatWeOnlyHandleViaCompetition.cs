@@ -40,7 +40,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         public void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
             MessageBroker.AllReceivedMessages
-                         .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
+                         .OfType<SomeEventWeOnlyHandleViaCompetition>()
                          .Count()
                          .ShouldBe(1);
         }
