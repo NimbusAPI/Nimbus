@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    public interface IQueueManager
+    internal interface IQueueManager
     {
         void EnsureSubscriptionExists(Type eventType, string subscriptionName);
         void EnsureTopicExists(Type eventType);

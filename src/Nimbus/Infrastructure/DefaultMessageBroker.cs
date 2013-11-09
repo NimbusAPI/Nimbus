@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Configuration;
+using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -8,7 +9,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageBroker : ICommandBroker, IRequestBroker, IMulticastEventBroker, ICompetingEventBroker
+    public class DefaultMessageBroker : ICommandBroker, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventBroker
     {
         private readonly ITypeProvider _typeProvider;
 
@@ -37,6 +38,17 @@ namespace Nimbus.Infrastructure
                                 .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
                                 .First()
                                 .Handle(request);
+        }
+
+        public virtual IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
+            where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
+            return _typeProvider.RequestHandlerTypes
+                                .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
+                                .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
+                                .Select(handler => Task.Run(() => handler.Handle(request)))
+                                .ReturnOpportunistically(timeout);
         }
 
         public virtual void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent

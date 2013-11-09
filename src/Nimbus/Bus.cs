@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Commands;
+using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.PoisonMessages;
 
@@ -12,14 +16,21 @@ namespace Nimbus
     {
         private readonly ICommandSender _commandSender;
         private readonly IRequestSender _requestSender;
+        private readonly IMulticastRequestSender _multicastRequestSender;
         private readonly IEventSender _eventSender;
         private readonly IMessagePump[] _messagePumps;
         private readonly IDeadLetterQueues _deadLetterQueues;
 
-        public Bus(ICommandSender commandSender, IRequestSender requestSender, IEventSender eventSender, IEnumerable<IMessagePump> messagePumps, IDeadLetterQueues deadLetterQueues)
+        internal Bus(ICommandSender commandSender,
+                     IRequestSender requestSender,
+                     IMulticastRequestSender multicastRequestSender,
+                     IEventSender eventSender,
+                     IEnumerable<IMessagePump> messagePumps,
+                     IDeadLetterQueues deadLetterQueues)
         {
             _commandSender = commandSender;
             _requestSender = requestSender;
+            _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
             _messagePumps = messagePumps.ToArray();
@@ -40,6 +51,13 @@ namespace Nimbus
             where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest, timeout);
+            return response;
+        }
+
+        public async Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest
+            where TResponse : IBusResponse
+        {
+            var response = await _multicastRequestSender.SendRequest(busRequest, timeout);
             return response;
         }
 

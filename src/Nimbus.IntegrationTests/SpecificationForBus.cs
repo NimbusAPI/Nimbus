@@ -25,6 +25,7 @@ namespace Nimbus.IntegrationTests
                                       .WithRequestBroker(MessageBroker)
                                       .WithMulticastEventBroker(MessageBroker)
                                       .WithCompetingEventBroker(MessageBroker)
+                                      .WithMulticastRequestBroker(MessageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithDebugOptions(
                                           dc =>

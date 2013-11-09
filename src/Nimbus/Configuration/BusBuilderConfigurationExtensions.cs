@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Logger;
 
 namespace Nimbus.Configuration
 {
@@ -47,6 +46,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithRequestBroker(this BusBuilderConfiguration configuration, IRequestBroker requestBroker)
         {
             configuration.RequestBroker = requestBroker;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestBroker requestBroker)
+        {
+            configuration.MulticastRequestBroker = requestBroker;
             return configuration;
         }
 

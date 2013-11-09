@@ -24,6 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         private ICommandBroker _commandBroker;
         private IRequestBroker _requestBroker;
+        private IMulticastRequestBroker _multicastRequestBroker;
         private IMulticastEventBroker _multicastEventBroker;
         private ICompetingEventBroker _competingEventBroker;
 
@@ -33,6 +34,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _commandBroker.When(cb => cb.Dispatch(Arg.Any<TestCommand>()))
                           .Do(callInfo => new TestCommandHandler().Handle(callInfo.Arg<TestCommand>()));
             _requestBroker = Substitute.For<IRequestBroker>();
+            _multicastRequestBroker = Substitute.For<IMulticastRequestBroker>();
             _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
             _competingEventBroker = Substitute.For<ICompetingEventBroker>();
 
@@ -47,6 +49,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
                                       .WithMaxDeliveryAttempts(_maxDeliveryAttempts)
                                       .WithCommandBroker(_commandBroker)
                                       .WithRequestBroker(_requestBroker)
+                                      .WithMulticastRequestBroker(_multicastRequestBroker)
                                       .WithMulticastEventBroker(_multicastEventBroker)
                                       .WithCompetingEventBroker(_competingEventBroker)
                                       .WithDebugOptions(

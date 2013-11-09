@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure
 
         public MessageSender GetMessageSender(Type messageType)
         {
-            var messageSender = _messageSenders.GetOrAdd(messageType, t => _messagingFactory.CreateMessageSender(t.FullName));
+            var messageSender = _messageSenders.GetOrAdd(messageType, t => _messagingFactory.CreateMessageSender(PathFactory.QueuePathFor(t)));
             return messageSender;
         }
 

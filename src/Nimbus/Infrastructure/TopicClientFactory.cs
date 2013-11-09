@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure
 
         public TopicClient GetTopicClient(Type busEventType)
         {
-            return _topicClients.GetOrAdd(busEventType, t => _messagingFactory.CreateTopicClient(t.FullName));
+            return _topicClients.GetOrAdd(busEventType, t => _messagingFactory.CreateTopicClient(PathFactory.TopicPathFor(t)));
         }
 
         public void Dispose()

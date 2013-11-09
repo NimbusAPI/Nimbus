@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.IntegrationTests
 {
@@ -30,6 +30,12 @@ namespace Nimbus.IntegrationTests
         {
             RecordCall(mb => mb.Handle<TBusRequest, TBusResponse>(request));
             return base.Handle<TBusRequest, TBusResponse>(request);
+        }
+
+        public override IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
+        {
+            RecordCall(mb => mb.HandleMulticast<TBusRequest, TBusResponse>(request, timeout));
+            return base.HandleMulticast<TBusRequest, TBusResponse>(request, timeout);
         }
 
         public override void PublishMulticast<TBusEvent>(TBusEvent busEvent)
@@ -74,16 +80,16 @@ namespace Nimbus.IntegrationTests
             var method = methodCallExpression.Method;
 
             // http://stackoverflow.com/questions/2616638/access-the-value-of-a-member-expression
-            var argExpr = methodCallExpression.Arguments.First();
-            var objectMember = Expression.Convert(argExpr, typeof (object));
+            var messageExpression = methodCallExpression.Arguments.First();
+            var objectMember = Expression.Convert(messageExpression, typeof (object));
             var getterLambda = Expression.Lambda<Func<object>>(objectMember);
             var getter = getterLambda.Compile();
-            var value = getter();
+            var message = getter();
 
             var messageBag = _allReceivedCalls.GetOrAdd(method, new ConcurrentBag<object>());
-            messageBag.Add(value);
+            messageBag.Add(message);
 
-            Console.WriteLine("Observed call to {0} with argument of type {1}".FormatWith(method.Name, value.GetType()));
+            Console.WriteLine("Observed call to {0} with argument of type {1}".FormatWith(method.Name, message.GetType()));
         }
     }
 }

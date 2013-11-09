@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
 using Shouldly;
 

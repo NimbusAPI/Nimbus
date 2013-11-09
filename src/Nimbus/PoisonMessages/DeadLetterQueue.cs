@@ -8,7 +8,7 @@ namespace Nimbus.PoisonMessages
     {
         private readonly IQueueManager _queueManager;
 
-        public DeadLetterQueue(IQueueManager queueManager)
+        internal DeadLetterQueue(IQueueManager queueManager)
         {
             _queueManager = queueManager;
         }

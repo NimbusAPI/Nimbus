@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Nimbus.Configuration;
+using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Shouldly;

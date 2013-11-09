@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Nimbus.Configuration;
+using Nimbus.Infrastructure;
 
 namespace Nimbus.IntegrationTests
 {

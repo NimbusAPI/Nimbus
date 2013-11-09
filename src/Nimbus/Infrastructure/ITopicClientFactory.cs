@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    public interface ITopicClientFactory
+    internal interface ITopicClientFactory
     {
         TopicClient GetTopicClient(Type busEventType);
     }

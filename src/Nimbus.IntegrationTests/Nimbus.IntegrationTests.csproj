@@ -56,6 +56,13 @@
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\RequestThatWillThrowHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\GrumpyBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\HappyBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCombinedEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />

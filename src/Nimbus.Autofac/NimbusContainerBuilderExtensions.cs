@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Nimbus.Configuration;
+using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Autofac

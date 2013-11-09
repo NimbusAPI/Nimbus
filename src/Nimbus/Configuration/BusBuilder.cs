@@ -6,8 +6,10 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Commands;
+using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
-using Nimbus.MessagePumps;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
@@ -26,13 +28,18 @@ namespace Nimbus.Configuration
             var namespaceManager = NamespaceManager.CreateFromConnectionString(configuration.ConnectionString);
             var messagingFactory = MessagingFactory.CreateFromConnectionString(configuration.ConnectionString);
 
-            var queueManager = new QueueManager(namespaceManager, messagingFactory, configuration.MaxDeliveryAttempts);
             var messagePumps = new List<IMessagePump>();
-            var requestResponseCorrelator = new RequestResponseCorrelator();
+
+            var queueManager = new QueueManager(namespaceManager, messagingFactory, configuration.MaxDeliveryAttempts);
+
+            var clock = new SystemClock();
+            var requestResponseCorrelator = new RequestResponseCorrelator(clock);
+
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory);
-            var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, configuration.DefaultTimeout);
+            var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, clock, configuration.DefaultTimeout);
+            var multicastRequestSender = new BusMulticastRequestSender(topicClientFactory, replyQueueName, requestResponseCorrelator, clock);
             var eventSender = new BusEventSender(topicClientFactory);
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
@@ -40,18 +47,21 @@ namespace Nimbus.Configuration
                 RemoveAllExistingNamespaceElements(namespaceManager);
             }
 
-            var queueCreationTasks = new List<Task>
+            var queueCreationTasks = new[]
             {
                 Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName)),
                 Task.Run(() => CreateCommandQueues(configuration, queueManager)),
                 Task.Run(() => CreateRequestQueues(configuration, queueManager)),
-                Task.Run(() => CreateEventTopics(configuration, queueManager))
+                Task.Run(() => CreateMulticastRequestTopics(configuration, queueManager)),
+                Task.Run(() => CreateEventTopics(configuration, queueManager)),
             };
-            queueCreationTasks.WaitAll();
+            Task.WaitAll(queueCreationTasks);
 
-            CreateRequestResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
+            //FIXME do these in parallel
+            CreateResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(configuration, messagingFactory, messagePumps);
             CreateRequestMessagePumps(configuration, messagingFactory, messagePumps);
+            CreateMulticastRequestMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
             CreateMulticastEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
             CreateCompetingEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
 
@@ -59,7 +69,7 @@ namespace Nimbus.Configuration
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
 
-            var bus = new Bus(commandSender, requestSender, eventSender, messagePumps, deadLetterQueues);
+            var bus = new Bus(commandSender, requestSender, multicastRequestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 
@@ -104,6 +114,14 @@ namespace Nimbus.Configuration
                          .Done();
         }
 
+        private static void CreateMulticastRequestTopics(BusBuilderConfiguration configuration, QueueManager queueManager)
+        {
+            configuration.RequestTypes
+                         .AsParallel()
+                         .Do(queueManager.EnsureTopicExists)
+                         .Done();
+        }
+
         private static void CreateEventTopics(BusBuilderConfiguration configuration, QueueManager queueManager)
         {
             configuration.EventTypes
@@ -112,14 +130,57 @@ namespace Nimbus.Configuration
                          .Done();
         }
 
-        private static void CreateRequestResponseMessagePump(BusBuilderConfiguration configuration,
-                                                             MessagingFactory messagingFactory,
-                                                             string replyQueueName,
-                                                             RequestResponseCorrelator requestResponseCorrelator,
-                                                             ICollection<IMessagePump> messagePumps)
+        private static void CreateResponseMessagePump(BusBuilderConfiguration configuration,
+                                                      MessagingFactory messagingFactory,
+                                                      string replyQueueName,
+                                                      RequestResponseCorrelator requestResponseCorrelator,
+                                                      ICollection<IMessagePump> messagePumps)
         {
-            var requestResponseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, configuration.Logger);
-            messagePumps.Add(requestResponseMessagePump);
+            var responseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, configuration.Logger);
+            messagePumps.Add(responseMessagePump);
+        }
+
+        private static void CreateCommandMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        {
+            foreach (var commandType in configuration.CommandTypes)
+            {
+                var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
+                messagePumps.Add(pump);
+            }
+        }
+
+        private static void CreateRequestMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        {
+            foreach (var requestType in configuration.RequestTypes)
+            {
+                var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger);
+                messagePumps.Add(pump);
+            }
+        }
+
+        private static void CreateMulticastRequestMessagePumps(BusBuilderConfiguration configuration,
+                                                               QueueManager queueManager,
+                                                               MessagingFactory messagingFactory,
+                                                               List<IMessagePump> messagePumps)
+        {
+            var requestTypes = configuration.RequestHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleRequest<,>)))
+                                            .Select(gi => gi.GetGenericArguments().First())
+                                            .OrderBy(t => t.FullName)
+                                            .Distinct()
+                                            .ToArray();
+
+            foreach (var requestType in requestTypes)
+            {
+                var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
+                queueManager.EnsureSubscriptionExists(requestType, applicationSharedSubscriptionName);
+
+                var pump = new MulticastRequestMessagePump(messagingFactory,
+                                                           configuration.MulticastRequestBroker,
+                                                           requestType,
+                                                           applicationSharedSubscriptionName,
+                                                           configuration.Logger);
+                messagePumps.Add(pump);
+            }
         }
 
         private static void CreateMulticastEventMessagePumps(BusBuilderConfiguration configuration,
@@ -158,24 +219,6 @@ namespace Nimbus.Configuration
                 var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, applicationSharedSubscriptionName);
                 var pump = new CompetingEventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger);
-                messagePumps.Add(pump);
-            }
-        }
-
-        private static void CreateRequestMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
-        {
-            foreach (var requestType in configuration.RequestTypes)
-            {
-                var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger);
-                messagePumps.Add(pump);
-            }
-        }
-
-        private static void CreateCommandMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
-        {
-            foreach (var commandType in configuration.CommandTypes)
-            {
-                var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
                 messagePumps.Add(pump);
             }
         }

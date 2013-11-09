@@ -23,34 +23,34 @@ namespace Nimbus.Infrastructure
 
         public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
         {
-            if (_namespaceManager.SubscriptionExists(eventType.FullName, subscriptionName)) return;
+            var topicPath = PathFactory.TopicPathFor(eventType);
+            if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName)) return;
 
-            _namespaceManager.CreateSubscription(eventType.FullName, subscriptionName);
+            _namespaceManager.CreateSubscription(topicPath, subscriptionName);
         }
 
         public void EnsureTopicExists(Type eventType)
         {
-            var topicName = eventType.FullName;
-            if (_namespaceManager.TopicExists(topicName)) return;
+            var topicPath = PathFactory.TopicPathFor(eventType);
+            EnsureTopicExists(topicPath);
+        }
 
-            _namespaceManager.CreateTopic(topicName);
+        private void EnsureTopicExists(string topicPath)
+        {
+            if (_namespaceManager.TopicExists(topicPath)) return;
+            _namespaceManager.CreateTopic(topicPath);
         }
 
         public void EnsureQueueExists(Type commandType)
         {
-            EnsureQueueExists(GetQueueName(commandType));
-        }
-
-        private static string GetQueueName(Type messageContractType)
-        {
-            var queueName = messageContractType.FullName;
-            return queueName;
+            var queuePath = PathFactory.QueuePathFor(commandType);
+            EnsureQueueExists(queuePath);
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)
         {
-            var queueName = messageContractType.FullName;
-            var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queueName);
+            var queuePath = PathFactory.QueuePathFor(messageContractType);
+            var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
         }
 
@@ -81,7 +81,7 @@ namespace Nimbus.Infrastructure
         public QueueClient CreateQueueClient<T>()
         {
             var messageContractType = typeof (T);
-            var queueName = GetQueueName(messageContractType);
+            var queueName = PathFactory.QueuePathFor(messageContractType);
 
             return _queueClients.GetOrAdd(messageContractType, t => GetOrCreateQueue(messageContractType, queueName));
         }

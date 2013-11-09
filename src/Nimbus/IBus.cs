@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 using Nimbus.PoisonMessages;
@@ -14,6 +15,10 @@ namespace Nimbus
             where TResponse : IBusResponse;
 
         Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusRequest
+            where TResponse : IBusResponse;
+
+        Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest
             where TResponse : IBusResponse;
 
