@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
+    <id>Nimbus.Autofac</id>
+    <version>0.0.1</version>
+    <title>Nimbus.Autofac</title>
     <authors>Damian Maclennan and Andrew Harcourt</authors>
     <owners>Damian Maclennan</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
