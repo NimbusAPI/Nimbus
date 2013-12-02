@@ -7,6 +7,9 @@ namespace Nimbus.InfrastructureContracts
     {
         IEnumerable<Type> CommandHandlerTypes { get; }
         IEnumerable<Type> CommandTypes { get; }
+        
+        IEnumerable<Type> TimeoutHandlerTypes { get; }
+        IEnumerable<Type> TimeoutTypes { get; }
 
         IEnumerable<Type> MulticastEventHandlerTypes { get; }
         IEnumerable<Type> CompetingEventHandlerTypes { get; }

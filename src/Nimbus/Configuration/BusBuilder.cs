@@ -9,6 +9,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.Timeouts;
 using Nimbus.InfrastructureContracts;
 using Nimbus.PoisonMessages;
 
@@ -38,6 +39,7 @@ namespace Nimbus.Configuration
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory);
+            var timeoutSender = new BusTimeoutSender(messageSenderFactory, clock);
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, clock, configuration.DefaultTimeout);
             var multicastRequestSender = new BusMulticastRequestSender(topicClientFactory, replyQueueName, requestResponseCorrelator, clock);
             var eventSender = new BusEventSender(topicClientFactory);
@@ -51,6 +53,7 @@ namespace Nimbus.Configuration
             {
                 Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName)),
                 Task.Run(() => CreateCommandQueues(configuration, queueManager)),
+                Task.Run(() => CreateTimeoutQueues(configuration, queueManager)),
                 Task.Run(() => CreateRequestQueues(configuration, queueManager)),
                 Task.Run(() => CreateMulticastRequestTopics(configuration, queueManager)),
                 Task.Run(() => CreateEventTopics(configuration, queueManager)),
@@ -60,6 +63,7 @@ namespace Nimbus.Configuration
             //FIXME do these in parallel
             CreateResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
             CreateCommandMessagePumps(configuration, messagingFactory, messagePumps);
+            CreateTimeoutMessagePumps(configuration, messagingFactory, messagePumps);
             CreateRequestMessagePumps(configuration, messagingFactory, messagePumps);
             CreateMulticastRequestMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
             CreateMulticastEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
@@ -69,7 +73,7 @@ namespace Nimbus.Configuration
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
 
-            var bus = new Bus(commandSender, requestSender, multicastRequestSender, eventSender, messagePumps, deadLetterQueues);
+            var bus = new Bus(commandSender, timeoutSender, requestSender, multicastRequestSender, eventSender, messagePumps, deadLetterQueues);
             return bus;
         }
 
@@ -101,6 +105,14 @@ namespace Nimbus.Configuration
         private static void CreateCommandQueues(BusBuilderConfiguration configuration, QueueManager queueManager)
         {
             configuration.CommandTypes
+                         .AsParallel()
+                         .Do(queueManager.EnsureQueueExists)
+                         .Done();
+        }
+        
+        private static void CreateTimeoutQueues(BusBuilderConfiguration configuration, QueueManager queueManager)
+        {
+            configuration.TimeoutTypes
                          .AsParallel()
                          .Do(queueManager.EnsureQueueExists)
                          .Done();
@@ -145,6 +157,15 @@ namespace Nimbus.Configuration
             foreach (var commandType in configuration.CommandTypes)
             {
                 var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
+                messagePumps.Add(pump);
+            }
+        }
+        
+        private static void CreateTimeoutMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        {
+            foreach (var timeoutType in configuration.TimeoutTypes)
+            {
+                var pump = new TimeoutMessagePump(messagingFactory, configuration.TimeoutBroker, timeoutType, configuration.Logger);
                 messagePumps.Add(pump);
             }
         }

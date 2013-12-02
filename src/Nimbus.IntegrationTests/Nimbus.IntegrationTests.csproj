@@ -63,6 +63,9 @@
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
+    <Compile Include="Tests\SimpleRequestTimeoutTests\TimeoutHandlers\SomeTimeoutHandler.cs" />
+    <Compile Include="Tests\SimpleRequestTimeoutTests\MessageContracts\SomeTimeout.cs" />
+    <Compile Include="Tests\SimpleRequestTimeoutTests\WhenRequestingATimeoutOnTheBus.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCombinedEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />

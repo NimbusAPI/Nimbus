@@ -10,6 +10,10 @@ namespace Nimbus
     {
         Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand;
 
+        Task Defer<TBusTimeout>(TimeSpan delay, TBusTimeout busTimeout) where TBusTimeout : IBusTimeout;
+
+        Task Defer<TBusTimeout>(DateTime processAt, TBusTimeout busTimeout) where TBusTimeout : IBusTimeout;
+
         Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest
             where TResponse : IBusResponse;

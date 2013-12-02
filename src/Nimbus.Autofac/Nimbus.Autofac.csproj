@@ -48,6 +48,7 @@
     <Compile Include="AutofacMulticastEventBroker.cs" />
     <Compile Include="AutofacMulticastRequestBroker.cs" />
     <Compile Include="AutofacRequestBroker.cs" />
+    <Compile Include="AutofacTimeoutBroker.cs" />
     <Compile Include="NimbusContainerBuilderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -11,12 +11,15 @@ namespace Nimbus.Configuration
         internal string InstanceName { get; set; }
         internal string ConnectionString { get; set; }
         internal ICommandBroker CommandBroker { get; set; }
+        internal ITimeoutBroker TimeoutBroker { get; set; }
         internal IRequestBroker RequestBroker { get; set; }
         internal IMulticastRequestBroker MulticastRequestBroker { get; set; }
         internal IMulticastEventBroker MulticastEventBroker { get; set; }
         internal ICompetingEventBroker CompetingEventBroker { get; set; }
         internal Type[] CommandHandlerTypes { get; set; }
         internal Type[] CommandTypes { get; set; }
+        internal Type[] TimeoutHandlerTypes { get; set; }
+        internal Type[] TimeoutTypes { get; set; }
         internal Type[] RequestHandlerTypes { get; set; }
         internal Type[] RequestTypes { get; set; }
         internal Type[] MulticastEventHandlerTypes { get; set; }
