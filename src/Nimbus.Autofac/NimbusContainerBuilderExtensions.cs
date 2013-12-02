@@ -26,6 +26,10 @@ namespace Nimbus.Autofac
 
             builder.RegisterType<AutofacRequestBroker>()
                    .As<IRequestBroker>()
+                   .SingleInstance();  
+            
+            builder.RegisterType<AutofacMulticastRequestBroker>()
+                   .As<IRequestBroker>()
                    .SingleInstance();
 
             return builder;
