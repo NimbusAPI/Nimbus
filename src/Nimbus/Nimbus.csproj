@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InfrastructureContracts\IHandleTimeouts.cs" />
+    <Compile Include="InfrastructureContracts\ITimeoutBroker.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\BusDebuggingConfiguration.cs" />
     <Compile Include="Configuration\BusDebuggingConfigurationExtensions.cs" />
@@ -68,6 +70,9 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePump.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
+    <Compile Include="Infrastructure\Timeouts\BusTimeoutSender.cs" />
+    <Compile Include="Infrastructure\Timeouts\TimeoutMessagePump.cs" />
+    <Compile Include="Infrastructure\Timeouts\ITimeoutSender.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />

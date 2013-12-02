@@ -46,6 +46,7 @@
     <Compile Include="IBusEvent.cs" />
     <Compile Include="IBusRequest.cs" />
     <Compile Include="IBusResponse.cs" />
+    <Compile Include="IBusTimeout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

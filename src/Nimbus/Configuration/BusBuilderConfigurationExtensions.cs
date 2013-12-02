@@ -42,6 +42,12 @@ namespace Nimbus.Configuration
             configuration.CommandBroker = commandBroker;
             return configuration;
         }
+        
+        public static BusBuilderConfiguration WithTimeoutBroker(this BusBuilderConfiguration configuration, ITimeoutBroker timeoutBroker)
+        {
+            configuration.TimeoutBroker = timeoutBroker;
+            return configuration;
+        }
 
         public static BusBuilderConfiguration WithRequestBroker(this BusBuilderConfiguration configuration, IRequestBroker requestBroker)
         {
@@ -59,6 +65,9 @@ namespace Nimbus.Configuration
         {
             configuration.CommandHandlerTypes = typeProvider.CommandHandlerTypes.ToArray();
             configuration.CommandTypes = typeProvider.CommandTypes.ToArray();
+            
+            configuration.TimeoutHandlerTypes = typeProvider.TimeoutHandlerTypes.ToArray();
+            configuration.TimeoutTypes = typeProvider.TimeoutTypes.ToArray();
 
             configuration.RequestHandlerTypes = typeProvider.RequestHandlerTypes.ToArray();
             configuration.RequestTypes = typeProvider.RequestTypes.ToArray();

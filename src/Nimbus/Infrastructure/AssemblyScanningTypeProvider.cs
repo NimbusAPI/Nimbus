@@ -14,6 +14,8 @@ namespace Nimbus.Infrastructure
         private readonly Lazy<Type[]> _allInstantiableTypesInScannedAssemblies;
         private readonly Lazy<Type[]> _commandHandlerTypes;
         private readonly Lazy<Type[]> _commandTypes;
+        private readonly Lazy<Type[]> _timeoutHandlerTypes;
+        private readonly Lazy<Type[]> _timeoutTypes;
         private readonly Lazy<Type[]> _multicastEventHandlerTypes;
         private readonly Lazy<Type[]> _competingEventHandlerTypes;
         private readonly Lazy<Type[]> _eventTypes;
@@ -32,6 +34,8 @@ namespace Nimbus.Infrastructure
             _allInstantiableTypesInScannedAssemblies = new Lazy<Type[]>(ScanAssembliesForInterestingTypes);
             _commandHandlerTypes = new Lazy<Type[]>(ScanForCommandHandlerTypes);
             _commandTypes = new Lazy<Type[]>(ScanForCommandTypes);
+            _timeoutHandlerTypes = new Lazy<Type[]>(ScanForTimeoutHandlerTypes);
+            _timeoutTypes = new Lazy<Type[]>(ScanForTimeoutTypes);
             _multicastEventHandlerTypes = new Lazy<Type[]>(ScanForMulticastEventHandlerTypes);
             _competingEventHandlerTypes = new Lazy<Type[]>(ScanForCompetingEventHandlerTypes);
             _eventTypes = new Lazy<Type[]>(ScanForEventTypes);
@@ -47,6 +51,16 @@ namespace Nimbus.Infrastructure
         public IEnumerable<Type> CommandTypes
         {
             get { return _commandTypes.Value; }
+        }
+
+        public IEnumerable<Type> TimeoutHandlerTypes
+        {
+            get { return _timeoutHandlerTypes.Value; }
+        }
+
+        public IEnumerable<Type> TimeoutTypes
+        {
+            get { return _timeoutTypes.Value; }
         }
 
         public IEnumerable<Type> MulticastEventHandlerTypes
@@ -95,6 +109,24 @@ namespace Nimbus.Infrastructure
         {
             var types = AllInstantiableTypesInScannedAssemblies
                 .Where(t => typeof (IBusCommand).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
+        }
+        
+        private Type[] ScanForTimeoutHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleTimeouts<>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForTimeoutTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof (IBusTimeout).IsAssignableFrom(t))
                 .ToArray();
 
             return types;

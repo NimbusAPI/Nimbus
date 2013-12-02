@@ -23,6 +23,10 @@ namespace Nimbus.Autofac
             builder.RegisterType<AutofacCommandBroker>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
+            
+            builder.RegisterType<AutofacTimeoutBroker>()
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
 
             builder.RegisterType<AutofacRequestBroker>()
                    .AsImplementedInterfaces()
