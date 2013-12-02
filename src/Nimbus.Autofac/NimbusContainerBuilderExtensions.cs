@@ -13,23 +13,23 @@ namespace Nimbus.Autofac
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<AutofacMulticastEventBroker>()
-                   .As<IMulticastEventBroker>()
+                   .AsImplementedInterfaces()
                    .SingleInstance();
 
             builder.RegisterType<AutofacCompetingEventBroker>()
-                   .As<ICompetingEventBroker>()
+                   .AsImplementedInterfaces()
                    .SingleInstance();
 
             builder.RegisterType<AutofacCommandBroker>()
-                   .As<ICommandBroker>()
+                   .AsImplementedInterfaces()
                    .SingleInstance();
 
             builder.RegisterType<AutofacRequestBroker>()
-                   .As<IRequestBroker>()
-                   .SingleInstance();  
-            
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
+
             builder.RegisterType<AutofacMulticastRequestBroker>()
-                   .As<IRequestBroker>()
+                   .AsImplementedInterfaces()
                    .SingleInstance();
 
             return builder;
