@@ -45,6 +45,33 @@ If you're using a bus, you should probably be using an IoC container. If you lik
 
     var container = builder.Build();
     return container;
+    
+### Sending commands
+
+    public class SomeClassThatSendsCommands
+    {
+        private readonly IBus _bus;
+        
+        public SomeClassThatSendsCommands(IBus bus)
+        {
+            _bus = bus;
+        }
+        
+        public void SendSomeCommand()
+        {
+            _bus.Send(new DoSomethingCommand());
+        }
+    }
+
+### Handling commands
+
+    public class DoSomethingCommandHandler: IHandleCommand<DoSomethingCommand>
+    {
+        public void Handle(DoSomethingCommand command)
+        {
+            //TODO: Do something useful here.
+        }
+    }
 
 ## Can I contribute?
 Absolutely! This is very very very early days for this project, we need things
