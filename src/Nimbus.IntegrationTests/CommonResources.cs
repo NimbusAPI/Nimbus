@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests
 
         private static string FetchConnectionString()
         {
-            return LocalFilesystemConnectionString() ?? FallbackConnectionString();
+            return LocalFilesystemConnectionString();
         }
 
         private static string LocalFilesystemConnectionString()
@@ -27,9 +27,5 @@ namespace Nimbus.IntegrationTests
                        : File.ReadAllText(filename).Trim();
         }
 
-        private static string FallbackConnectionString()
-        {
-            return @"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=";
-        }
     }
 }
