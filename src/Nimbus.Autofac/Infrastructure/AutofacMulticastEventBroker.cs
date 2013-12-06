@@ -5,24 +5,24 @@ using Autofac;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.Autofac
+namespace Nimbus.Autofac.Infrastructure
 {
-    public class AutofacCompetingEventBroker : ICompetingEventBroker
+    public class AutofacMulticastEventBroker : IMulticastEventBroker
     {
         private readonly ILifetimeScope _lifetimeScope;
 
-        public AutofacCompetingEventBroker(ILifetimeScope lifetimeScope)
+        public AutofacMulticastEventBroker(ILifetimeScope lifetimeScope)
         {
             _lifetimeScope = lifetimeScope;
         }
 
-        public void PublishCompeting<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        public void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {
-                var type = typeof (IEnumerable<IHandleCompetingEvent<TBusEvent>>);
+                var type = typeof (IEnumerable<IHandleMulticastEvent<TBusEvent>>);
                 var handlers = (IEnumerable) scope.Resolve(type);
-                foreach (var handler in handlers.Cast<IHandleCompetingEvent<IBusEvent>>()) handler.Handle(busEvent);
+                foreach (var handler in handlers.Cast<IHandleMulticastEvent<IBusEvent>>()) handler.Handle(busEvent);
             }
         }
     }

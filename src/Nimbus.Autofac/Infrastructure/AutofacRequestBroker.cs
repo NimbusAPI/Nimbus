@@ -2,7 +2,7 @@
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.Autofac
+namespace Nimbus.Autofac.Infrastructure
 {
     public class AutofacRequestBroker : IRequestBroker
     {

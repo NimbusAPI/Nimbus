@@ -43,12 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutofacCommandBroker.cs" />
-    <Compile Include="AutofacCompetingEventBroker.cs" />
-    <Compile Include="AutofacMulticastEventBroker.cs" />
-    <Compile Include="AutofacMulticastRequestBroker.cs" />
-    <Compile Include="AutofacRequestBroker.cs" />
-    <Compile Include="NimbusContainerBuilderExtensions.cs" />
+    <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
+    <Compile Include="Infrastructure\AutofacCommandBroker.cs" />
+    <Compile Include="Infrastructure\AutofacCompetingEventBroker.cs" />
+    <Compile Include="Infrastructure\AutofacMulticastEventBroker.cs" />
+    <Compile Include="Infrastructure\AutofacMulticastRequestBroker.cs" />
+    <Compile Include="Infrastructure\AutofacRequestBroker.cs" />
+    <Compile Include="Configuration\NimbusContainerBuilderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +66,7 @@
     <None Include="Nimbus.Autofac.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

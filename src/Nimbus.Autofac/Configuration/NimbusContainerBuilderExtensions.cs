@@ -1,8 +1,9 @@
 ﻿using Autofac;
+using Nimbus.Autofac.Infrastructure;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Autofac
+namespace Nimbus.Autofac.Configuration
 {
     public static class NimbusContainerBuilderExtensions
     {

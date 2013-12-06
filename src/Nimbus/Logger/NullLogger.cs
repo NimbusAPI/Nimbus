@@ -3,7 +3,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Logger
 {
-    internal class NullLogger : ILogger
+    public class NullLogger : ILogger
     {
         public void Debug(string format, params object[] args)
         {
