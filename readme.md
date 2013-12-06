@@ -18,6 +18,25 @@ If you're using a bus, you should probably be using an IoC container. If you lik
 
     Install-Package Nimbus.Autofac
 
+### Configuring the bus without a container
+
+    var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+    var messageBroker = new DefaultMessageBroker(typeProvider);
+
+    var bus = new BusBuilder().Configure()
+                                .WithNames("MyTestSuite", Environment.MachineName)
+                                .WithConnectionString(CommonResources.ConnectionString)
+                                .WithTypesFrom(typeProvider)
+                                .WithCommandBroker(messageBroker)
+                                .WithRequestBroker(messageBroker)
+                                .WithMulticastEventBroker(messageBroker)
+                                .WithCompetingEventBroker(messageBroker)
+                                .WithMulticastRequestBroker(messageBroker)
+                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                .Build();
+    bus.Start();
+    return bus;
+
 ### Configuring the bus with Autofac
     //TODO: Set up your own connection string in app.config
     var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
