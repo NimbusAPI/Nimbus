@@ -3,8 +3,8 @@ Nimbus is a .NET client library to add an easy to develop against experience aga
 
 If you've used NServiceBus or MassTransit before, you'll be right at home.
 
-Nimbus was designed to be lightweight and pluggable. You won't find fifty conflicting versions of other projects ILMerged into the binary, if you want to plug your own container or logging framework in, go right ahead. However if you
-want something that will just work out of the box we give you that too.
+Nimbus was designed to be lightweight and pluggable. You won't find fifty conflicting versions of other projects ILMerged into the binary. If you want to plug your own container or logging framework in, go right ahead. If you
+want something that will just work out of the box we give you that, too.
 
 Nimbus provides implementations of all of the common messaging patterns for building distributed, service-oriented systems.
 
@@ -14,13 +14,15 @@ It's on NuGet:
 
     Install-Package Nimbus
 
-If you're using a bus, you should probably be using an IoC container. If you like Autofac, grab the corresponding bundle:
+If you're using a bus you should probably be using an IoC container. If you like Autofac, grab the corresponding bundle:
 
     Install-Package Nimbus.Autofac
 
 ### Configuring the bus without a container
 
+    // This is how you tell Nimbus where to find all your message types and handlers.
     var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+
     var messageBroker = new DefaultMessageBroker(typeProvider);
 
     var bus = new BusBuilder().Configure()
@@ -41,7 +43,8 @@ If you're using a bus, you should probably be using an IoC container. If you lik
     //TODO: Set up your own connection string in app.config
     var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
-    // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care.
+    // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care. You can roll your
+	// own by implementing the ILogger interface if you want to hook it to an existing logging implementation.
     builder.RegisterType<ConsoleLogger>()
            .AsImplementedInterfaces()
            .SingleInstance();
@@ -93,7 +96,7 @@ If you're using a bus, you should probably be using an IoC container. If you lik
     }
 
 ## Can I contribute?
-Absolutely! This is very very very early days for this project, we need things
+Absolutely! This is very very very early days for this project. We need things
 like:
 
 1.  Documentation
