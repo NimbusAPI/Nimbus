@@ -50,3 +50,9 @@ Maclennan [@damianm][2].
 [1]: <http://twitter.com/uglybugger>
 
 [2]: <http://twitter.com/damianm>
+
+
+
+You can follow Nimbus updates on the [NimbusAPI][3] Twitter account.
+
+[3]: <http://twitter.com/NimbusAPI>
