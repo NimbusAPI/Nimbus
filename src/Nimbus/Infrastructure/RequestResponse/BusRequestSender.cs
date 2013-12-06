@@ -26,12 +26,15 @@ namespace Nimbus.Infrastructure.RequestResponse
             _clock = clock;
         }
 
-        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
+        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+            where TRequest : IBusRequest<TRequest, TResponse>
+            where TResponse : IBusResponse
         {
             return await SendRequest(busRequest, _responseTimeout);
         }
 
-        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest
+        public async Task<TResponse> SendRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
             var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());

@@ -11,15 +11,15 @@ namespace Nimbus
         Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand;
 
         Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
-            where TRequest : IBusRequest
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse;
 
         Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse;
 
         Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse;
 
         Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent;

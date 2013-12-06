@@ -139,7 +139,7 @@ namespace Nimbus.Infrastructure
         private Type[] ScanForRequestTypes()
         {
             var types = AllInstantiableTypesInScannedAssemblies
-                .Where(t => typeof (IBusRequest).IsAssignableFrom(t))
+                .Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
                 .ToArray();
 
             return types;

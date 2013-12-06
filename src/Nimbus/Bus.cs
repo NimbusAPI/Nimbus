@@ -41,20 +41,24 @@ namespace Nimbus
             await _commandSender.Send(busCommand);
         }
 
-        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest) where TRequest : IBusRequest where TResponse : IBusResponse
+        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+            where TRequest : IBusRequest<TRequest, TResponse>
+            where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest);
             return response;
         }
 
-        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest
+        public async Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
             var response = await _requestSender.SendRequest(busRequest, timeout);
             return response;
         }
 
-        public async Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout) where TRequest : IBusRequest
+        public async Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
             var response = await _multicastRequestSender.SendRequest(busRequest, timeout);

@@ -3,8 +3,8 @@
 namespace Nimbus.MessageContracts
 {
     // ReSharper disable UnusedTypeParameter
-    public abstract class BusRequest<TRequest, TResponse> : IBusRequest
-        where TRequest : IBusRequest
+    public abstract class BusRequest<TRequest, TResponse> : IBusRequest<TRequest, TResponse>
+        where TRequest : IBusRequest<TRequest, TResponse>
         where TResponse : IBusResponse
         // ReSharper restore UnusedTypeParameter
     {

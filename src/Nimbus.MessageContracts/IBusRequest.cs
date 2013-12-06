@@ -1,6 +1,6 @@
 ﻿namespace Nimbus.MessageContracts
 {
-    public interface IBusRequest
+    public interface IBusRequest<TRequest, TResponse>
     {
     }
 }
