@@ -97,14 +97,10 @@ Absolutely! This is very very very early days for this project, we need things
 like:
 
 1.  Documentation
-
-2.  More container implementations
-
-3.  Logger implementations
-
-4.  Samples
-
-5.  Real world input from your projects
+1.  More container implementations
+1.  Logger implementations
+1.  Samples
+1.  Real world input from your projects
 
 We've put some issues here marked as [Up-for-grabs][4] if you want to jump in.
 
