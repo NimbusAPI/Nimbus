@@ -24,21 +24,61 @@ building distributed, service-oriented systems.
 
 
 
-Publish / Subscribe
+
+
+How to get started ?
+--------------------
 
 
 
-Command / Consumer and Command / Competing Consumer
+Well we need to add a bunch more content here, but for now you can either grab
+the code and look at the samples, and as much as it's a lame and overdone thing
+you can look at the tests (yes, not good enough but we'll get this better).
 
 
 
-Request / Response
+Or if you want to add it to your own project it's on Nuget.
 
 
 
-Multicast Request / Response
+Install-Package Nimbus
 
 
+
+Or the easiest way to get running is to grab it packaged with an IoC container.
+
+
+
+Install-Package Nimbus.Autofac
+
+
+
+
+
+Can I contribute ?
+------------------
+
+  
+Absolutely! This is very very very early days for this project, we need things
+like:
+
+
+
+1.  Documentation
+
+2.  More container implementations
+
+3.  Logger implementations
+
+4.  Samples
+
+5.  Real world input from your projects
+
+
+
+We've put some issues here marked as [Up-for-grabs][4] if you want to jump in.
+
+[4]: <https://github.com/DamianMac/Nimbus/issues?labels=up-for-grabs&page=1&state=open>
 
 
 
