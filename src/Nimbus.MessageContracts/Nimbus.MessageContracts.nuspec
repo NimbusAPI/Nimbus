@@ -11,5 +11,6 @@
     <releaseNotes>Init.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>azure servicebus</tags>
+    <projectUrl>https://github.com/DamianMac/Nimbus</projectUrl>
   </metadata>
 </package>
