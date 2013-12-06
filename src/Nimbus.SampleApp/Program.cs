@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Reflection;
 using Autofac;
 using Nimbus.Autofac;
@@ -34,10 +35,15 @@ namespace Nimbus.SampleApp
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             builder.RegisterNimbus(handlerTypesProvider);
+            
+
+            //TODO: Set up your own connection string in app.config
+            var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
+
             builder.Register(c => new BusBuilder()
                                       .Configure()
                                       .WithConnectionString(
-                                          @"Endpoint=sb://nimbustest.servicebus.windows.net/;SharedAccessKeyName=Demo;SharedAccessKey=bQppKwhg3xfBpIYqTAWcn9fC5HK1F2eh7G+AHb66jis=")
+                                          connectionString)
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(handlerTypesProvider)
                                       .WithMulticastEventBroker(c.Resolve<IMulticastEventBroker>())
