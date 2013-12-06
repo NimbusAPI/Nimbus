@@ -64,7 +64,6 @@
     <Compile Include="InfrastructureContracts\IMulticastRequestSender.cs" />
     <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
     <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
-    <Compile Include="InfrastructureContracts\IHandleUniqueEvent.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePump.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
