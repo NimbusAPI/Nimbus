@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nimbus.Logger.Serilog</id>
+    <version>0.0.1</version>
+    <title>Nimbus.Logger.Serilog</title>
+    <authors>Nicholas Blumhardt</authors>
+    <owners>Damian Maclennan</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Nimbus logger that writes to Serilog.</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>azure servicebus serilog</tags>
+    <projectUrl>https://github.com/DamianMac/Nimbus</projectUrl>
+    <dependencies>
+      <dependency id="Serilog" />
+    </dependencies>
+  </metadata>
+</package>
