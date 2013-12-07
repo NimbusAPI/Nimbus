@@ -15,6 +15,10 @@ namespace Nimbus.SampleApp
         {
             using (var container = CreateContainer())
             {
+                var heartbeat = container.Resolve<Heartbeat>();
+                heartbeat.Run();
+
+
                 var deepThought = container.Resolve<DeepThought>();
                 deepThought.ComputeTheAnswer().Wait();
                 Console.ReadKey();
@@ -26,6 +30,8 @@ namespace Nimbus.SampleApp
             var builder = new ContainerBuilder();
 
             builder.RegisterType<DeepThought>();
+
+            builder.RegisterType<Heartbeat>().SingleInstance();
 
 
             //TODO: Set up your own connection string in app.config

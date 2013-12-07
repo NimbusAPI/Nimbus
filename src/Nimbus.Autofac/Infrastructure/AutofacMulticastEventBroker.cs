@@ -22,7 +22,7 @@ namespace Nimbus.Autofac.Infrastructure
             {
                 var type = typeof (IEnumerable<IHandleMulticastEvent<TBusEvent>>);
                 var handlers = (IEnumerable) scope.Resolve(type);
-                foreach (var handler in handlers.Cast<IHandleMulticastEvent<IBusEvent>>()) handler.Handle(busEvent);
+                foreach (var handler in handlers.Cast<IHandleMulticastEvent<TBusEvent>>()) handler.Handle(busEvent);
             }
         }
     }
