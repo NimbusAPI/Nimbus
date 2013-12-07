@@ -19,7 +19,7 @@ namespace Nimbus.Autofac.Infrastructure
             {
                 var type = typeof (IHandleCommand<TBusCommand>);
 
-                var handler = (IHandleCommand<IBusCommand>) scope.Resolve(type);
+                var handler = (IHandleCommand<TBusCommand>) scope.Resolve(type);
                 handler.Handle(busCommand);
             }
         }
