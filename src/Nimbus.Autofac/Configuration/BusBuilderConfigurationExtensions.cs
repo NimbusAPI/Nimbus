@@ -13,6 +13,7 @@ namespace Nimbus.Autofac.Configuration
                 .WithCompetingEventBroker(componentContext.Resolve<ICompetingEventBroker>())
                 .WithCommandBroker(componentContext.Resolve<ICommandBroker>())
                 .WithRequestBroker(componentContext.Resolve<IRequestBroker>())
+                .WithMulticastRequestBroker(componentContext.Resolve<IMulticastRequestBroker>())
                 .WithLogger(componentContext.Resolve<ILogger>());
         }
     }
