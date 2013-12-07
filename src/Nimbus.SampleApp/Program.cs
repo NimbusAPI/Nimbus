@@ -5,7 +5,9 @@ using Autofac;
 using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.Logger;
+using Nimbus.Logger.Serilog;
+using Serilog;
+using ILogger = Nimbus.InfrastructureContracts.ILogger;
 
 namespace Nimbus.SampleApp
 {
@@ -13,6 +15,10 @@ namespace Nimbus.SampleApp
     {
         private static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.ColoredConsole()
+                .CreateLogger();
+
             using (var container = CreateContainer())
             {
                 var deepThought = container.Resolve<DeepThought>();
@@ -27,13 +33,12 @@ namespace Nimbus.SampleApp
 
             builder.RegisterType<DeepThought>();
 
+            builder.RegisterType<SerilogStaticLogger>()
+                .As<ILogger>()
+                .SingleInstance();
 
             //TODO: Set up your own connection string in app.config
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
-
-            builder.RegisterType<ConsoleLogger>()
-                   .AsImplementedInterfaces()
-                   .SingleInstance();
 
             var handlerTypesProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
             builder.RegisterNimbus(handlerTypesProvider);

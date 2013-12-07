@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{6B665505-3C52-49D3-914A-7C295AF3F877}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.SampleApp</RootNamespace>
-    <AssemblyName>Nimbus.SampleApp</AssemblyName>
+    <RootNamespace>Nimbus</RootNamespace>
+    <AssemblyName>Nimbus.Logger.Serilog</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,21 +20,22 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Autofac.3.1.5\lib\net40\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="Serilog">
       <HintPath>..\packages\Serilog.1.2.3\lib\net45\Serilog.dll</HintPath>
     </Reference>
@@ -43,7 +43,6 @@
       <HintPath>..\packages\Serilog.1.2.3\lib\net45\Serilog.FullNetFx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -52,27 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeepThought.cs" />
-    <Compile Include="Handlers\WhatIsTheAnswerRequestHandler.cs" />
-    <Compile Include="OtherProgramWithoutAutofac.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
+    <Compile Include="Logger\Serilog\SerilogStaticLogger.cs" />
+    <Compile Include="Logger\Serilog\SerilogLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MessageContracts\WhatIsTheAnswerRequest.cs" />
-    <Compile Include="MessageContracts\WhatIsTheAnswerResponse.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Nimbus.Autofac\Nimbus.Autofac.csproj">
-      <Project>{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}</Project>
-      <Name>Nimbus.Autofac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
-      <Project>{6b665505-3c52-49d3-914a-7c295af3f877}</Project>
-      <Name>Nimbus.Logger.Serilog</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>
@@ -82,6 +66,13 @@
       <Name>Nimbus</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Nimbus.Logger.Serilog.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
