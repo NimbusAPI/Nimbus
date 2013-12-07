@@ -6,6 +6,7 @@ using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
+using Nimbus.SampleApp.MessageContracts;
 
 namespace Nimbus.SampleApp
 {
@@ -17,6 +18,10 @@ namespace Nimbus.SampleApp
             {
                 var heartbeat = container.Resolve<Heartbeat>();
                 heartbeat.Run();
+
+                var bus = container.Resolve<IBus>();
+                bus.Send(new JustDoIt());
+
 
 
                 var deepThought = container.Resolve<DeepThought>();

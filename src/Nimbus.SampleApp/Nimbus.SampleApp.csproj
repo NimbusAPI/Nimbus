@@ -48,9 +48,11 @@
   <ItemGroup>
     <Compile Include="DeepThought.cs" />
     <Compile Include="Handlers\HeartbeatHandler.cs" />
+    <Compile Include="Handlers\Minion.cs" />
     <Compile Include="Handlers\WhatIsTheAnswerRequestHandler.cs" />
     <Compile Include="Heartbeat.cs" />
     <Compile Include="MessageContracts\HeartbeatEvent.cs" />
+    <Compile Include="MessageContracts\JustDoIt.cs" />
     <Compile Include="OtherProgramWithoutAutofac.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
