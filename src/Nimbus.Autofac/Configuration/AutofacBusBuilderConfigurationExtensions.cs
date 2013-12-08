@@ -1,10 +1,12 @@
 ﻿using Autofac;
-using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Autofac.Configuration
+// ReSharper disable CheckNamespace
+
+namespace Nimbus.Configuration
+// ReSharper restore CheckNamespace
 {
-    public static class BusBuilderConfigurationExtensions
+    public static class AutofacBusBuilderConfigurationExtensions
     {
         public static BusBuilderConfiguration WithAutofacDefaults(this BusBuilderConfiguration configuration, IComponentContext componentContext)
         {

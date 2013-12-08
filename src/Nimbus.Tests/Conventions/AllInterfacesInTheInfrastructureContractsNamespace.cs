@@ -18,7 +18,7 @@ namespace Nimbus.Tests.Conventions
             interfaceType.IsPublic.ShouldBe(true);
         }
 
-        public class TestCases : IEnumerable<TestCaseData>
+        private class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {

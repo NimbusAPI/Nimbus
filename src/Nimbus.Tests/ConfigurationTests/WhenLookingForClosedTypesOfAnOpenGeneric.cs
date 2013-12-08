@@ -19,7 +19,7 @@ namespace Nimbus.Tests.ConfigurationTests
             candidateType.IsClosedTypeOf(openGenericType).ShouldBe(expectedResult);
         }
 
-        public class TestCases : IEnumerable<TestCaseData>
+        private class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {

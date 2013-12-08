@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
+    <Compile Include="Configuration\AutofacBusBuilderConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\AutofacCommandBroker.cs" />
     <Compile Include="Infrastructure\AutofacCompetingEventBroker.cs" />
     <Compile Include="Infrastructure\AutofacMulticastEventBroker.cs" />
