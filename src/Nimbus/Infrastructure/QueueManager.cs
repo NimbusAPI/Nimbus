@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {
@@ -10,15 +11,17 @@ namespace Nimbus.Infrastructure
         private readonly NamespaceManager _namespaceManager;
         private readonly MessagingFactory _messagingFactory;
         private readonly int _maxDeliveryAttempts;
+        private readonly ILogger _logger;
 
         private readonly ConcurrentDictionary<Type, QueueClient> _queueClients = new ConcurrentDictionary<Type, QueueClient>();
         private readonly ConcurrentDictionary<Type, QueueClient> _deadLetterQueueClients = new ConcurrentDictionary<Type, QueueClient>();
 
-        public QueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, int maxDeliveryAttempts)
+        public QueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, int maxDeliveryAttempts, ILogger logger)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
+            _logger = logger;
         }
 
         public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
@@ -53,6 +56,8 @@ namespace Nimbus.Infrastructure
 
         private void EnsureTopicExists(string topicPath)
         {
+            _logger.Debug("Ensuring topic '{0}' exists", topicPath);
+
             var topicDescription = new TopicDescription(topicPath)
             {
                 DefaultMessageTimeToLive = TimeSpan.MaxValue,
@@ -78,15 +83,10 @@ namespace Nimbus.Infrastructure
             EnsureQueueExists(queuePath);
         }
 
-        private string GetDeadLetterQueueName(Type messageContractType)
-        {
-            var queuePath = PathFactory.QueuePathFor(messageContractType);
-            var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
-            return deadLetterQueueName;
-        }
-
         public void EnsureQueueExists(string queuePath)
         {
+            _logger.Debug("Ensuring queue '{0}' exists", queuePath);
+
             var queueDescription = new QueueDescription(queuePath)
             {
                 MaxDeliveryCount = _maxDeliveryAttempts,
@@ -108,6 +108,13 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateQueue(queueDescription);
             }
+        }
+
+        private string GetDeadLetterQueueName(Type messageContractType)
+        {
+            var queuePath = PathFactory.QueuePathFor(messageContractType);
+            var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
+            return deadLetterQueueName;
         }
 
         public QueueClient CreateQueueClient<T>()

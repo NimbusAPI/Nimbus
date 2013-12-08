@@ -23,14 +23,20 @@ namespace Nimbus.Configuration
 
         internal static Bus Build(BusBuilderConfiguration configuration)
         {
+            var logger = configuration.Logger;
+
+            logger.Debug("Constructing bus...");
+
             var replyQueueName = string.Format("InputQueue.{0}.{1}", configuration.ApplicationName, configuration.InstanceName);
 
             var namespaceManager = NamespaceManager.CreateFromConnectionString(configuration.ConnectionString);
+            var versionInfo = namespaceManager.GetVersionInfo();
+
             var messagingFactory = MessagingFactory.CreateFromConnectionString(configuration.ConnectionString);
 
             var messagePumps = new List<IMessagePump>();
 
-            var queueManager = new QueueManager(namespaceManager, messagingFactory, configuration.MaxDeliveryAttempts);
+            var queueManager = new QueueManager(namespaceManager, messagingFactory, configuration.MaxDeliveryAttempts, logger);
 
             var clock = new SystemClock();
             var requestResponseCorrelator = new RequestResponseCorrelator(clock);
@@ -44,42 +50,56 @@ namespace Nimbus.Configuration
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {
-                RemoveAllExistingNamespaceElements(namespaceManager);
+                RemoveAllExistingNamespaceElements(namespaceManager, logger);
             }
 
-            var queueCreationTasks = new[]
-            {
-                Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName)),
-                Task.Run(() => CreateCommandQueues(configuration, queueManager)),
-                Task.Run(() => CreateRequestQueues(configuration, queueManager)),
-                Task.Run(() => CreateMulticastRequestTopics(configuration, queueManager)),
-                Task.Run(() => CreateEventTopics(configuration, queueManager)),
-            };
-            Task.WaitAll(queueCreationTasks);
+            logger.Debug("Creating queues and topics");
 
-            //FIXME do these in parallel
-            CreateResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps);
-            CreateCommandMessagePumps(configuration, messagingFactory, messagePumps);
-            CreateRequestMessagePumps(configuration, messagingFactory, messagePumps);
-            CreateMulticastRequestMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
-            CreateMulticastEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
-            CreateCompetingEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps);
+            var queueCreationTasks =
+                new[]
+                {
+                    Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName, logger)),
+                    Task.Run(() => CreateCommandQueues(configuration, queueManager, logger)),
+                    Task.Run(() => CreateRequestQueues(configuration, queueManager, logger)),
+                    Task.Run(() => CreateMulticastRequestTopics(configuration, queueManager, logger)),
+                    Task.Run(() => CreateEventTopics(configuration, queueManager, logger))
+                };
+            Task.WaitAll(queueCreationTasks);
+            logger.Debug("Queues and topics are all created.");
+
+            logger.Debug("Creating message pumps and subscriptions.");
+            var messagePumpCreationTasks =
+                new[]
+                {
+                    Task.Run(() => CreateResponseMessagePump(configuration, messagingFactory, replyQueueName, requestResponseCorrelator, messagePumps, logger)),
+                    Task.Run(() => CreateCommandMessagePumps(configuration, messagingFactory, messagePumps, logger)),
+                    Task.Run(() => CreateRequestMessagePumps(configuration, messagingFactory, messagePumps, logger)),
+                    Task.Run(() => CreateMulticastRequestMessagePumps(configuration, queueManager, messagingFactory, messagePumps, logger)),
+                    Task.Run(() => CreateMulticastEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps, logger)),
+                    Task.Run(() => CreateCompetingEventMessagePumps(configuration, queueManager, messagingFactory, messagePumps, logger))
+                };
+            messagePumpCreationTasks.WaitAll();
+            logger.Debug("Message pumps and subscriptions are all created.");
 
             var commandDeadLetterQueue = new DeadLetterQueue(queueManager);
             var requestDeadLetterQueue = new DeadLetterQueue(queueManager);
             var deadLetterQueues = new DeadLetterQueues(commandDeadLetterQueue, requestDeadLetterQueue);
 
             var bus = new Bus(commandSender, requestSender, multicastRequestSender, eventSender, messagePumps, deadLetterQueues);
+
+            logger.Debug("Bus build. Job done!");
+
             return bus;
         }
 
         /// <summary>
         ///     Danger! Danger, Will Robinson!
         /// </summary>
-        private static void RemoveAllExistingNamespaceElements(NamespaceManager namespaceManager)
+        private static void RemoveAllExistingNamespaceElements(NamespaceManager namespaceManager, ILogger logger)
         {
-            var tasks = new List<Task>();
+            logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
 
+            var tasks = new List<Task>();
             var queuePaths = namespaceManager.GetQueues().Select(q => q.Path).ToArray();
             queuePaths
                 .Do(queuePath => tasks.Add(Task.Run(() => namespaceManager.DeleteQueue(queuePath))))
@@ -93,37 +113,47 @@ namespace Nimbus.Configuration
             tasks.WaitAll();
         }
 
-        private static void CreateMyInputQueue(QueueManager queueManager, string replyQueueName)
+        private static void CreateMyInputQueue(QueueManager queueManager, string replyQueueName, ILogger logger)
         {
+            logger.Debug("Creating our own input queue ({0})", replyQueueName);
+
             queueManager.EnsureQueueExists(replyQueueName);
         }
 
-        private static void CreateCommandQueues(BusBuilderConfiguration configuration, QueueManager queueManager)
+        private static void CreateCommandQueues(BusBuilderConfiguration configuration, QueueManager queueManager, ILogger logger)
         {
+            logger.Debug("Creating command queues");
+
             configuration.CommandTypes
                          .AsParallel()
                          .Do(queueManager.EnsureQueueExists)
                          .Done();
         }
 
-        private static void CreateRequestQueues(BusBuilderConfiguration configuration, QueueManager queueManager)
+        private static void CreateRequestQueues(BusBuilderConfiguration configuration, QueueManager queueManager, ILogger logger)
         {
+            logger.Debug("Creating request queues");
+
             configuration.RequestTypes
                          .AsParallel()
                          .Do(queueManager.EnsureQueueExists)
                          .Done();
         }
 
-        private static void CreateMulticastRequestTopics(BusBuilderConfiguration configuration, QueueManager queueManager)
+        private static void CreateMulticastRequestTopics(BusBuilderConfiguration configuration, QueueManager queueManager, ILogger logger)
         {
+            logger.Debug("Creating multicast request topics");
+
             configuration.RequestTypes
                          .AsParallel()
                          .Do(queueManager.EnsureTopicExists)
                          .Done();
         }
 
-        private static void CreateEventTopics(BusBuilderConfiguration configuration, QueueManager queueManager)
+        private static void CreateEventTopics(BusBuilderConfiguration configuration, QueueManager queueManager, ILogger logger)
         {
+            logger.Debug("Creating event topics");
+
             configuration.EventTypes
                          .AsParallel()
                          .Do(queueManager.EnsureTopicExists)
@@ -134,14 +164,17 @@ namespace Nimbus.Configuration
                                                       MessagingFactory messagingFactory,
                                                       string replyQueueName,
                                                       RequestResponseCorrelator requestResponseCorrelator,
-                                                      ICollection<IMessagePump> messagePumps)
+                                                      ICollection<IMessagePump> messagePumps,
+                                                      ILogger logger)
         {
             var responseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, configuration.Logger);
             messagePumps.Add(responseMessagePump);
         }
 
-        private static void CreateCommandMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private static void CreateCommandMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps, ILogger logger)
         {
+            logger.Debug("Creating command message pumps");
+
             foreach (var commandType in configuration.CommandTypes)
             {
                 var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
@@ -149,8 +182,10 @@ namespace Nimbus.Configuration
             }
         }
 
-        private static void CreateRequestMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps)
+        private static void CreateRequestMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps, ILogger logger)
         {
+            logger.Debug("Creating request message pumps");
+
             foreach (var requestType in configuration.RequestTypes)
             {
                 var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger);
@@ -161,8 +196,11 @@ namespace Nimbus.Configuration
         private static void CreateMulticastRequestMessagePumps(BusBuilderConfiguration configuration,
                                                                QueueManager queueManager,
                                                                MessagingFactory messagingFactory,
-                                                               List<IMessagePump> messagePumps)
+                                                               List<IMessagePump> messagePumps,
+                                                               ILogger logger)
         {
+            logger.Debug("Creating multicast request message pumps");
+
             var requestTypes = configuration.RequestHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleRequest<,>)))
                                             .Select(gi => gi.GetGenericArguments().First())
                                             .OrderBy(t => t.FullName)
@@ -186,8 +224,11 @@ namespace Nimbus.Configuration
         private static void CreateMulticastEventMessagePumps(BusBuilderConfiguration configuration,
                                                              IQueueManager queueManager,
                                                              MessagingFactory messagingFactory,
-                                                             ICollection<IMessagePump> messagePumps)
+                                                             ICollection<IMessagePump> messagePumps,
+                                                             ILogger logger)
         {
+            logger.Debug("Creating multicast event message pumps");
+
             var eventTypes = configuration.MulticastEventHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>)))
                                           .Select(gi => gi.GetGenericArguments().Single())
                                           .OrderBy(t => t.FullName)
@@ -206,8 +247,11 @@ namespace Nimbus.Configuration
         private static void CreateCompetingEventMessagePumps(BusBuilderConfiguration configuration,
                                                              IQueueManager queueManager,
                                                              MessagingFactory messagingFactory,
-                                                             ICollection<IMessagePump> messagePumps)
+                                                             ICollection<IMessagePump> messagePumps,
+                                                             ILogger logger)
         {
+            logger.Debug("Creating competing event message pumps");
+
             var eventTypes = configuration.CompetingEventHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>)))
                                           .Select(gi => gi.GetGenericArguments().Single())
                                           .OrderBy(t => t.FullName)

@@ -49,8 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="TestHarnessMessageBroker.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="Tests\BusBuilderTests\CommandHandlers\SomeCommandHandler.cs" />
+    <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
