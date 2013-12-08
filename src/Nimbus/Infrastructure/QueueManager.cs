@@ -2,7 +2,10 @@
 using System.Collections.Concurrent;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Exceptions;
+using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
@@ -29,15 +32,15 @@ namespace Nimbus.Infrastructure
             var topicPath = PathFactory.TopicPathFor(eventType);
 
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-            {
-                MaxDeliveryCount = _maxDeliveryAttempts,
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableDeadLetteringOnMessageExpiration = true,
-                EnableBatchedOperations = true,
-                LockDuration = TimeSpan.FromSeconds(30),
-                RequiresSession = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                          {
+                                              MaxDeliveryCount = _maxDeliveryAttempts,
+                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                              EnableDeadLetteringOnMessageExpiration = true,
+                                              EnableBatchedOperations = true,
+                                              LockDuration = TimeSpan.FromSeconds(30),
+                                              RequiresSession = false,
+                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                          };
             if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
             {
                 _namespaceManager.UpdateSubscription(subscriptionDescription);
@@ -59,22 +62,39 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Ensuring topic '{0}' exists", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
-            {
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableBatchedOperations = true,
-                RequiresDuplicateDetection = false,
-                SupportOrdering = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                   {
+                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                       EnableBatchedOperations = true,
+                                       RequiresDuplicateDetection = false,
+                                       SupportOrdering = false,
+                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                   };
 
-            if (_namespaceManager.TopicExists(topicPath))
-            {
-                _namespaceManager.UpdateTopic(topicDescription);
-            }
-            else
+            // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
+            // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+            // update its configuration in a minute anyway.  -andrewh 8/12/2013
+            try
             {
                 _namespaceManager.CreateTopic(topicDescription);
             }
+            catch (MessagingEntityAlreadyExistsException)
+            {
+                _logger.Debug("Topic '{0}' has already been created.", topicPath);
+            }
+            catch (MessagingException)
+            {
+                _logger.Debug("Looks like a conflicting create operation is in progress for '{0}'. We'll find out in a minute...", topicPath);
+            }
+
+            try
+            {
+                _namespaceManager.UpdateTopic(topicDescription);
+            }
+            catch (MessagingException)
+            {
+            }
+
+            if (!_namespaceManager.TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
         }
 
         public void EnsureQueueExists(Type commandType)
@@ -88,26 +108,43 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Ensuring queue '{0}' exists", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
-            {
-                MaxDeliveryCount = _maxDeliveryAttempts,
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableDeadLetteringOnMessageExpiration = true,
-                EnableBatchedOperations = true,
-                LockDuration = TimeSpan.FromSeconds(30),
-                RequiresDuplicateDetection = false,
-                RequiresSession = false,
-                SupportOrdering = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                   {
+                                       MaxDeliveryCount = _maxDeliveryAttempts,
+                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                       EnableDeadLetteringOnMessageExpiration = true,
+                                       EnableBatchedOperations = true,
+                                       LockDuration = TimeSpan.FromSeconds(30),
+                                       RequiresDuplicateDetection = false,
+                                       RequiresSession = false,
+                                       SupportOrdering = false,
+                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                   };
 
-            if (_namespaceManager.QueueExists(queuePath))
-            {
-                _namespaceManager.UpdateQueue(queueDescription);
-            }
-            else
+            // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
+            // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+            // update its configuration in a minute anyway.  -andrewh 8/12/2013
+            try
             {
                 _namespaceManager.CreateQueue(queueDescription);
             }
+            catch (MessagingEntityAlreadyExistsException)
+            {
+                _logger.Debug("Queue '{0}' has already been created.", queuePath);
+            }
+            catch (MessagingException)
+            {
+                _logger.Debug("Looks like a conflicting create operation is in progress for '{0}'. We'll find out in a minute...", queuePath);
+            }
+
+            try
+            {
+                _namespaceManager.UpdateQueue(queueDescription);
+            }
+            catch (MessagingException)
+            {
+            }
+
+            if (!_namespaceManager.QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)

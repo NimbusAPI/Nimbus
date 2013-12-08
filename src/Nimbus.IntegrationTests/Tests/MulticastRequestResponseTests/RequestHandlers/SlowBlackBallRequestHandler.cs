@@ -12,9 +12,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
             Thread.Sleep(TimeSpan.FromSeconds(5));
 
             return new BlackBallResponse
-            {
-                IsBlackBalled = false,
-            };
+                   {
+                       IsBlackBalled = false,
+                   };
         }
     }
 }

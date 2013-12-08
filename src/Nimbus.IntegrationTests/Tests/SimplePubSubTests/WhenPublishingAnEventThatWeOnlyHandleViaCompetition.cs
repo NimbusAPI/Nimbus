@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests

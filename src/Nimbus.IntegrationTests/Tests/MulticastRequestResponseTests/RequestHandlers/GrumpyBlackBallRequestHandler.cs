@@ -8,9 +8,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
         public BlackBallResponse Handle(BlackBallRequest request)
         {
             return new BlackBallResponse
-            {
-                IsBlackBalled = true,
-            };
+                   {
+                       IsBlackBalled = true,
+                   };
         }
     }
 }

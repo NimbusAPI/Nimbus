@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
+using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests

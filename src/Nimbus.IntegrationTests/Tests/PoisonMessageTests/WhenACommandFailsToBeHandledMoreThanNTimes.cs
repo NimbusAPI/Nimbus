@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NSubstitute;
-using NUnit.Framework;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
+using NSubstitute;
+using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
@@ -54,8 +54,8 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
                                       .WithCompetingEventBroker(_competingEventBroker)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;

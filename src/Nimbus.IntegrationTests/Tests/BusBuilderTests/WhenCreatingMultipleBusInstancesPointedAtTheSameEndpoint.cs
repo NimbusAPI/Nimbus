@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             ClearMeABus();
 
             var tasks = new List<Task>();
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < 10; i++)
             {
                 tasks.Add(Task.Run(() => BuildMeABus()));
             }

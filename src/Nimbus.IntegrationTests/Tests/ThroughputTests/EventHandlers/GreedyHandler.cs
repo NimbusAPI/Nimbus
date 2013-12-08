@@ -4,7 +4,8 @@ using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
 {
     /// <summary>
-    ///     This class needs to exist so that our bus knows to subscribe to these types of message. That's all. It's not supposed to do anything.
+    ///     This class needs to exist so that our bus knows to subscribe to these types of message. That's all. It's not
+    ///     supposed to do anything.
     /// </summary>
     public class GreedyHandler : IHandleMulticastEvent<FooEvent>,
                                  IHandleMulticastEvent<BarEvent>,

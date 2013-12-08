@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
+using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests

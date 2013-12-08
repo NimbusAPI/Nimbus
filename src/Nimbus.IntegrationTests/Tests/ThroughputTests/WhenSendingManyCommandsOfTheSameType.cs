@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
+using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
