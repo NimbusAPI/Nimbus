@@ -57,6 +57,8 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
+            typeProvider.Verify();
+
             configuration.CommandHandlerTypes = typeProvider.CommandHandlerTypes.ToArray();
             configuration.CommandTypes = typeProvider.CommandTypes.ToArray();
 

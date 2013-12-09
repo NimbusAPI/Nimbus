@@ -14,5 +14,7 @@ namespace Nimbus.InfrastructureContracts
 
         IEnumerable<Type> RequestHandlerTypes { get; }
         IEnumerable<Type> RequestTypes { get; }
+
+        void Verify();
     }
 }
