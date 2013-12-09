@@ -11,7 +11,7 @@ namespace Nimbus.Tests.TaskExtensionTests
     public class GivenOneTaskThatSucceedsAndOneTaskThatThrows
     {
         [TestFixture]
-        public class WhenOpprtunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<Task<int>[]>
+        public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<Task<int>[]>
         {
             private int[] _result;
             private Stopwatch _sw;
