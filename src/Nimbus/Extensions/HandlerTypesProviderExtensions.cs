@@ -15,5 +15,14 @@ namespace Nimbus.Extensions
                 .Union(typeProvider.RequestHandlerTypes)
                 .ToArray();
         }
+
+        public static Type[] AllMessageContractTypes(this ITypeProvider typeProvider)
+        {
+            return new Type[0]
+                .Union(typeProvider.CommandTypes)
+                .Union(typeProvider.EventTypes)
+                .Union(typeProvider.RequestTypes)
+                .ToArray();
+        }
     }
 }

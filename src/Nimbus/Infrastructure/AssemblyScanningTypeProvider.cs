@@ -5,6 +5,7 @@ using System.Reflection;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
@@ -143,6 +144,39 @@ namespace Nimbus.Infrastructure
                 .ToArray();
 
             return types;
+        }
+
+        public void Verify()
+        {
+            AssertAllHandledMessageTypesAreIncludedDirectly();
+        }
+
+        private void AssertAllHandledMessageTypesAreIncludedDirectly()
+        {
+            var handlerTypes = this.AllHandlerTypes()
+                                   .SelectMany(ht => ht.GetInterfaces())
+                                   .Where(t => t.IsClosedTypeOf(typeof (IHandleCommand<>),
+                                                                typeof (IHandleCompetingEvent<>),
+                                                                typeof (IHandleMulticastEvent<>),
+                                                                typeof (IHandleRequest<,>)))
+                                   .ToArray();
+            var genericParameterTypes = handlerTypes
+                .SelectMany(ht => ht.GetGenericArguments())
+                .ToArray();
+
+            foreach (var parameterType in genericParameterTypes)
+            {
+                var assemblyIsInProvidedList = _assemblies.Contains(parameterType.Assembly);
+
+                if (!assemblyIsInProvidedList)
+                {
+                    var message = "The message contract type {0} is referenced by one of your handlers but its assembly is not included in the list of assemblies to scan."
+                        .FormatWith(
+                            parameterType.FullName);
+
+                    throw new BusException(message);
+                }
+            }
         }
     }
 }

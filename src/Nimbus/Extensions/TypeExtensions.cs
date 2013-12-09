@@ -18,6 +18,11 @@ namespace Nimbus.Extensions
             return assignableGenericTypes.Any();
         }
 
+        public static bool IsClosedTypeOf(this Type type, params Type[] openGenericTypes)
+        {
+            return openGenericTypes.Any(type.IsClosedTypeOf);
+        }
+
         public static bool IsInstantiable(this Type type)
         {
             if (type.IsInterface) return false;
