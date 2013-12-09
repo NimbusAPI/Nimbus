@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Nimbus.Extensions
@@ -39,5 +40,6 @@ namespace Nimbus.Extensions
                                         .ToArray();
             return genericInterfaces;
         }
+
     }
 }

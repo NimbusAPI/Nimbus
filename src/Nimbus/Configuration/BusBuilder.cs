@@ -10,6 +10,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
+using Nimbus.MessageContracts;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
@@ -176,24 +177,40 @@ namespace Nimbus.Configuration
         {
             logger.Debug("Creating command message pumps");
 
-            foreach (var commandType in configuration.CommandTypes)
+            var commandTypes = configuration.CommandHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof(IHandleCommand<>)))
+                                .Select(gi => gi.GetGenericArguments().First())
+                                .OrderBy(t => t.FullName)
+                                .Distinct()
+                                .ToArray();
+
+            foreach (var commandType in commandTypes)
             {
                 logger.Debug("Registering Message Pump for Command type {0}", commandType.Name);
                 var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
-                messagePumps.Add(pump);
+                messagePumps.Add(pump);    
             }
+
         }
 
         private static void CreateRequestMessagePumps(BusBuilderConfiguration configuration, MessagingFactory messagingFactory, List<IMessagePump> messagePumps, ILogger logger)
         {
             logger.Debug("Creating request message pumps");
 
-            foreach (var requestType in configuration.RequestTypes)
+
+            var requestTypes = configuration.RequestHandlerTypes.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof(IHandleRequest<,>)))
+                                            .Select(gi => gi.GetGenericArguments().First())
+                                            .OrderBy(t => t.FullName)
+                                            .Distinct()
+                                            .ToArray();
+
+            foreach (var requestType in requestTypes)
             {
                 logger.Debug("Registering Message Pump for Request type {0}", requestType.Name);
                 var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger);
                 messagePumps.Add(pump);
             }
+
+  
         }
 
         private static void CreateMulticastRequestMessagePumps(BusBuilderConfiguration configuration,
