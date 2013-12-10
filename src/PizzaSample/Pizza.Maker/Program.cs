@@ -11,7 +11,9 @@ using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
+using Nimbus.Logger.Serilog;
 using Pizza.Ordering.Messages;
+using Serilog;
 
 namespace Pizza.Maker
 {
@@ -19,6 +21,11 @@ namespace Pizza.Maker
     {
         static void Main(string[] args)
         {
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.ColoredConsole()
+                .MinimumLevel.Debug()
+                .CreateLogger();
 
 
             var builder = new ContainerBuilder();
@@ -62,7 +69,7 @@ namespace Pizza.Maker
 
             // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care. You can roll your
             // own by implementing the ILogger interface if you want to hook it to an existing logging implementation.
-            builder.RegisterType<ConsoleLogger>()
+            builder.RegisterType<SerilogStaticLogger>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
