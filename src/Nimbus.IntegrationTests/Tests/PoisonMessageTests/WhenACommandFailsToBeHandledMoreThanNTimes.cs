@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration;
-using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
-using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 {
     [TestFixture]
-    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationFor<Bus>
+    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationForBus
     {
         private TestCommand _testCommand;
         private string _someContent;
@@ -22,60 +18,15 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         private const int _maxDeliveryAttempts = 7;
 
-        private ICommandBroker _commandBroker;
-        private IRequestBroker _requestBroker;
-        private IMulticastRequestBroker _multicastRequestBroker;
-        private IMulticastEventBroker _multicastEventBroker;
-        private ICompetingEventBroker _competingEventBroker;
-
-        public override Bus Given()
-        {
-            _commandBroker = Substitute.For<ICommandBroker>();
-            _commandBroker.When(cb => cb.Dispatch(Arg.Any<TestCommand>()))
-                          .Do(callInfo => new TestCommandHandler().Handle(callInfo.Arg<TestCommand>()));
-            _requestBroker = Substitute.For<IRequestBroker>();
-            _multicastRequestBroker = Substitute.For<IMulticastRequestBroker>();
-            _multicastEventBroker = Substitute.For<IMulticastEventBroker>();
-            _competingEventBroker = Substitute.For<ICompetingEventBroker>();
-
-            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-            // deleting queues and topics is slow.
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-
-            var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ConnectionString)
-                                      .WithTypesFrom(typeProvider)
-                                      .WithMaxDeliveryAttempts(_maxDeliveryAttempts)
-                                      .WithCommandBroker(_commandBroker)
-                                      .WithRequestBroker(_requestBroker)
-                                      .WithMulticastRequestBroker(_multicastRequestBroker)
-                                      .WithMulticastEventBroker(_multicastEventBroker)
-                                      .WithCompetingEventBroker(_competingEventBroker)
-                                      .WithDebugOptions(
-                                          dc =>
-                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                      .Build();
-            bus.Start();
-            return bus;
-        }
-
-        public override void When()
+        public override async Task WhenAsync()
         {
             _someContent = Guid.NewGuid().ToString();
             _testCommand = new TestCommand(_someContent);
 
-            FetchAllDeadLetterMessages().WaitForResult(); // clear the dead letter queue
-            Subject.Send(_testCommand).Wait();
-            TimeSpan.FromSeconds(10).SleepUntil(() => _commandBroker.ReceivedCalls().Count() >= _maxDeliveryAttempts);
-            _deadLetterMessages = FetchAllDeadLetterMessages().WaitForResult();
-        }
+            await Subject.Send(_testCommand);
+            TimeSpan.FromSeconds(10).SleepUntil(() => MessageBroker.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-        [Test]
-        public void TheCommandBrokerShouldHaveBeenCalledExactlyNTimes()
-        {
-            _commandBroker.Received(_maxDeliveryAttempts).Dispatch(Arg.Any<TestCommand>());
+            _deadLetterMessages = await FetchAllDeadLetterMessages();
         }
 
         [Test]

@@ -88,7 +88,7 @@ namespace Nimbus.Configuration
 
             var bus = new Bus(commandSender, requestSender, multicastRequestSender, eventSender, messagePumps, deadLetterQueues);
 
-            logger.Debug("Bus build. Job done!");
+            logger.Debug("Bus built. Job done!");
 
             return bus;
         }

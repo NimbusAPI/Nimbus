@@ -43,7 +43,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _client.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1)).ToArray();
+            return _client.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage requestMessage)

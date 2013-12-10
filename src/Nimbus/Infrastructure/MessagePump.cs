@@ -14,6 +14,8 @@ namespace Nimbus.Infrastructure
         private bool _haveBeenToldToStop;
         private readonly ILogger _logger;
 
+        protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
+
         protected MessagePump(ILogger logger)
         {
             _logger = logger;
@@ -33,39 +35,42 @@ namespace Nimbus.Infrastructure
         {
             while (!_haveBeenToldToStop)
             {
+                BrokeredMessage[] messages;
+
                 try
                 {
-                    var messages = ReceiveMessages();
-                    var completedMessages = new List<BrokeredMessage>();
-                    var abandonedMessages = new List<AbandonedMessage>();
+                    messages = ReceiveMessages();
+                }
+                catch (TimeoutException e)
+                {
+                    continue;
+                }
 
-                    foreach (var message in messages)
-                    {
-                        try
-                        {
-                            PumpMessage(message);
-                            completedMessages.Add(message);
-                        }
-                        catch (Exception exc)
-                        {
-                            abandonedMessages.Add(new AbandonedMessage(message, exc));
-                            _logger.Error(exc, "Message dispatch failed.");
-                        }
-                    }
-
-                    completedMessages
-                        .Select(m => m.CompleteAsync())
-                        .WaitAll();
-
-                    abandonedMessages
-                        .Select(am => am.Message.AbandonAsync(ExceptionDetailsAsProperties(am.Exception)))
+                try
+                {
+                    messages
+                        .Select(m => Task.Run(() => PumpMessage(m))
+                                         .ContinueWith(t => HandleDispatchCompletion(t, m)))
                         .WaitAll();
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Message dispatch failed.");
+                    _logger.Error(exc, "Overall message dispatch failed.");
                 }
             }
+        }
+
+        private async Task HandleDispatchCompletion(Task t, BrokeredMessage m)
+        {
+            if (t.IsFaulted)
+            {
+                var exception = t.Exception;
+                _logger.Error(exception, "Message dispatch failed");
+                await m.AbandonAsync(ExceptionDetailsAsProperties(exception));
+                return;
+            }
+
+            await m.CompleteAsync();
         }
 
         protected static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
@@ -73,26 +78,14 @@ namespace Nimbus.Infrastructure
             if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException);
 
             return new Dictionary<string, object>
-            {
-                {MessagePropertyKeys.ExceptionTypeKey, exception.GetType().FullName},
-                {MessagePropertyKeys.ExceptionMessageKey, exception.Message},
-                {MessagePropertyKeys.ExceptionStackTraceKey, exception.StackTrace},
-            };
+                   {
+                       {MessagePropertyKeys.ExceptionTypeKey, exception.GetType().FullName},
+                       {MessagePropertyKeys.ExceptionMessageKey, exception.Message},
+                       {MessagePropertyKeys.ExceptionStackTraceKey, exception.StackTrace},
+                   };
         }
 
         protected abstract BrokeredMessage[] ReceiveMessages();
         protected abstract void PumpMessage(BrokeredMessage message);
-
-        protected class AbandonedMessage
-        {
-            public AbandonedMessage(BrokeredMessage message, Exception exception)
-            {
-                Message = message;
-                Exception = exception;
-            }
-
-            public BrokeredMessage Message { get; set; }
-            public Exception Exception { get; set; }
-        }
     }
 }
