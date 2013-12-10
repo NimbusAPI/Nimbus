@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Nimbus.Tests;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests

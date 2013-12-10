@@ -35,7 +35,7 @@ namespace Nimbus.Infrastructure.Commands
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _reciever.ReceiveBatch(int.MaxValue, TimeSpan.FromSeconds(1)).ToArray();
+            return _reciever.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage message)
