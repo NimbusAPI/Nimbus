@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pizza.Ordering.Messages", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pizza.WaitTimeService", "PizzaSample\Pizza.WaitTimeService\Pizza.WaitTimeService.csproj", "{B968EC32-3DE7-4C44-BD93-FFA2FDD3AE60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Serilog", "Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj", "{6B665505-3C52-49D3-914A-7C295AF3F877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{B968EC32-3DE7-4C44-BD93-FFA2FDD3AE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B968EC32-3DE7-4C44-BD93-FFA2FDD3AE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B968EC32-3DE7-4C44-BD93-FFA2FDD3AE60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B665505-3C52-49D3-914A-7C295AF3F877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B665505-3C52-49D3-914A-7C295AF3F877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B665505-3C52-49D3-914A-7C295AF3F877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B665505-3C52-49D3-914A-7C295AF3F877}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
