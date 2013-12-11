@@ -10,7 +10,7 @@ namespace Nimbus
     {
         Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand;
 
-        Task<TResponse> Request<TRequest, TResponse>(BusRequest<TRequest, TResponse> busRequest)
+        Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse;
 
