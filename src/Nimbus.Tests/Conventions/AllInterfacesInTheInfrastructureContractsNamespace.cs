@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using Nimbus.InfrastructureContracts;
+using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.Tests.Conventions
@@ -28,7 +28,7 @@ namespace Nimbus.Tests.Conventions
                                     .Where(t => t.Namespace.StartsWith(referenceType.Namespace))
                                     .Where(t => t.IsInterface)
                                     .Select(t => new TestCaseData(t)
-                                                     .SetName(t.FullName)
+                                                .SetName(t.FullName)
                     ).GetEnumerator();
             }
 
