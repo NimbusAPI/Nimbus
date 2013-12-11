@@ -6,12 +6,23 @@ namespace Nimbus.Infrastructure
     {
         public static string QueuePathFor(Type type)
         {
-            return "Q." + type.FullName;
+            return Sanitize("Q." + type.FullName);
         }
 
         public static string TopicPathFor(Type type)
         {
-            return "T." + type.FullName;
+            return Sanitize("T." + type.FullName);
+        }
+
+        private static string Sanitize(string path)
+        {
+            // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
+
+            //FIXME we should tidy this up a bit.  -andrewh 11/12/2013
+            return path
+                .Replace("+", ".")
+                .Replace("`", ".")
+                ;
         }
     }
 }
