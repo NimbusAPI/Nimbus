@@ -25,5 +25,10 @@ namespace Nimbus.Exceptions
         protected RequestFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+
+        public override string ToString()
+        {
+            return ServerStackTrace + Environment.NewLine + base.ToString();
+        }
     }
 }
