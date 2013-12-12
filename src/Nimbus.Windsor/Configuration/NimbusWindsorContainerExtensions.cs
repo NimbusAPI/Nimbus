@@ -7,12 +7,12 @@ using Castle.Windsor;
 
 namespace Nimbus.Windsor.Configuration
 {
-    public static class NimbusContainerBuilderExtensions
+    public static class NimbusWindsorContainerExtensions
     {
         public static IWindsorContainer RegisterNimbus(this IWindsorContainer container, ITypeProvider typeProvider)
         {
             container.Register(
-                Classes.From(typeProvider.AllHandlerTypes()).Where(t => true).WithServiceAllInterfaces().LifestyleScoped(),
+                Classes.From(typeProvider.AllHandlerTypes()).Pick().WithServiceAllInterfaces().LifestyleScoped(),
                 Component.For<IMulticastEventBroker>().ImplementedBy<WindsorMulticastEventBroker>().LifestyleSingleton(),
                 Component.For<ICompetingEventBroker>().ImplementedBy<WindsorCompetingEventBroker>().LifestyleSingleton(),
                 Component.For<ICommandBroker>().ImplementedBy<WindsorCommandBroker>().LifestyleSingleton(),
