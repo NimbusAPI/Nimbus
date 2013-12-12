@@ -164,16 +164,14 @@ namespace Nimbus.Infrastructure
 
         private static void TestType(Dictionary<string, Type> queueNames, Type messageType, Func<Type, string> formatter  )
         {
-            const string exceptionFormat = "Your message type {0} will result in a duplicate queue name.";
-            
             try
             {
                 queueNames.Add(formatter(messageType), messageType);
             }
             catch (Exception)
             {
-
-                throw new BusException(string.Format(exceptionFormat, messageType.Name));
+                var message = "Your message type {0} will result in a duplicate queue name.".FormatWith(messageType.Name);
+                throw new BusException(message);
             }
             
         }
