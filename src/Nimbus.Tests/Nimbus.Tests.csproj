@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyScanningTests\WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
+    <Compile Include="AssemblyScanningTests\WhenAMessageTypeNameIsDuplicated.cs" />
     <Compile Include="ConfigurationTests\WhenLookingForClosedTypesOfAnOpenGeneric.cs" />
     <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
     <Compile Include="Conventions\AllBusBuilderConfigurationExtensionMethods.cs" />
@@ -81,6 +82,10 @@
     <ProjectReference Include="..\Nimbus.Tests.TestAssemblies.Handlers\Nimbus.Tests.TestAssemblies.Handlers.csproj">
       <Project>{0747E41E-8BC7-4CE9-82AE-9051F3F6E55B}</Project>
       <Name>Nimbus.Tests.TestAssemblies.Handlers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.Tests.TestAssemblies.MessageContracts\Nimbus.Tests.TestAssemblies.MessageContracts.csproj">
+      <Project>{AD2DAA55-CA83-4FA6-A0A8-2AAE1CB9EA41}</Project>
+      <Name>Nimbus.Tests.TestAssemblies.MessageContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
