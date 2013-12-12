@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\WindsorBusBuilderConfigurationExtensions.cs" />
-    <Compile Include="Configuration\NimbusContainerBuilderExtensions.cs" />
+    <Compile Include="Configuration\NimbusWindsorContainerExtensions.cs" />
     <Compile Include="Infrastructure\WindsorCommandBroker.cs" />
     <Compile Include="Infrastructure\WindsorCompetingEventBroker.cs" />
     <Compile Include="Infrastructure\WindsorMulticastEventBroker.cs" />
