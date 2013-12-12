@@ -2,7 +2,6 @@
 using Nimbus.InfrastructureContracts;
 
 // ReSharper disable CheckNamespace
-
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {

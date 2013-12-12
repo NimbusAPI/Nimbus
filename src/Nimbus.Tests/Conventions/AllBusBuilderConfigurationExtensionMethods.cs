@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using NUnit.Framework;

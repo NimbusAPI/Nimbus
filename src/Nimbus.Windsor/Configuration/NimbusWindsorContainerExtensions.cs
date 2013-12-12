@@ -5,7 +5,9 @@ using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Castle.Windsor;
 
-namespace Nimbus.Windsor.Configuration
+// ReSharper disable CheckNamespace
+namespace Nimbus.Configuration
+// ReSharper restore CheckNamespace
 {
     public static class NimbusWindsorContainerExtensions
     {
