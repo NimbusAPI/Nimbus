@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Reflection;
 using Autofac;
 using Nimbus;
-using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;

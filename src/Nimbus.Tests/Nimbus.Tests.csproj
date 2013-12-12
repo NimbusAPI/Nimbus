@@ -86,6 +86,7 @@
     <ProjectReference Include="..\Nimbus.Windsor\Nimbus.Windsor.csproj">
       <Project>{7fcf3124-24ec-40ca-95fd-e30315d0dde2}</Project>
       <Name>Nimbus.Windsor</Name>
+  	</ProjectReference>
     <ProjectReference Include="..\Nimbus.Tests.TestAssemblies.MessageContracts\Nimbus.Tests.TestAssemblies.MessageContracts.csproj">
       <Project>{AD2DAA55-CA83-4FA6-A0A8-2AAE1CB9EA41}</Project>
       <Name>Nimbus.Tests.TestAssemblies.MessageContracts</Name>
