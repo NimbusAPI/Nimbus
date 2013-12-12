@@ -5,14 +5,15 @@ using Castle.MicroKernel.Lifestyle;
 using Castle.Windsor;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Castle.MicroKernel;
 
 namespace Nimbus.Windsor.Infrastructure
 {
     public class WindsorMulticastEventBroker : IMulticastEventBroker
     {
-        private readonly IWindsorContainer _container;
+        private readonly IKernel _container;
 
-        public WindsorMulticastEventBroker(IWindsorContainer container)
+        public WindsorMulticastEventBroker(IKernel container)
         {
             _container = container;
         }

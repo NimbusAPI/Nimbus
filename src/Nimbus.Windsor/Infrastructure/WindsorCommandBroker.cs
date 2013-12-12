@@ -1,4 +1,5 @@
-﻿using Castle.MicroKernel.Lifestyle;
+﻿using Castle.MicroKernel;
+using Castle.MicroKernel.Lifestyle;
 using Castle.Windsor;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -7,9 +8,9 @@ namespace Nimbus.Windsor.Infrastructure
 {
     public class WindsorCommandBroker : ICommandBroker
     {
-        private readonly IWindsorContainer _container;
+        private readonly IKernel _container;
 
-        public WindsorCommandBroker(IWindsorContainer container)
+        public WindsorCommandBroker(IKernel container)
         {
             _container = container;
         }

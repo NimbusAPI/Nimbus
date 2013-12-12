@@ -7,14 +7,15 @@ using Castle.Windsor;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Castle.MicroKernel;
 
 namespace Nimbus.Windsor.Infrastructure
 {
     public class WindsorMulticastRequestBroker : IMulticastRequestBroker
     {
-        private readonly IWindsorContainer _container;
+        private readonly IKernel _container;
 
-        public WindsorMulticastRequestBroker(IWindsorContainer container)
+        public WindsorMulticastRequestBroker(IKernel container)
         {
             _container = container;
         }
