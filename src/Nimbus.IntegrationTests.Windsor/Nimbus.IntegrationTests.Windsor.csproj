@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C5B962B5-AE25-46F5-AE82-4307227688BD}</ProjectGuid>
+    <ProjectGuid>{1F1CE629-7FFE-48A7-B114-A218FF21129A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Windsor.Tests</RootNamespace>
-    <AssemblyName>Nimbus.Windsor.Tests</AssemblyName>
+    <RootNamespace>Nimbus.IntegrationTests.Windsor</RootNamespace>
+    <AssemblyName>Nimbus.IntegrationTests.Windsor</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,7 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core.3.2.2\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly">
@@ -45,20 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpecificationFor.cs" />
+    <Compile Include="Tests.cs" />
+    <Compile Include="ThenAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nimbus.Tests.TestAssemblies.Handlers\Nimbus.Tests.TestAssemblies.Handlers.csproj">
-      <Project>{0747e41e-8bc7-4ce9-82ae-9051f3f6e55b}</Project>
-      <Name>Nimbus.Tests.TestAssemblies.Handlers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.Tests.TestAssemblies.MessageContracts\Nimbus.Tests.TestAssemblies.MessageContracts.csproj">
-      <Project>{ad2daa55-ca83-4fa6-a0a8-2aae1cb9ea41}</Project>
-      <Name>Nimbus.Tests.TestAssemblies.MessageContracts</Name>
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
+      <Project>{702a4f7e-97c5-4651-b704-65c6d0d70c1c}</Project>
+      <Name>Nimbus.MessageContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nimbus.Windsor\Nimbus.Windsor.csproj">
       <Project>{7fcf3124-24ec-40ca-95fd-e30315d0dde2}</Project>

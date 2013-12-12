@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Nimbus.Windsor.Tests")]
+[assembly: AssemblyTitle("Nimbus.IntegrationTests.Windsor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Nimbus.Windsor.Tests")]
+[assembly: AssemblyProduct("Nimbus.IntegrationTests.Windsor")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("22411838-0318-4f45-bcd6-dc9d1dc1a851")]
+[assembly: Guid("cb50b6eb-1c91-4cf2-bf44-4954b7e0d608")]
 
 // Version information for an assembly consists of the following four values:
 //
