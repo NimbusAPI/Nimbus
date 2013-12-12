@@ -52,6 +52,7 @@
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
+    <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
     <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationFor.cs">
