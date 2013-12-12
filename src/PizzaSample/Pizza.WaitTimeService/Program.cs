@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Nimbus;
-using Nimbus.Autofac.Configuration;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
