@@ -37,6 +37,16 @@ namespace Nimbus.Tests.InfrastructureTests
             pathName.ShouldNotContain("`");
         }
 
+        [Test]
+        public void WhenCreatingAQueueForAGenericType_WeShouldShortenTheGenericTypeArgumentName()
+        {
+            var pathName = PathFactory.QueuePathFor(typeof (MyCommand<string>));
+
+            var expected = "q.nimbus.tests.infrastructuretests.mycommand.1-string";
+
+            pathName.ShouldBe(expected);
+        }
+
 
 
         

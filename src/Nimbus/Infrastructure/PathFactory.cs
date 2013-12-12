@@ -10,12 +10,23 @@ namespace Nimbus.Infrastructure
 
         public static string QueuePathFor(Type type)
         {
-            return Sanitize("Q." + type.FullName);
+            return Sanitize("Q." + StripGenericQualification(type));
         }
 
         public static string TopicPathFor(Type type)
         {
-            return Sanitize("T." + type.FullName);
+            return Sanitize("T." + StripGenericQualification(type));
+        }
+
+        private static string StripGenericQualification(Type type)
+        {
+            if (! type.IsGenericType)
+                return type.FullName;
+
+            var genericArgs = type.GetGenericArguments().Select(arg => arg.Name);
+
+            return type.Namespace + "." + type.Name + "-" + string.Join("-", genericArgs);
+
         }
 
         private static string Sanitize(string path)
@@ -27,6 +38,7 @@ namespace Nimbus.Infrastructure
             return path;
                 
         }
+
 
         private static char SanitiseCharacter(char currentChar)
         {
