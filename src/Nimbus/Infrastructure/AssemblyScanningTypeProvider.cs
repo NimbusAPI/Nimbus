@@ -149,6 +149,31 @@ namespace Nimbus.Infrastructure
         public void Verify()
         {
             AssertAllHandledMessageTypesAreIncludedDirectly();
+            AssertThatWeWontDuplicateQueueNames();
+        }
+
+        private void AssertThatWeWontDuplicateQueueNames()
+        {
+            var queueNames = new Dictionary<string, Type>();
+
+            CommandTypes.Do(t => TestType(queueNames, t, PathFactory.QueuePathFor)).ToArray();
+            RequestTypes.Do(t => TestType(queueNames, t, PathFactory.QueuePathFor)).ToArray();
+            EventTypes.Do(t => TestType(queueNames, t, PathFactory.TopicPathFor)).ToArray();
+            
+        }
+
+        private static void TestType(Dictionary<string, Type> queueNames, Type messageType, Func<Type, string> formatter  )
+        {
+            try
+            {
+                queueNames.Add(formatter(messageType), messageType);
+            }
+            catch (Exception)
+            {
+                var message = "Your message type {0} will result in a duplicate queue name.".FormatWith(messageType.Name);
+                throw new BusException(message);
+            }
+            
         }
 
         private void AssertAllHandledMessageTypesAreIncludedDirectly()
