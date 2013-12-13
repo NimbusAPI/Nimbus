@@ -154,27 +154,24 @@ namespace Nimbus.Infrastructure
 
         private void AssertThatWeWontDuplicateQueueNames()
         {
-            var queueNames = new Dictionary<string, Type>();
+            var queueCounts = new Tuple<string, Type>[0]
+                .Union(CommandTypes.Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t)))
+                .Union(RequestTypes.Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t)))
+                .Union(EventTypes.Select(t => new Tuple<string, Type>(PathFactory.TopicPathFor(t), t)))
+                .GroupBy(queue => queue.Item1)
+                .Where(dupe => dupe.Count() > 1).ToArray();
 
-            CommandTypes.Do(t => TestType(queueNames, t, PathFactory.QueuePathFor)).ToArray();
-            RequestTypes.Do(t => TestType(queueNames, t, PathFactory.QueuePathFor)).ToArray();
-            EventTypes.Do(t => TestType(queueNames, t, PathFactory.TopicPathFor)).ToArray();
-            
-        }
 
-        private static void TestType(Dictionary<string, Type> queueNames, Type messageType, Func<Type, string> formatter  )
-        {
-            try
-            {
-                queueNames.Add(formatter(messageType), messageType);
-            }
-            catch (Exception)
-            {
-                var message = "Your message type {0} will result in a duplicate queue name.".FormatWith(messageType.Name);
-                throw new BusException(message);
-            }
-            
+            if (queueCounts.None())
+                return;
+
+            var badTypes = queueCounts.SelectMany(dupe => dupe.Select( d => d.Item2.Name));
+            var message = "Your message types {0} will result in a duplicate queue name.".FormatWith(string.Join(", ", badTypes));
+
+            throw new BusException(message);
+
         }
+        
 
         private void AssertAllHandledMessageTypesAreIncludedDirectly()
         {
