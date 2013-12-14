@@ -32,7 +32,7 @@ namespace Nimbus.IntegrationTests
                 foreach (var factory in busFactoryEnumerator.GetBusFactories())
                 {
                     yield return new TestCaseData(factory)
-                        .SetName(factory.BusFactoryName)
+                        .SetName(factory.MessageBrokerName)
                         ;
                 }
                 // ReSharper restore LoopCanBeConvertedToQuery

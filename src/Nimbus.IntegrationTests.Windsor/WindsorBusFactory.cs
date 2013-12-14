@@ -18,9 +18,9 @@ namespace Nimbus.IntegrationTests.Windsor
             _connectionString = connectionString;
         }
 
-        public string BusFactoryName
+        public string MessageBrokerName
         {
-            get { return "WindsorBusFactory"; }
+            get { return "WindsorMessageBrokers"; }
         }
 
         public IBus Create()

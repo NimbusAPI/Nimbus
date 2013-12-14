@@ -18,9 +18,9 @@ namespace Nimbus.IntegrationTests.Autofac
             _connectionString = connectionString;
         }
 
-        public string BusFactoryName
+        public string MessageBrokerName
         {
-            get { return "AutofacBusFactory"; }
+            get { return "AutofacMessageBrokers"; }
         }
 
         public IBus Create()

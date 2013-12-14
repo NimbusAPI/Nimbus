@@ -36,9 +36,9 @@ namespace Nimbus.IntegrationTests
                 _typeProvider = typeProvider;
             }
 
-            public string BusFactoryName
+            public string MessageBrokerName
             {
-                get { return "DefaultBusFactory"; }
+                get { return "DefaultMessageBroker"; }
             }
 
             public IBus Create()

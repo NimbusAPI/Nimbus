@@ -2,7 +2,7 @@
 {
     public interface ITestHarnessBusFactory
     {
-        string BusFactoryName { get; }
+        string MessageBrokerName { get; }
         IBus Create();
     }
 }
