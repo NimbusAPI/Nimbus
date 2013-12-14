@@ -32,7 +32,8 @@ namespace Nimbus.IntegrationTests
             var messageBag = _allReceivedCalls.GetOrAdd(method, new ConcurrentBag<object>());
             messageBag.Add(message);
 
-            Console.WriteLine("Observed call to {0} with argument of type {1}".FormatWith(method.Name, message.GetType()));
+            var methodName = "{0}.{1}".FormatWith(typeof(T).FullName, method.Name);
+            Console.WriteLine("Observed call to {0} with argument of type {1}".FormatWith(methodName, message.GetType()));
         }
 
         public static IEnumerable<object> AllReceivedMessages
