@@ -8,17 +8,22 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 {
-    public class WhenSendingARequestThatWillThrow : SpecificationForBus
+    public class WhenSendingARequestThatWillThrow : TestForAllBuses
     {
         private RequestThatWillThrowResponse _response;
         private Exception _exception;
 
-        public override async Task WhenAsync()
+        public override async Task When(ITestHarnessBusFactory busFactory)
         {
+            _response = null;
+            _exception = null;
+
+            var bus = busFactory.Create();
+
             try
             {
                 var request = new RequestThatWillThrow();
-                _response = await Subject.Request(request);
+                _response = await bus.Request(request);
             }
             catch (RequestFailedException exc)
             {
@@ -27,27 +32,39 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        public void TheResponseShouldNotBeSet()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheResponseShouldNotBeSet(ITestHarnessBusFactory busFactory)
         {
+            await When(busFactory);
+
             _response.ShouldBe(null);
         }
 
         [Test]
-        public void AnExceptionShouldBeReThrownOnTheClient()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void AnExceptionShouldBeReThrownOnTheClient(ITestHarnessBusFactory busFactory)
         {
+            await When(busFactory);
+
             _exception.ShouldNotBe(null);
         }
 
         [Test]
-        public void TheExceptionShouldBeARequestFailedException()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheExceptionShouldBeARequestFailedException(ITestHarnessBusFactory busFactory)
         {
+            await When(busFactory);
+
             _exception.ShouldBeTypeOf<RequestFailedException>();
         }
 
         [Test]
-        public void TheExceptionShouldHaveTheMessageThatWasThrownOnTheServer()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(ITestHarnessBusFactory busFactory)
         {
-            _exception.Message.ShouldBe(RequestThatWillThrowHandler.ExceptionMessage);
+            await When(busFactory);
+
+            _exception.Message.ShouldContain(RequestThatWillThrowHandler.ExceptionMessage);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Castle.MicroKernel;
 using Castle.MicroKernel.Lifestyle;
-using Castle.Windsor;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
@@ -15,7 +14,7 @@ namespace Nimbus.Windsor.Infrastructure
             _container = container;
         }
 
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
         {
             using (var scope = _container.BeginScope())
             {

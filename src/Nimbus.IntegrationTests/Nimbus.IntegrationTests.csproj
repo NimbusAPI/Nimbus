@@ -52,6 +52,7 @@
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="TestHarnessMessageBroker.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="Tests\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
@@ -66,11 +67,12 @@
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
-    <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCombinedEventHandler.cs" />
+    <Compile Include="BusFactoryEnumerator.cs" />
+    <Compile Include="ITestHarnessBusFactory.cs" />
+    <Compile Include="TestForAllBuses.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaCompetition.cs" />
-    <Compile Include="SpecificationForBus.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaCompetition.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />

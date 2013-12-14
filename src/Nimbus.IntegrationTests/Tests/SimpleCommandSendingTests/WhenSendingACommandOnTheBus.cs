@@ -9,25 +9,33 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    public class WhenSendingACommandOnTheBus : SpecificationForBus
+    public class WhenSendingACommandOnTheBus : TestForAllBuses
     {
-        public override async Task WhenAsync()
+        public override async Task When(ITestHarnessBusFactory busFactory)
         {
+            var bus = busFactory.Create();
+
             var someCommand = new SomeCommand();
-            await Subject.Send(someCommand);
-            TimeSpan.FromSeconds(5).SleepUntil(() => MessageBroker.AllReceivedMessages.Any());
+            await bus.Send(someCommand);
+            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
-        public void TheCommandBrokerShouldReceiveThatCommand()
+        [TestCaseSource("AllBusesTestCases")]
+        public async Task TheCommandBrokerShouldReceiveThatCommand(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.AllReceivedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
+            await When(busFactory);
+
+            MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.AllReceivedMessages.Count().ShouldBe(1);
+            await When(busFactory);
+
+            MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
     }
 }

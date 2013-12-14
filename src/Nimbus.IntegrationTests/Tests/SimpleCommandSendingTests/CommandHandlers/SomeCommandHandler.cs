@@ -7,6 +7,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandler
     {
         public void Handle(SomeCommand busCommand)
         {
+            MethodCallCounter.RecordCall<SomeCommandHandler>(ch => ch.Handle(busCommand));
         }
     }
 }

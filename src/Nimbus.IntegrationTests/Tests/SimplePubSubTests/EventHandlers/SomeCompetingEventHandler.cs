@@ -7,6 +7,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers
     {
         public void Handle(SomeEventWeOnlyHandleViaCompetition busEvent)
         {
+            MethodCallCounter.RecordCall<SomeCompetingEventHandler>(h => h.Handle(busEvent));
         }
     }
 }

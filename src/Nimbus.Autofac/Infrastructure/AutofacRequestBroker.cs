@@ -13,7 +13,9 @@ namespace Nimbus.Autofac.Infrastructure
             _lifetimeScope = lifetimeScope;
         }
 
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())
             {

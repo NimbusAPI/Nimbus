@@ -30,7 +30,7 @@ namespace Nimbus.Infrastructure
         }
 
         public virtual TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
-            where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             return _typeProvider.RequestHandlerTypes
@@ -41,7 +41,7 @@ namespace Nimbus.Infrastructure
         }
 
         public virtual IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
-            where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             return _typeProvider.RequestHandlerTypes

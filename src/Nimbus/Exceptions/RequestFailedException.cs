@@ -17,7 +17,7 @@ namespace Nimbus.Exceptions
         {
         }
 
-        public RequestFailedException(string message, string serverStackTrace) : base(message)
+        public RequestFailedException(string message, string serverStackTrace) : base(message + Environment.NewLine + serverStackTrace)
         {
             ServerStackTrace = serverStackTrace;
         }

@@ -19,7 +19,7 @@ namespace Nimbus.Autofac.Infrastructure
         }
 
         public IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
-            where TBusRequest : BusRequest<TBusRequest, TBusResponse>
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             using (var scope = _lifetimeScope.BeginLifetimeScope())

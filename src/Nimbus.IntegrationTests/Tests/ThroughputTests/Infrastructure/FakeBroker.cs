@@ -52,7 +52,9 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             RecordMessageReceipt();
         }
 
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : BusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
         {
             throw new NotImplementedException();
         }

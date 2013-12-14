@@ -7,6 +7,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers
     {
         public void Handle(SomeEventWeOnlyHandleViaMulticast busEvent)
         {
+            MethodCallCounter.RecordCall<SomeMulticastEventHandler>(h => h.Handle(busEvent));
         }
     }
 }

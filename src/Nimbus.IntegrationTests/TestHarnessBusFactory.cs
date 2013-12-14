@@ -1,5 +1,6 @@
 using System;
 using Nimbus.Configuration;
+using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
 
@@ -7,7 +8,7 @@ namespace Nimbus.IntegrationTests
 {
     public static class TestHarnessBusFactory
     {
-        public static Bus Create(ITypeProvider typeProvider, TestHarnessMessageBroker messageBroker)
+        public static Bus CreateAndStart(ITypeProvider typeProvider, DefaultMessageBroker messageBroker)
         {
             var logger = new ConsoleLogger();
 

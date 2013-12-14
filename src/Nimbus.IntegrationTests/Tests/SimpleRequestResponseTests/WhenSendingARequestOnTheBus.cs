@@ -7,20 +7,25 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 {
     [TestFixture]
-    public class WhenSendingARequestOnTheBus : SpecificationForBus
+    public class WhenSendingARequestOnTheBus : TestForAllBuses
     {
         private SomeResponse _response;
 
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
 
-        public override async Task WhenAsync()
+        public override async Task When(ITestHarnessBusFactory busFactory)
         {
-            _response = await Subject.Request(new SomeRequest(), _timeout);
+            var bus = busFactory.Create();
+
+            _response = await bus.Request(new SomeRequest(), _timeout);
         }
 
         [Test]
-        public void WeShouldGetSomethingNiceBack()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
         {
+            await When(busFactory);
+
             _response.ShouldNotBe(null);
         }
     }

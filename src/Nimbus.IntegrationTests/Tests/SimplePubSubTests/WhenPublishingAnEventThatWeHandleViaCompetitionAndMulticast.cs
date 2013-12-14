@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
+using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -9,46 +10,60 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
     [TestFixture]
-    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : SpecificationForBus
+    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : TestForAllBuses
     {
-        public override async Task WhenAsync()
+        public override async Task When(ITestHarnessBusFactory busFactory)
         {
-            await Subject.Publish(new SomeEventWeHandleViaMulticastAndCompetition());
+            var bus = busFactory.Create();
 
-            TimeSpan.FromSeconds(5).SleepUntil(() => MessageBroker.AllReceivedMessages.Count() >= 2);
+            await bus.Publish(new SomeEventWeHandleViaMulticastAndCompetition());
+
+            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
         }
 
         [Test]
-        public void TheCompetingEventBrokerShouldReceiveTheEvent()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.ReceivedCallsWithAnyArg(mb => mb.PublishCompeting<SomeEventWeHandleViaMulticastAndCompetition>(null))
-                         .Count()
-                         .ShouldBe(1);
+            await When(busFactory);
+
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle(null))
+                             .Count()
+                             .ShouldBe(1);
         }
 
         [Test]
-        public void TheMulticastEventBrokerShouldReceiveTheEvent()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheMulticastEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.ReceivedCallsWithAnyArg(mb => mb.PublishMulticast<SomeEventWeHandleViaMulticastAndCompetition>(null))
-                         .Count()
-                         .ShouldBe(1);
+            await When(busFactory);
+
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle(null))
+                             .Count()
+                             .ShouldBe(1);
         }
 
         [Test]
-        public void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.AllReceivedMessages
-                         .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
-                         .Count()
-                         .ShouldBe(2);
+            await When(busFactory);
+
+            MethodCallCounter.AllReceivedMessages
+                             .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
+                             .Count()
+                             .ShouldBe(2);
         }
 
         [Test]
-        public void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
-            MessageBroker.AllReceivedMessages
-                         .Count()
-                         .ShouldBe(2);
+            await When(busFactory);
+
+            MethodCallCounter.AllReceivedMessages
+                             .Count()
+                             .ShouldBe(2);
         }
     }
 }

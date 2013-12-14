@@ -10,7 +10,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 {
     [TestFixture]
-    public class WhenACommandFailsToBeHandledMoreThanNTimes : SpecificationForBus
+    public class WhenACommandFailsToBeHandledMoreThanNTimes : TestForAllBuses
     {
         private TestCommand _testCommand;
         private string _someContent;
@@ -18,30 +18,35 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         private const int _maxDeliveryAttempts = 7;
 
-        public override async Task WhenAsync()
+        public override async Task When(ITestHarnessBusFactory busFactory)
         {
+            var bus = busFactory.Create();
+
             _someContent = Guid.NewGuid().ToString();
             _testCommand = new TestCommand(_someContent);
 
-            await Subject.Send(_testCommand);
-            TimeSpan.FromSeconds(10).SleepUntil(() => MessageBroker.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
+            await bus.Send(_testCommand);
+            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-            _deadLetterMessages = await FetchAllDeadLetterMessages();
+            _deadLetterMessages = await FetchAllDeadLetterMessages(bus);
         }
 
         [Test]
-        public void ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
+        [TestCaseSource("AllBusesTestCases")]
+        public async void ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(ITestHarnessBusFactory busFactory)
         {
+            await When(busFactory);
+
             _deadLetterMessages.Count.ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }
 
-        private async Task<List<TestCommand>> FetchAllDeadLetterMessages()
+        private static async Task<List<TestCommand>> FetchAllDeadLetterMessages(IBus bus)
         {
             var deadLetterMessages = new List<TestCommand>();
             while (true)
             {
-                var message = await Subject.DeadLetterQueues.CommandQueue.Pop<TestCommand>();
+                var message = await bus.DeadLetterQueues.CommandQueue.Pop<TestCommand>();
                 if (message == null) break;
                 deadLetterMessages.Add(message);
             }
