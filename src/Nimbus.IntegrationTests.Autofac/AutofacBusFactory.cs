@@ -38,6 +38,10 @@ namespace Nimbus.IntegrationTests.Autofac
                                  .WithNames("Maker", Environment.MachineName)
                                  .WithTypesFrom(_typeProvider)
                                  .WithAutofacDefaults(componentContext)
+                                 .WithDebugOptions(
+                                     dc =>
+                                         dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                             "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                  .Build())
                    .As<IBus>()
                    .AutoActivate()

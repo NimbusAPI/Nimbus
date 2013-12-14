@@ -36,6 +36,10 @@ namespace Nimbus.IntegrationTests.Windsor
                     .WithNames("TestApp", "TestInstance")
                     .WithTypesFrom(_typeProvider)
                     .WithWindsorDefaults(container)
+                    .WithDebugOptions(
+                        dc =>
+                            dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                     .Build())
                                         .LifestyleSingleton()
                 );
