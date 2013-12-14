@@ -29,20 +29,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await When(busFactory);
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle(null))
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
                              .Count()
                              .ShouldBe(1);
-        }
-
-        [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async void TheMulticastEventBrokerShouldNotReceiveTheEvent(ITestHarnessBusFactory busFactory)
-        {
-            await When(busFactory);
-
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle(null))
-                             .Count()
-                             .ShouldBe(0);
         }
 
         [Test]

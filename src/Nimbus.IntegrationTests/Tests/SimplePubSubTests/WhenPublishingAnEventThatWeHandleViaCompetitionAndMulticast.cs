@@ -28,7 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await When(busFactory);
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle(null))
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
         }
@@ -39,7 +39,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await When(busFactory);
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle(null))
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
         }
