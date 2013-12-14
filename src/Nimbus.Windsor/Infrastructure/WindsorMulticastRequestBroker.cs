@@ -25,7 +25,8 @@ namespace Nimbus.Windsor.Infrastructure
         {
             using (_container.BeginScope())
             {
-                var handlers = _container.Resolve<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>>();
+                var type = typeof (IHandleRequest<TBusRequest, TBusResponse>);
+                var handlers = _container.ResolveAll(type).Cast<IHandleRequest<TBusRequest, TBusResponse>>();
 
                 return handlers.Select(handler => Task.Run(() => handler.Handle(request)))
                                .ReturnOpportunistically(timeout);

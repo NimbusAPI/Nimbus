@@ -26,21 +26,26 @@ namespace Nimbus.IntegrationTests.Windsor
         public IBus Create()
         {
             var container = new WindsorContainer();
-            container.Register(Component.For<ILogger>().ImplementedBy<NullLogger>().LifestyleSingleton());
+            container.Register(Component.For<ILogger>().ImplementedBy<ConsoleLogger>().LifestyleSingleton());
             container.RegisterNimbus(_typeProvider);
 
             container.Register(Component.For<IBus>().ImplementedBy<Bus>().UsingFactoryMethod<IBus>(
-                () => new BusBuilder()
-                    .Configure()
-                    .WithConnectionString(_connectionString)
-                    .WithNames("TestApp", "TestInstance")
-                    .WithTypesFrom(_typeProvider)
-                    .WithWindsorDefaults(container)
-                    .WithDebugOptions(
-                        dc =>
-                            dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                    .Build())
+                () =>
+                {
+                    var bus = new BusBuilder()
+                        .Configure()
+                        .WithConnectionString(_connectionString)
+                        .WithNames("TestApp", "TestInstance")
+                        .WithTypesFrom(_typeProvider)
+                        .WithWindsorDefaults(container)
+                        .WithDebugOptions(
+                            dc =>
+                                dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                    "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                        .Build();
+                    bus.Start();
+                    return bus;
+                })
                                         .LifestyleSingleton()
                 );
 

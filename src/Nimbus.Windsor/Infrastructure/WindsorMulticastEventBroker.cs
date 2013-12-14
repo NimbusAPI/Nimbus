@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Castle.MicroKernel;
 using Castle.MicroKernel.Lifestyle;
 using Nimbus.InfrastructureContracts;
@@ -21,9 +19,9 @@ namespace Nimbus.Windsor.Infrastructure
         {
             using (_container.BeginScope())
             {
-                var type = typeof (IEnumerable<IHandleMulticastEvent<TBusEvent>>);
-                var handlers = (IEnumerable) _container.Resolve(type);
-                foreach (var handler in handlers.Cast<IHandleMulticastEvent<TBusEvent>>()) handler.Handle(busEvent);
+                var type = typeof (IHandleMulticastEvent<TBusEvent>);
+                var handlers = _container.ResolveAll(type).Cast<IHandleMulticastEvent<TBusEvent>>();
+                foreach (var handler in handlers) handler.Handle(busEvent);
             }
         }
     }

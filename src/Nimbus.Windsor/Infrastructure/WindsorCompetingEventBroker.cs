@@ -21,9 +21,9 @@ namespace Nimbus.Windsor.Infrastructure
         {
             using (_container.BeginScope())
             {
-                var type = typeof (IEnumerable<IHandleCompetingEvent<TBusEvent>>);
-                var handlers = (IEnumerable) _container.Resolve(type);
-                foreach (var handler in handlers.Cast<IHandleCompetingEvent<TBusEvent>>()) handler.Handle(busEvent);
+                var type = typeof (IHandleCompetingEvent<TBusEvent>);
+                var handlers = _container.ResolveAll(type).Cast<IHandleCompetingEvent<TBusEvent>>();
+                foreach (var handler in handlers) handler.Handle(busEvent);
             }
         }
     }
