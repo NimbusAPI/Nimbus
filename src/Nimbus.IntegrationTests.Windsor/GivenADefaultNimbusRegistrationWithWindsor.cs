@@ -1,16 +1,11 @@
-﻿using Castle.Facilities.Startable;
+﻿using System.Reflection;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Windsor
@@ -25,12 +20,12 @@ namespace Nimbus.IntegrationTests.Windsor
 
         public override void TearDown()
         {
- 	        Subject.Dispose();
+            Subject.Dispose();
         }
 
         public override void When()
         {
-            Subject.Register(Component.For<Nimbus.InfrastructureContracts.ILogger>().ImplementedBy<NullLogger>().LifestyleSingleton());
+            Subject.Register(Component.For<ILogger>().ImplementedBy<NullLogger>().LifestyleSingleton());
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
             Subject.RegisterNimbus(typeProvider);
 
@@ -42,8 +37,8 @@ namespace Nimbus.IntegrationTests.Windsor
                     .WithTypesFrom(typeProvider)
                     .WithWindsorDefaults(Subject)
                     .Build())
-                    .LifestyleSingleton()
-                    );
+                                      .LifestyleSingleton()
+                );
         }
 
         [Then]

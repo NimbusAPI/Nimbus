@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Autofac;
 using Nimbus.IntegrationTests.InfrastructureContracts;
+using Nimbus.IntegrationTests.Windsor;
 
 namespace Nimbus.IntegrationTests
 {
@@ -23,6 +24,7 @@ namespace Nimbus.IntegrationTests
 
             yield return new DefaultBusFactory(typeProvider);
             yield return new AutofacBusFactory(typeProvider, CommonResources.ConnectionString);
+            yield return new WindsorBusFactory(typeProvider, CommonResources.ConnectionString);
         }
 
         public class DefaultBusFactory : ITestHarnessBusFactory
