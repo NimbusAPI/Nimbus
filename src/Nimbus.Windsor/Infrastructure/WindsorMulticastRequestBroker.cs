@@ -23,7 +23,7 @@ namespace Nimbus.Windsor.Infrastructure
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
-            using (var scope = _container.BeginScope())
+            using (_container.BeginScope())
             {
                 var handlers = _container.Resolve<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>>();
 

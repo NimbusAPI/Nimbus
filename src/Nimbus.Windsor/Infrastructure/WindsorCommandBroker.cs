@@ -1,6 +1,5 @@
 ﻿using Castle.MicroKernel;
 using Castle.MicroKernel.Lifestyle;
-using Castle.Windsor;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
@@ -17,7 +16,7 @@ namespace Nimbus.Windsor.Infrastructure
 
         public void Dispatch<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            using (var scope = _container.BeginScope())
+            using (_container.BeginScope())
             {
                 var type = typeof (IHandleCommand<TBusCommand>);
 

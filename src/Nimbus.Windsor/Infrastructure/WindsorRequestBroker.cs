@@ -16,7 +16,7 @@ namespace Nimbus.Windsor.Infrastructure
 
         public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request) where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
         {
-            using (var scope = _container.BeginScope())
+            using (_container.BeginScope())
             {
                 var type = typeof (IHandleRequest<TBusRequest, TBusResponse>);
 
