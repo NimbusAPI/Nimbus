@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Exceptions;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
 using NUnit.Framework;

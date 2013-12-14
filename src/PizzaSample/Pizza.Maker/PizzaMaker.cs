@@ -6,12 +6,6 @@ using Pizza.Maker.Messages;
 
 namespace Pizza.Maker
 {
-    public interface IPizzaMaker
-    {
-        void TakePizzaOrder(int pizzaId);
-        void CompletePizza(int pizzaId);
-    }
-
     public class PizzaMaker : IPizzaMaker
     {
         private readonly IBus _bus;

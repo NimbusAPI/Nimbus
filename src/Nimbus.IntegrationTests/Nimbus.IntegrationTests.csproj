@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Nimbus.IntegrationTests</RootNamespace>
     <AssemblyName>Nimbus.IntegrationTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,7 +51,7 @@
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
-    <Compile Include="TestHarnessMessageBroker.cs" />
+    <Compile Include="MethodCallCounter.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="Tests\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
@@ -68,7 +69,6 @@
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
     <Compile Include="BusFactoryEnumerator.cs" />
-    <Compile Include="ITestHarnessBusFactory.cs" />
     <Compile Include="TestForAllBuses.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
@@ -113,6 +113,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Nimbus.IntegrationTests.Autofac\Nimbus.IntegrationTests.Autofac.csproj">
+      <Project>{EBEB2241-1C54-43EF-B88E-DAC0ED8B7F1B}</Project>
+      <Name>Nimbus.IntegrationTests.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
+      <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
+      <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>

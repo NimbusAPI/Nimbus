@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;

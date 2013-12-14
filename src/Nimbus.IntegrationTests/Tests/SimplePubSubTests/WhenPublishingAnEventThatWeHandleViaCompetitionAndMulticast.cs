@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using NUnit.Framework;

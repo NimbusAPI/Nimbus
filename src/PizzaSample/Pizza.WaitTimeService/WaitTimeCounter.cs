@@ -4,13 +4,6 @@ using System.Linq;
 
 namespace Pizza.WaitTimeService
 {
-    public interface IWaitTimeCounter
-    {
-        void RecordNewPizzaOrder(int id);
-        void RecordPizzaCompleted(int id);
-        int GetAveragePizzaTimes();
-    }
-
     public class WaitTimeCounter : IWaitTimeCounter
     {
 
@@ -45,13 +38,4 @@ namespace Pizza.WaitTimeService
         }
 
     }
-
-    public class PizzaTime
-    {
-        public DateTime OrderRecieved { get; set; }
-        public DateTime? PizzaCooked { get; set; }
-
-    }
-
-
 }

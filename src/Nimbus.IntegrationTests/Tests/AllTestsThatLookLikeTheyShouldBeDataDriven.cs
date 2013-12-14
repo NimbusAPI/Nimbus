@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Extensions;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using NUnit.Framework;
 using Shouldly;
 

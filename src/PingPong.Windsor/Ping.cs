@@ -11,9 +11,4 @@ namespace PingPong.Windsor
     {
         public string Message { get; set; }
     }
-
-    public class Pong : IBusResponse
-    {
-        public string Message { get; set; }
-    }
 }

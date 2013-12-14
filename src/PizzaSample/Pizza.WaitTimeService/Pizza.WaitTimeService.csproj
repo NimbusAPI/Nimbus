@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="Handlers\HandleWaitTimeRequests.cs" />
     <Compile Include="Handlers\ListenForNewOrders.cs" />
+    <Compile Include="IWaitTimeCounter.cs" />
+    <Compile Include="PizzaTime.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WaitTimeCounter.cs" />

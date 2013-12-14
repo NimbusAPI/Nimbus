@@ -1,5 +1,4 @@
 ﻿using Nimbus.Infrastructure;
-using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
@@ -50,18 +49,5 @@ namespace Nimbus.Tests.InfrastructureTests
 
 
         
-    }
-
-    public class MyCommand<T>
-    {
-        public T Metadata { get; set; }
-    }
-
-    public class MyEscapingTestMessages
-    {
-        public class EscapingTestMessage : IBusEvent
-        {
-            
-        }
     }
 }

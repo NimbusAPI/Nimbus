@@ -54,8 +54,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages.cs" />
+    <Compile Include="IPinger.cs" />
+    <Compile Include="Ping.cs" />
     <Compile Include="Pinger.cs" />
+    <Compile Include="Pong.cs" />
     <Compile Include="Ponger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

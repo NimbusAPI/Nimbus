@@ -1,4 +1,4 @@
-﻿namespace Nimbus.IntegrationTests
+﻿namespace Nimbus.IntegrationTests.InfrastructureContracts
 {
     public interface ITestHarnessBusFactory
     {

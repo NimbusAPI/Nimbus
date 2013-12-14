@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;

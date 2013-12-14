@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests

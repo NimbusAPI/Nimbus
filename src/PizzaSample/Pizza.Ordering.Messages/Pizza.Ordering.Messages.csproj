@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HowLongDoPizzasTakeRequest.cs" />
+    <Compile Include="HowLongDoPizzasTakeResponse.cs" />
     <Compile Include="OrderPizzaCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Nimbus.Infrastructure;
+using Nimbus.IntegrationTests.Autofac;
+using Nimbus.IntegrationTests.InfrastructureContracts;
 
 namespace Nimbus.IntegrationTests
 {
@@ -15,16 +17,21 @@ namespace Nimbus.IntegrationTests
 
         public IEnumerable<ITestHarnessBusFactory> GetBusFactories()
         {
-            yield return new DefaultBusFactory(_testFixtureType);
+            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
+            // deleting queues and topics is slow.
+            var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
+
+            yield return new DefaultBusFactory(typeProvider);
+            yield return new AutofacBusFactory(typeProvider, CommonResources.ConnectionString);
         }
 
         public class DefaultBusFactory : ITestHarnessBusFactory
         {
-            private readonly Type _testFixtureType;
+            private readonly TestHarnessTypeProvider _typeProvider;
 
-            public DefaultBusFactory(Type testFixtureType)
+            public DefaultBusFactory(TestHarnessTypeProvider typeProvider)
             {
-                _testFixtureType = testFixtureType;
+                _typeProvider = typeProvider;
             }
 
             public string BusFactoryName
@@ -34,13 +41,9 @@ namespace Nimbus.IntegrationTests
 
             public IBus Create()
             {
-                // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-                // deleting queues and topics is slow.
-                var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
+                var messageBroker = new DefaultMessageBroker(_typeProvider);
 
-                var messageBroker = new DefaultMessageBroker(typeProvider);
-
-                var bus = TestHarnessBusFactory.CreateAndStart(typeProvider, messageBroker);
+                var bus = TestHarnessBusFactory.CreateAndStart(_typeProvider, messageBroker);
                 return bus;
             }
         }

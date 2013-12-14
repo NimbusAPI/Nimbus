@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 
 namespace PingPong.Windsor
 {
-    public interface IPinger
-    {
-        Task<string> Ping(string message);
-    }
-
     public class Pinger : IPinger
     {
         private readonly IBus _bus;
