@@ -44,7 +44,7 @@ namespace Nimbus.Configuration
 
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);
-            var commandSender = new BusCommandSender(messageSenderFactory);
+            var commandSender = new BusCommandSender(messageSenderFactory, clock);
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, clock, configuration.DefaultTimeout);
             var multicastRequestSender = new BusMulticastRequestSender(topicClientFactory, replyQueueName, requestResponseCorrelator, clock);
             var eventSender = new BusEventSender(topicClientFactory);
