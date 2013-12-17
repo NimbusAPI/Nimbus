@@ -54,14 +54,15 @@ namespace Nimbus.Tests.TaskExtensionTests
             }
 
             [Test]
-            public void TheFirstResultShouldBe10()
+            public void OneResultShouldBe10()
             {
-                _result[0].ShouldBe(10);
+                _result.ShouldContain(10);
             }
 
             [Test]
-            public void TheSecondResultShouldBe50()
+            public void OneResultShouldBe20()
             {
+                _result.ShouldContain(20);
             }
 
             [Test]
