@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Nimbus.Extensions;
 
 namespace Nimbus.IntegrationTests
 {
@@ -22,9 +23,10 @@ namespace Nimbus.IntegrationTests
             // this file can (and usually does) have passwords in it so it's important to have it NOT under source control anywhere
             const string filename = @"C:\Temp\NimbusConnectionString.txt";
 
-            return !File.Exists(filename)
-                       ? null
-                       : File.ReadAllText(filename).Trim();
+            if (!File.Exists(filename))
+                throw new Exception("Could not find the file {0} containing the Azure Service Bus connection string to use for integration testing".FormatWith(filename));
+                       
+            return File.ReadAllText(filename).Trim();
         }
 
     }
