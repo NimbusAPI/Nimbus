@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -13,19 +15,25 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
+        private readonly HashSet<Type> _validRequestTypes;
 
-        public BusMulticastRequestSender(TopicClientFactory topicClientFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, IClock clock)
+        public BusMulticastRequestSender(TopicClientFactory topicClientFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, IClock clock, IReadOnlyList<Type> validRequestTypes)
         {
             _topicClientFactory = topicClientFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
             _clock = clock;
+            _validRequestTypes = new HashSet<Type>(validRequestTypes);
         }
 
         public async Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
+            if (!_validRequestTypes.Contains(typeof(TRequest)))
+                throw new BusException("The type {0} is not a recognised multicast request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(typeof(TRequest).FullName));
+
+
             var sender = _topicClientFactory.GetTopicClient(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
