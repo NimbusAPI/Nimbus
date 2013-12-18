@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -75,12 +76,18 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal static MethodInfo ExtractHandleMulticastMethodInfo(object request)
         {
-            var genericHandleMethod = typeof (IMulticastRequestBroker).GetMethod("HandleMulticast");
-            var requestGenericBaseType = request.GetType().BaseType;
-            var genericArguments = requestGenericBaseType.GetGenericArguments();
+            
+            var closedGenericTypeOfIBusRequest = request.GetType()
+                                            .GetInterfaces()
+                                            .Where(t => t.IsClosedTypeOf(typeof(IBusRequest<,>)))
+                                            .Single();
+
+            var genericArguments = closedGenericTypeOfIBusRequest.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
+
+            var genericHandleMethod = typeof(IMulticastRequestBroker).GetMethod("HandleMulticast");
+            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] { requestType, responseType });
             return handleMethod;
         }
     }
