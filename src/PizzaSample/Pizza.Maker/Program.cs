@@ -6,6 +6,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
+using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 using Serilog;
 
@@ -63,7 +64,7 @@ namespace Pizza.Maker
 
             // This is how you tell Nimbus where to find all your message types and handlers.
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(),
-                typeof (OrderPizzaCommand).Assembly);
+                typeof (OrderPizzaCommand).Assembly, typeof(NewOrderRecieved).Assembly);
 
             builder.RegisterNimbus(typeProvider);
             builder.Register(componentContext => new BusBuilder()

@@ -19,6 +19,7 @@ namespace Nimbus.IntegrationTests
             var interestingTypes = base.ScanAssembliesForInterestingTypes();
             var interestingTypesInFilteredNamespaces = interestingTypes
                 .Where(t => _namespaces.Any(ns => (t.Namespace ?? string.Empty).StartsWith(ns)))
+                .Where(t => !t.Name.EndsWith("ThatIsNotReturedByTheTypeProvider"))
                 .ToArray();
             return interestingTypesInFilteredNamespaces;
         }
