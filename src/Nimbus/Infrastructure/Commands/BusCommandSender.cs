@@ -13,7 +13,6 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IClock _clock;
         private readonly HashSet<Type> _validCommandTypes;
 
-        public BusCommandSender(IMessageSenderFactory messageSenderFactory, IClock clock)
         public BusCommandSender(IMessageSenderFactory messageSenderFactory, IClock clock, IReadOnlyList<Type> validCommandTypes)
         {
             _messageSenderFactory = messageSenderFactory;
