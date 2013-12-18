@@ -46,7 +46,7 @@ namespace Nimbus.Configuration
             var topicClientFactory = new TopicClientFactory(messagingFactory);
             var commandSender = new BusCommandSender(messageSenderFactory, clock, configuration.CommandTypes);
             var requestSender = new BusRequestSender(messageSenderFactory, replyQueueName, requestResponseCorrelator, clock, configuration.DefaultTimeout, configuration.RequestTypes);
-            var multicastRequestSender = new BusMulticastRequestSender(topicClientFactory, replyQueueName, requestResponseCorrelator, clock, configuration.MulticastEventHandlerTypes);
+            var multicastRequestSender = new BusMulticastRequestSender(topicClientFactory, replyQueueName, requestResponseCorrelator, clock, configuration.RequestTypes);
             var eventSender = new BusEventSender(topicClientFactory, configuration.EventTypes);
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
