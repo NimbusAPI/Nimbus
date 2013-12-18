@@ -19,7 +19,7 @@ namespace Pizza.Ordering
         {
 
             // This is how you tell Nimbus where to find all your message types and handlers.
-            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof(NewOrderRecieved).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof(NewOrderRecieved).Assembly, typeof(OrderPizzaCommand).Assembly);
 
             var messageBroker = new DefaultMessageBroker(typeProvider);
 
