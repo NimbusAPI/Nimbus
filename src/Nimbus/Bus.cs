@@ -41,6 +41,16 @@ namespace Nimbus
             await _commandSender.Send(busCommand);
         }
 
+        public async Task Defer<TBusCommand>(TimeSpan delay, TBusCommand busCommand) where TBusCommand : IBusCommand
+        {
+            await _commandSender.SendAt(delay, busCommand);
+        }
+
+        public async Task Defer<TBusCommand>(DateTimeOffset processAt, TBusCommand busCommand) where TBusCommand : IBusCommand
+        {
+            await _commandSender.SendAt(processAt, busCommand);
+        }
+
         public async Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
