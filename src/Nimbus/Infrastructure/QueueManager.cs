@@ -41,13 +41,24 @@ namespace Nimbus.Infrastructure
                                               RequiresSession = false,
                                               AutoDeleteOnIdle = TimeSpan.FromDays(367),
                                           };
+            _logger.Debug("Checking whether subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
             if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
             {
+                _logger.Debug("Updating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
                 _namespaceManager.UpdateSubscription(subscriptionDescription);
             }
             else
             {
-                _namespaceManager.CreateSubscription(subscriptionDescription);
+                _logger.Debug("Creating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
+                try
+                {
+                    _namespaceManager.CreateSubscription(subscriptionDescription);
+                }
+                catch (MessagingEntityAlreadyExistsException)
+                {
+                    _logger.Debug("Subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
+                    _namespaceManager.UpdateSubscription(subscriptionDescription);
+                }
             }
         }
 
