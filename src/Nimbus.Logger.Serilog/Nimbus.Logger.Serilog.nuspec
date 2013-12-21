@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Logger.Serilog</id>
-    <version>0.0.1</version>
+    <version>$version$</version>
     <title>Nimbus.Logger.Serilog</title>
     <authors>Nicholas Blumhardt</authors>
     <owners>Damian Maclennan</owners>
