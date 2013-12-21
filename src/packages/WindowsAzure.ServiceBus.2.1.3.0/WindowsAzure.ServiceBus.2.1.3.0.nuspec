@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>WindowsAzure.ServiceBus</id>
-    <version>2.2.1.1</version>
+    <version>2.1.3.0</version>
     <title>Windows Azure Service Bus</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
@@ -10,13 +10,14 @@
     <projectUrl>http://go.microsoft.com/fwlink/?LinkId=218964</projectUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Use this for Windows Azure Service Bus Queues, Topics, Relay and Notification Hubs backend operations. 
-It adds Microsoft.ServiceBus.dll along with related configuration files to your project. This library allows AMQP 1.0 to be used as one of the protocols for communication with Windows Azure Service Bus. Notification Hubs support sending push notifications to Windows, Windows Phone, iOS and Android. Please note that this package requires .Net Framework 4 Full Profile.</description>
-    <releaseNotes>Package metadata updates.</releaseNotes>
+    <description>This package works with Windows Azure - Service Bus. 
+It adds Microsoft.ServiceBus.dll along with related configuration files to your project. 
+Please note that this package requires .Net Framework 4 Full Profile.</description>
+    <copyright>2013 Microsoft Corp.</copyright>
     <language>en-US</language>
-    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe Queue Topic Relay Service Bus AMQP OASIS windowsazureofficial NotificationHub Notifications Notification Hub Push Windows Phone iOS Android</tags>
+    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe Queue Topic Relay Service Bus windowsazureofficial</tags>
     <dependencies>
-      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.0.2" />
+      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="2.0.1.0" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.ServiceModel" targetFramework=".NETFramework4.0" />
