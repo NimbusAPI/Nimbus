@@ -28,6 +28,5 @@ namespace Nimbus.IntegrationTests
 
             return File.ReadAllText(filename).Trim();
         }
-
     }
 }

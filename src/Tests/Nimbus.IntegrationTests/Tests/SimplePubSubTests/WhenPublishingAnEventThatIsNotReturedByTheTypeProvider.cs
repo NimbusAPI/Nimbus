@@ -30,7 +30,8 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             catch (Exception ex)
             {
                 ex.ShouldBeTypeOf<BusException>();
-                ex.Message.ShouldMatch(@"^The type Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts.SomeEventThatIsNotReturedByTheTypeProvider is not a recognised event type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
+                ex.Message.ShouldMatch(
+                    @"^The type Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts.SomeEventThatIsNotReturedByTheTypeProvider is not a recognised event type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
             }
         }
     }

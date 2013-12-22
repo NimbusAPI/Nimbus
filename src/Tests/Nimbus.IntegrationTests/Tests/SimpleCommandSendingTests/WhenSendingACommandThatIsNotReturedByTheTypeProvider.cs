@@ -30,7 +30,8 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
             catch (Exception ex)
             {
                 ex.ShouldBeTypeOf<BusException>();
-                ex.Message.ShouldMatch(@"^The type Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts.SomeCommandThatIsNotReturedByTheTypeProvider is not a recognised command type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
+                ex.Message.ShouldMatch(
+                    @"^The type Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts.SomeCommandThatIsNotReturedByTheTypeProvider is not a recognised command type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
             }
         }
     }

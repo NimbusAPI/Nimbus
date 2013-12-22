@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Infrastructure;
 using NUnit.Framework;
 using Shouldly;
 
@@ -28,7 +27,7 @@ namespace Nimbus.UnitTests.Conventions
                                     .Where(t => t.Namespace == referenceType.Namespace || t.Namespace.StartsWith(referenceType.Namespace + "."))
                                     .Where(t => t.IsInterface)
                                     .Select(t => new TestCaseData(t)
-                                                     .SetName(t.FullName)
+                                                .SetName(t.FullName)
                     ).GetEnumerator();
             }
 

@@ -17,11 +17,11 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             public override Task<int>[] Given()
             {
                 return new[]
-                {
-                    Task.FromResult(1),
-                    Task.FromResult(2),
-                    Task.FromResult(3),
-                };
+                       {
+                           Task.FromResult(1),
+                           Task.FromResult(2),
+                           Task.FromResult(3)
+                       };
             }
 
             public override void When()

@@ -26,11 +26,11 @@ namespace Nimbus.UnitTests.Conventions
             public IEnumerator<TestCaseData> GetEnumerator()
             {
                 var assemblies = new[]
-                {
-                    typeof (BusBuilderConfigurationExtensions).Assembly,
-                    typeof (AutofacBusBuilderConfigurationExtensions).Assembly,
-                    typeof (WindsorBusBuilderConfigurationExtensions).Assembly
-                };
+                                 {
+                                     typeof (BusBuilderConfigurationExtensions).Assembly,
+                                     typeof (AutofacBusBuilderConfigurationExtensions).Assembly,
+                                     typeof (WindsorBusBuilderConfigurationExtensions).Assembly
+                                 };
 
                 var testCases = assemblies
                     .SelectMany(a => a.GetExportedTypes())

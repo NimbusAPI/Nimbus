@@ -22,23 +22,23 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 _sw = Stopwatch.StartNew();
 
                 return new[]
-                {
-                    Task.Run(() =>
-                    {
-                        Thread.Sleep(TimeSpan.FromMilliseconds(200));
-                        return 200;
-                    }),
-                    Task.Run(() =>
-                    {
-                        Thread.Sleep(TimeSpan.FromMilliseconds(50));
-                        return 20;
-                    }),
-                    Task.Run(() =>
-                    {
-                        Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                        return 10;
-                    }),
-                };
+                       {
+                           Task.Run(() =>
+                                    {
+                                        Thread.Sleep(TimeSpan.FromMilliseconds(200));
+                                        return 200;
+                                    }),
+                           Task.Run(() =>
+                                    {
+                                        Thread.Sleep(TimeSpan.FromMilliseconds(50));
+                                        return 20;
+                                    }),
+                           Task.Run(() =>
+                                    {
+                                        Thread.Sleep(TimeSpan.FromMilliseconds(10));
+                                        return 10;
+                                    })
+                       };
             }
 
             public override void When()

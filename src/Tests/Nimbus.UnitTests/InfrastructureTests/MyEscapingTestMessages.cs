@@ -6,7 +6,6 @@ namespace Nimbus.UnitTests.InfrastructureTests
     {
         public class EscapingTestMessage : IBusEvent
         {
-            
         }
     }
 }

@@ -10,16 +10,13 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForANestedType_WeShouldStripOutPlusSigns()
         {
-
             var pathName = PathFactory.TopicPathFor(typeof (MyEscapingTestMessages.EscapingTestMessage));
             pathName.ShouldNotContain("+");
-
         }
 
         [Test]
         public void WhenCreatingAQueue_WeShouldConvertToLowerCase()
         {
-
             var pathName = PathFactory.TopicPathFor(typeof (MyEscapingTestMessages.EscapingTestMessage));
 
             var expectedName = "t." +
@@ -27,7 +24,6 @@ namespace Nimbus.UnitTests.InfrastructureTests
 
             pathName.ShouldBe(expectedName);
         }
-
 
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldStripOutBackticks()
@@ -45,9 +41,5 @@ namespace Nimbus.UnitTests.InfrastructureTests
 
             pathName.ShouldBe(expected);
         }
-
-
-
-        
     }
 }

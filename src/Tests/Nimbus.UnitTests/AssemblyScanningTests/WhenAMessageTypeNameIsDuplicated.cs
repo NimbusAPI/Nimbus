@@ -7,16 +7,14 @@ using Shouldly;
 namespace Nimbus.UnitTests.AssemblyScanningTests
 {
     [TestFixture]
-    public class WhenAMessageTypeNameIsDuplicated 
+    public class WhenAMessageTypeNameIsDuplicated
     {
         [Test]
         public void TheTypeScannerShouldThrowOnVerify()
         {
-            var scanner = new AssemblyScanningTypeProvider(Assembly.GetAssembly(typeof(DuplicateMessageType)));
+            var scanner = new AssemblyScanningTypeProvider(Assembly.GetAssembly(typeof (DuplicateMessageType)));
 
             Should.Throw<BusException>(scanner.Verify);
-
-
         }
     }
 }

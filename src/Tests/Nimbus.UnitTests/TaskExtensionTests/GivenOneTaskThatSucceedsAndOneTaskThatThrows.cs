@@ -21,10 +21,10 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 _sw = Stopwatch.StartNew();
 
                 return new[]
-                {
-                    Task.Run(() => GoBang()),
-                    Task.FromResult(20),
-                };
+                       {
+                           Task.Run(() => GoBang()),
+                           Task.FromResult(20)
+                       };
             }
 
             [DebuggerStepThrough]

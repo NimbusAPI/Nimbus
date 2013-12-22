@@ -31,7 +31,8 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
             catch (Exception ex)
             {
                 ex.ShouldBeTypeOf<BusException>();
-                ex.Message.ShouldMatch(@"^The type Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts.SomeRequestThatIsNotReturedByTheTypeProvider is not a recognised request type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
+                ex.Message.ShouldMatch(
+                    @"^The type Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts.SomeRequestThatIsNotReturedByTheTypeProvider is not a recognised request type\. Ensure it has been registered with the builder with the WithTypesFrom method\.$");
             }
         }
     }

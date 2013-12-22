@@ -4,6 +4,5 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContrac
 {
     public class SomeCommandThatIsNotReturedByTheTypeProvider : IBusCommand
     {
-         
     }
 }
