@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5BAAC418-8993-48FB-994B-2F06A4B5A26B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Nimbus.IntegrationTests</RootNamespace>
+    <AssemblyName>Nimbus.IntegrationTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NSubstitute">
+      <HintPath>..\packages\NSubstitute.1.6.1.0\lib\NET40\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonResources.cs" />
+    <Compile Include="SpecificationFor.cs" />
+    <Compile Include="TestHarnessBusFactory.cs" />
+    <Compile Include="MethodCallCounter.cs" />
+    <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="Tests\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
+    <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
+    <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\RequestThatWillThrowHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\GrumpyBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\HappyBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenPublishingAnEventThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
+    <Compile Include="BusFactoryEnumerator.cs" />
+    <Compile Include="TestForAllBuses.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatIsNotHandled.cs" />
+    <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaCompetition.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaCompetition.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeBroker.cs" />
+    <Compile Include="Tests\ThroughputTests\EventHandlers\GreedyHandler.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\BarCommand.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\BarEvent.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\BazEvent.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\BazCommand.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\FooEvent.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\QuxCommand.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\QuxEvent.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaMulticast.cs" />
+    <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeMulticastEventHandler.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequest.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\RequestHandlers\SomeRequestHandler.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeResponse.cs" />
+    <Compile Include="Tests\PoisonMessageTests\MessageContracts\TestCommand.cs" />
+    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\TestCommandHandler.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="ThenAttribute.cs" />
+    <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
+    <Compile Include="Extensions\ThreadExtensions.cs" />
+    <Compile Include="Tests\ThroughputTests\ThroughputSpecificationForBus.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaMulticast.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandOnTheBus.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestOnTheBus.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nimbus.IntegrationTests.Autofac\Nimbus.IntegrationTests.Autofac.csproj">
+      <Project>{EBEB2241-1C54-43EF-B88E-DAC0ED8B7F1B}</Project>
+      <Name>Nimbus.IntegrationTests.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
+      <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
+      <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.IntegrationTests.Windsor\Nimbus.IntegrationTests.Windsor.csproj">
+      <Project>{1F1CE629-7FFE-48A7-B114-A218FF21129A}</Project>
+      <Name>Nimbus.IntegrationTests.Windsor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
+      <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
+      <Name>Nimbus.MessageContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
+      <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
+      <Name>Nimbus</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
