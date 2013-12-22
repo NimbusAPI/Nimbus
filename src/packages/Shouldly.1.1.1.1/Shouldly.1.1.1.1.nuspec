@@ -3,6 +3,7 @@
   <metadata>
     <id>Shouldly</id>
     <version>1.1.1.1</version>
+    <title>Shouldly</title>
     <authors>Dave Newman,  Xerxes Battiwalla,  Anthony Egerton,  Peter van der Woude</authors>
     <owners>Dave Newman,  Xerxes Battiwalla,  Anthony Egerton,  Peter van der Woude</owners>
     <licenseUrl>https://github.com/shouldly/shouldly/blob/master/LICENSE.txt</licenseUrl>
@@ -10,6 +11,9 @@
     <iconUrl>http://shouldly.github.com/images/nuget_logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Shouldly - Assertion framework for .NET. The way asserting *Should* be</description>
+    <releaseNotes />
+    <copyright />
+    <language />
     <tags>testing unit TDD AAA shoulda testunit rspec</tags>
   </metadata>
 </package>
