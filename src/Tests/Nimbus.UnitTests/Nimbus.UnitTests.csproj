@@ -7,8 +7,8 @@
     <ProjectGuid>{3A562499-3DA9-469E-88B6-2437FC23DD24}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Tests</RootNamespace>
-    <AssemblyName>Nimbus.Tests</AssemblyName>
+    <RootNamespace>Nimbus.UnitTests</RootNamespace>
+    <AssemblyName>Nimbus.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

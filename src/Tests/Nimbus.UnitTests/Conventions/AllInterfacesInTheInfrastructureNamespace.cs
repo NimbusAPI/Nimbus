@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using Nimbus.Infrastructure;
+using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests.Conventions
+namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
     public class AllInterfacesInTheInfrastructureNamespace

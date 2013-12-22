@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Nimbus.Extensions;
 
-namespace Nimbus.Tests
+namespace Nimbus.UnitTests
 {
     public static class MethodInfoExtensions
     {

@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Nimbus.Extensions;
+using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests.TaskExtensionTests
+namespace Nimbus.UnitTests.TaskExtensionTests
 {
     public class GivenThreeTasksOfVaryingDuration
     {

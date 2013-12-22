@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests.InfrastructureTests
+namespace Nimbus.UnitTests.InfrastructureTests
 {
     [TestFixture]
     public class PathFactoryTests

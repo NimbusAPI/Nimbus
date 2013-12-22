@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Nimbus.Tests
+namespace Nimbus.UnitTests
 {
     public class ThenAttribute : TestAttribute
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{AD2DAA55-CA83-4FA6-A0A8-2AAE1CB9EA41}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Tests.TestAssemblies.MessageContracts</RootNamespace>
-    <AssemblyName>Nimbus.Tests.TestAssemblies.MessageContracts</AssemblyName>
+    <RootNamespace>Nimbus.UnitTests.TestAssemblies.MessageContracts</RootNamespace>
+    <AssemblyName>Nimbus.UnitTests.TestAssemblies.MessageContracts</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

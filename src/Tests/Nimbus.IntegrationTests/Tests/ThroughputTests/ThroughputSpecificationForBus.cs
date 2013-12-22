@@ -6,7 +6,6 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
-using Nimbus.Tests;
 using NUnit.Framework;
 using Shouldly;
 

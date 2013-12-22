@@ -7,7 +7,7 @@ using Nimbus.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests.Conventions
+namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
     public class AllBusBuilderConfigurationExtensionMethods

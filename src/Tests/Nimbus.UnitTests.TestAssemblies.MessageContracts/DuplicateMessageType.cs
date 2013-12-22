@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.Tests.TestAssemblies.MessageContracts
+namespace Nimbus.UnitTests.TestAssemblies.MessageContracts
 {
     public class DuplicateMessageType : IBusEvent
     {

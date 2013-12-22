@@ -7,8 +7,8 @@
     <ProjectGuid>{0747E41E-8BC7-4CE9-82AE-9051F3F6E55B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Tests.TestAssemblies.Handlers</RootNamespace>
-    <AssemblyName>Nimbus.Tests.TestAssemblies.Handlers</AssemblyName>
+    <RootNamespace>Nimbus.UnitTests.TestAssemblies.Handlers</RootNamespace>
+    <AssemblyName>Nimbus.UnitTests.TestAssemblies.Handlers</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

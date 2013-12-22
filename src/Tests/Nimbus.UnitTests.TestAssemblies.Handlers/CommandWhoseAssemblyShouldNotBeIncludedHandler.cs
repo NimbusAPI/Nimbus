@@ -1,8 +1,8 @@
 ﻿using System;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Tests.TestAssemblies.MessageContracts;
+using Nimbus.UnitTests.TestAssemblies.MessageContracts;
 
-namespace Nimbus.Tests.TestAssemblies.Handlers
+namespace Nimbus.UnitTests.TestAssemblies.Handlers
 {
     public class CommandWhoseAssemblyShouldNotBeIncludedHandler : IHandleCommand<CommandWhoseAssemblyShouldNotBeIncluded>
     {

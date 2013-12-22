@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using NUnit.Framework;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests.ConfigurationTests
+namespace Nimbus.UnitTests.ConfigurationTests
 {
     [TestFixture]
     public class WhenLookingForClosedTypesOfAnOpenGeneric

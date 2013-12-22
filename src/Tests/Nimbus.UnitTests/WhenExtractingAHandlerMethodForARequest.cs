@@ -1,9 +1,9 @@
-﻿using NUnit.Framework;
-using Nimbus.Infrastructure.RequestResponse;
+﻿using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
+using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.Tests
+namespace Nimbus.UnitTests
 {
     public class WhenExtractingAHandlerMethodForARequest
     {

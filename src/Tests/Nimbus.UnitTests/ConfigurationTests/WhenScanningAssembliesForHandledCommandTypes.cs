@@ -5,7 +5,7 @@ using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Shouldly;
 
-namespace Nimbus.Tests.ConfigurationTests
+namespace Nimbus.UnitTests.ConfigurationTests
 {
     public class WhenScanningAssembliesForHandledCommandTypes : SpecificationFor<AssemblyScanningTypeProvider>
     {

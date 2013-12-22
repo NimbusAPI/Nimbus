@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.Tests.InfrastructureTests
+namespace Nimbus.UnitTests.InfrastructureTests
 {
     public class MyEscapingTestMessages
     {
