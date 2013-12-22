@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.UnitTests.TestAssemblies.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -13,7 +13,7 @@ namespace Nimbus.UnitTests
             var request = new SomeInternalRequest();
             var handlerMethod = MulticastRequestMessagePump.ExtractHandleMulticastMethodInfo(request);
 
-            ShouldBeTestExtensions.ShouldNotBe<MethodInfo>(handlerMethod, null);
+            handlerMethod.ShouldNotBe(null);
         }
 
         public class SomeInternalRequest : BusRequest<SomeInternalRequest, SomeInternalResponse>

@@ -1,5 +1,6 @@
 ﻿using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.UnitTests.TestAssemblies.Handlers;
 using NUnit.Framework;
 
 namespace Nimbus.UnitTests.AssemblyScanningTests
