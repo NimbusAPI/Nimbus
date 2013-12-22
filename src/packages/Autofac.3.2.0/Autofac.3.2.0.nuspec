@@ -12,6 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Base assemblies for the Autofac Inversion of Control Container</description>
     <summary>Autofac is an IoC container for Microsoft .NET. It manages the dependencies between classes so that applications stay easy to change as they grow in size and complexity.</summary>
+    <releaseNotes />
+    <copyright />
     <language>en-US</language>
   </metadata>
 </package>
