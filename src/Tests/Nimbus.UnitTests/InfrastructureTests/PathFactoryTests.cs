@@ -37,7 +37,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         {
             var pathName = PathFactory.QueuePathFor(typeof (MyCommand<string>));
 
-            var expected = "q.nimbus.tests.infrastructuretests.mycommand.1-string";
+            var expected = "q.nimbus.unittests.infrastructuretests.mycommand.1-string";
 
             pathName.ShouldBe(expected);
         }
