@@ -55,7 +55,9 @@ namespace Pizza.Ordering
                 {
                     case "1":
 
+#pragma warning disable 4014
                         FindOutHowLongItWillBe(bus);
+#pragma warning restore 4014
 
                         break;
 
@@ -63,7 +65,9 @@ namespace Pizza.Ordering
 
                         var command = new OrderPizzaCommand {PizzaId = nextPizzaId};
 
+#pragma warning disable 4014
                         bus.Send(command);
+#pragma warning restore 4014
 
 
                         Console.WriteLine("Pizza number {0} ordered", nextPizzaId);
