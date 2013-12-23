@@ -41,7 +41,7 @@ namespace Nimbus.Infrastructure
                 {
                     messages = ReceiveMessages();
                 }
-                catch (TimeoutException e)
+                catch (TimeoutException)
                 {
                     continue;
                 }
