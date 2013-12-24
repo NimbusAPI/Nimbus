@@ -41,7 +41,7 @@ namespace Nimbus.Infrastructure
                 {
                     messages = ReceiveMessages();
                 }
-                catch (TimeoutException e)
+                catch (TimeoutException)
                 {
                     continue;
                 }
@@ -49,7 +49,11 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     messages
-                        .Select(m => Task.Run(() => PumpMessage(m))
+                        .Select(m => Task.Run(delegate
+                                              {
+                                                  _logger.Debug("Dispatching message: {0} from {1}", m, m.ReplyTo);
+                                                  PumpMessage(m);
+                                              })
                                          .ContinueWith(t => HandleDispatchCompletion(t, m)))
                         .WaitAll();
                 }
@@ -70,6 +74,7 @@ namespace Nimbus.Infrastructure
                 return;
             }
 
+            _logger.Debug("Dispatched message: {0} from {1}", m, m.ReplyTo);
             await m.CompleteAsync();
         }
 
