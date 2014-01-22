@@ -61,6 +61,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             foreach (var response in responses)
             {
                 var responseMessage = new BrokeredMessage(response);
+                responseMessage.Properties.Add(MessagePropertyKeys.MessageType, response.GetType().FullName);
                 responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
                 responseMessage.CorrelationId = requestMessage.CorrelationId;
                 replyQueueClient.Send(responseMessage);

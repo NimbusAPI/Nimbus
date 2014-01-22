@@ -40,7 +40,7 @@ namespace Nimbus.Configuration
             var queueManager = new QueueManager(namespaceManager, messagingFactory, configuration.MaxDeliveryAttempts, logger);
 
             var clock = new SystemClock();
-            var requestResponseCorrelator = new RequestResponseCorrelator(clock);
+            var requestResponseCorrelator = new RequestResponseCorrelator(clock, logger);
 
             var messageSenderFactory = new MessageSenderFactory(messagingFactory);
             var topicClientFactory = new TopicClientFactory(messagingFactory);

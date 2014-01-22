@@ -42,7 +42,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 CorrelationId = correlationId.ToString(),
                 ReplyTo = _replyQueueName,
             };
-
+            message.Properties.Add(MessagePropertyKeys.MessageType, typeof(TRequest).FullName);
             message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMillisecondsKey, (int) timeout.TotalMilliseconds);
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(correlationId, expiresAfter);

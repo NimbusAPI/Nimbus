@@ -45,19 +45,30 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var correlationId = Guid.Parse(message.CorrelationId);
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
-            if (responseCorrelationWrapper == null) return;
+            if (responseCorrelationWrapper == null)
+            {
+                _logger.Debug("Could not find correlation wrapper for reply {0} ({1}", correlationId, message.Properties[MessagePropertyKeys.MessageType]);
+                return;
+            }
 
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessfulKey];
             if (success)
             {
+                _logger.Debug("Request {0} was successful. Dispatching reply to correlation wrapper.", correlationId);
+
                 var responseType = responseCorrelationWrapper.ResponseType;
                 var response = message.GetBody(responseType);
-                responseCorrelationWrapper.SetResponse(response);
+                responseCorrelationWrapper.Reply(response);
+
+                _logger.Debug("Response {0} dispatched.", correlationId);
             }
             else
             {
                 var exceptionMessage = (string) message.Properties[MessagePropertyKeys.ExceptionMessageKey];
                 var exceptionStackTrace = (string) message.Properties[MessagePropertyKeys.ExceptionStackTraceKey];
+
+                _logger.Debug("Request {0} failed. Dispatching exception to correlation wrapper: {1} {2}", correlationId, exceptionMessage, exceptionStackTrace);
+
                 responseCorrelationWrapper.Throw(exceptionMessage, exceptionStackTrace);
             }
         }

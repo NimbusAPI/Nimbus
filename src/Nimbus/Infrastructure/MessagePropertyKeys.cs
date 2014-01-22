@@ -7,5 +7,6 @@
         public const string ExceptionMessageKey = "ExceptionMessage";
         public const string ExceptionTypeKey = "ExceptionType";
         public const string ExceptionStackTraceKey = "ExceptionStackTrace";
+        public const string MessageType = "MessageType";
     }
 }

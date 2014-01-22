@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure
     public abstract class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
 

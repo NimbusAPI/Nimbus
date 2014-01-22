@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             get { return typeof (TResponse); }
         }
 
-        public void SetResponse(object response)
+        public void Reply(object response)
         {
             _requestWasSuccessful = true;
             _response = (TResponse) response;

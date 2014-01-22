@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             get { return _expiresAfter; }
         }
 
-        public void SetResponse(object response)
+        public void Reply(object response)
         {
             _responses.Add((TResponse) response);
         }

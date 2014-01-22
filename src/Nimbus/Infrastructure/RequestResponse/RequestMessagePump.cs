@@ -58,6 +58,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var response = InvokeGenericHandleMethod(_requestBroker, request);
                 responseMessage = new BrokeredMessage(response);
                 responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
+                responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
             }
             catch (Exception exc)
             {
