@@ -41,8 +41,10 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
+            var requestTypeName = typeof(TRequest).FullName;
+
             if (!_validRequestTypes.Contains(typeof(TRequest)))
-                throw new BusException("The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(typeof(TRequest).FullName));
+                throw new BusException("The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
 
             var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
 
@@ -53,19 +55,18 @@ namespace Nimbus.Infrastructure.RequestResponse
                 ReplyTo = _replyQueueName,
                 TimeToLive = timeout,
             };
-            message.Properties.Add(MessagePropertyKeys.MessageType, typeof(TRequest).FullName);
+            message.Properties.Add(MessagePropertyKeys.MessageType, requestTypeName);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
 
-            _logger.Debug("Sending request message {0} of type {1}", correlationId, typeof(TRequest).FullName);
+            _logger.Debug("Sending request message {0} of type {1}", correlationId, requestTypeName);
             await sender.SendAsync(message);
-            _logger.Debug("Sent request message {0} of type {1}", correlationId, typeof(TRequest).FullName);
+            _logger.Debug("Sent request message {0} of type {1}", correlationId, requestTypeName);
 
-
-            _logger.Debug("Waiting for response to request {0} of type {1}", correlationId, typeof(TRequest).FullName);
+            _logger.Debug("Waiting for response to request {0} of type {1}", correlationId, requestTypeName);
             var response = responseCorrelationWrapper.WaitForResponse(timeout);
-            _logger.Debug("Received response to request {0} of type {1}", correlationId, typeof(TRequest).FullName);
+            _logger.Debug("Received response to request {0} of type {1}", correlationId, requestTypeName);
 
             return response;
         }
