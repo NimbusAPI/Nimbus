@@ -12,13 +12,13 @@ namespace Nimbus.Infrastructure
     public abstract class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
-        protected readonly ILogger _logger;
+        protected readonly ILogger Logger;
 
         protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
 
         protected MessagePump(ILogger logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
 
         public virtual void Start()
@@ -51,7 +51,7 @@ namespace Nimbus.Infrastructure
                     messages
                         .Select(m => Task.Run(delegate
                                               {
-                                                  _logger.Debug("Dispatching message: {0} from {1}", m, m.ReplyTo);
+                                                  Logger.Debug("Dispatching message: {0} from {1}", m, m.ReplyTo);
                                                   PumpMessage(m);
                                               })
                                          .ContinueWith(t => HandleDispatchCompletion(t, m)))
@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Overall message dispatch failed.");
+                    Logger.Error(exc, "Overall message dispatch failed.");
                 }
             }
         }
@@ -69,12 +69,12 @@ namespace Nimbus.Infrastructure
             if (t.IsFaulted)
             {
                 var exception = t.Exception;
-                _logger.Error(exception, "Message dispatch failed");
+                Logger.Error(exception, "Message dispatch failed");
                 await m.AbandonAsync(ExceptionDetailsAsProperties(exception));
                 return;
             }
 
-            _logger.Debug("Dispatched message: {0} from {1}", m, m.ReplyTo);
+            Logger.Debug("Dispatched message: {0} from {1}", m, m.ReplyTo);
             await m.CompleteAsync();
         }
 

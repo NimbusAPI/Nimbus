@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 
@@ -14,15 +15,17 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly TimeSpan _responseTimeout;
+        private readonly ILogger _logger;
         private readonly IClock _clock;
         private readonly HashSet<Type> _validRequestTypes;
 
-        internal BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, IClock clock, TimeSpan responseTimeout, IReadOnlyList<Type> validRequestTypes)
+        internal BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, IClock clock, TimeSpan responseTimeout, IReadOnlyList<Type> validRequestTypes, ILogger logger)
         {
             _messageSenderFactory = messageSenderFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
             _responseTimeout = responseTimeout;
+            _logger = logger;
             _clock = clock;
             _validRequestTypes = new HashSet<Type>(validRequestTypes);
         }
@@ -48,14 +51,21 @@ namespace Nimbus.Infrastructure.RequestResponse
             {
                 CorrelationId = correlationId.ToString(),
                 ReplyTo = _replyQueueName,
+                TimeToLive = timeout,
             };
             message.Properties.Add(MessagePropertyKeys.MessageType, typeof(TRequest).FullName);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
 
+            _logger.Debug("Sending request message {0} of type {1}", correlationId, typeof(TRequest).FullName);
             await sender.SendAsync(message);
+            _logger.Debug("Sent request message {0} of type {1}", correlationId, typeof(TRequest).FullName);
+
+
+            _logger.Debug("Waiting for response to request {0} of type {1}", correlationId, typeof(TRequest).FullName);
             var response = responseCorrelationWrapper.WaitForResponse(timeout);
+            _logger.Debug("Received response to request {0} of type {1}", correlationId, typeof(TRequest).FullName);
 
             return response;
         }

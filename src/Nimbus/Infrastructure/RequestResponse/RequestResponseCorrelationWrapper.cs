@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestResponseCorrelationWrapper(DateTimeOffset expiresAfter)
         {
             _expiresAfter = expiresAfter;
-            _semaphore = new Semaphore(0, 1);
+            _semaphore = new Semaphore(0, int.MaxValue);
         }
 
         public Type ResponseType
