@@ -26,16 +26,18 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             RecordMessageProcessed();
             var wrapper = new RequestResponseCorrelationWrapper<TResponse>(expiresAfter);
-            _requestWrappers[correlationId] = wrapper;
-            return wrapper;
+            if (_requestWrappers.TryAdd(correlationId, wrapper)) return wrapper;
+
+            throw new InvalidOperationException("A request with this correlation ID already exists.");
         }
 
         internal MulticastRequestResponseCorrelationWrapper<TResponse> RecordMulticastRequest<TResponse>(Guid correlationId, DateTimeOffset expiresAfter)
         {
             RecordMessageProcessed();
             var wrapper = new MulticastRequestResponseCorrelationWrapper<TResponse>(expiresAfter);
-            _requestWrappers[correlationId] = wrapper;
-            return wrapper;
+            if (_requestWrappers.TryAdd(correlationId, wrapper)) return wrapper;
+
+            throw new InvalidOperationException("A request with this correlation ID already exists.");
         }
 
         internal IRequestResponseCorrelationWrapper TryGetWrapper(Guid correlationId)

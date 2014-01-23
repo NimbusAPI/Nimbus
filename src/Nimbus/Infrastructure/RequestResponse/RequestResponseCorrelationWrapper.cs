@@ -51,8 +51,11 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public TResponse WaitForResponse(TimeSpan timeout)
         {
-            if (!_semaphore.WaitOne(timeout)) throw new TimeoutException("No response was received from the bus within the configured timeout.");
+            var responseReceivedInTime = _semaphore.WaitOne(timeout);
+
+            if (!responseReceivedInTime) throw new TimeoutException("No response was received from the bus within the configured timeout.");
             if (!_requestWasSuccessful) throw new RequestFailedException(_exceptionMessage, _exceptionStackTrace);
+
             return _response;
         }
     }
