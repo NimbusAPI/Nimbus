@@ -38,46 +38,45 @@ namespace Nimbus
 
         public async Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            await _commandSender.Send(busCommand);
+            // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
+            // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
+            await Task.Run(() => _commandSender.Send(busCommand));
         }
 
         public async Task Defer<TBusCommand>(TimeSpan delay, TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            await _commandSender.SendAt(delay, busCommand);
+            await Task.Run(() => _commandSender.SendAt(delay, busCommand));
         }
 
         public async Task Defer<TBusCommand>(DateTimeOffset processAt, TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            await _commandSender.SendAt(processAt, busCommand);
+            await Task.Run(() => _commandSender.SendAt(processAt, busCommand));
         }
 
         public async Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            var response = await _requestSender.SendRequest(busRequest);
-            return response;
+            return await Task.Run(() => _requestSender.SendRequest(busRequest));
         }
 
         public async Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            var response = await _requestSender.SendRequest(busRequest, timeout);
-            return response;
+            return await Task.Run(() => _requestSender.SendRequest(busRequest, timeout));
         }
 
         public async Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            var response = await _multicastRequestSender.SendRequest(busRequest, timeout);
-            return response;
+            return await Task.Run(() => _multicastRequestSender.SendRequest(busRequest, timeout));
         }
 
         public async Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
-            await _eventSender.Publish(busEvent);
+            await Task.Run(() => _eventSender.Publish(busEvent));
         }
 
         public IDeadLetterQueues DeadLetterQueues
