@@ -14,8 +14,8 @@ namespace Nimbus.Infrastructure.Events
         private readonly string _subscriptionName;
         private SubscriptionClient _client;
 
-        public MulticastEventMessagePump(MessagingFactory messagingFactory, IMulticastEventBroker multicastEventBroker, Type eventType, string subscriptionName, ILogger logger)
-            : base(logger)
+        public MulticastEventMessagePump(MessagingFactory messagingFactory, IMulticastEventBroker multicastEventBroker, Type eventType, string subscriptionName, ILogger logger, int batchSize)
+            : base(logger, batchSize)
         {
             _messagingFactory = messagingFactory;
             _multicastEventBroker = multicastEventBroker;
@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.Events
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _client.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
+            return _client.ReceiveBatch(BatchSize, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage message)

@@ -15,9 +15,11 @@ namespace Nimbus.Infrastructure
         protected readonly ILogger Logger;
 
         protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
+        protected int BatchSize { get; private set; }
 
-        protected MessagePump(ILogger logger)
+        protected MessagePump(ILogger logger, int batchSize)
         {
+            BatchSize = batchSize;
             Logger = logger;
         }
 
