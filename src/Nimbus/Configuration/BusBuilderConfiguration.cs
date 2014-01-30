@@ -24,6 +24,7 @@ namespace Nimbus.Configuration
         internal Type[] EventTypes { get; set; }
         internal TimeSpan DefaultTimeout { get; set; }
         internal int MaxDeliveryAttempts { get; set; }
+        internal int DefaultBatchSize { get; set; }
         internal ILogger Logger { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
@@ -31,6 +32,7 @@ namespace Nimbus.Configuration
         {
             DefaultTimeout = TimeSpan.FromSeconds(10);
             MaxDeliveryAttempts = 5;
+            DefaultBatchSize = 16;
             Logger = new NullLogger();
 
             Debugging = new BusDebuggingConfiguration();

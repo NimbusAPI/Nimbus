@@ -17,11 +17,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly string _applicationSharedSubscriptionName;
         private SubscriptionClient _client;
 
-        public MulticastRequestMessagePump(MessagingFactory messagingFactory,
-                                           IMulticastRequestBroker multicastRequestBroker,
-                                           Type requestType,
-                                           string applicationSharedSubscriptionName,
-                                           ILogger logger) : base(logger)
+        public MulticastRequestMessagePump(MessagingFactory messagingFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType, string applicationSharedSubscriptionName, ILogger logger, int batchSize) : base(logger, batchSize)
         {
             _messagingFactory = messagingFactory;
             _multicastRequestBroker = multicastRequestBroker;
@@ -44,7 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _client.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
+            return _client.ReceiveBatch(BatchSize, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage requestMessage)

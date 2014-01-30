@@ -169,7 +169,7 @@ namespace Nimbus.Configuration
                                                       ILogger logger)
         {
 
-            var responseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, configuration.Logger);
+            var responseMessagePump = new ResponseMessagePump(messagingFactory, replyQueueName, requestResponseCorrelator, configuration.Logger, configuration.DefaultBatchSize);
             messagePumps.Add(responseMessagePump);
         }
 
@@ -186,7 +186,7 @@ namespace Nimbus.Configuration
             foreach (var commandType in commandTypes)
             {
                 logger.Debug("Registering Message Pump for Command type {0}", commandType.Name);
-                var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger);
+                var pump = new CommandMessagePump(messagingFactory, configuration.CommandBroker, commandType, configuration.Logger, configuration.DefaultBatchSize);
                 messagePumps.Add(pump);    
             }
 
@@ -206,7 +206,7 @@ namespace Nimbus.Configuration
             foreach (var requestType in requestTypes)
             {
                 logger.Debug("Registering Message Pump for Request type {0}", requestType.Name);
-                var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger);
+                var pump = new RequestMessagePump(messagingFactory, configuration.RequestBroker, requestType, configuration.Logger, configuration.DefaultBatchSize);
                 messagePumps.Add(pump);
             }
 
@@ -238,7 +238,7 @@ namespace Nimbus.Configuration
                                                            configuration.MulticastRequestBroker,
                                                            requestType,
                                                            applicationSharedSubscriptionName,
-                                                           configuration.Logger);
+                                                           configuration.Logger, configuration.DefaultBatchSize);
                 messagePumps.Add(pump);
             }
         }
@@ -263,7 +263,7 @@ namespace Nimbus.Configuration
 
                 var myInstanceSubscriptionName = String.Format("{0}.{1}", configuration.InstanceName, configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, myInstanceSubscriptionName);
-                var pump = new MulticastEventMessagePump(messagingFactory, configuration.MulticastEventBroker, eventType, myInstanceSubscriptionName, configuration.Logger);
+                var pump = new MulticastEventMessagePump(messagingFactory, configuration.MulticastEventBroker, eventType, myInstanceSubscriptionName, configuration.Logger, configuration.DefaultBatchSize);
                 messagePumps.Add(pump);
             }
         }
@@ -288,7 +288,7 @@ namespace Nimbus.Configuration
 
                 var applicationSharedSubscriptionName = String.Format("{0}", configuration.ApplicationName);
                 queueManager.EnsureSubscriptionExists(eventType, applicationSharedSubscriptionName);
-                var pump = new CompetingEventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger);
+                var pump = new CompetingEventMessagePump(messagingFactory, configuration.CompetingEventBroker, eventType, applicationSharedSubscriptionName, configuration.Logger, configuration.DefaultBatchSize);
                 messagePumps.Add(pump);
             }
         }

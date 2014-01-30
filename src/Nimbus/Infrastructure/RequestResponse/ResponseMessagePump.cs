@@ -14,8 +14,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         private MessageReceiver _receiver;
 
-        internal ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, ILogger logger)
-            : base(logger)
+        internal ResponseMessagePump(MessagingFactory messagingFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, ILogger logger, int batchSize)
+            : base(logger, batchSize)
         {
             _messagingFactory = messagingFactory;
             _replyQueueName = replyQueueName;
@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _receiver.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
+            return _receiver.ReceiveBatch(BatchSize, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage message)

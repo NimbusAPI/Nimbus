@@ -15,7 +15,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly Type _messageType;
         private MessageReceiver _reciever;
 
-        public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType, ILogger logger) : base(logger)
+        public RequestMessagePump(MessagingFactory messagingFactory, IRequestBroker requestBroker, Type messageType, ILogger logger, int batchSize) : base(logger, batchSize)
         {
             _messagingFactory = messagingFactory;
             _requestBroker = requestBroker;
@@ -37,7 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _reciever.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
+            return _reciever.ReceiveBatch(BatchSize, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage message)

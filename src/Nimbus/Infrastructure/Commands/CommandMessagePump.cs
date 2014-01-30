@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly Type _messageType;
         private MessageReceiver _reciever;
 
-        public CommandMessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType, ILogger logger) : base(logger)
+        public CommandMessagePump(MessagingFactory messagingFactory, ICommandBroker commandBroker, Type messageType, ILogger logger, int batchSize) : base(logger, batchSize)
         {
             _messagingFactory = messagingFactory;
             _commandBroker = commandBroker;
@@ -35,7 +35,7 @@ namespace Nimbus.Infrastructure.Commands
 
         protected override BrokeredMessage[] ReceiveMessages()
         {
-            return _reciever.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
+            return _reciever.ReceiveBatch(BatchSize, BatchTimeout).ToArray();
         }
 
         protected override void PumpMessage(BrokeredMessage message)
