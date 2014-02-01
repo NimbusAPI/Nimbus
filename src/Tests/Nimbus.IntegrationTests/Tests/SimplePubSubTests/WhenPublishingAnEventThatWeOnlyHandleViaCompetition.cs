@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.InfrastructureContracts;
@@ -19,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             await Bus.Publish(myEvent);
 
-            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
