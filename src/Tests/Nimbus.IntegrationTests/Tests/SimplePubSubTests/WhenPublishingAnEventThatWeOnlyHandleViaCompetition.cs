@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.InfrastructureContracts;
@@ -18,12 +19,12 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             await Bus.Publish(myEvent);
 
-            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -35,7 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -48,7 +49,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

@@ -4,6 +4,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
+    [Obsolete]
     public class TopicClientFactory : ITopicClientFactory, IDisposable
     {
         private readonly MessagingFactory _messagingFactory;

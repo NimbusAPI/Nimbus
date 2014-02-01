@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.Events
@@ -11,11 +12,13 @@ namespace Nimbus.Infrastructure.Events
     internal class BusEventSender : IEventSender
     {
         private readonly ITopicClientFactory _topicClientFactory;
+        private readonly ILogger _logger;
         private readonly HashSet<Type> _validEventTypes;
 
-        public BusEventSender(ITopicClientFactory topicClientFactory, EventTypesSetting validEventTypes)
+        public BusEventSender(ITopicClientFactory topicClientFactory, EventTypesSetting validEventTypes, ILogger logger)
         {
             _topicClientFactory = topicClientFactory;
+            _logger = logger;
             _validEventTypes = new HashSet<Type>(validEventTypes.Value);
         }
 
@@ -28,7 +31,9 @@ namespace Nimbus.Infrastructure.Events
 
             var client = _topicClientFactory.GetTopicClient(typeof (TBusEvent));
             var brokeredMessage = new BrokeredMessage(busEvent);
-            await client.SendBatchAsync(new[] {brokeredMessage});
+
+            await client.SendAsync(brokeredMessage);
+            _logger.Debug("Published event: {0}", brokeredMessage);
         }
     }
 }

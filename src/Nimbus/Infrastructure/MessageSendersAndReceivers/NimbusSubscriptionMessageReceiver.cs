@@ -23,6 +23,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _subscriptionClient = new Lazy<SubscriptionClient>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
 
+        public Task WaitUntilReady()
+        {
+            return Task.Run(() => { var dummy = _subscriptionClient.Value; });
+        }
+
         public Task<BrokeredMessage> Receive()
         {
             return _subscriptionClient.Value.ReceiveAsync(TimeSpan.FromSeconds(1));
