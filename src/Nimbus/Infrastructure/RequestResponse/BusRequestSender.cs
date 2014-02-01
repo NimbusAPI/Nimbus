@@ -72,7 +72,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
 
             _logger.Debug("Sending request message {0} of type {1}", correlationId, requestTypeName);
-            await sender.SendAsync(message);
+            await sender.Send(message);
             _logger.Debug("Sent request message {0} of type {1}", correlationId, requestTypeName);
 
             _logger.Debug("Waiting for response to request {0} of type {1}", correlationId, requestTypeName);

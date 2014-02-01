@@ -1,9 +1,10 @@
-﻿using Microsoft.ServiceBus.Messaging;
+﻿using System.Threading.Tasks;
+using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     public interface INimbusMessageSender
     {
-        void Send(BrokeredMessage message);
+        Task Send(BrokeredMessage message);
     }
 }

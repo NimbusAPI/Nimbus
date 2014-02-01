@@ -5,7 +5,7 @@ namespace Nimbus.Infrastructure
 {
     public interface IQueueManager
     {
-        MessageSender CreateMessageSender(Type messageType);
+        MessageSender CreateMessageSender(string queuePath);
         MessageReceiver CreateMessageReceiver(string queuePath);
 
         SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName);

@@ -89,8 +89,13 @@ namespace Nimbus.Infrastructure
             catch (MessagingException)
             {
             }
-
-            _namespaceManager.UpdateTopic(topicDescription);
+            try
+            {
+                _namespaceManager.UpdateTopic(topicDescription);
+            }
+            catch (MessagingException)
+            {
+            }
 
             if (!_namespaceManager.TopicExists(topicPath))
             {
@@ -131,8 +136,13 @@ namespace Nimbus.Infrastructure
             catch (MessagingException)
             {
             }
-
-            _namespaceManager.UpdateQueue(queueDescription);
+            try
+            {
+                _namespaceManager.UpdateQueue(queueDescription);
+            }
+            catch (MessagingException)
+            {
+            }
 
             if (!_namespaceManager.QueueExists(queuePath))
             {
@@ -142,8 +152,13 @@ namespace Nimbus.Infrastructure
 
         public MessageSender CreateMessageSender(Type messageType)
         {
-            EnsureQueueExists(messageType);
             var queuePath = PathFactory.QueuePathFor(messageType);
+            return CreateMessageSender(queuePath);
+        }
+
+        public MessageSender CreateMessageSender(string queuePath)
+        {
+            EnsureQueueExists(queuePath);
             return _messagingFactory.CreateMessageSender(queuePath);
         }
 

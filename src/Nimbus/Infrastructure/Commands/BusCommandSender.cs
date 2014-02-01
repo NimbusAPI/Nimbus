@@ -23,12 +23,14 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task Send<TBusCommand>(TBusCommand busCommand)
         {
-            if (!_validCommandTypes.Contains(typeof(TBusCommand)))
-                throw new BusException("The type {0} is not a recognised command type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(typeof(TBusCommand).FullName));
+            if (!_validCommandTypes.Contains(typeof (TBusCommand)))
+                throw new BusException(
+                    "The type {0} is not a recognised command type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
+                        typeof (TBusCommand).FullName));
 
             var sender = _messageSenderFactory.GetMessageSender(typeof (TBusCommand));
             var message = new BrokeredMessage(busCommand);
-            await sender.SendBatchAsync(new[] {message});
+            await sender.Send(message);
         }
 
         public async Task SendAt<TBusCommand>(TimeSpan delay, TBusCommand busCommand)
@@ -38,13 +40,13 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task SendAt<TBusCommand>(DateTimeOffset proccessAt, TBusCommand busCommand)
         {
-            var sender = _messageSenderFactory.GetMessageSender(typeof(TBusCommand));
+            var sender = _messageSenderFactory.GetMessageSender(typeof (TBusCommand));
             var message = new BrokeredMessage(busCommand)
-            {
-                ScheduledEnqueueTimeUtc = proccessAt.DateTime
-            };
+                          {
+                              ScheduledEnqueueTimeUtc = proccessAt.DateTime
+                          };
 
-            await sender.SendBatchAsync(new[] { message });
+            await sender.Send(message);
         }
     }
 }

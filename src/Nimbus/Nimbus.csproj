@@ -51,6 +51,7 @@
     <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastEventMessageDispatcher.cs" />

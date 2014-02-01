@@ -1,10 +1,10 @@
 ﻿using System;
-using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
     internal interface IMessageSenderFactory
     {
-        MessageSender GetMessageSender(Type messageType);
+        INimbusMessageSender GetMessageSender(Type messageType);
     }
 }
