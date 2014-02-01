@@ -127,7 +127,6 @@
     <Compile Include="InfrastructureContracts\IHandleMulticastEvent.cs" />
     <Compile Include="InfrastructureContracts\IHandleRequest.cs" />
     <Compile Include="Infrastructure\IMessagePump.cs" />
-    <Compile Include="Infrastructure\IMessageSenderFactory.cs" />
     <Compile Include="Infrastructure\IQueueManager.cs" />
     <Compile Include="InfrastructureContracts\IRequestBroker.cs" />
     <Compile Include="Infrastructure\RequestResponse\IRequestResponseCorrelationWrapper.cs" />
@@ -136,7 +135,6 @@
     <Compile Include="Infrastructure\RequestResponse\BusRequestSender.cs" />
     <Compile Include="Infrastructure\MessagePump.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelator.cs" />
-    <Compile Include="Infrastructure\MessageSenderFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\AzureQueueManager.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageReceiver.cs" />

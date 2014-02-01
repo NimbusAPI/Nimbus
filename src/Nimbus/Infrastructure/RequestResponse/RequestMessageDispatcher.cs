@@ -10,15 +10,15 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Configuration
 {
-    internal class RequestMessageDispatcher: IMessageDispatcher
+    internal class RequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly MessagingFactory _messagingFactory;
+        private readonly IQueueManager _queueManager;
         private readonly Type _messageType;
         private readonly IRequestBroker _requestBroker;
 
-        public RequestMessageDispatcher(MessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker)
+        public RequestMessageDispatcher(IQueueManager queueManager, Type messageType, IRequestBroker requestBroker)
         {
-            _messagingFactory = messagingFactory;
+            _queueManager = queueManager;
             _messageType = messageType;
             _requestBroker = requestBroker;
         }
@@ -26,7 +26,7 @@ namespace Nimbus.Configuration
         public async Task Dispatch(BrokeredMessage message)
         {
             var replyQueueName = message.ReplyTo;
-            var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
+            var replyQueueClient = _queueManager.CreateMessageSender(replyQueueName);
 
             var request = message.GetBody(_messageType);
 
@@ -46,7 +46,7 @@ namespace Nimbus.Configuration
             }
 
             responseMessage.CorrelationId = message.CorrelationId;
-           await  replyQueueClient.SendAsync(responseMessage);
+            await replyQueueClient.SendAsync(responseMessage);
         }
 
         private static object InvokeGenericHandleMethod(IRequestBroker requestBroker, object request)
@@ -54,7 +54,7 @@ namespace Nimbus.Configuration
             // We can't use dynamic dispatch here as the DLR isn't so great at figuring things out when we have
             // multiple generic parameters.  -andrewh 19/01/2014
             var handleMethod = ExtractHandlerMethodInfo(request);
-            var response = handleMethod.Invoke(requestBroker, new[] { request });
+            var response = handleMethod.Invoke(requestBroker, new[] {request});
             return response;
         }
 
@@ -62,15 +62,15 @@ namespace Nimbus.Configuration
         {
             var closedGenericTypeOfIBusRequest = request.GetType()
                                                         .GetInterfaces()
-                                                        .Where(t => TypeExtensions.IsClosedTypeOf(t, typeof(IBusRequest<,>)))
+                                                        .Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
                                                         .Single();
 
             var genericArguments = closedGenericTypeOfIBusRequest.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof(IRequestBroker).GetMethod("Handle");
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] { requestType, responseType });
+            var genericHandleMethod = typeof (IRequestBroker).GetMethod("Handle");
+            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
             return handleMethod;
         }
     }

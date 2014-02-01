@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
@@ -7,18 +6,18 @@ namespace Nimbus.Configuration
 {
     internal class RequestMessageDispatcherFactory
     {
-        private MessagingFactory _messagingFactory;
-        private IRequestBroker _requestBroker;
+        private readonly IQueueManager _queueManager;
+        private readonly IRequestBroker _requestBroker;
 
-        public RequestMessageDispatcherFactory(MessagingFactory messagingFactory, IRequestBroker requestBroker)
+        public RequestMessageDispatcherFactory(IQueueManager queueManager, IRequestBroker requestBroker)
         {
-            _messagingFactory = messagingFactory;
+            _queueManager = queueManager;
             _requestBroker = requestBroker;
         }
 
         public IMessageDispatcher Create(Type messageType)
         {
-            return new RequestMessageDispatcher(_messagingFactory, messageType, _requestBroker);
+            return new RequestMessageDispatcher(_queueManager, messageType, _requestBroker);
         }
     }
 }

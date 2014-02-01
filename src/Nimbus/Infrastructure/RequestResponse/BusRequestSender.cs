@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     public class BusRequestSender : IRequestSender
     {
-        private readonly IMessageSenderFactory _messageSenderFactory;
+        private readonly IQueueManager _queueManager;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly RequestTypesSetting _requestTypes;
         private readonly Lazy<HashSet<Type>> _validRequestTypes;
 
-        internal BusRequestSender(IMessageSenderFactory messageSenderFactory,
+        internal BusRequestSender(IQueueManager queueManager,
                                   ReplyQueueNameSetting replyQueueName,
                                   RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   RequestTypesSetting requestTypes,
                                   ILogger logger)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _queueManager = queueManager;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
             _logger = logger;
@@ -57,7 +57,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 throw new BusException(
                     "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
 
-            var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
+            var sender = _queueManager.GetMessageSender(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
             var message = new BrokeredMessage(busRequest)
