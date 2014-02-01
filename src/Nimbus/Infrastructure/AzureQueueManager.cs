@@ -29,8 +29,12 @@ namespace Nimbus.Infrastructure
 
         public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
         {
-            var topicPath = PathFactory.TopicPathFor(eventType);
+            EnsureSubscriptionExists(PathFactory.TopicPathFor(eventType), subscriptionName);
+        }
 
+        private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
+        {
+            EnsureTopicExists(topicPath);
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
                                           {
                                               MaxDeliveryCount = _maxDeliveryAttempts,
@@ -41,25 +45,19 @@ namespace Nimbus.Infrastructure
                                               RequiresSession = false,
                                               AutoDeleteOnIdle = TimeSpan.FromDays(367),
                                           };
-            _logger.Debug("Checking whether subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
-            if (_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
+
+            try
             {
-                _logger.Debug("Updating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
+                _namespaceManager.CreateSubscription(subscriptionDescription);
+            }
+            catch (MessagingEntityAlreadyExistsException)
+            {
+                _logger.Debug("Subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
                 _namespaceManager.UpdateSubscription(subscriptionDescription);
             }
-            else
-            {
-                _logger.Debug("Creating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
-                try
-                {
-                    _namespaceManager.CreateSubscription(subscriptionDescription);
-                }
-                catch (MessagingEntityAlreadyExistsException)
-                {
-                    _logger.Debug("Subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
-                    _namespaceManager.UpdateSubscription(subscriptionDescription);
-                }
-            }
+
+            _logger.Debug("Updating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
+            _namespaceManager.UpdateSubscription(subscriptionDescription);
         }
 
         public void EnsureTopicExists(Type eventType)
@@ -163,6 +161,18 @@ namespace Nimbus.Infrastructure
             EnsureQueueExists(messageType);
             var queuePath = PathFactory.QueuePathFor(messageType);
             return _messagingFactory.CreateMessageSender(queuePath);
+        }
+
+        public MessageReceiver CreateMessageReceiver(string queuePath)
+        {
+            EnsureQueueExists(queuePath);
+            return _messagingFactory.CreateMessageReceiver(queuePath);
+        }
+
+        public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
+        {
+            EnsureSubscriptionExists(topicPath, subscriptionName);
+            return _messagingFactory.CreateSubscriptionClient(topicPath, subscriptionName);
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)

@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure
         private readonly IMessageDispatcher _dispatcher;
         private readonly ILogger _logger;
 
-        protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
+        private Task _internalMessagePump;
 
         public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger)
         {
@@ -22,14 +22,25 @@ namespace Nimbus.Infrastructure
             _logger = logger;
         }
 
-        public void Start()
+        public async Task Start()
         {
-            Task.Run(() => InternalMessagePump());
+            if (_internalMessagePump != null)
+                throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
+
+            _logger.Debug("Message pump for {0} starting...", _receiver);
+            _internalMessagePump = Task.Run(() => InternalMessagePump());
+            _logger.Debug("Message pump for {0} started", _receiver);
         }
 
-        public void Stop()
+        public async Task Stop()
         {
+            _logger.Debug("Message pump for {0} stopping...", _receiver);
             _haveBeenToldToStop = true;
+            var internalMessagePump = _internalMessagePump;
+            if (internalMessagePump == null) return;
+
+            await internalMessagePump;
+            _logger.Debug("Message pump for {0} stopped.", _receiver);
         }
 
         private async Task InternalMessagePump()

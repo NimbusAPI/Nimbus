@@ -5,6 +5,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
@@ -13,21 +14,24 @@ namespace Nimbus.Configuration
     {
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
-        private readonly IMessageDispatcher _dispatcher;
-        private readonly MessagingFactory _messagingFactory;
         private readonly ApplicationNameSetting _applicationName;
+        private readonly IQueueManager _queueManager;
+        private readonly MessagingFactory _messagingFactory;
+        private readonly IMulticastRequestBroker _multicastRequestBroker;
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
                                                    RequestHandlerTypesSetting requestHandlerTypes,
-                                                   IMessageDispatcher dispatcher,
+                                                   ApplicationNameSetting applicationName,
+                                                   IQueueManager queueManager,
                                                    MessagingFactory messagingFactory,
-                                                   ApplicationNameSetting applicationName)
+                                                   IMulticastRequestBroker multicastRequestBroker)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
-            _dispatcher = dispatcher;
-            _messagingFactory = messagingFactory;
             _applicationName = applicationName;
+            _queueManager = queueManager;
+            _messagingFactory = messagingFactory;
+            _multicastRequestBroker = multicastRequestBroker;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -46,11 +50,10 @@ namespace Nimbus.Configuration
 
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
-                var messageReceiver = new NimbusMessageReceiver(_messagingFactory.CreateSubscriptionClient(topicPath, applicationSharedSubscriptionName));
+                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
+                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);
 
-                //FIXME still need to do this...
-                //queueManager.EnsureSubscriptionExists(requestType, applicationSharedSubscriptionName);
-                var pump = new MessagePump(messageReceiver, _dispatcher, _logger);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger);
                 yield return pump;
             }
         }

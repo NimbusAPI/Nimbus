@@ -9,6 +9,8 @@ namespace Nimbus.IntegrationTests
     [Timeout(30*1000)]
     public abstract class TestForAllBuses
     {
+        protected Bus Bus { get; private set; }
+
         [SetUp]
         public void SetUp()
         {
@@ -18,9 +20,15 @@ namespace Nimbus.IntegrationTests
         [TearDown]
         public void TearDown()
         {
+            Bus.Stop();
         }
 
-        public abstract Task When(ITestHarnessBusFactory busFactory);
+        public virtual async Task Given(ITestHarnessBusFactory busFactory)
+        {
+            Bus = (Bus) busFactory.Create();
+        }
+
+        public abstract Task When();
 
         public IEnumerable<TestCaseData> AllBusesTestCases
         {

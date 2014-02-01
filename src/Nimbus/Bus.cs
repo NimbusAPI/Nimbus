@@ -86,12 +86,14 @@ namespace Nimbus
 
         public void Start()
         {
-            foreach (var pump in _messagePumps) pump.Start();
+            var messagePumpStartTasks = _messagePumps.Select(p => p.Start()).ToArray();
+            Task.WaitAll(messagePumpStartTasks);
         }
 
         public void Stop()
         {
-            foreach (var messagePump in _messagePumps) messagePump.Stop();
+            var messagePumpStopTasks = _messagePumps.Select(p => p.Stop()).ToArray();
+            Task.WaitAll(messagePumpStopTasks);
         }
     }
 }

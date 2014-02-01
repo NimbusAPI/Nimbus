@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
@@ -12,15 +11,15 @@ namespace Nimbus.Configuration
     {
         private readonly ILogger _logger;
         private readonly CommandHandlerTypesSetting _commandHandlerTypes;
-        private readonly MessagingFactory _messagingFactory;
         private readonly ICommandBroker _commandBroker;
+        private readonly IQueueManager _queueManager;
 
-        public CommandMessagePumpsFactory(ILogger logger, CommandHandlerTypesSetting commandHandlerTypes, MessagingFactory messagingFactory, ICommandBroker commandBroker)
+        public CommandMessagePumpsFactory(ILogger logger, CommandHandlerTypesSetting commandHandlerTypes, ICommandBroker commandBroker, IQueueManager queueManager)
         {
             _logger = logger;
             _commandHandlerTypes = commandHandlerTypes;
-            _messagingFactory = messagingFactory;
             _commandBroker = commandBroker;
+            _queueManager = queueManager;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -37,8 +36,8 @@ namespace Nimbus.Configuration
             {
                 _logger.Debug("Creating message pump for command type {0}", commandType.Name);
 
-                var queueName = PathFactory.QueuePathFor(commandType);
-                var messageReceiver = new NimbusMessageReceiver(_messagingFactory.CreateMessageReceiver(queueName));
+                var queuePath = PathFactory.QueuePathFor(commandType);
+                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
 
                 var dispatcher = new CommandMessageDispatcher(_commandBroker, commandType);
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger);

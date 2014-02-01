@@ -51,6 +51,7 @@
     <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
@@ -137,7 +138,7 @@
     <Compile Include="Infrastructure\MessageSenderFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\AzureQueueManager.cs" />
-    <Compile Include="Infrastructure\NimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\NimbusQueueMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\TopicClientFactory.cs" />
   </ItemGroup>

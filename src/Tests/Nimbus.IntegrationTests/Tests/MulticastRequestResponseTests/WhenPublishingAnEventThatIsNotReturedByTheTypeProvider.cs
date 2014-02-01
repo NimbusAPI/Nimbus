@@ -12,20 +12,20 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
     {
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
 
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
-            await bus.Request(new SomeRequestThatIsNotReturedByTheTypeProvider(), _timeout);
+            await Bus.Request(new SomeRequestThatIsNotReturedByTheTypeProvider(), _timeout);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
         public async void ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
         {
+            await Given(busFactory);
+
             try
             {
-                await When(busFactory);
+                await When();
                 Assert.Fail("Exception expected");
             }
             catch (Exception ex)

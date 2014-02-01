@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
@@ -13,14 +12,17 @@ namespace Nimbus.Configuration
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly RequestMessageDispatcherFactory _dispatcherFactory;
-        private readonly MessagingFactory _messagingFactory;
+        private readonly IQueueManager _queueManager;
 
-        public RequestMessagePumpsFactory(ILogger logger, RequestHandlerTypesSetting requestHandlerTypes, RequestMessageDispatcherFactory dispatcherFactory, MessagingFactory messagingFactory)
+        public RequestMessagePumpsFactory(ILogger logger,
+                                          RequestHandlerTypesSetting requestHandlerTypes,
+                                          RequestMessageDispatcherFactory dispatcherFactory,
+                                          IQueueManager queueManager)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
             _dispatcherFactory = dispatcherFactory;
-            _messagingFactory = messagingFactory;
+            _queueManager = queueManager;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -37,8 +39,8 @@ namespace Nimbus.Configuration
             {
                 _logger.Debug("Creating message pump for request type {0}", requestType.Name);
 
-                var queueName = PathFactory.QueuePathFor(requestType);
-                var messageReceiver = new NimbusMessageReceiver(_messagingFactory.CreateMessageReceiver(queueName));
+                var queuePath = PathFactory.QueuePathFor(requestType);
+                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
                 var dispatcher = _dispatcherFactory.Create(requestType);
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger);
 

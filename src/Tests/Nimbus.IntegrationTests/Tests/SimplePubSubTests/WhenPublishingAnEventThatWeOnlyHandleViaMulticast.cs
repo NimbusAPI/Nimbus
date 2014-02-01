@@ -13,12 +13,10 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
     [TestFixture]
     public class WhenPublishingAnEventThatWeOnlyHandleViaMulticast : TestForAllBuses
     {
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             var myEvent = new SomeEventWeOnlyHandleViaMulticast();
-            await bus.Publish(myEvent);
+            await Bus.Publish(myEvent);
 
             TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
@@ -27,7 +25,8 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [TestCaseSource("AllBusesTestCases")]
         public async void TheMulticastEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaMulticast) null))
                              .Count()
@@ -38,7 +37,8 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [TestCaseSource("AllBusesTestCases")]
         public async void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaMulticast>()
@@ -50,7 +50,8 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [TestCaseSource("AllBusesTestCases")]
         public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             MethodCallCounter.AllReceivedMessages
                              .Count()

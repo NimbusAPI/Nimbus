@@ -14,23 +14,22 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
     {
         private IEnumerable<BlackBallResponse> _response;
 
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             var request = new BlackBallRequest
                           {
                               ProspectiveMemberName = "Fred Flintstone",
                           };
 
-            _response = await bus.MulticastRequest(request, TimeSpan.FromSeconds(2));
+            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2));
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
         public async void WeShouldReceiveTwoResponses(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             _response.Count().ShouldBe(2);
         }

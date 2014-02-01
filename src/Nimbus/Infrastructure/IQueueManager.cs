@@ -5,12 +5,10 @@ namespace Nimbus.Infrastructure
 {
     public interface IQueueManager
     {
-        void EnsureSubscriptionExists(Type eventType, string subscriptionName);
-        void EnsureTopicExists(Type eventType);
-        void EnsureQueueExists(Type commandType);
-        void EnsureQueueExists(string queuePath);
-
         MessageSender CreateMessageSender(Type messageType);
+        MessageReceiver CreateMessageReceiver(string queuePath);
+
+        SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName);
 
         QueueClient CreateDeadLetterQueueClient<T>();
     }

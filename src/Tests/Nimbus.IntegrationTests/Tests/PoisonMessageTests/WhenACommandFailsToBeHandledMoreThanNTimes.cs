@@ -19,24 +19,23 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         private const int _maxDeliveryAttempts = 7;
 
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             _someContent = Guid.NewGuid().ToString();
             _testCommand = new TestCommand(_someContent);
 
-            await bus.Send(_testCommand);
+            await Bus.Send(_testCommand);
             TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-            _deadLetterMessages = await FetchAllDeadLetterMessages(bus);
+            _deadLetterMessages = await FetchAllDeadLetterMessages(Bus);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
         public async void ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             _deadLetterMessages.Count.ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);

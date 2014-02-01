@@ -10,21 +10,21 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     public class WhenSendingACommandThatIsNotReturedByTheTypeProvider : TestForAllBuses
     {
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             var myCommand = new SomeCommandThatIsNotReturedByTheTypeProvider();
-            await bus.Send(myCommand);
+            await Bus.Send(myCommand);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
         public async void ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
         {
+            await Given(busFactory);
+
             try
             {
-                await When(busFactory);
+                await When();
                 Assert.Fail("Exception expected");
             }
             catch (Exception ex)

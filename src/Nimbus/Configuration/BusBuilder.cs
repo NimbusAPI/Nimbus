@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
@@ -69,25 +68,6 @@ namespace Nimbus.Configuration
             return bus;
         }
 
-        #region Queue plumbing. Refactor.
-
-        private static void EnsureQueuesAndTopicsExist(BusBuilderConfiguration configuration, ILogger logger, AzureQueueManager queueManager, string replyQueueName)
-        {
-            logger.Debug("Creating queues and topics");
-
-            var queueCreationTasks =
-                new[]
-                {
-                    Task.Run(() => CreateMyInputQueue(queueManager, replyQueueName, logger)),
-                    Task.Run(() => CreateCommandQueues(configuration, queueManager, logger)),
-                    Task.Run(() => CreateRequestQueues(configuration, queueManager, logger)),
-                    Task.Run(() => CreateMulticastRequestTopics(configuration, queueManager, logger)),
-                    Task.Run(() => CreateEventTopics(configuration, queueManager, logger))
-                };
-            Task.WaitAll(queueCreationTasks);
-            logger.Debug("Queues and topics are all created.");
-        }
-
         /// <summary>
         ///     Danger! Danger, Will Robinson!
         /// </summary>
@@ -113,57 +93,11 @@ namespace Nimbus.Configuration
                                                                                    }))
                                                      .ToArray();
 
-            queueDeletionTasks.WaitAll();
-            topicDeletionTasks.WaitAll();
+            var allDeletionTasks = new Task[0]
+                .Union(queueDeletionTasks)
+                .Union(topicDeletionTasks)
+                .ToArray();
+            Task.WaitAll(allDeletionTasks);
         }
-
-        private static void CreateMyInputQueue(IQueueManager queueManager, string replyQueueName, ILogger logger)
-        {
-            logger.Debug("Creating our own input queue ({0})", replyQueueName);
-
-            queueManager.EnsureQueueExists(replyQueueName);
-        }
-
-        private static void CreateCommandQueues(BusBuilderConfiguration configuration, IQueueManager queueManager, ILogger logger)
-        {
-            logger.Debug("Creating command queues");
-
-            configuration.CommandTypes.Value
-                         .AsParallel()
-                         .Do(queueManager.EnsureQueueExists)
-                         .Done();
-        }
-
-        private static void CreateRequestQueues(BusBuilderConfiguration configuration, IQueueManager queueManager, ILogger logger)
-        {
-            logger.Debug("Creating request queues");
-
-            configuration.RequestTypes.Value
-                         .AsParallel()
-                         .Do(queueManager.EnsureQueueExists)
-                         .Done();
-        }
-
-        private static void CreateMulticastRequestTopics(BusBuilderConfiguration configuration, IQueueManager queueManager, ILogger logger)
-        {
-            logger.Debug("Creating multicast request topics");
-
-            configuration.RequestTypes.Value
-                         .AsParallel()
-                         .Do(queueManager.EnsureTopicExists)
-                         .Done();
-        }
-
-        private static void CreateEventTopics(BusBuilderConfiguration configuration, IQueueManager queueManager, ILogger logger)
-        {
-            logger.Debug("Creating event topics");
-
-            configuration.EventTypes.Value
-                         .AsParallel()
-                         .Do(queueManager.EnsureTopicExists)
-                         .Done();
-        }
-
-        #endregion
     }
 }

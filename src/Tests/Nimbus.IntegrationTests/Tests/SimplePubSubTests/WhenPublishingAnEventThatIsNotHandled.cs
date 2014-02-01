@@ -8,19 +8,18 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
     public class WhenPublishingAnEventThatIsNotHandled : TestForAllBuses
     {
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             var myEvent = new SomeEventWeDoNotHandle();
-            await bus.Publish(myEvent);
+            await Bus.Publish(myEvent);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public void NoExceptionIsThrown(ITestHarnessBusFactory busFactory)
+        public async Task NoExceptionIsThrown(ITestHarnessBusFactory busFactory)
         {
-            Should.NotThrow(async () => await When(busFactory));
+            await Given(busFactory);
+            Should.NotThrow(async () => await When());
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿namespace Nimbus.Infrastructure
+﻿using System.Threading.Tasks;
+
+namespace Nimbus.Infrastructure
 {
     public interface IMessagePump
     {
-        void Start();
-        void Stop();
+        Task Start();
+        Task Stop();
     }
 }
