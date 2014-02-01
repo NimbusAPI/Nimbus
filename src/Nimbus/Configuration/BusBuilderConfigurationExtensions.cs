@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Nimbus.Configuration.Settings;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
@@ -8,20 +9,26 @@ namespace Nimbus.Configuration
     {
         public static BusBuilderConfiguration WithConnectionString(this BusBuilderConfiguration configuration, string connectionString)
         {
-            configuration.ConnectionString = connectionString;
+            configuration.ConnectionString = new ConnectionStringSetting {Value = connectionString};
             return configuration;
         }
 
         /// <summary>
         /// </summary>
         /// <param name="configuration"></param>
-        /// <param name="applicationName">This should be unique for your application (e.g. Foo.exe) but should be the same across all instances of your application.</param>
-        /// <param name="instanceName">This should be unique across ALL instances of your application. Use your hostname if you're stuck.</param>
+        /// <param name="applicationName">
+        ///     This should be unique for your application (e.g. Foo.exe) but should be the same across
+        ///     all instances of your application.
+        /// </param>
+        /// <param name="instanceName">
+        ///     This should be unique across ALL instances of your application. Use your hostname if you're
+        ///     stuck.
+        /// </param>
         /// <returns></returns>
         public static BusBuilderConfiguration WithNames(this BusBuilderConfiguration configuration, string applicationName, string instanceName)
         {
-            configuration.ApplicationName = applicationName;
-            configuration.InstanceName = instanceName;
+            configuration.ApplicationName = new ApplicationNameSetting {Value = applicationName};
+            configuration.InstanceName = new InstanceNameSetting {Value = instanceName};
             return configuration;
         }
 
@@ -59,22 +66,22 @@ namespace Nimbus.Configuration
         {
             typeProvider.Verify();
 
-            configuration.CommandHandlerTypes = typeProvider.CommandHandlerTypes.ToArray();
-            configuration.CommandTypes = typeProvider.CommandTypes.ToArray();
+            configuration.CommandHandlerTypes = new CommandHandlerTypesSetting {Value = typeProvider.CommandHandlerTypes.ToArray()};
+            configuration.CommandTypes = new CommandTypesSetting {Value = typeProvider.CommandTypes.ToArray()};
 
-            configuration.RequestHandlerTypes = typeProvider.RequestHandlerTypes.ToArray();
-            configuration.RequestTypes = typeProvider.RequestTypes.ToArray();
+            configuration.RequestHandlerTypes = new RequestHandlerTypesSetting {Value = typeProvider.RequestHandlerTypes.ToArray()};
+            configuration.RequestTypes = new RequestTypesSetting {Value = typeProvider.RequestTypes.ToArray()};
 
-            configuration.MulticastEventHandlerTypes = typeProvider.MulticastEventHandlerTypes.ToArray();
-            configuration.CompetingEventHandlerTypes = typeProvider.CompetingEventHandlerTypes.ToArray();
-            configuration.EventTypes = typeProvider.EventTypes.ToArray();
+            configuration.MulticastEventHandlerTypes = new MulticastEventHandlerTypesSetting {Value = typeProvider.MulticastEventHandlerTypes.ToArray()};
+            configuration.CompetingEventHandlerTypes = new CompetingEventHandlerTypesSetting {Value = typeProvider.CompetingEventHandlerTypes.ToArray()};
+            configuration.EventTypes = new EventTypesSetting {Value = typeProvider.EventTypes.ToArray()};
 
             return configuration;
         }
 
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
-            configuration.DefaultTimeout = defaultTimeout;
+            configuration.DefaultTimeout = new DefaultTimeoutSetting {Value = defaultTimeout};
             return configuration;
         }
 
@@ -82,7 +89,7 @@ namespace Nimbus.Configuration
         {
             if (maxDeliveryAttempts < 1) throw new ArgumentOutOfRangeException("maxDeliveryAttempts", "You must attempt to deliver a message at least once.");
 
-            configuration.MaxDeliveryAttempts = maxDeliveryAttempts;
+            configuration.MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = maxDeliveryAttempts};
             return configuration;
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace Nimbus.Infrastructure
 {
-    internal interface IMessagePump
+    public interface IMessagePump
     {
         void Start();
         void Stop();

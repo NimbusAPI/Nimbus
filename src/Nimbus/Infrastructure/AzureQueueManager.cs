@@ -2,24 +2,24 @@
 using System.Collections.Concurrent;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Exceptions;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class QueueManager : IQueueManager
+    public class AzureQueueManager : IQueueManager
     {
         private readonly NamespaceManager _namespaceManager;
         private readonly MessagingFactory _messagingFactory;
-        private readonly int _maxDeliveryAttempts;
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
         private readonly ConcurrentDictionary<Type, QueueClient> _queueClients = new ConcurrentDictionary<Type, QueueClient>();
         private readonly ConcurrentDictionary<Type, QueueClient> _deadLetterQueueClients = new ConcurrentDictionary<Type, QueueClient>();
 
-        public QueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, int maxDeliveryAttempts, ILogger logger)
+        public AzureQueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, MaxDeliveryAttemptSetting maxDeliveryAttempts, ILogger logger)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -156,6 +156,13 @@ namespace Nimbus.Infrastructure
             }
 
             if (!_namespaceManager.QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+        }
+
+        public MessageSender CreateMessageSender(Type messageType)
+        {
+            EnsureQueueExists(messageType);
+            var queuePath = PathFactory.QueuePathFor(messageType);
+            return _messagingFactory.CreateMessageSender(queuePath);
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)

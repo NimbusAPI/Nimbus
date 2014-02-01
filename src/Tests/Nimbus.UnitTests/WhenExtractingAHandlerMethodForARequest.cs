@@ -1,4 +1,4 @@
-﻿using Nimbus.Infrastructure.RequestResponse;
+﻿using Nimbus.Configuration;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -11,7 +11,7 @@ namespace Nimbus.UnitTests
         public void WeShouldGetTheRightMethod()
         {
             var request = new SomeInternalRequest();
-            var handlerMethod = RequestMessagePump.ExtractHandlerMethodInfo(request);
+            var handlerMethod = RequestMessageDispatcher.ExtractHandlerMethodInfo(request);
 
             handlerMethod.ShouldNotBe(null);
         }

@@ -4,20 +4,26 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
+    [Obsolete("Consider removing in favour of just QueueManager.")]
     internal class MessageSenderFactory : IMessageSenderFactory, IDisposable
     {
-        private readonly MessagingFactory _messagingFactory;
+        private readonly IQueueManager _queueManager;
         private readonly ConcurrentDictionary<Type, MessageSender> _messageSenders = new ConcurrentDictionary<Type, MessageSender>();
 
-        public MessageSenderFactory(MessagingFactory messagingFactory)
+        public MessageSenderFactory(IQueueManager queueManager)
         {
-            _messagingFactory = messagingFactory;
+            _queueManager = queueManager;
         }
 
         public MessageSender GetMessageSender(Type messageType)
         {
-            var messageSender = _messageSenders.GetOrAdd(messageType, t => _messagingFactory.CreateMessageSender(PathFactory.QueuePathFor(t)));
+            var messageSender = _messageSenders.GetOrAdd(messageType, CreateMessageSender);
             return messageSender;
+        }
+
+        private MessageSender CreateMessageSender(Type messageType)
+        {
+            return _queueManager.CreateMessageSender(messageType);
         }
 
         public void Dispose()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
@@ -9,46 +10,22 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class MulticastRequestMessagePump : MessagePump
+    public class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
         private readonly MessagingFactory _messagingFactory;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
         private readonly Type _requestType;
-        private readonly string _applicationSharedSubscriptionName;
-        private SubscriptionClient _client;
 
-        public MulticastRequestMessagePump(MessagingFactory messagingFactory,
-                                           IMulticastRequestBroker multicastRequestBroker,
-                                           Type requestType,
-                                           string applicationSharedSubscriptionName,
-                                           ILogger logger) : base(logger)
+        public MulticastRequestMessageDispatcher(MessagingFactory messagingFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
         {
             _messagingFactory = messagingFactory;
             _multicastRequestBroker = multicastRequestBroker;
             _requestType = requestType;
-            _applicationSharedSubscriptionName = applicationSharedSubscriptionName;
         }
 
-        public override void Start()
+        public async Task Dispatch(BrokeredMessage message)
         {
-            var topicPath = PathFactory.TopicPathFor(_requestType);
-            _client = _messagingFactory.CreateSubscriptionClient(topicPath, _applicationSharedSubscriptionName);
-            base.Start();
-        }
-
-        public override void Stop()
-        {
-            if (_client != null) _client.Close();
-            base.Stop();
-        }
-
-        protected override BrokeredMessage[] ReceiveMessages()
-        {
-            return _client.ReceiveBatch(int.MaxValue, BatchTimeout).ToArray();
-        }
-
-        protected override void PumpMessage(BrokeredMessage requestMessage)
-        {
+            var requestMessage = message;
             var replyQueueName = requestMessage.ReplyTo;
             var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
 
@@ -61,10 +38,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             foreach (var response in responses)
             {
                 var responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.MessageType, response.GetType().FullName);
                 responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
                 responseMessage.CorrelationId = requestMessage.CorrelationId;
-                replyQueueClient.Send(responseMessage);
+                await replyQueueClient.SendAsync(responseMessage);
             }
         }
 
@@ -77,18 +53,17 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal static MethodInfo ExtractHandleMulticastMethodInfo(object request)
         {
-            
             var closedGenericTypeOfIBusRequest = request.GetType()
-                                            .GetInterfaces()
-                                            .Where(t => t.IsClosedTypeOf(typeof(IBusRequest<,>)))
-                                            .Single();
+                                                        .GetInterfaces()
+                                                        .Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                                                        .Single();
 
             var genericArguments = closedGenericTypeOfIBusRequest.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof(IMulticastRequestBroker).GetMethod("HandleMulticast");
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] { requestType, responseType });
+            var genericHandleMethod = typeof (IMulticastRequestBroker).GetMethod("HandleMulticast");
+            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
             return handleMethod;
         }
     }

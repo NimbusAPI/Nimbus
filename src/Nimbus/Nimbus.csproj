@@ -48,14 +48,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
+    <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
+    <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\CompetingEventMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\MulticastEventMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
+    <Compile Include="Infrastructure\ExceptionExtensions.cs" />
+    <Compile Include="Infrastructure\IMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
+    <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcherFactory.cs" />
+    <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
+    <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
+    <Compile Include="Configuration\Settings\CommandHandlerTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\CommandTypesSetting.cs" />
+    <Compile Include="Configuration\CompetingEventHandlerTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\ConnectionStringSetting.cs" />
+    <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
+    <Compile Include="Configuration\Settings\EventTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
+    <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />
+    <Compile Include="Configuration\Settings\MulticastEventHandlerTypesSetting.cs" />
+    <Compile Include="Configuration\PoorMansIoC.cs" />
+    <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
+    <Compile Include="Configuration\Settings\RequestHandlerTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\RequestTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\BusDebuggingConfiguration.cs" />
     <Compile Include="Configuration\BusDebuggingConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\PathFactory.cs" />
+    <Compile Include="Infrastructure\INimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\INimbusMessageSender.cs" />
+    <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
-    <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePump.cs" />
     <Compile Include="InfrastructureContracts\IMulticastRequestBroker.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusMulticastRequestSender.cs" />
     <Compile Include="Extensions\HandlerTypesProviderExtensions.cs" />
@@ -66,7 +97,6 @@
     <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
     <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
-    <Compile Include="Infrastructure\Events\CompetingEventMessagePump.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
@@ -102,16 +132,13 @@
     <Compile Include="Infrastructure\RequestResponse\IRequestSender.cs" />
     <Compile Include="Infrastructure\ITopicClientFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusRequestSender.cs" />
-    <Compile Include="Infrastructure\Commands\CommandMessagePump.cs" />
     <Compile Include="Infrastructure\MessagePump.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelator.cs" />
     <Compile Include="Infrastructure\MessageSenderFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Infrastructure\QueueManager.cs" />
-    <Compile Include="Infrastructure\RequestResponse\RequestMessagePump.cs" />
-    <Compile Include="Infrastructure\RequestResponse\ResponseMessagePump.cs" />
+    <Compile Include="Infrastructure\AzureQueueManager.cs" />
+    <Compile Include="Infrastructure\NimbusMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
-    <Compile Include="Infrastructure\Events\MulticastEventMessagePump.cs" />
     <Compile Include="Infrastructure\TopicClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>

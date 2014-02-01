@@ -1,45 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {
-    public abstract class MessagePump : IMessagePump
+    public class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
-        protected readonly ILogger Logger;
+
+        private readonly INimbusMessageReceiver _receiver;
+        private readonly IMessageDispatcher _dispatcher;
+        private readonly ILogger _logger;
 
         protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
 
-        protected MessagePump(ILogger logger)
+        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger)
         {
-            Logger = logger;
+            _receiver = receiver;
+            _dispatcher = dispatcher;
+            _logger = logger;
         }
 
-        public virtual void Start()
+        public void Start()
         {
-            Task.Run((() => InternalMessagePump()));
+            Task.Run(() => InternalMessagePump());
         }
 
-        public virtual void Stop()
+        public void Stop()
         {
             _haveBeenToldToStop = true;
         }
 
-        private void InternalMessagePump()
+        private async Task InternalMessagePump()
         {
             while (!_haveBeenToldToStop)
             {
-                BrokeredMessage[] messages;
+                BrokeredMessage message;
+                Exception exception = null;
 
                 try
                 {
-                    messages = ReceiveMessages();
+                    message = await _receiver.Receive();
+                    if (message == null) continue;
                 }
                 catch (TimeoutException)
                 {
@@ -48,49 +51,27 @@ namespace Nimbus.Infrastructure
 
                 try
                 {
-                    messages
-                        .Select(m => Task.Run(delegate
-                                              {
-                                                  Logger.Debug("Dispatching message: {0} from {1}", m, m.ReplyTo);
-                                                  PumpMessage(m);
-                                              })
-                                         .ContinueWith(t => HandleDispatchCompletion(t, m)))
-                        .WaitAll();
+                    _logger.Debug("Dispatching message: {0} from {1}", message, message.ReplyTo);
+                    await _dispatcher.Dispatch(message);
+                    _logger.Debug("Dispatched message: {0} from {1}", message, message.ReplyTo);
+
+                    _logger.Debug("Completing message {0}", message);
+                    await message.CompleteAsync();
+                    _logger.Debug("Completed message {0}", message);
+
+                    continue;
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc, "Overall message dispatch failed.");
+                    exception = exc;
                 }
+
+                _logger.Error(exception, "Message dispatch failed");
+
+                _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
+                await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
+                _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
             }
         }
-
-        private async Task HandleDispatchCompletion(Task t, BrokeredMessage m)
-        {
-            if (t.IsFaulted)
-            {
-                var exception = t.Exception;
-                Logger.Error(exception, "Message dispatch failed");
-                await m.AbandonAsync(ExceptionDetailsAsProperties(exception));
-                return;
-            }
-
-            Logger.Debug("Dispatched message: {0} from {1}", m, m.ReplyTo);
-            await m.CompleteAsync();
-        }
-
-        protected static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
-        {
-            if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException);
-
-            return new Dictionary<string, object>
-                   {
-                       {MessagePropertyKeys.ExceptionTypeKey, exception.GetType().FullName},
-                       {MessagePropertyKeys.ExceptionMessageKey, exception.Message},
-                       {MessagePropertyKeys.ExceptionStackTraceKey, exception.StackTrace},
-                   };
-        }
-
-        protected abstract BrokeredMessage[] ReceiveMessages();
-        protected abstract void PumpMessage(BrokeredMessage message);
     }
 }

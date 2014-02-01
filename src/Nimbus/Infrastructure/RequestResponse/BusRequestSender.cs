@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -12,22 +13,31 @@ namespace Nimbus.Infrastructure.RequestResponse
     public class BusRequestSender : IRequestSender
     {
         private readonly IMessageSenderFactory _messageSenderFactory;
-        private readonly string _replyQueueName;
+        private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
-        private readonly TimeSpan _responseTimeout;
         private readonly ILogger _logger;
         private readonly IClock _clock;
-        private readonly HashSet<Type> _validRequestTypes;
+        private readonly DefaultTimeoutSetting _responseTimeout;
+        private readonly RequestTypesSetting _requestTypes;
+        private readonly Lazy<HashSet<Type>> _validRequestTypes;
 
-        internal BusRequestSender(IMessageSenderFactory messageSenderFactory, string replyQueueName, RequestResponseCorrelator requestResponseCorrelator, IClock clock, TimeSpan responseTimeout, IReadOnlyList<Type> validRequestTypes, ILogger logger)
+        internal BusRequestSender(IMessageSenderFactory messageSenderFactory,
+                                  ReplyQueueNameSetting replyQueueName,
+                                  RequestResponseCorrelator requestResponseCorrelator,
+                                  IClock clock,
+                                  DefaultTimeoutSetting responseTimeout,
+                                  RequestTypesSetting requestTypes,
+                                  ILogger logger)
         {
             _messageSenderFactory = messageSenderFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
-            _responseTimeout = responseTimeout;
             _logger = logger;
             _clock = clock;
-            _validRequestTypes = new HashSet<Type>(validRequestTypes);
+            _responseTimeout = responseTimeout;
+            _requestTypes = requestTypes;
+
+            _validRequestTypes = new Lazy<HashSet<Type>>(() => new HashSet<Type>(_requestTypes.Value));
         }
 
         public async Task<TResponse> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
@@ -41,20 +51,21 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            var requestTypeName = typeof(TRequest).FullName;
+            var requestTypeName = typeof (TRequest).FullName;
 
-            if (!_validRequestTypes.Contains(typeof(TRequest)))
-                throw new BusException("The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
+            if (!_validRequestTypes.Value.Contains(typeof (TRequest)))
+                throw new BusException(
+                    "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
 
             var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
             var message = new BrokeredMessage(busRequest)
-            {
-                CorrelationId = correlationId.ToString(),
-                ReplyTo = _replyQueueName,
-                TimeToLive = timeout,
-            };
+                          {
+                              CorrelationId = correlationId.ToString(),
+                              ReplyTo = _replyQueueName,
+                              TimeToLive = timeout,
+                          };
             message.Properties.Add(MessagePropertyKeys.MessageType, requestTypeName);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
