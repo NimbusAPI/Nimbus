@@ -25,7 +25,6 @@ namespace Nimbus.IntegrationTests
             yield return new DefaultBusFactory(typeProvider);
             yield return new AutofacBusFactory(typeProvider, CommonResources.ConnectionString);
             yield return new WindsorBusFactory(typeProvider, CommonResources.ConnectionString);
-            yield return new DefaultBusFactory(typeProvider);
         }
 
         public class DefaultBusFactory : ITestHarnessBusFactory
