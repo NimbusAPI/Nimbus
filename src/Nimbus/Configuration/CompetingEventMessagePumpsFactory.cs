@@ -4,6 +4,7 @@ using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 

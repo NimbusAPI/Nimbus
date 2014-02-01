@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusSubscriptionMessageReceiver : INimbusMessageReceiver
     {
@@ -19,7 +20,7 @@ namespace Nimbus.Infrastructure
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
 
-            _subscriptionClient = new Lazy<SubscriptionClient>(CreateMessageReceiver);
+            _subscriptionClient = new Lazy<SubscriptionClient>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
 
         public Task<BrokeredMessage> Receive()

@@ -51,7 +51,7 @@
     <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\NimbusSubscriptionMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
@@ -81,8 +81,8 @@
     <Compile Include="Configuration\BusDebuggingConfiguration.cs" />
     <Compile Include="Configuration\BusDebuggingConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\PathFactory.cs" />
-    <Compile Include="Infrastructure\INimbusMessageReceiver.cs" />
-    <Compile Include="Infrastructure\INimbusMessageSender.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
@@ -138,7 +138,7 @@
     <Compile Include="Infrastructure\MessageSenderFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\AzureQueueManager.cs" />
-    <Compile Include="Infrastructure\NimbusQueueMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\TopicClientFactory.cs" />
   </ItemGroup>

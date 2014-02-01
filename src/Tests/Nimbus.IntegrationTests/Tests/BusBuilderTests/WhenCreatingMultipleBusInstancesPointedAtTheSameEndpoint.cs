@@ -36,7 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             var logger = new ConsoleLogger();
 
             var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
+                                      .WithNames("IntegrationTestHarness", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(messageBroker)
@@ -63,7 +63,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             var logger = new ConsoleLogger();
 
             var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
+                                      .WithNames("IntegrationTestHarness", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(messageBroker)

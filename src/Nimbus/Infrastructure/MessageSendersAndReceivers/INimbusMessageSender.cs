@@ -1,6 +1,6 @@
 ﻿using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     public interface INimbusMessageSender
     {

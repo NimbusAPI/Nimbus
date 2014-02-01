@@ -86,24 +86,16 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateTopic(topicDescription);
             }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-                _logger.Debug("Topic '{0}' has already been created.", topicPath);
-            }
-            catch (MessagingException)
-            {
-                _logger.Debug("Looks like a conflicting create operation is in progress for '{0}'. We'll find out in a minute...", topicPath);
-            }
-
-            try
-            {
-                _namespaceManager.UpdateTopic(topicDescription);
-            }
             catch (MessagingException)
             {
             }
 
-            if (!_namespaceManager.TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+            _namespaceManager.UpdateTopic(topicDescription);
+
+            if (!_namespaceManager.TopicExists(topicPath))
+            {
+                throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+            }
         }
 
         public void EnsureQueueExists(Type commandType)
@@ -136,24 +128,16 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateQueue(queueDescription);
             }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-                _logger.Debug("Queue '{0}' has already been created.", queuePath);
-            }
-            catch (MessagingException)
-            {
-                _logger.Debug("Looks like a conflicting create operation is in progress for '{0}'. We'll find out in a minute...", queuePath);
-            }
-
-            try
-            {
-                _namespaceManager.UpdateQueue(queueDescription);
-            }
             catch (MessagingException)
             {
             }
 
-            if (!_namespaceManager.QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+            _namespaceManager.UpdateQueue(queueDescription);
+
+            if (!_namespaceManager.QueueExists(queuePath))
+            {
+                throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+            }
         }
 
         public MessageSender CreateMessageSender(Type messageType)

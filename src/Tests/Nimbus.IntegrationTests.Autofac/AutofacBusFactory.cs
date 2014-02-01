@@ -35,7 +35,7 @@ namespace Nimbus.IntegrationTests.Autofac
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
                                  .WithConnectionString(_connectionString)
-                                 .WithNames("Maker", Environment.MachineName)
+                                 .WithNames("IntegrationTestHarness", Environment.MachineName)
                                  .WithTypesFrom(_typeProvider)
                                  .WithAutofacDefaults(componentContext)
                                  .WithDebugOptions(

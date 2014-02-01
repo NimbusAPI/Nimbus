@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusQueueMessageReceiver : INimbusMessageReceiver
     {
@@ -16,7 +17,7 @@ namespace Nimbus.Infrastructure
             _queueManager = queueManager;
             _queuePath = queuePath;
 
-            _messageReceiver = new Lazy<MessageReceiver>(CreateMessageReceiver);
+            _messageReceiver = new Lazy<MessageReceiver>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
 
         private MessageReceiver CreateMessageReceiver()
