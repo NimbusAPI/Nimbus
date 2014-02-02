@@ -86,13 +86,13 @@ namespace Nimbus
 
         public void Start()
         {
-            var messagePumpStartTasks = _messagePumps.Select(p => p.Start()).ToArray();
+            var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(async () => await p.Start())).ToArray();
             Task.WaitAll(messagePumpStartTasks);
         }
 
         public void Stop()
         {
-            var messagePumpStopTasks = _messagePumps.Select(p => p.Stop()).ToArray();
+            var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(async () => await p.Stop())).ToArray();
             Task.WaitAll(messagePumpStopTasks);
         }
     }

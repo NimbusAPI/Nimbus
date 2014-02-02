@@ -30,8 +30,8 @@ namespace Nimbus.Infrastructure
                 throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
 
             _logger.Debug("Message pump for {0} starting...", _receiver);
-            await _receiver.WaitUntilReady();
             _internalMessagePump = Task.Run(() => InternalMessagePump());
+            await _receiver.WaitUntilReady();
             _logger.Debug("Message pump for {0} started", _receiver);
         }
 

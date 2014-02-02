@@ -52,14 +52,25 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateSubscription(subscriptionDescription);
             }
-            catch (MessagingEntityAlreadyExistsException)
+            catch (MessagingException)
             {
-                _logger.Debug("Subscription '{0}' for topic '{1}' has already been created.", subscriptionName, topicPath);
+            }
+
+            try
+            {
                 _namespaceManager.UpdateSubscription(subscriptionDescription);
+            }
+            catch (MessagingException)
+            {
             }
 
             _logger.Debug("Updating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
             _namespaceManager.UpdateSubscription(subscriptionDescription);
+
+            if (!_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
+            {
+                throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+            }
         }
 
         public void EnsureTopicExists(Type eventType)

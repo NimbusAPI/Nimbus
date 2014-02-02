@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return _queueManager.CreateMessageReceiver(_queuePath);
         }
 
-        public Task WaitUntilReady()
+        public  Task WaitUntilReady()
         {
             return Task.Run(() => { var dummy = _messageReceiver.Value; });
         }
