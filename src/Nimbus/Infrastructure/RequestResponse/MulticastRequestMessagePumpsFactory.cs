@@ -4,12 +4,10 @@ using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class MulticastRequestMessagePumpsFactory
     {

@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    public interface INimbusMessageSender
+    internal interface INimbusMessageSender
     {
         Task Send(BrokeredMessage message);
     }

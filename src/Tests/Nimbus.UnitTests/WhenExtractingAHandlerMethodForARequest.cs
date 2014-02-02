@@ -1,4 +1,5 @@
 ﻿using Nimbus.Configuration;
+using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;

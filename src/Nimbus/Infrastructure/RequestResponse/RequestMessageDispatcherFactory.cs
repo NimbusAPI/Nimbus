@@ -1,8 +1,7 @@
 ﻿using System;
-using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestMessageDispatcherFactory
     {

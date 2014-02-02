@@ -10,7 +10,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class AzureQueueManager : IQueueManager
+    internal class AzureQueueManager : IQueueManager
     {
         private readonly NamespaceManager _namespaceManager;
         private readonly MessagingFactory _messagingFactory;

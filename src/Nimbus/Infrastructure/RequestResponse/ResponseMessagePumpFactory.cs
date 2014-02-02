@@ -4,7 +4,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    public class ResponseMessagePumpFactory
+    internal class ResponseMessagePumpFactory
     {
         private readonly ILogger _logger;
         private readonly ReplyQueueNameSetting _replyQueueName;

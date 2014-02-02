@@ -2,10 +2,8 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Configuration
 {
@@ -94,26 +92,6 @@ namespace Nimbus.Configuration
             if (concreteType == null) throw new DependencyResolutionException("Could not find a concrete type that implements {0}".FormatWith(type.FullName));
 
             return concreteType;
-        }
-    }
-
-    [Serializable]
-    public class DependencyResolutionException : BusException
-    {
-        public DependencyResolutionException()
-        {
-        }
-
-        public DependencyResolutionException(string message) : base(message)
-        {
-        }
-
-        public DependencyResolutionException(string message, Exception inner) : base(message, inner)
-        {
-        }
-
-        protected DependencyResolutionException(SerializationInfo info,StreamingContext context) : base(info, context)
-        {
         }
     }
 }

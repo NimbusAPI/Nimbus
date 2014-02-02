@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    public interface IMessageDispatcher
+    internal interface IMessageDispatcher
     {
         Task Dispatch(BrokeredMessage message);
     }

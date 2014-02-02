@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
+    <Compile Include="Configuration\DependencyResolutionException.cs" />
     <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />

@@ -2,11 +2,10 @@
 using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestMessagePumpsFactory
     {

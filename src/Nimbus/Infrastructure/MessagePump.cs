@@ -7,7 +7,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {
-    public class MessagePump : IMessagePump
+    internal class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
 

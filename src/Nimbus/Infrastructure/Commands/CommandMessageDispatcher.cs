@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Infrastructure.Commands
 {
     internal class CommandMessageDispatcher : IMessageDispatcher
     {

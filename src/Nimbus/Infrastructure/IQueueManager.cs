@@ -4,7 +4,7 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
-    public interface IQueueManager
+    internal interface IQueueManager
     {
         //FIXME not sure that this belongs here. It doesn't actually need to know about Azure...
         INimbusMessageSender GetMessageSender(Type messageType);
