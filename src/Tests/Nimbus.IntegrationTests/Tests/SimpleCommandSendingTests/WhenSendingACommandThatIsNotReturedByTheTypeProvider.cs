@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
+        public async Task ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
 

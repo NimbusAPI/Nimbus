@@ -21,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
+        public async Task WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

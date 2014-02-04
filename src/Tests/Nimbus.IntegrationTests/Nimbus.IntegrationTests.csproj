@@ -65,9 +65,11 @@
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
-    <Compile Include="Tests\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
+    <Compile Include="Conventions\AllIntegrationTests.cs" />
+    <Compile Include="Conventions\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />

@@ -26,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void WeShouldReceiveTwoResponses(ITestHarnessBusFactory busFactory)
+        public async Task WeShouldReceiveTwoResponses(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

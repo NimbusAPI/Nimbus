@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -34,7 +34,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheMulticastEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
+        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -46,7 +46,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -59,7 +59,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

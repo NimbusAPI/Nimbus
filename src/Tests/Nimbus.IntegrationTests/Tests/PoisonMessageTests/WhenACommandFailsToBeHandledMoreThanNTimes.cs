@@ -32,7 +32,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(ITestHarnessBusFactory busFactory)
+        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

@@ -99,9 +99,21 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateTopic(topicDescription);
             }
-            catch (MessagingException)
+            catch (MessagingEntityAlreadyExistsException)
             {
             }
+            catch (MessagingException exc)
+            {
+                if (exc.Message.Contains("SubCode=40901"))
+                {
+                    // SubCode=40901. Another conflicting operation is in progress. Ignore.
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             try
             {
                 _namespaceManager.UpdateTopic(topicDescription);
@@ -146,9 +158,21 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateQueue(queueDescription);
             }
-            catch (MessagingException)
+            catch (MessagingEntityAlreadyExistsException)
             {
             }
+            catch (MessagingException exc)
+            {
+                if (exc.Message.Contains("SubCode=40901"))
+                {
+                    // SubCode=40901. Another conflicting operation is in progress. Ignore.
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             try
             {
                 _namespaceManager.UpdateQueue(queueDescription);

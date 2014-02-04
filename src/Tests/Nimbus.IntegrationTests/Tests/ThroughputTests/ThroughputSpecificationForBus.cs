@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
 using NUnit.Framework;
@@ -12,7 +11,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
     [TestFixture]
-    [Ignore("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
+    [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public abstract class ThroughputSpecificationForBus : SpecificationFor<Bus>
     {
         private TimeSpan _timeout;
@@ -25,14 +24,14 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         protected const int NumMessagesToSend = 4*1000;
         protected abstract int ExpectedMessagesPerSecond { get; }
 
-        public override Bus Given()
+        public override async Task<Bus> Given()
         {
             _broker = new FakeBroker(NumMessagesToSend);
             _timeout = TimeSpan.FromSeconds(30);
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
-                                      .WithNames("MyTestSuite", Environment.MachineName)
+                                      .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(_typeProvider)
                                       .WithCommandBroker(_broker)
@@ -48,12 +47,13 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             return bus;
         }
 
-        public override void When()
+        public override async Task When()
         {
             Console.WriteLine("Starting to send messages...");
             _stopwatch = Stopwatch.StartNew();
 
-            SendMessages(Subject).WaitAll();
+            await Task.WhenAll(SendMessages(Subject));
+            ;
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
@@ -68,13 +68,16 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         public abstract IEnumerable<Task> SendMessages(IBus bus);
 
         [Test]
-        public void TheCorrectNumberOfMessagesShouldHaveBeenObserved()
+        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
+            Subject = await Given();
+            await When();
+
             _broker.ActualNumMessagesReceived.ShouldBe(_broker.ExpectedNumMessagesReceived);
         }
 
         [Test]
-        public void WeShouldGetAcceptableThroughput()
+        public async Task WeShouldGetAcceptableThroughput()
         {
             _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
         }

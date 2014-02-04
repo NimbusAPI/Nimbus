@@ -8,11 +8,12 @@ using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.Exceptions;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus
 {
-    public class Bus : IBus
+    public class Bus : IBus, IDisposable
     {
         private readonly ICommandSender _commandSender;
         private readonly IRequestSender _requestSender;
@@ -87,13 +88,46 @@ namespace Nimbus
         public void Start()
         {
             var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(async () => await p.Start())).ToArray();
-            Task.WaitAll(messagePumpStartTasks);
+
+            try
+            {
+                Task.WaitAll(messagePumpStartTasks);
+            }
+            catch (AggregateException aex)
+            {
+                throw new BusException("Failed to start bus", aex);
+            }
         }
 
         public void Stop()
         {
             var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(async () => await p.Stop())).ToArray();
-            Task.WaitAll(messagePumpStopTasks);
+
+            try
+            {
+                Task.WaitAll(messagePumpStopTasks);
+            }
+            catch (AggregateException aex)
+            {
+                throw new BusException("Failed to stop bus", aex);
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~Bus()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            Stop();
         }
     }
 }

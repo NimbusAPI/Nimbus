@@ -25,14 +25,13 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         {
             await Given(busFactory);
             await When();
-            ;
 
             MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();

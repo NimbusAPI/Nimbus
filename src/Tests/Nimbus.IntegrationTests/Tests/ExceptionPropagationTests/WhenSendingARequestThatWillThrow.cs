@@ -9,6 +9,7 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 {
+    [TestFixture]
     public class WhenSendingARequestThatWillThrow : TestForAllBuses
     {
         private RequestThatWillThrowResponse _response;
@@ -37,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheResponseShouldNotBeSet(ITestHarnessBusFactory busFactory)
+        public async Task TheResponseShouldNotBeSet(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -47,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void AnExceptionShouldBeReThrownOnTheClient(ITestHarnessBusFactory busFactory)
+        public async Task AnExceptionShouldBeReThrownOnTheClient(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -57,7 +58,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheExceptionShouldBeARequestFailedException(ITestHarnessBusFactory busFactory)
+        public async Task TheExceptionShouldBeARequestFailedException(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
@@ -67,7 +68,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(ITestHarnessBusFactory busFactory)
+        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(ITestHarnessBusFactory busFactory)
         {
             await Given(busFactory);
             await When();
