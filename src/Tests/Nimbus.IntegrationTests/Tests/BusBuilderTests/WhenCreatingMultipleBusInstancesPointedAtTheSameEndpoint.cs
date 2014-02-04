@@ -41,9 +41,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 .AsParallel()
                 .Do(b => b.Dispose())
                 .Done();
-
-            Console.WriteLine("Sleeping (allowing R#'s test runner to sort itelf out...)");
-            Thread.Sleep(TimeSpan.FromSeconds(5));
         }
 
         private void ClearMeABus()

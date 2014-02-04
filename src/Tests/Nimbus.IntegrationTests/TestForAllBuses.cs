@@ -17,9 +17,6 @@ namespace Nimbus.IntegrationTests
         [SetUp]
         public void SetUp()
         {
-            //Console.WriteLine("Sleeping (allowing R#'s test runner to sort itelf out...)");
-            //Thread.Sleep(TimeSpan.FromSeconds(2));
-
             MethodCallCounter.Clear();
         }
 
