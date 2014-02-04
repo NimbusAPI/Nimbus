@@ -5,18 +5,18 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestMessageDispatcherFactory
     {
-        private readonly IQueueManager _queueManager;
         private readonly IRequestBroker _requestBroker;
+        private readonly INimbusMessageSenderFactory _messageSenderFactory;
 
-        public RequestMessageDispatcherFactory(IQueueManager queueManager, IRequestBroker requestBroker)
+        public RequestMessageDispatcherFactory(IRequestBroker requestBroker, INimbusMessageSenderFactory messageSenderFactory)
         {
-            _queueManager = queueManager;
             _requestBroker = requestBroker;
+            _messageSenderFactory = messageSenderFactory;
         }
 
         public IMessageDispatcher Create(Type messageType)
         {
-            return new RequestMessageDispatcher(_queueManager, messageType, _requestBroker);
+            return new RequestMessageDispatcher(_messageSenderFactory, messageType, _requestBroker);
         }
     }
 }

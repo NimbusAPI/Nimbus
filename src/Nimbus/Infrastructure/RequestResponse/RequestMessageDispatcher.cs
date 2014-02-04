@@ -11,13 +11,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly IQueueManager _queueManager;
+        private readonly INimbusMessageSenderFactory _messageSenderFactory;
         private readonly Type _messageType;
         private readonly IRequestBroker _requestBroker;
 
-        public RequestMessageDispatcher(IQueueManager queueManager, Type messageType, IRequestBroker requestBroker)
+        public RequestMessageDispatcher(INimbusMessageSenderFactory messageSenderFactory, Type messageType, IRequestBroker requestBroker)
         {
-            _queueManager = queueManager;
+            _messageSenderFactory = messageSenderFactory;
             _messageType = messageType;
             _requestBroker = requestBroker;
         }
@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public async Task Dispatch(BrokeredMessage message)
         {
             var replyQueueName = message.ReplyTo;
-            var replyQueueClient = _queueManager.CreateMessageSender(replyQueueName);
+            var replyQueueClient = _messageSenderFactory.GetMessageSender(replyQueueName);
 
             var request = message.GetBody(_messageType);
 
@@ -45,7 +45,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             }
 
             responseMessage.CorrelationId = message.CorrelationId;
-            await replyQueueClient.SendAsync(responseMessage);
+            await replyQueueClient.Send(responseMessage);
         }
 
         private static object InvokeGenericHandleMethod(IRequestBroker requestBroker, object request)

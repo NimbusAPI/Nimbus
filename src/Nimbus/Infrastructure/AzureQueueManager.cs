@@ -17,7 +17,6 @@ namespace Nimbus.Infrastructure
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
-        private readonly ConcurrentDictionary<Type, INimbusMessageSender> _messageSenders = new ConcurrentDictionary<Type, INimbusMessageSender>();
         private readonly ConcurrentDictionary<Type, QueueClient> _queueClients = new ConcurrentDictionary<Type, QueueClient>();
         private readonly ConcurrentDictionary<Type, QueueClient> _deadLetterQueueClients = new ConcurrentDictionary<Type, QueueClient>();
 
@@ -187,16 +186,7 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        //FIXME not sure that this belongs here. It doesn't actually need to know about Azure...
-        public INimbusMessageSender GetMessageSender(Type messageType)
-        {
-            return _messageSenders.GetOrAdd(messageType, CreateNimbusMessageSender);
-        }
 
-        private INimbusMessageSender CreateNimbusMessageSender(Type messageType)
-        {
-            return new NimbusQueueMessageSender(this, PathFactory.QueuePathFor(messageType));
-        }
 
         public MessageSender CreateMessageSender(Type messageType)
         {
