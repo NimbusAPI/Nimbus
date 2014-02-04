@@ -36,6 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithTypesFrom(_typeProvider)
                                       .WithCommandBroker(_broker)
                                       .WithRequestBroker(_broker)
+                                      .WithMulticastRequestBroker(_broker)
                                       .WithMulticastEventBroker(_broker)
                                       .WithCompetingEventBroker(_broker)
                                       .WithDebugOptions(
@@ -53,7 +54,6 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             _stopwatch = Stopwatch.StartNew();
 
             await Task.WhenAll(SendMessages(Subject));
-            ;
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
@@ -79,6 +79,9 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         [Test]
         public async Task WeShouldGetAcceptableThroughput()
         {
+            Subject = await Given();
+            await When();
+
             _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
         }
 

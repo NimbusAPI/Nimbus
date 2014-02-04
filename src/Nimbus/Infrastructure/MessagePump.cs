@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
@@ -56,13 +57,12 @@ namespace Nimbus.Infrastructure
             {
                 try
                 {
-                    BrokeredMessage message;
-                    Exception exception = null;
+                    BrokeredMessage[] messages;
 
                     try
                     {
-                        message = await _receiver.Receive();
-                        if (message == null) continue;
+                        messages = (await _receiver.Receive(_defaultBatchSize)).ToArray();
+                        if (messages.None()) continue;
                     }
                     catch (TimeoutException)
                     {
@@ -75,34 +75,42 @@ namespace Nimbus.Infrastructure
                         continue;
                     }
 
-                    try
-                    {
-                        _logger.Debug("Dispatching message: {0} from {1}", message, message.ReplyTo);
-                        await _dispatcher.Dispatch(message);
-                        _logger.Debug("Dispatched message: {0} from {1}", message, message.ReplyTo);
-
-                        _logger.Debug("Completing message {0}", message);
-                        await message.CompleteAsync();
-                        _logger.Debug("Completed message {0}", message);
-
-                        continue;
-                    }
-                    catch (Exception exc)
-                    {
-                        exception = exc;
-                    }
-
-                    _logger.Error(exception, "Message dispatch failed");
-
-                    _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
-                    await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
-                    _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+                    var dispatchTasks = messages.Select(Dispatch).ToArray();
+                    await Task.WhenAll(dispatchTasks);
                 }
                 catch (Exception exc)
                 {
                     _logger.Error(exc, "Unhandled exception in message pump");
                 }
             }
+        }
+
+        private async Task Dispatch(BrokeredMessage message)
+        {
+            Exception exception = null;
+
+            try
+            {
+                _logger.Debug("Dispatching message: {0} from {1}", message, message.ReplyTo);
+                await _dispatcher.Dispatch(message);
+                _logger.Debug("Dispatched message: {0} from {1}", message, message.ReplyTo);
+
+                _logger.Debug("Completing message {0}", message);
+                await message.CompleteAsync();
+                _logger.Debug("Completed message {0}", message);
+
+                return;
+            }
+            catch (Exception exc)
+            {
+                exception = exc;
+            }
+
+            _logger.Error(exception, "Message dispatch failed");
+
+            _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
+            await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
+            _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
         }
     }
 }

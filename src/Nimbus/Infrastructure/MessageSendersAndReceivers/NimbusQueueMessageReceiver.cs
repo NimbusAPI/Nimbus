@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -25,14 +26,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return _queueManager.CreateMessageReceiver(_queuePath);
         }
 
-        public  Task WaitUntilReady()
+        public Task WaitUntilReady()
         {
             return Task.Run(() => { var dummy = _messageReceiver.Value; });
         }
 
-        public Task<BrokeredMessage> Receive()
+        public Task<IEnumerable<BrokeredMessage>> Receive(int batchSize)
         {
-            return _messageReceiver.Value.ReceiveAsync(TimeSpan.FromSeconds(1));
+            return _messageReceiver.Value.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(1));
         }
 
         public override string ToString()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -28,9 +29,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return Task.Run(() => { var dummy = _subscriptionClient.Value; });
         }
 
-        public Task<BrokeredMessage> Receive()
+        public Task<IEnumerable<BrokeredMessage>> Receive(int batchSize)
         {
-            return _subscriptionClient.Value.ReceiveAsync(TimeSpan.FromSeconds(1));
+            return _subscriptionClient.Value.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(1));
         }
 
         private SubscriptionClient CreateMessageReceiver()
