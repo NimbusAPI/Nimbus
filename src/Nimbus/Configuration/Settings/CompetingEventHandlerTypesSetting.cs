@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    public class RequestTypesSetting : Setting<Type[]>
+    public class CompetingEventHandlerTypesSetting : Setting<Type[]>
     {
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -17,13 +18,15 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IQueueManager _queueManager;
         private readonly MessagingFactory _messagingFactory;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
                                                    RequestHandlerTypesSetting requestHandlerTypes,
                                                    ApplicationNameSetting applicationName,
                                                    IQueueManager queueManager,
                                                    MessagingFactory messagingFactory,
-                                                   IMulticastRequestBroker multicastRequestBroker)
+                                                   IMulticastRequestBroker multicastRequestBroker,
+                                                   DefaultBatchSizeSetting defaultBatchSize)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -31,6 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _queueManager = queueManager;
             _messagingFactory = messagingFactory;
             _multicastRequestBroker = multicastRequestBroker;
+            _defaultBatchSize = defaultBatchSize;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -52,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
                 var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
                 yield return pump;
             }
         }

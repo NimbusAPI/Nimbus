@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
@@ -14,14 +16,16 @@ namespace Nimbus.Infrastructure
         private readonly INimbusMessageReceiver _receiver;
         private readonly IMessageDispatcher _dispatcher;
         private readonly ILogger _logger;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
         private Task _internalMessagePump;
 
-        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger)
+        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, DefaultBatchSizeSetting defaultBatchSize)
         {
             _receiver = receiver;
             _dispatcher = dispatcher;
             _logger = logger;
+            _defaultBatchSize = defaultBatchSize;
         }
 
         public async Task Start()

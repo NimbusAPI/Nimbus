@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    internal class MulticastEventHandlerTypesSetting: Setting<Type[]>
+    public class MulticastEventHandlerTypesSetting : Setting<Type[]>
     {
     }
 }

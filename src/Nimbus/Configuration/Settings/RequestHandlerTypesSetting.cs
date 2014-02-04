@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    internal class RequestHandlerTypesSetting: Setting<Type[]>
+    public class RequestHandlerTypesSetting : Setting<Type[]>
     {
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -13,16 +14,19 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly RequestMessageDispatcherFactory _dispatcherFactory;
         private readonly IQueueManager _queueManager;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
                                           RequestMessageDispatcherFactory dispatcherFactory,
-                                          IQueueManager queueManager)
+                                          IQueueManager queueManager,
+                                          DefaultBatchSizeSetting defaultBatchSize)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
             _dispatcherFactory = dispatcherFactory;
             _queueManager = queueManager;
+            _defaultBatchSize = defaultBatchSize;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -42,7 +46,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var queuePath = PathFactory.QueuePathFor(requestType);
                 var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
                 var dispatcher = _dispatcherFactory.Create(requestType);
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
 
                 yield return pump;
             }

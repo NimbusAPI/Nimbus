@@ -17,18 +17,21 @@ namespace Nimbus.Configuration
         private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
         private readonly ICompetingEventBroker _competingEventBroker;
         private readonly ILogger _logger;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
         public CompetingEventMessagePumpsFactory(IQueueManager queueManager,
                                                  ApplicationNameSetting applicationName,
                                                  CompetingEventHandlerTypesSetting competingEventHandlerTypes,
                                                  ICompetingEventBroker competingEventBroker,
-                                                 ILogger logger)
+                                                 ILogger logger,
+                                                 DefaultBatchSizeSetting defaultBatchSize)
         {
             _queueManager = queueManager;
             _applicationName = applicationName;
             _competingEventHandlerTypes = competingEventHandlerTypes;
             _competingEventBroker = competingEventBroker;
             _logger = logger;
+            _defaultBatchSize = defaultBatchSize;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -50,7 +53,7 @@ namespace Nimbus.Configuration
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
                 var dispatcher = new CompetingEventMessageDispatcher(_competingEventBroker, eventType);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger);
+                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize);
                 yield return pump;
             }
         }

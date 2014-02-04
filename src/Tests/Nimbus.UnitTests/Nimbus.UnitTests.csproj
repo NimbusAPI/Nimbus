@@ -55,6 +55,7 @@
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
+    <Compile Include="Conventions\AllSettingsClasses.cs" />
     <Compile Include="InfrastructureTests\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />

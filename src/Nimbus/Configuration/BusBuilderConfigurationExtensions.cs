@@ -93,6 +93,13 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithDefaultBatchSize(this BusBuilderConfiguration configuration, int defaultBatchSize)
+        {
+            if (defaultBatchSize < 1) throw new ArgumentOutOfRangeException("defaultBatchSize", "Batch size must be at least one.");
+            configuration.DefaultBatchSize = new DefaultBatchSizeSetting {Value = defaultBatchSize};
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithLogger(this BusBuilderConfiguration configuration, ILogger logger)
         {
             configuration.Logger = logger;

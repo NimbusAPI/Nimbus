@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
+    <Compile Include="Configuration\Settings\DefaultBatchSizeSetting.cs" />
     <Compile Include="Configuration\DependencyResolutionException.cs" />
     <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
@@ -67,7 +68,7 @@
     <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
     <Compile Include="Configuration\Settings\CommandHandlerTypesSetting.cs" />
     <Compile Include="Configuration\Settings\CommandTypesSetting.cs" />
-    <Compile Include="Configuration\CompetingEventHandlerTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\CompetingEventHandlerTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ConnectionStringSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\EventTypesSetting.cs" />

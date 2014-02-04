@@ -18,13 +18,15 @@ namespace Nimbus.Configuration
         private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
         private readonly ILogger _logger;
         private readonly IMulticastEventBroker _multicastEventBroker;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
         internal MulticastEventMessagePumpsFactory(IQueueManager queueManager,
                                                    ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
                                                    CompetingEventHandlerTypesSetting competingEventHandlerTypes,
                                                    ILogger logger,
-                                                   IMulticastEventBroker multicastEventBroker)
+                                                   IMulticastEventBroker multicastEventBroker,
+                                                   DefaultBatchSizeSetting defaultBatchSize)
         {
             _queueManager = queueManager;
             _applicationName = applicationName;
@@ -32,6 +34,7 @@ namespace Nimbus.Configuration
             _competingEventHandlerTypes = competingEventHandlerTypes;
             _logger = logger;
             _multicastEventBroker = multicastEventBroker;
+            _defaultBatchSize = defaultBatchSize;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -54,7 +57,7 @@ namespace Nimbus.Configuration
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
                 var dispatcher = new MulticastEventMessageDispatcher(_multicastEventBroker, eventType);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger);
+                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize);
                 yield return pump;
             }
         }

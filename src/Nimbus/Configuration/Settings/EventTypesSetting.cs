@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    internal class EventTypesSetting:Setting<Type[]>
+    public class EventTypesSetting : Setting<Type[]>
     {
     }
 }
