@@ -8,6 +8,7 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
+    //FIXME we should be able to refactor this to a unit test shortly.
     public class WhenPublishingAnEventThatIsNotReturedByTheTypeProvider : TestForAllBuses
     {
         public override async Task When()
