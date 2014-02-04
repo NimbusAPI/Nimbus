@@ -43,6 +43,13 @@ namespace Nimbus
             return Task.Run(() => _commandSender.Send(busCommand));
         }
 
+        public Task Send(IBusCommand busCommand)
+        {
+            // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
+            // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
+            return Task.Run(() => _commandSender.Send(busCommand));
+        }
+
         public Task Defer<TBusCommand>(TimeSpan delay, TBusCommand busCommand) where TBusCommand : IBusCommand
         {
             return Task.Run(() => _commandSender.SendAt(delay, busCommand));
