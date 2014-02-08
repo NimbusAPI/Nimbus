@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Nimbus.Extensions;
 using NUnit.Framework;
 using Shouldly;
@@ -14,9 +16,16 @@ namespace Nimbus.IntegrationTests.Conventions
     {
         [Test]
         [TestCaseSource(typeof (TestCases))]
+        public async Task ShouldReturnTask(MethodInfo testMethod)
+        {
+            typeof (Task).IsAssignableFrom(testMethod.ReturnType).ShouldBe(true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof (TestCases))]
         public async Task ShouldBeAsync(MethodInfo testMethod)
         {
-            typeof(Task).IsAssignableFrom(testMethod.ReturnType).ShouldBe(true);
+            testMethod.HasAttribute<AsyncStateMachineAttribute>().ShouldBe(true);
         }
 
         internal class TestCases : IEnumerable<TestCaseData>
@@ -25,7 +34,7 @@ namespace Nimbus.IntegrationTests.Conventions
             {
                 return GetType().Assembly
                                 .GetExportedTypes()
-                                .Where(t => CustomAttributeExtensions.GetCustomAttributes<TestFixtureAttribute>((MemberInfo) t).Any())
+                                .Where(t => t.GetCustomAttributes<TestFixtureAttribute>().Any())
                                 .SelectMany(t => t.GetMethods())
                                 .Where(m => m.GetCustomAttributes<TestAttribute>().Any())
                                 .Select(m => new TestCaseData(m)
