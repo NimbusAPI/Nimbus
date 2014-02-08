@@ -95,6 +95,13 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingEntityAlreadyExistsException)
             {
+                try
+                {
+                    _namespaceManager.UpdateTopic(topicDescription);
+                }
+                catch (MessagingException)
+                {
+                }
             }
             catch (MessagingException exc)
             {
@@ -106,14 +113,6 @@ namespace Nimbus.Infrastructure
                 {
                     throw;
                 }
-            }
-
-            try
-            {
-                _namespaceManager.UpdateTopic(topicDescription);
-            }
-            catch (MessagingException)
-            {
             }
 
             if (!_namespaceManager.TopicExists(topicPath))
@@ -146,13 +145,15 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager.CreateSubscription(subscriptionDescription);
             }
-            catch (MessagingException)
+            catch (MessagingEntityAlreadyExistsException)
             {
-            }
-
-            try
-            {
-                _namespaceManager.UpdateSubscription(subscriptionDescription);
+                try
+                {
+                    _namespaceManager.UpdateSubscription(subscriptionDescription);
+                }
+                catch (MessagingException)
+                {
+                }
             }
             catch (MessagingException)
             {
@@ -203,6 +204,13 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingEntityAlreadyExistsException)
             {
+                try
+                {
+                    _namespaceManager.UpdateQueue(queueDescription);
+                }
+                catch (MessagingException)
+                {
+                }
             }
             catch (MessagingException exc)
             {
@@ -214,14 +222,6 @@ namespace Nimbus.Infrastructure
                 {
                     throw;
                 }
-            }
-
-            try
-            {
-                _namespaceManager.UpdateQueue(queueDescription);
-            }
-            catch (MessagingException)
-            {
             }
 
             if (!_namespaceManager.QueueExists(queuePath))
