@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var requestMessage = message;
             var replyQueueName = requestMessage.ReplyTo;
-            var replyQueueClient = _messageSenderFactory.GetMessageSender(replyQueueName);
+            var replyQueueClient = _messageSenderFactory.GetQueueSender(replyQueueName);
 
             var busRequest = requestMessage.GetBody(_requestType);
 

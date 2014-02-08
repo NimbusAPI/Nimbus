@@ -28,7 +28,7 @@ namespace Nimbus.Infrastructure.Commands
                     "The type {0} is not a recognised command type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
                         typeof (TBusCommand).FullName));
 
-            var sender = _messageSenderFactory.GetMessageSender(typeof (TBusCommand));
+            var sender = _messageSenderFactory.GetQueueSender(typeof (TBusCommand));
             var message = new BrokeredMessage(busCommand);
             await sender.Send(message);
         }
@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task SendAt<TBusCommand>(DateTimeOffset proccessAt, TBusCommand busCommand)
         {
-            var sender = _messageSenderFactory.GetMessageSender(typeof (TBusCommand));
+            var sender = _messageSenderFactory.GetQueueSender(typeof (TBusCommand));
             var message = new BrokeredMessage(busCommand)
                           {
                               ScheduledEnqueueTimeUtc = proccessAt.DateTime

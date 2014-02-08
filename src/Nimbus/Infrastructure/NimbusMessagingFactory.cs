@@ -18,12 +18,12 @@ namespace Nimbus.Infrastructure
             _queueManager = queueManager;
         }
 
-        public INimbusMessageSender GetMessageSender(Type messageType)
+        public INimbusMessageSender GetQueueSender(Type messageType)
         {
-            return GetMessageSender(PathFactory.QueuePathFor(messageType));
+            return GetQueueSender(PathFactory.QueuePathFor(messageType));
         }
 
-        public INimbusMessageSender GetMessageSender(string queuePath)
+        public INimbusMessageSender GetQueueSender(string queuePath)
         {
             return _queueMessageSenders.GetOrAdd(queuePath, CreateQueueSender);
         }

@@ -57,7 +57,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 throw new BusException(
                     "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
 
-            var sender = _messageSenderFactory.GetMessageSender(busRequest.GetType());
+            var sender = _messageSenderFactory.GetQueueSender(busRequest.GetType());
 
             var correlationId = Guid.NewGuid();
             var message = new BrokeredMessage(busRequest)

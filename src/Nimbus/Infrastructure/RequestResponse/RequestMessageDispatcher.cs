@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public async Task Dispatch(BrokeredMessage message)
         {
             var replyQueueName = message.ReplyTo;
-            var replyQueueClient = _messageSenderFactory.GetMessageSender(replyQueueName);
+            var replyQueueClient = _messageSenderFactory.GetQueueSender(replyQueueName);
 
             var request = message.GetBody(_messageType);
 
