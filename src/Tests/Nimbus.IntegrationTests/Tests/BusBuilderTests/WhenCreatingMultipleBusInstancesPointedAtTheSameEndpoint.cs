@@ -11,7 +11,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(10 * 1000)]
+    [Timeout(60 * 1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
         private Bus[] _buses;
