@@ -100,6 +100,7 @@ namespace Nimbus
             }
             catch (AggregateException aex)
             {
+                _logger.Error(aex, "Failed to start bus.");
                 throw new BusException("Failed to start bus", aex);
             }
 

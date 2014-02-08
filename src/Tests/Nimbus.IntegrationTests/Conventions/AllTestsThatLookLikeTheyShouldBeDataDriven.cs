@@ -11,6 +11,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
+    [Timeout(1*1000)]
     public class AllTestsThatLookLikeTheyShouldBeDataDriven
     {
         [Test]

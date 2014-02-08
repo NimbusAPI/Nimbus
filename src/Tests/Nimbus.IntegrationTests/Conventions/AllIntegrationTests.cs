@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
+    [Timeout(1 * 1000)]
     public class AllIntegrationTests
     {
         [Test]
@@ -26,6 +28,18 @@ namespace Nimbus.IntegrationTests.Conventions
         public async Task ShouldBeAsync(MethodInfo testMethod)
         {
             testMethod.HasAttribute<AsyncStateMachineAttribute>().ShouldBe(true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(TestCases))]
+        public async Task ShouldHaveATimeout(MethodInfo testMethod)
+        {
+            if (testMethod.HasAttribute<TimeoutAttribute>()) return;
+
+            var fixtureTypeHeirarchy = new [] { testMethod.DeclaringType}.DepthFirst(t => t.BaseType != null ? new [] { t.BaseType} : new Type[0]);
+            if (fixtureTypeHeirarchy.Any(t => t.HasAttribute<TimeoutAttribute>())) return;
+
+            Assert.Fail();
         }
 
         internal class TestCases : IEnumerable<TestCaseData>
