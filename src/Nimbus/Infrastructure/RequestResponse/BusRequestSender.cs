@@ -51,15 +51,10 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            var requestTypeName = typeof (TRequest).FullName;
-
-            if (!_validRequestTypes.Value.Contains(typeof (TRequest)))
-                throw new BusException(
-                    "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(requestTypeName));
-
-            var sender = _messageSenderFactory.GetQueueSender(busRequest.GetType());
+            AssertValidRequestType<TRequest, TResponse>();
 
             var correlationId = Guid.NewGuid();
+            var requestTypeName = typeof (TRequest).FullName;
             var message = new BrokeredMessage(busRequest)
                           {
                               CorrelationId = correlationId.ToString(),
@@ -71,6 +66,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
 
+            var sender = _messageSenderFactory.GetQueueSender(busRequest.GetType());
+
             _logger.Debug("Sending request message {0} of type {1}", correlationId, requestTypeName);
             await sender.Send(message);
             _logger.Debug("Sent request message {0} of type {1}", correlationId, requestTypeName);
@@ -80,6 +77,14 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger.Debug("Received response to request {0} of type {1}", correlationId, requestTypeName);
 
             return response;
+        }
+
+        private void AssertValidRequestType<TRequest, TResponse>() where TRequest : IBusRequest<TRequest, TResponse> where TResponse : IBusResponse
+        {
+            if (!_validRequestTypes.Value.Contains(typeof (TRequest)))
+                throw new BusException(
+                    "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
+                        typeof (TRequest).FullName));
         }
     }
 }
