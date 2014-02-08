@@ -2,15 +2,16 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using Nimbus.Exceptions;
 using Nimbus.Extensions;
 
 namespace Nimbus.Configuration
 {
-    public class PoorMansIoC
+    public class PoorMansIoC : ICreateComponents
     {
         private readonly ConcurrentDictionary<Type, object> _components = new ConcurrentDictionary<Type, object>();
         private readonly ConcurrentDictionary<Type, Func<PoorMansIoC, object>> _factoryDelegates = new ConcurrentDictionary<Type, Func<PoorMansIoC, object>>();
+
+        private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public void Register<T>(T instance)
         {
@@ -49,7 +50,6 @@ namespace Nimbus.Configuration
             try
             {
                 return _components.GetOrAdd(type, ConstructObject);
-
             }
             catch (Exception exc)
             {
@@ -58,6 +58,14 @@ namespace Nimbus.Configuration
         }
 
         private object ConstructObject(Type type)
+        {
+            var instance = ConstructObjectInternal(type);
+            var disposable = instance as IDisposable;
+            if (disposable != null) _garbageMan.Add(disposable);
+            return instance;
+        }
+
+        private object ConstructObjectInternal(Type type)
         {
             Func<PoorMansIoC, object> factory;
             if (_factoryDelegates.TryGetValue(type, out factory))
@@ -92,6 +100,23 @@ namespace Nimbus.Configuration
             if (concreteType == null) throw new DependencyResolutionException("Could not find a concrete type that implements {0}".FormatWith(type.FullName));
 
             return concreteType;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~PoorMansIoC()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _garbageMan.Dispose();
         }
     }
 }

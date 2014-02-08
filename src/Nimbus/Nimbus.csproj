@@ -48,10 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\CompetingEventMessagePumpsFactory.cs" />
+    <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
+    <Compile Include="Configuration\GarbageMan.cs" />
+    <Compile Include="Configuration\ICreateComponents.cs" />
     <Compile Include="Configuration\Settings\DefaultBatchSizeSetting.cs" />
     <Compile Include="Configuration\DependencyResolutionException.cs" />
-    <Compile Include="Configuration\MulticastEventMessagePumpsFactory.cs" />
+    <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
     <Compile Include="Infrastructure\INimbusMessageSenderFactory.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
@@ -65,7 +67,6 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
-    <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcherFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
     <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
     <Compile Include="Configuration\Settings\CommandHandlerTypesSetting.cs" />

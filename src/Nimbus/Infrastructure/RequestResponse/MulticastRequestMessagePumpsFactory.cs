@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
@@ -10,31 +9,33 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class MulticastRequestMessagePumpsFactory
+    internal class MulticastRequestMessagePumpsFactory : ICreateComponents
     {
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly ApplicationNameSetting _applicationName;
         private readonly IQueueManager _queueManager;
-        private readonly MessagingFactory _messagingFactory;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+
+        private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
                                                    RequestHandlerTypesSetting requestHandlerTypes,
                                                    ApplicationNameSetting applicationName,
                                                    IQueueManager queueManager,
-                                                   MessagingFactory messagingFactory,
                                                    IMulticastRequestBroker multicastRequestBroker,
-                                                   DefaultBatchSizeSetting defaultBatchSize)
+                                                   DefaultBatchSizeSetting defaultBatchSize,
+                                                   INimbusMessageSenderFactory messageSenderFactory)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
             _applicationName = applicationName;
             _queueManager = queueManager;
-            _messagingFactory = messagingFactory;
             _multicastRequestBroker = multicastRequestBroker;
             _defaultBatchSize = defaultBatchSize;
+            _messageSenderFactory = messageSenderFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -53,12 +54,36 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
+
                 var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
-                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);
+                _garbageMan.Add(messageReceiver);
+
+                var dispatcher = new MulticastRequestMessageDispatcher(_messageSenderFactory, _multicastRequestBroker, requestType);
+                _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
+                _garbageMan.Add(pump);
+
                 yield return pump;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~MulticastRequestMessagePumpsFactory()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            _garbageMan.Dispose();
         }
     }
 }

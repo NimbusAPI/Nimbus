@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Infrastructure.Events
 {
-    internal class CompetingEventMessagePumpsFactory
+    internal class CompetingEventMessagePumpsFactory : ICreateComponents
     {
         private readonly IQueueManager _queueManager;
         private readonly ApplicationNameSetting _applicationName;
@@ -18,6 +18,8 @@ namespace Nimbus.Configuration
         private readonly ICompetingEventBroker _competingEventBroker;
         private readonly ILogger _logger;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+
+        private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public CompetingEventMessagePumpsFactory(IQueueManager queueManager,
                                                  ApplicationNameSetting applicationName,
@@ -51,11 +53,33 @@ namespace Nimbus.Configuration
                 var topicPath = PathFactory.TopicPathFor(eventType);
                 var subscriptionName = String.Format("{0}", _applicationName);
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
+                _garbageMan.Add(receiver);
+
                 var dispatcher = new CompetingEventMessageDispatcher(_competingEventBroker, eventType);
+                _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize);
+                _garbageMan.Add(pump);
+
                 yield return pump;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~CompetingEventMessagePumpsFactory()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _garbageMan.Dispose();
         }
     }
 }

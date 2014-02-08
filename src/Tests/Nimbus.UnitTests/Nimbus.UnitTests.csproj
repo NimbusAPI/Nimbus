@@ -52,6 +52,8 @@
     <Compile Include="ConfigurationTests\WhenLookingForClosedTypesOfAnOpenGeneric.cs" />
     <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
     <Compile Include="Conventions\AllBusBuilderConfigurationExtensionMethods.cs" />
+    <Compile Include="Conventions\AllComponentsThatCreateOtherComponents.cs" />
+    <Compile Include="Conventions\AllFactories.cs" />
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />

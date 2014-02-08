@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Nimbus.Configuration;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
-    internal class NimbusMessagingFactory : INimbusMessageSenderFactory
+    internal class NimbusMessagingFactory : INimbusMessageSenderFactory, ICreateComponents
     {
         private readonly IQueueManager _queueManager;
 
         private readonly ConcurrentDictionary<string, INimbusMessageSender> _messageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
+        private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public NimbusMessagingFactory(IQueueManager queueManager)
         {
             _queueManager = queueManager;
         }
 
-        //FIXME not sure that this belongs here. It doesn't actually need to know about Azure...
         public INimbusMessageSender GetMessageSender(Type messageType)
         {
             return GetMessageSender(PathFactory.QueuePathFor(messageType));
@@ -28,7 +29,26 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageSender CreateNimbusMessageSender(string queuePath)
         {
-            return new NimbusQueueMessageSender(_queueManager, queuePath);
+            var messageSender = new NimbusQueueMessageSender(_queueManager, queuePath);
+            _garbageMan.Add(messageSender);
+            return messageSender;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~NimbusMessagingFactory()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _garbageMan.Dispose();
         }
     }
 }

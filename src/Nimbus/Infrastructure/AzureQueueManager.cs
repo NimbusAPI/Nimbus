@@ -4,7 +4,6 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.Exceptions;
 
@@ -185,8 +184,6 @@ namespace Nimbus.Infrastructure
                 throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
             }
         }
-
-
 
         public MessageSender CreateMessageSender(Type messageType)
         {

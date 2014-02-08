@@ -43,5 +43,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             return "{0}/{1}".FormatWith(_topicPath, _subscriptionName);
         }
+
+        public void Dispose()
+        {
+            if (!_subscriptionClient.IsValueCreated) return;
+            _subscriptionClient.Value.Close();
+        }
     }
 }

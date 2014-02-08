@@ -40,5 +40,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             return _queuePath;
         }
+
+        public void Dispose()
+        {
+            if (!_messageReceiver.IsValueCreated) return;
+            _messageReceiver.Value.Close();
+        }
     }
 }

@@ -10,15 +10,15 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    public class MulticastRequestMessageDispatcher : IMessageDispatcher
+    internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly MessagingFactory _messagingFactory;
+        private readonly INimbusMessageSenderFactory _messageSenderFactory;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
         private readonly Type _requestType;
 
-        public MulticastRequestMessageDispatcher(MessagingFactory messagingFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
+        public MulticastRequestMessageDispatcher(INimbusMessageSenderFactory messageSenderFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
         {
-            _messagingFactory = messagingFactory;
+            _messageSenderFactory = messageSenderFactory;
             _multicastRequestBroker = multicastRequestBroker;
             _requestType = requestType;
         }
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var requestMessage = message;
             var replyQueueName = requestMessage.ReplyTo;
-            var replyQueueClient = _messagingFactory.CreateQueueClient(replyQueueName);
+            var replyQueueClient = _messageSenderFactory.GetMessageSender(replyQueueName);
 
             var busRequest = requestMessage.GetBody(_requestType);
 
@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var responseMessage = new BrokeredMessage(response);
                 responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
                 responseMessage.CorrelationId = requestMessage.CorrelationId;
-                await replyQueueClient.SendAsync(responseMessage);
+                await replyQueueClient.Send(responseMessage);
             }
         }
 

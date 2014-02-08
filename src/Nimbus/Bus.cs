@@ -113,6 +113,8 @@ namespace Nimbus
             }
         }
 
+        public EventHandler<EventArgs> Disposing;
+
         public void Dispose()
         {
             Dispose(true);
@@ -127,7 +129,13 @@ namespace Nimbus
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+
             Stop();
+
+            var handler = Disposing;
+            if (handler == null) return;
+
+            handler(this, EventArgs.Empty);
         }
     }
 }

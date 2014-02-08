@@ -35,6 +35,7 @@ namespace Nimbus.Infrastructure
                 throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
 
             _logger.Debug("Message pump for {0} starting...", _receiver);
+            _haveBeenToldToStop = false;
             _internalMessagePump = Task.Run(() => InternalMessagePump());
             await _receiver.WaitUntilReady();
             _logger.Debug("Message pump for {0} started", _receiver);
@@ -42,12 +43,23 @@ namespace Nimbus.Infrastructure
 
         public async Task Stop()
         {
-            _logger.Debug("Message pump for {0} stopping...", _receiver);
-            _haveBeenToldToStop = true;
             var internalMessagePump = _internalMessagePump;
+
+            // not running?
             if (internalMessagePump == null) return;
 
+            if (_haveBeenToldToStop)
+            {
+                await internalMessagePump;
+                return;
+            }
+
+            // actually stop
+            _logger.Debug("Message pump for {0} stopping...", _receiver);
+            _haveBeenToldToStop = true;
+
             await internalMessagePump;
+            _internalMessagePump = null;
             _logger.Debug("Message pump for {0} stopped.", _receiver);
         }
 
@@ -111,6 +123,11 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
             await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
             _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+        }
+
+        public void Dispose()
+        {
+            Stop().Wait();
         }
     }
 }

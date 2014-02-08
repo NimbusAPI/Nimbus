@@ -4,7 +4,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    [Obsolete]
+    [Obsolete("We should be using a dependency on some kind of INimbusEventSender")]
     public class TopicClientFactory : ITopicClientFactory, IDisposable
     {
         private readonly MessagingFactory _messagingFactory;

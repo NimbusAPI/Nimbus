@@ -38,16 +38,13 @@ namespace Nimbus.Configuration
             container.Register(c => NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
             container.Register(c => MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
 
-            var messagePumps = new List<IMessagePump>();
-
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {
                 RemoveAllExistingNamespaceElements(container.Resolve<NamespaceManager>(), logger);
             }
 
-            //EnsureQueuesAndTopicsExist(configuration, logger, queueManager, replyQueueName);
-
             logger.Debug("Creating message pumps and subscriptions.");
+            var messagePumps = new List<IMessagePump>();
             messagePumps.Add(container.Resolve<ResponseMessagePumpFactory>().Create());
             messagePumps.AddRange(container.Resolve<CommandMessagePumpsFactory>().CreateAll());
             messagePumps.AddRange(container.Resolve<RequestMessagePumpsFactory>().CreateAll());
@@ -63,6 +60,8 @@ namespace Nimbus.Configuration
                               messagePumps,
                               container.Resolve<DeadLetterQueues>());
 
+            bus.Disposing += (sender, args) => container.Dispose();
+
             logger.Debug("Bus built. Job done!");
 
             return bus;
@@ -77,20 +76,20 @@ namespace Nimbus.Configuration
 
             var queueDeletionTasks = namespaceManager.GetQueues()
                                                      .Select(q => q.Path)
-                                                     .Select(queuePath => Task.Run(delegate
-                                                                                   {
-                                                                                       logger.Debug("Deleting queue {0}", queuePath);
-                                                                                       namespaceManager.DeleteQueue(queuePath);
-                                                                                   }))
+                                                     .Select(queuePath => Task.Run(async delegate
+                                                                                         {
+                                                                                             logger.Debug("Deleting queue {0}", queuePath);
+                                                                                             await namespaceManager.DeleteQueueAsync(queuePath);
+                                                                                         }))
                                                      .ToArray();
 
             var topicDeletionTasks = namespaceManager.GetTopics()
                                                      .Select(t => t.Path)
-                                                     .Select(topicPath => Task.Run(delegate
-                                                                                   {
-                                                                                       logger.Debug("Deleting topic {0}", topicPath);
-                                                                                       namespaceManager.DeleteTopic(topicPath);
-                                                                                   }))
+                                                     .Select(topicPath => Task.Run(async delegate
+                                                                                         {
+                                                                                             logger.Debug("Deleting topic {0}", topicPath);
+                                                                                             await namespaceManager.DeleteTopicAsync(topicPath);
+                                                                                         }))
                                                      .ToArray();
 
             var allDeletionTasks = new Task[0]

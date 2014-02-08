@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
@@ -8,25 +9,30 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class RequestMessagePumpsFactory
+    internal class RequestMessagePumpsFactory : ICreateComponents
     {
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
-        private readonly RequestMessageDispatcherFactory _dispatcherFactory;
         private readonly IQueueManager _queueManager;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly IRequestBroker _requestBroker;
+        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+
+        private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
-                                          RequestMessageDispatcherFactory dispatcherFactory,
                                           IQueueManager queueManager,
-                                          DefaultBatchSizeSetting defaultBatchSize)
+                                          DefaultBatchSizeSetting defaultBatchSize,
+                                          IRequestBroker requestBroker,
+                                          INimbusMessageSenderFactory messageSenderFactory)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
-            _dispatcherFactory = dispatcherFactory;
             _queueManager = queueManager;
             _defaultBatchSize = defaultBatchSize;
+            _requestBroker = requestBroker;
+            _messageSenderFactory = messageSenderFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -45,11 +51,33 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 var queuePath = PathFactory.QueuePathFor(requestType);
                 var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
-                var dispatcher = _dispatcherFactory.Create(requestType);
+                _garbageMan.Add(messageReceiver);
+
+                var dispatcher = new RequestMessageDispatcher(_messageSenderFactory, requestType, _requestBroker);
+                _garbageMan.Add(dispatcher);
+
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
+                _garbageMan.Add(pump);
 
                 yield return pump;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~RequestMessagePumpsFactory()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _garbageMan.Dispose();
         }
     }
 }
