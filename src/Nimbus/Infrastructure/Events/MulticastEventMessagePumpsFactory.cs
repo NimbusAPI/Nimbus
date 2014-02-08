@@ -15,7 +15,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IQueueManager _queueManager;
         private readonly ApplicationNameSetting _applicationName;
         private readonly InstanceNameSetting _instanceName;
-        private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
+        private readonly MulticastEventHandlerTypesSetting _multicastEventHandlerTypes;
         private readonly ILogger _logger;
         private readonly IMulticastEventBroker _multicastEventBroker;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.Events
         internal MulticastEventMessagePumpsFactory(IQueueManager queueManager,
                                                    ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
-                                                   CompetingEventHandlerTypesSetting competingEventHandlerTypes,
+                                                   MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
                                                    IMulticastEventBroker multicastEventBroker,
                                                    DefaultBatchSizeSetting defaultBatchSize)
@@ -33,7 +33,7 @@ namespace Nimbus.Infrastructure.Events
             _queueManager = queueManager;
             _applicationName = applicationName;
             _instanceName = instanceName;
-            _competingEventHandlerTypes = competingEventHandlerTypes;
+            _multicastEventHandlerTypes = multicastEventHandlerTypes;
             _logger = logger;
             _multicastEventBroker = multicastEventBroker;
             _defaultBatchSize = defaultBatchSize;
@@ -41,10 +41,10 @@ namespace Nimbus.Infrastructure.Events
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            _logger.Debug("Creating competing event message pumps");
+            _logger.Debug("Creating multicast event message pumps");
 
-            var eventTypes = _competingEventHandlerTypes.Value
-                                                        .SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>)))
+            var eventTypes = _multicastEventHandlerTypes.Value
+                                                        .SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>)))
                                                         .Select(gi => gi.GetGenericArguments().Single())
                                                         .OrderBy(t => t.FullName)
                                                         .Distinct()

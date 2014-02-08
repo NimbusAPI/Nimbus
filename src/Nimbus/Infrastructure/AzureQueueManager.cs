@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -16,8 +17,9 @@ namespace Nimbus.Infrastructure
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
-        private readonly ConcurrentDictionary<Type, QueueClient> _queueClients = new ConcurrentDictionary<Type, QueueClient>();
-        private readonly ConcurrentDictionary<Type, QueueClient> _deadLetterQueueClients = new ConcurrentDictionary<Type, QueueClient>();
+        private readonly ConcurrentBag<string> _knownTopics = new ConcurrentBag<string>();
+        private readonly ConcurrentBag<string> _knownSubscriptions = new ConcurrentBag<string>();
+        private readonly ConcurrentBag<string> _knownQueues = new ConcurrentBag<string>();
 
         public AzureQueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, MaxDeliveryAttemptSetting maxDeliveryAttempts, ILogger logger)
         {
@@ -27,58 +29,52 @@ namespace Nimbus.Infrastructure
             _logger = logger;
         }
 
-        public void EnsureSubscriptionExists(Type eventType, string subscriptionName)
+        public MessageSender CreateMessageSender(string queuePath)
         {
-            EnsureSubscriptionExists(PathFactory.TopicPathFor(eventType), subscriptionName);
+            EnsureQueueExists(queuePath);
+            return _messagingFactory.CreateMessageSender(queuePath);
         }
 
-        private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
+        public MessageReceiver CreateMessageReceiver(string queuePath)
         {
-            EnsureTopicExists(topicPath);
-            var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                          {
-                                              MaxDeliveryCount = _maxDeliveryAttempts,
-                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                              EnableDeadLetteringOnMessageExpiration = true,
-                                              EnableBatchedOperations = true,
-                                              LockDuration = TimeSpan.FromSeconds(30),
-                                              RequiresSession = false,
-                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                          };
-
-            try
-            {
-                _namespaceManager.CreateSubscription(subscriptionDescription);
-            }
-            catch (MessagingException)
-            {
-            }
-
-            try
-            {
-                _namespaceManager.UpdateSubscription(subscriptionDescription);
-            }
-            catch (MessagingException)
-            {
-            }
-
-            _logger.Debug("Updating subscription '{0}' for topic '{1}'.", subscriptionName, topicPath);
-            _namespaceManager.UpdateSubscription(subscriptionDescription);
-
-            if (!_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
-            {
-                throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
-            }
+            EnsureQueueExists(queuePath);
+            return _messagingFactory.CreateMessageReceiver(queuePath);
         }
 
-        public void EnsureTopicExists(Type eventType)
+        public TopicClient CreateTopicSender(string topicPath)
         {
-            var topicPath = PathFactory.TopicPathFor(eventType);
             EnsureTopicExists(topicPath);
+            return _messagingFactory.CreateTopicClient(topicPath);
+        }
+
+        public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
+        {
+            EnsureSubscriptionExists(topicPath, subscriptionName);
+            return _messagingFactory.CreateSubscriptionClient(topicPath, subscriptionName);
+        }
+
+        public QueueClient CreateQueueClient<T>()
+        {
+            var messageContractType = typeof (T);
+            var queueName = PathFactory.QueuePathFor(messageContractType);
+
+            EnsureQueueExists(messageContractType);
+            return _messagingFactory.CreateQueueClient(queueName);
+        }
+
+        public QueueClient CreateDeadLetterQueueClient<T>()
+        {
+            var messageContractType = typeof (T);
+            var queueName = GetDeadLetterQueueName(messageContractType);
+
+            EnsureQueueExists(messageContractType);
+            return _messagingFactory.CreateQueueClient(queueName);
         }
 
         private void EnsureTopicExists(string topicPath)
         {
+            if (_knownTopics.Contains(topicPath)) return;
+
             _logger.Debug("Ensuring topic '{0}' exists", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
@@ -124,16 +120,65 @@ namespace Nimbus.Infrastructure
             {
                 throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
             }
+
+            _knownTopics.Add(topicPath);
         }
 
-        public void EnsureQueueExists(Type commandType)
+        private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
+        {
+            var subscriptionKey = "{0}/{1}".FormatWith(topicPath, subscriptionName);
+            if (_knownSubscriptions.Contains(subscriptionKey)) return;
+
+            EnsureTopicExists(topicPath);
+
+            var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
+                                          {
+                                              MaxDeliveryCount = _maxDeliveryAttempts,
+                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                              EnableDeadLetteringOnMessageExpiration = true,
+                                              EnableBatchedOperations = true,
+                                              LockDuration = TimeSpan.FromSeconds(30),
+                                              RequiresSession = false,
+                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                          };
+
+            try
+            {
+                _namespaceManager.CreateSubscription(subscriptionDescription);
+            }
+            catch (MessagingException)
+            {
+            }
+
+            try
+            {
+                _namespaceManager.UpdateSubscription(subscriptionDescription);
+            }
+            catch (MessagingException)
+            {
+            }
+
+            _logger.Debug("Updating subscription '{0}'.", subscriptionKey);
+            _namespaceManager.UpdateSubscription(subscriptionDescription);
+
+            if (!_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
+            {
+                throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+            }
+
+            _knownSubscriptions.Add(subscriptionKey);
+        }
+
+        private void EnsureQueueExists(Type commandType)
         {
             var queuePath = PathFactory.QueuePathFor(commandType);
             EnsureQueueExists(queuePath);
         }
 
-        public void EnsureQueueExists(string queuePath)
+        private void EnsureQueueExists(string queuePath)
         {
+            if (_knownQueues.Contains(queuePath)) return;
+
             _logger.Debug("Ensuring queue '{0}' exists", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
@@ -183,36 +228,7 @@ namespace Nimbus.Infrastructure
             {
                 throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
             }
-        }
-
-        public MessageSender CreateMessageSender(Type messageType)
-        {
-            var queuePath = PathFactory.QueuePathFor(messageType);
-            return CreateMessageSender(queuePath);
-        }
-
-        public MessageSender CreateMessageSender(string queuePath)
-        {
-            EnsureQueueExists(queuePath);
-            return _messagingFactory.CreateMessageSender(queuePath);
-        }
-
-        public MessageReceiver CreateMessageReceiver(string queuePath)
-        {
-            EnsureQueueExists(queuePath);
-            return _messagingFactory.CreateMessageReceiver(queuePath);
-        }
-
-        public TopicClient CreateTopicSender(string topicPath)
-        {
-            EnsureTopicExists(topicPath);
-            return _messagingFactory.CreateTopicClient(topicPath);
-        }
-
-        public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
-        {
-            EnsureSubscriptionExists(topicPath, subscriptionName);
-            return _messagingFactory.CreateSubscriptionClient(topicPath, subscriptionName);
+            _knownQueues.Add(queuePath);
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)
@@ -220,28 +236,6 @@ namespace Nimbus.Infrastructure
             var queuePath = PathFactory.QueuePathFor(messageContractType);
             var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
-        }
-
-        public QueueClient CreateQueueClient<T>()
-        {
-            var messageContractType = typeof (T);
-            var queueName = PathFactory.QueuePathFor(messageContractType);
-
-            return _queueClients.GetOrAdd(messageContractType, t => GetOrCreateQueue(messageContractType, queueName));
-        }
-
-        public QueueClient CreateDeadLetterQueueClient<T>()
-        {
-            var messageContractType = typeof (T);
-            var queueName = GetDeadLetterQueueName(messageContractType);
-
-            return _deadLetterQueueClients.GetOrAdd(messageContractType, t => GetOrCreateQueue(messageContractType, queueName));
-        }
-
-        private QueueClient GetOrCreateQueue(Type messageContractType, string queueName)
-        {
-            EnsureQueueExists(messageContractType);
-            return _messagingFactory.CreateQueueClient(queueName);
         }
     }
 }
