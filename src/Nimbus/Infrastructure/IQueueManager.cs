@@ -7,6 +7,7 @@ namespace Nimbus.Infrastructure
         MessageSender CreateMessageSender(string queuePath);
         MessageReceiver CreateMessageReceiver(string queuePath);
 
+        TopicClient CreateTopicSender(string topicPath);
         SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName);
 
         QueueClient CreateDeadLetterQueueClient<T>();

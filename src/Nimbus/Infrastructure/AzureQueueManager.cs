@@ -203,6 +203,12 @@ namespace Nimbus.Infrastructure
             return _messagingFactory.CreateMessageReceiver(queuePath);
         }
 
+        public TopicClient CreateTopicSender(string topicPath)
+        {
+            EnsureTopicExists(topicPath);
+            return _messagingFactory.CreateTopicClient(topicPath);
+        }
+
         public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
             EnsureSubscriptionExists(topicPath, subscriptionName);

@@ -9,7 +9,8 @@ namespace Nimbus.Infrastructure
     {
         private readonly IQueueManager _queueManager;
 
-        private readonly ConcurrentDictionary<string, INimbusMessageSender> _messageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
+        private readonly ConcurrentDictionary<string, INimbusMessageSender> _queueMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
+        private readonly ConcurrentDictionary<string, INimbusMessageSender> _topicMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public NimbusMessagingFactory(IQueueManager queueManager)
@@ -24,12 +25,29 @@ namespace Nimbus.Infrastructure
 
         public INimbusMessageSender GetMessageSender(string queuePath)
         {
-            return _messageSenders.GetOrAdd(queuePath, CreateNimbusMessageSender);
+            return _queueMessageSenders.GetOrAdd(queuePath, CreateQueueSender);
         }
 
-        private INimbusMessageSender CreateNimbusMessageSender(string queuePath)
+        public INimbusMessageSender GetTopicSender(Type messageType)
+        {
+            return GetTopicSender(PathFactory.TopicPathFor(messageType));
+        }
+
+        public INimbusMessageSender GetTopicSender(string topicPath)
+        {
+            return _topicMessageSenders.GetOrAdd(topicPath, CreateTopicSender);
+        }
+
+        private INimbusMessageSender CreateQueueSender(string queuePath)
         {
             var messageSender = new NimbusQueueMessageSender(_queueManager, queuePath);
+            _garbageMan.Add(messageSender);
+            return messageSender;
+        }
+
+        private INimbusMessageSender CreateTopicSender(string topicPath)
+        {
+            var messageSender = new NimbusTopicMessageSender(_queueManager, topicPath);
             _garbageMan.Add(messageSender);
             return messageSender;
         }
