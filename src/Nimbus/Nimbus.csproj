@@ -55,7 +55,7 @@
     <Compile Include="Configuration\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\INimbusMessageSenderFactory.cs" />
+    <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />

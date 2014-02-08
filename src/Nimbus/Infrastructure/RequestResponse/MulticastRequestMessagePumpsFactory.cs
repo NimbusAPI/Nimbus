@@ -17,7 +17,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IQueueManager _queueManager;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    IQueueManager queueManager,
                                                    IMulticastRequestBroker multicastRequestBroker,
                                                    DefaultBatchSizeSetting defaultBatchSize,
-                                                   INimbusMessageSenderFactory messageSenderFactory)
+                                                   INimbusMessagingFactory messagingFactory)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -35,7 +35,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _queueManager = queueManager;
             _multicastRequestBroker = multicastRequestBroker;
             _defaultBatchSize = defaultBatchSize;
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -58,7 +58,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new MulticastRequestMessageDispatcher(_messageSenderFactory, _multicastRequestBroker, requestType);
+                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);

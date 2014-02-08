@@ -4,7 +4,6 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Commands
@@ -14,22 +13,22 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ILogger _logger;
         private readonly CommandHandlerTypesSetting _commandHandlerTypes;
         private readonly ICommandBroker _commandBroker;
-        private readonly IQueueManager _queueManager;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly INimbusMessagingFactory _messagingFactory;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public CommandMessagePumpsFactory(ILogger logger,
                                           CommandHandlerTypesSetting commandHandlerTypes,
                                           ICommandBroker commandBroker,
-                                          IQueueManager queueManager,
-                                          DefaultBatchSizeSetting defaultBatchSize)
+                                          DefaultBatchSizeSetting defaultBatchSize,
+                                          INimbusMessagingFactory messagingFactory)
         {
             _logger = logger;
             _commandHandlerTypes = commandHandlerTypes;
             _commandBroker = commandBroker;
-            _queueManager = queueManager;
             _defaultBatchSize = defaultBatchSize;
+            _messagingFactory = messagingFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -47,8 +46,7 @@ namespace Nimbus.Infrastructure.Commands
                 _logger.Debug("Creating message pump for command type {0}", commandType.Name);
 
                 var queuePath = PathFactory.QueuePathFor(commandType);
-                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
-                _garbageMan.Add(messageReceiver);
+                var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
                 var dispatcher = new CommandMessageDispatcher(_commandBroker, commandType);
                 _garbageMan.Add(dispatcher);

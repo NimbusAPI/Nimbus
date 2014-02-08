@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     public class BusRequestSender : IRequestSender
     {
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly RequestTypesSetting _requestTypes;
         private readonly Lazy<HashSet<Type>> _validRequestTypes;
 
-        internal BusRequestSender(INimbusMessageSenderFactory messageSenderFactory,
+        internal BusRequestSender(INimbusMessagingFactory messagingFactory,
                                   ReplyQueueNameSetting replyQueueName,
                                   RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   RequestTypesSetting requestTypes,
                                   ILogger logger)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
             _logger = logger;
@@ -66,7 +66,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
 
-            var sender = _messageSenderFactory.GetQueueSender(busRequest.GetType());
+            var sender = _messagingFactory.GetQueueSender(PathFactory.QueuePathFor(busRequest.GetType()));
 
             _logger.Debug("Sending request message {0} of type {1}", correlationId, requestTypeName);
             await sender.Send(message);

@@ -12,19 +12,19 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class BusMulticastRequestSender : IMulticastRequestSender
     {
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
         private readonly HashSet<Type> _validRequestTypes;
 
-        public BusMulticastRequestSender(INimbusMessageSenderFactory messageSenderFactory,
+        public BusMulticastRequestSender(INimbusMessagingFactory messagingFactory,
                                          ReplyQueueNameSetting replyQueueName,
                                          RequestResponseCorrelator requestResponseCorrelator,
                                          IClock clock,
                                          RequestTypesSetting validRequestTypes)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
             _replyQueueName = replyQueueName;
             _requestResponseCorrelator = requestResponseCorrelator;
             _clock = clock;
@@ -48,7 +48,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(correlationId, expiresAfter);
 
-            var sender = _messageSenderFactory.GetTopicSender(busRequest.GetType());
+            var sender = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(busRequest.GetType()));
             await sender.Send(message);
             var response = responseCorrelationWrapper.WaitForResponses(timeout);
 

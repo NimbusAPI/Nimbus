@@ -36,8 +36,8 @@ namespace Nimbus.Infrastructure
 
             _logger.Debug("Message pump for {0} starting...", _receiver);
             _haveBeenToldToStop = false;
-            _internalMessagePump = Task.Run(() => InternalMessagePump());
             await _receiver.WaitUntilReady();
+            _internalMessagePump = Task.Run(() => InternalMessagePump());
             _logger.Debug("Message pump for {0} started", _receiver);
         }
 

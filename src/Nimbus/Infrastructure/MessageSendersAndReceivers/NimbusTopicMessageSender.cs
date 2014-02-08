@@ -23,5 +23,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             await _topicClient.Value.SendAsync(message);
         }
+
+        public void Dispose()
+        {
+            if (!_topicClient.IsValueCreated) return;
+            _topicClient.Value.Close();
+        }
     }
 }

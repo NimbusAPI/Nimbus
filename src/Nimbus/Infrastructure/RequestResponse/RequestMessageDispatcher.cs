@@ -11,13 +11,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly Type _messageType;
         private readonly IRequestBroker _requestBroker;
 
-        public RequestMessageDispatcher(INimbusMessageSenderFactory messageSenderFactory, Type messageType, IRequestBroker requestBroker)
+        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
             _messageType = messageType;
             _requestBroker = requestBroker;
         }
@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public async Task Dispatch(BrokeredMessage message)
         {
             var replyQueueName = message.ReplyTo;
-            var replyQueueClient = _messageSenderFactory.GetQueueSender(replyQueueName);
+            var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
             var request = message.GetBody(_messageType);
 

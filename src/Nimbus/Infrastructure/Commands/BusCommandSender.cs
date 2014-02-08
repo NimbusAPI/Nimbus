@@ -10,13 +10,13 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class BusCommandSender : ICommandSender
     {
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
         private readonly HashSet<Type> _validCommandTypes;
 
-        public BusCommandSender(INimbusMessageSenderFactory messageSenderFactory, IClock clock, CommandTypesSetting validCommandTypes)
+        public BusCommandSender(INimbusMessagingFactory messagingFactory, IClock clock, CommandTypesSetting validCommandTypes)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
             _clock = clock;
             _validCommandTypes = new HashSet<Type>(validCommandTypes.Value);
         }
@@ -27,7 +27,8 @@ namespace Nimbus.Infrastructure.Commands
 
             var message = new BrokeredMessage(busCommand);
 
-            var sender = _messageSenderFactory.GetQueueSender(typeof (TBusCommand));
+            var queuePath = PathFactory.QueuePathFor(typeof (TBusCommand));
+            var sender = _messagingFactory.GetQueueSender(queuePath);
             await sender.Send(message);
         }
 
@@ -45,7 +46,8 @@ namespace Nimbus.Infrastructure.Commands
                               ScheduledEnqueueTimeUtc = proccessAt.DateTime
                           };
 
-            var sender = _messageSenderFactory.GetQueueSender(typeof(TBusCommand));
+            var queuePath = PathFactory.QueuePathFor(typeof (TBusCommand));
+            var sender = _messagingFactory.GetQueueSender(queuePath);
             await sender.Send(message);
         }
 

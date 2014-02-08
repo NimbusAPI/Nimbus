@@ -53,7 +53,8 @@ namespace Nimbus.Configuration
             messagePumps.AddRange(container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
             logger.Debug("Message pumps and subscriptions are all created.");
 
-            var bus = new Bus(container.Resolve<ICommandSender>(),
+            var bus = new Bus(container.Resolve<ILogger>(),
+                              container.Resolve<ICommandSender>(),
                               container.Resolve<IRequestSender>(),
                               container.Resolve<IMulticastRequestSender>(),
                               container.Resolve<IEventSender>(),

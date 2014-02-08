@@ -12,13 +12,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly INimbusMessageSenderFactory _messageSenderFactory;
+        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
         private readonly Type _requestType;
 
-        public MulticastRequestMessageDispatcher(INimbusMessageSenderFactory messageSenderFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
+        public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
         {
-            _messageSenderFactory = messageSenderFactory;
+            _messagingFactory = messagingFactory;
             _multicastRequestBroker = multicastRequestBroker;
             _requestType = requestType;
         }
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var requestMessage = message;
             var replyQueueName = requestMessage.ReplyTo;
-            var replyQueueClient = _messageSenderFactory.GetQueueSender(replyQueueName);
+            var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
             var busRequest = requestMessage.GetBody(_requestType);
 
