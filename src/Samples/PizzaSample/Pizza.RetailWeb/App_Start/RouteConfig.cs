@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace Pizza.RetailWeb.App_Start
+namespace Pizza.RetailWeb
 {
     public class RouteConfig
     {

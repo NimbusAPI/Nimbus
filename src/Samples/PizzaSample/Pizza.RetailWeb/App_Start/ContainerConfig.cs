@@ -2,7 +2,7 @@
 using Autofac;
 using Autofac.Integration.Mvc;
 
-namespace Pizza.RetailWeb.App_Start
+namespace Pizza.RetailWeb
 {
     public static class ContainerConfig
     {

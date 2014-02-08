@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Pizza.RetailWeb.App_Start
+namespace Pizza.RetailWeb
 {
     public class FilterConfig
     {
