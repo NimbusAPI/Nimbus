@@ -24,22 +24,23 @@ namespace Nimbus.Infrastructure.Events
 
         public async Task Publish<TBusEvent>(TBusEvent busEvent)
         {
-            AssertValidEventType<TBusEvent>();
+            var eventType = busEvent.GetType();
+            AssertValidEventType(eventType);
 
             var brokeredMessage = new BrokeredMessage(busEvent);
 
-            var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(typeof (TBusEvent)));
+            var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(eventType));
             await client.Send(brokeredMessage);
 
             _logger.Debug("Published event: {0}", brokeredMessage);
         }
 
-        private void AssertValidEventType<TBusEvent>()
+        private void AssertValidEventType(Type eventType)
         {
-            if (!_validEventTypes.Contains(typeof (TBusEvent)))
+            if (!_validEventTypes.Contains(eventType))
                 throw new BusException(
                     "The type {0} is not a recognised event type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
-                        typeof (TBusEvent).FullName));
+                        eventType.FullName));
         }
     }
 }
