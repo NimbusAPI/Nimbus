@@ -23,11 +23,12 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task Send<TBusCommand>(TBusCommand busCommand)
         {
-            AssertValidCommandType<TBusCommand>();
+            var commandType = busCommand.GetType();
+            AssertValidCommandType(commandType);
 
             var message = new BrokeredMessage(busCommand);
 
-            var queuePath = PathFactory.QueuePathFor(typeof (TBusCommand));
+            var queuePath = PathFactory.QueuePathFor(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
             await sender.Send(message);
         }
@@ -39,24 +40,26 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task SendAt<TBusCommand>(DateTimeOffset proccessAt, TBusCommand busCommand)
         {
-            AssertValidCommandType<TBusCommand>();
+            var commandType = busCommand.GetType();
+            AssertValidCommandType(commandType);
 
             var message = new BrokeredMessage(busCommand)
                           {
                               ScheduledEnqueueTimeUtc = proccessAt.DateTime
                           };
+            message.Properties[MessagePropertyKeys.MessageType] = commandType.AssemblyQualifiedName;
 
-            var queuePath = PathFactory.QueuePathFor(typeof (TBusCommand));
+            var queuePath = PathFactory.QueuePathFor(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
             await sender.Send(message);
         }
 
-        private void AssertValidCommandType<TBusCommand>()
+        private void AssertValidCommandType(Type commandType)
         {
-            if (!_validCommandTypes.Contains(typeof (TBusCommand)))
+            if (!_validCommandTypes.Contains(commandType))
                 throw new BusException(
                     "The type {0} is not a recognised command type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
-                        typeof (TBusCommand).FullName));
+                        commandType.FullName));
         }
     }
 }
