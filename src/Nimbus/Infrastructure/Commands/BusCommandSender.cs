@@ -26,32 +26,20 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = new BrokeredMessage(busCommand);
+            var message = ConstructBrokeredMessage(busCommand, commandType);
 
-            var queuePath = PathFactory.QueuePathFor(commandType);
-            var sender = _messagingFactory.GetQueueSender(queuePath);
-            await sender.Send(message);
+            await Deliver(commandType, message);
         }
 
-        public async Task SendAt<TBusCommand>(TimeSpan delay, TBusCommand busCommand)
-        {
-            await SendAt(_clock.UtcNow.Add(delay), busCommand);
-        }
-
-        public async Task SendAt<TBusCommand>(DateTimeOffset proccessAt, TBusCommand busCommand)
+        public async Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset whenToSend)
         {
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = new BrokeredMessage(busCommand)
-                          {
-                              ScheduledEnqueueTimeUtc = proccessAt.DateTime
-                          };
-            message.Properties[MessagePropertyKeys.MessageType] = commandType.AssemblyQualifiedName;
+            var message = ConstructBrokeredMessage(busCommand, commandType);
+            message.ScheduledEnqueueTimeUtc = whenToSend.DateTime;
 
-            var queuePath = PathFactory.QueuePathFor(commandType);
-            var sender = _messagingFactory.GetQueueSender(queuePath);
-            await sender.Send(message);
+            await Deliver(commandType, message);
         }
 
         private void AssertValidCommandType(Type commandType)
@@ -60,6 +48,20 @@ namespace Nimbus.Infrastructure.Commands
                 throw new BusException(
                     "The type {0} is not a recognised command type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
                         commandType.FullName));
+        }
+
+        private static BrokeredMessage ConstructBrokeredMessage<TBusCommand>(TBusCommand busCommand, Type commandType)
+        {
+            var message = new BrokeredMessage(busCommand);
+            message.Properties[MessagePropertyKeys.MessageType] = commandType.AssemblyQualifiedName;
+            return message;
+        }
+
+        private async Task Deliver(Type commandType, BrokeredMessage message)
+        {
+            var queuePath = PathFactory.QueuePathFor(commandType);
+            var sender = _messagingFactory.GetQueueSender(queuePath);
+            await sender.Send(message);
         }
     }
 }

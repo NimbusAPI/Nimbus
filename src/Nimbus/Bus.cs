@@ -47,14 +47,9 @@ namespace Nimbus
             return Task.Run(() => _commandSender.Send(busCommand));
         }
 
-        public Task Defer<TBusCommand>(TimeSpan delay, TBusCommand busCommand) where TBusCommand : IBusCommand
+        public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
         {
-            return Task.Run(() => _commandSender.SendAt(delay, busCommand));
-        }
-
-        public Task Defer<TBusCommand>(DateTimeOffset processAt, TBusCommand busCommand) where TBusCommand : IBusCommand
-        {
-            return Task.Run(() => _commandSender.SendAt(processAt, busCommand));
+            return Task.Run(() => _commandSender.SendAt(busCommand, deliveryTime));
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
