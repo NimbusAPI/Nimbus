@@ -1,8 +1,11 @@
-﻿namespace Nimbus.Infrastructure
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Nimbus.Infrastructure
 {
-    internal interface IMessagePump
+    internal interface IMessagePump: IDisposable
     {
-        void Start();
-        void Stop();
+        Task Start();
+        Task Stop();
     }
 }

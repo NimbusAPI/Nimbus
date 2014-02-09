@@ -14,7 +14,6 @@ namespace Pizza.WaitTimeService.Handlers
 
         public HowLongDoPizzasTakeResponse Handle(HowLongDoPizzasTakeRequest request)
         {
-
             var currentAverage = _waitTimeCounter.GetAveragePizzaTimes();
 
             return new HowLongDoPizzasTakeResponse {Minutes = currentAverage};

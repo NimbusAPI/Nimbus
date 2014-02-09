@@ -11,7 +11,7 @@ namespace Nimbus.UnitTests
         public void WeShouldGetTheRightMethod()
         {
             var request = new SomeInternalRequest();
-            var handlerMethod = MulticastRequestMessagePump.ExtractHandleMulticastMethodInfo(request);
+            var handlerMethod = MulticastRequestMessageDispatcher.ExtractHandleMulticastMethodInfo(request);
 
             handlerMethod.ShouldNotBe(null);
         }

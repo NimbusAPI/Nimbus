@@ -16,6 +16,7 @@ namespace Pizza.WaitTimeService.Handlers
         public void Handle(NewOrderRecieved busEvent)
         {
             Console.WriteLine("I heard about a new order");
+
             _waitTimeCounter.RecordNewPizzaOrder(busEvent.PizzaId);
         }
 

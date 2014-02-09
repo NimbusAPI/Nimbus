@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests
@@ -9,26 +10,23 @@ namespace Nimbus.IntegrationTests
     {
         public T Subject;
 
-        public abstract T Given();
-        public abstract void When();
+        public abstract Task<T> Given();
+        public abstract Task When();
 
         private Stopwatch _sw;
 
         [SetUp]
         public void SetUp()
         {
-            Subject = Given();
-
             _sw = Stopwatch.StartNew();
-            When();
-            _sw.Stop();
-
-            Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
         }
 
         [TearDown]
         public virtual void TearDown()
         {
+            _sw.Stop();
+
+            Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
             Subject = null;
         }
     }

@@ -8,12 +8,14 @@ using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.Exceptions;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus
 {
-    public class Bus : IBus
+    public class Bus : IBus, IDisposable
     {
+        private readonly ILogger _logger;
         private readonly ICommandSender _commandSender;
         private readonly IRequestSender _requestSender;
         private readonly IMulticastRequestSender _multicastRequestSender;
@@ -21,13 +23,15 @@ namespace Nimbus
         private readonly IMessagePump[] _messagePumps;
         private readonly IDeadLetterQueues _deadLetterQueues;
 
-        internal Bus(ICommandSender commandSender,
+        internal Bus(ILogger logger,
+                     ICommandSender commandSender,
                      IRequestSender requestSender,
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
                      IEnumerable<IMessagePump> messagePumps,
                      IDeadLetterQueues deadLetterQueues)
         {
+            _logger = logger;
             _commandSender = commandSender;
             _requestSender = requestSender;
             _multicastRequestSender = multicastRequestSender;
@@ -86,12 +90,64 @@ namespace Nimbus
 
         public void Start()
         {
-            foreach (var pump in _messagePumps) pump.Start();
+            _logger.Debug("Bus starting...");
+
+            var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(async () => await p.Start())).ToArray();
+
+            try
+            {
+                Task.WaitAll(messagePumpStartTasks);
+            }
+            catch (AggregateException aex)
+            {
+                _logger.Error(aex, "Failed to start bus.");
+                throw new BusException("Failed to start bus", aex);
+            }
+
+            _logger.Info("Bus started.");
         }
 
         public void Stop()
         {
-            foreach (var messagePump in _messagePumps) messagePump.Stop();
+            _logger.Debug("Bus stopping...");
+
+            var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(async () => await p.Stop())).ToArray();
+
+            try
+            {
+                Task.WaitAll(messagePumpStopTasks);
+            }
+            catch (AggregateException aex)
+            {
+                throw new BusException("Failed to stop bus", aex);
+            }
+
+            _logger.Info("Bus stopped.");
+        }
+
+        public EventHandler<EventArgs> Disposing;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~Bus()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            Stop();
+
+            var handler = Disposing;
+            if (handler == null) return;
+
+            handler(this, EventArgs.Empty);
         }
     }
 }

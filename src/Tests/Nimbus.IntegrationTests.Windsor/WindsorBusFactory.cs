@@ -1,4 +1,5 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using System;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
@@ -35,7 +36,7 @@ namespace Nimbus.IntegrationTests.Windsor
                                    .UsingFactoryMethod<IBus>(() => new BusBuilder()
                                                                  .Configure()
                                                                  .WithConnectionString(_connectionString)
-                                                                 .WithNames("TestApp", "TestInstance")
+                                                                 .WithNames("IntegrationTestHarness", Environment.MachineName)
                                                                  .WithTypesFrom(_typeProvider)
                                                                  .WithWindsorDefaults(container)
                                                                  .WithDebugOptions(
