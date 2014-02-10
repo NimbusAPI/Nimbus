@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 using Nimbus.PoisonMessages;
 
+// ReSharper disable CheckNamespace
 namespace Nimbus
+// ReSharper restore CheckNamespace
 {
     public interface IBus
     {
