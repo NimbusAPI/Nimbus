@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -27,6 +28,7 @@ namespace Nimbus.UnitTests.ConfigurationTests
                 yield return new TestCaseData(typeof (IHandleCommand<MyCommand>), typeof (IHandleCommand<>), true);
                 yield return new TestCaseData(typeof (MyCommandHandler), typeof (IHandleCommand<>), true);
                 yield return new TestCaseData(typeof (MyDerivedCommandHandler), typeof (IHandleCommand<>), true);
+                yield return new TestCaseData(typeof (ApplicationNameSetting), typeof (Setting<>), true);
             }
 
             IEnumerator IEnumerable.GetEnumerator()

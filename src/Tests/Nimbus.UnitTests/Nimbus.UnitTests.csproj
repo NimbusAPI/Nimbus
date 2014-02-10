@@ -30,6 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.3.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="NSubstitute">
+      <HintPath>..\..\packages\NSubstitute.1.7.1.0\lib\NET40\NSubstitute.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -40,6 +50,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,12 +61,27 @@
   <ItemGroup>
     <Compile Include="AssemblyScanningTests\WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
     <Compile Include="AssemblyScanningTests\WhenAMessageTypeNameIsDuplicated.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\BarEvent.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\BazEvent.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\FooEvent.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\BarCommand.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\BazCommand.cs" />
+    <Compile Include="BatchSendingTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="BatchSendingTests\WhenPublishingACollectionOfCommands.cs" />
+    <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEvents.cs" />
+    <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
+    <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="ConfigurationTests\WhenLookingForClosedTypesOfAnOpenGeneric.cs" />
     <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
     <Compile Include="Conventions\AllBusBuilderConfigurationExtensionMethods.cs" />
+    <Compile Include="Conventions\AllComponentsThatCreateOtherComponents.cs" />
+    <Compile Include="Conventions\AllFactories.cs" />
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
+    <Compile Include="Conventions\AllSettingsClasses.cs" />
+    <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="InfrastructureTests\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
@@ -64,6 +91,7 @@
       <SubType>
       </SubType>
     </Compile>
+    <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TaskExtensionTests\GivenOneTaskThatSucceedsAndOneTaskThatThrows.cs" />
     <Compile Include="TaskExtensionTests\GivenThreeTasksOfVaryingDuration.cs" />
     <Compile Include="TaskExtensionTests\GivenThreeCompletedTasks.cs" />
@@ -72,6 +100,7 @@
     <Compile Include="WhenExtractingAHandlerMethodForARequest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +132,9 @@
       <Project>{ad2daa55-ca83-4fa6-a0a8-2aae1cb9ea41}</Project>
       <Name>Nimbus.UnitTests.TestAssemblies.MessageContracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

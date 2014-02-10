@@ -65,9 +65,11 @@
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
-    <Compile Include="Tests\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
+    <Compile Include="Conventions\AllIntegrationTests.cs" />
+    <Compile Include="Conventions\AllTestsThatLookLikeTheyShouldBeDataDriven.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
@@ -84,7 +86,9 @@
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
     <Compile Include="BusFactoryEnumerator.cs" />
     <Compile Include="TestForAllBuses.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatIsNotReturedByTheTypeProvider.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />
@@ -159,6 +163,9 @@
       <Project>{1f1ce629-7ffe-48a7-b114-a218ff21129a}</Project>
       <Name>Nimbus.IntegrationTests.Windsor</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

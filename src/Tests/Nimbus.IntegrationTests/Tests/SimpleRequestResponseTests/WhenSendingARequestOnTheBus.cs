@@ -14,18 +14,17 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
 
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
-            _response = await bus.Request(new SomeRequest(), _timeout);
+            _response = await Bus.Request(new SomeRequest(), _timeout);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
+        public async Task WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
         {
-            await When(busFactory);
+            await Given(busFactory);
+            await When();
 
             _response.ShouldNotBe(null);
         }

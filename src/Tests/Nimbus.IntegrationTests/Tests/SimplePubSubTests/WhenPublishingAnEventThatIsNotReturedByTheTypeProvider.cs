@@ -8,23 +8,24 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
+    //FIXME we should be able to refactor this to a unit test shortly.
     public class WhenPublishingAnEventThatIsNotReturedByTheTypeProvider : TestForAllBuses
     {
-        public override async Task When(ITestHarnessBusFactory busFactory)
+        public override async Task When()
         {
-            var bus = busFactory.Create();
-
             var myEvent = new SomeEventThatIsNotReturedByTheTypeProvider();
-            await bus.Publish(myEvent);
+            await Bus.Publish(myEvent);
         }
 
         [Test]
         [TestCaseSource("AllBusesTestCases")]
-        public async void ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
+        public async Task ABusExceptionIsThrown(ITestHarnessBusFactory busFactory)
         {
+            await Given(busFactory);
+
             try
             {
-                await When(busFactory);
+                await When();
                 Assert.Fail("Exception expected");
             }
             catch (Exception ex)

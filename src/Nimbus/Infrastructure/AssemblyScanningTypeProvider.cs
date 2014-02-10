@@ -161,17 +161,14 @@ namespace Nimbus.Infrastructure
                 .GroupBy(queue => queue.Item1)
                 .Where(dupe => dupe.Count() > 1).ToArray();
 
-
             if (queueCounts.None())
                 return;
 
-            var badTypes = queueCounts.SelectMany(dupe => dupe.Select( d => d.Item2.Name));
+            var badTypes = queueCounts.SelectMany(dupe => dupe.Select(d => d.Item2.Name));
             var message = "Your message types {0} will result in a duplicate queue name.".FormatWith(string.Join(", ", badTypes));
 
             throw new BusException(message);
-
         }
-        
 
         private void AssertAllHandledMessageTypesAreIncludedDirectly()
         {

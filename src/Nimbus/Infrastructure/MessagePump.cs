@@ -1,98 +1,133 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {
-    public abstract class MessagePump : IMessagePump
+    internal class MessagePump : IMessagePump
     {
         private bool _haveBeenToldToStop;
-        protected readonly ILogger Logger;
 
-        protected readonly TimeSpan BatchTimeout = TimeSpan.FromMinutes(5);
-        protected int BatchSize { get; private set; }
+        private readonly INimbusMessageReceiver _receiver;
+        private readonly IMessageDispatcher _dispatcher;
+        private readonly ILogger _logger;
+        private readonly DefaultBatchSizeSetting _defaultBatchSize;
 
-        protected MessagePump(ILogger logger, int batchSize)
+        private Task _internalMessagePump;
+
+        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, DefaultBatchSizeSetting defaultBatchSize)
         {
-            BatchSize = batchSize;
-            Logger = logger;
+            _receiver = receiver;
+            _dispatcher = dispatcher;
+            _logger = logger;
+            _defaultBatchSize = defaultBatchSize;
         }
 
-        public virtual void Start()
+        public async Task Start()
         {
-            Task.Run((() => InternalMessagePump()));
+            if (_internalMessagePump != null)
+                throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
+
+            _logger.Debug("Message pump for {0} starting...", _receiver);
+            _haveBeenToldToStop = false;
+            await _receiver.WaitUntilReady();
+            _internalMessagePump = Task.Run(() => InternalMessagePump());
+            _logger.Debug("Message pump for {0} started", _receiver);
         }
 
-        public virtual void Stop()
+        public async Task Stop()
         {
-            _haveBeenToldToStop = true;
-        }
+            var internalMessagePump = _internalMessagePump;
 
-        private void InternalMessagePump()
-        {
-            while (!_haveBeenToldToStop)
+            // not running?
+            if (internalMessagePump == null) return;
+
+            if (_haveBeenToldToStop)
             {
-                BrokeredMessage[] messages;
-
-                try
-                {
-                    messages = ReceiveMessages();
-                }
-                catch (TimeoutException)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    messages
-                        .Select(m => Task.Run(delegate
-                                              {
-                                                  Logger.Debug("Dispatching message: {0} from {1}", m, m.ReplyTo);
-                                                  PumpMessage(m);
-                                              })
-                                         .ContinueWith(t => HandleDispatchCompletion(t, m)))
-                        .WaitAll();
-                }
-                catch (Exception exc)
-                {
-                    Logger.Error(exc, "Overall message dispatch failed.");
-                }
-            }
-        }
-
-        private async Task HandleDispatchCompletion(Task t, BrokeredMessage m)
-        {
-            if (t.IsFaulted)
-            {
-                var exception = t.Exception;
-                Logger.Error(exception, "Message dispatch failed");
-                await m.AbandonAsync(ExceptionDetailsAsProperties(exception));
+                await internalMessagePump;
                 return;
             }
 
-            Logger.Debug("Dispatched message: {0} from {1}", m, m.ReplyTo);
-            await m.CompleteAsync();
+            // actually stop
+            _logger.Debug("Message pump for {0} stopping...", _receiver);
+            _haveBeenToldToStop = true;
+
+            await internalMessagePump;
+            _internalMessagePump = null;
+            _logger.Debug("Message pump for {0} stopped.", _receiver);
         }
 
-        protected static Dictionary<string, object> ExceptionDetailsAsProperties(Exception exception)
+        private async Task InternalMessagePump()
         {
-            if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException);
+            while (!_haveBeenToldToStop)
+            {
+                try
+                {
+                    BrokeredMessage[] messages;
 
-            return new Dictionary<string, object>
-                   {
-                       {MessagePropertyKeys.ExceptionTypeKey, exception.GetType().FullName},
-                       {MessagePropertyKeys.ExceptionMessageKey, exception.Message},
-                       {MessagePropertyKeys.ExceptionStackTraceKey, exception.StackTrace},
-                   };
+                    try
+                    {
+                        messages = (await _receiver.Receive(_defaultBatchSize)).ToArray();
+                        if (messages.None()) continue;
+                    }
+                    catch (TimeoutException)
+                    {
+                        continue;
+                    }
+                    catch (MessagingException exc)
+                    {
+                        _logger.Error(exc.Message, exc);
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                        continue;
+                    }
+
+                    var dispatchTasks = messages.Select(Dispatch).ToArray();
+                    await Task.WhenAll(dispatchTasks);
+                }
+                catch (Exception exc)
+                {
+                    _logger.Error(exc, "Unhandled exception in message pump");
+                }
+            }
         }
 
-        protected abstract BrokeredMessage[] ReceiveMessages();
-        protected abstract void PumpMessage(BrokeredMessage message);
+        private async Task Dispatch(BrokeredMessage message)
+        {
+            Exception exception = null;
+
+            try
+            {
+                _logger.Debug("Dispatching message: {0} from {1}", message, message.ReplyTo);
+                await _dispatcher.Dispatch(message);
+                _logger.Debug("Dispatched message: {0} from {1}", message, message.ReplyTo);
+
+                _logger.Debug("Completing message {0}", message);
+                await message.CompleteAsync();
+                _logger.Debug("Completed message {0}", message);
+
+                return;
+            }
+            catch (Exception exc)
+            {
+                exception = exc;
+            }
+
+            _logger.Error(exception, "Message dispatch failed");
+
+            _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
+            await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
+            _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+        }
+
+        public void Dispose()
+        {
+            Stop().Wait();
+        }
     }
 }

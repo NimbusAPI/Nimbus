@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.InfrastructureContracts;
 using NUnit.Framework;
@@ -6,9 +9,11 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(30*1000)]
+    [Timeout(15*1000)]
     public abstract class TestForAllBuses
     {
+        protected Bus Bus { get; private set; }
+
         [SetUp]
         public void SetUp()
         {
@@ -18,9 +23,20 @@ namespace Nimbus.IntegrationTests
         [TearDown]
         public void TearDown()
         {
+            Console.WriteLine();
+            Console.WriteLine();
+            Bus.Dispose();
         }
 
-        public abstract Task When(ITestHarnessBusFactory busFactory);
+        public virtual async Task Given(ITestHarnessBusFactory busFactory)
+        {
+            Bus = (Bus) busFactory.Create();
+
+            Console.WriteLine();
+            Console.WriteLine();
+        }
+
+        public abstract Task When();
 
         public IEnumerable<TestCaseData> AllBusesTestCases
         {
@@ -29,6 +45,7 @@ namespace Nimbus.IntegrationTests
                 // ReSharper disable LoopCanBeConvertedToQuery
                 var testFixtureType = GetType();
                 var busFactoryEnumerator = new BusFactoryEnumerator(testFixtureType);
+
                 foreach (var factory in busFactoryEnumerator.GetBusFactories())
                 {
                     yield return new TestCaseData(factory)

@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
     [TestFixture]
-    [Ignore("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
+    [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public class WhenPublishingManyEventsOfDifferentTypes : ThroughputSpecificationForBus
     {
         protected override int ExpectedMessagesPerSecond

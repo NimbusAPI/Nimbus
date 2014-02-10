@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Nimbus.InfrastructureContracts;
@@ -6,7 +7,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
 {
-    public class FakeBroker : ICommandBroker, IMulticastEventBroker, ICompetingEventBroker, IRequestBroker
+    public class FakeBroker : ICommandBroker, IMulticastEventBroker, ICompetingEventBroker, IRequestBroker, IMulticastRequestBroker
     {
         private readonly int _expectedNumMessagesReceived;
         private int _actualNumMessagesReceived;
@@ -53,6 +54,13 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
         }
 
         public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
