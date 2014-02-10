@@ -32,7 +32,7 @@ namespace Nimbus.Configuration
 
         internal BusBuilderConfiguration()
         {
-            DefaultTimeout = new DefaultTimeoutSetting {Value = TimeSpan.FromSeconds(10)};
+            DefaultTimeout = new DefaultTimeoutSetting {Value = TimeSpan.FromSeconds(10)}; //FIXME refactor these to override the Default property on their setting class
             MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = 5};
             DefaultBatchSize = new DefaultBatchSizeSetting {Value = 16};
             Logger = new NullLogger();

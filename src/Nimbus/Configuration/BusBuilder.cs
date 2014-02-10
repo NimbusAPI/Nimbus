@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -35,12 +36,12 @@ namespace Nimbus.Configuration
                 container.Register(value);
             }
 
-            container.Register(c => NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
-            container.Register(c => MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
+            container.Register<Func<NamespaceManager>>(c => () => NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
+            container.Register<Func<MessagingFactory>>(c => () => MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {
-                RemoveAllExistingNamespaceElements(container.Resolve<NamespaceManager>(), logger);
+                RemoveAllExistingNamespaceElements(container.Resolve<Func<NamespaceManager>>(), logger);
             }
 
             logger.Debug("Creating message pumps and subscriptions.");
@@ -71,25 +72,25 @@ namespace Nimbus.Configuration
         /// <summary>
         ///     Danger! Danger, Will Robinson!
         /// </summary>
-        private static void RemoveAllExistingNamespaceElements(NamespaceManager namespaceManager, ILogger logger)
+        private static void RemoveAllExistingNamespaceElements(Func<NamespaceManager> namespaceManager, ILogger logger)
         {
             logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
 
-            var queueDeletionTasks = namespaceManager.GetQueues()
+            var queueDeletionTasks = namespaceManager().GetQueues()
                                                      .Select(q => q.Path)
                                                      .Select(queuePath => Task.Run(async delegate
                                                                                          {
                                                                                              logger.Debug("Deleting queue {0}", queuePath);
-                                                                                             await namespaceManager.DeleteQueueAsync(queuePath);
+                                                                                             await namespaceManager().DeleteQueueAsync(queuePath);
                                                                                          }))
                                                      .ToArray();
 
-            var topicDeletionTasks = namespaceManager.GetTopics()
+            var topicDeletionTasks = namespaceManager().GetTopics()
                                                      .Select(t => t.Path)
                                                      .Select(topicPath => Task.Run(async delegate
                                                                                          {
                                                                                              logger.Debug("Deleting topic {0}", topicPath);
-                                                                                             await namespaceManager.DeleteTopicAsync(topicPath);
+                                                                                             await namespaceManager().DeleteTopicAsync(topicPath);
                                                                                          }))
                                                      .ToArray();
 

@@ -12,8 +12,8 @@ namespace Nimbus.Infrastructure
 {
     internal class AzureQueueManager : IQueueManager
     {
-        private readonly NamespaceManager _namespaceManager;
-        private readonly MessagingFactory _messagingFactory;
+        private readonly Func<NamespaceManager> _namespaceManager;
+        private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
@@ -21,7 +21,10 @@ namespace Nimbus.Infrastructure
         private readonly ConcurrentBag<string> _knownSubscriptions = new ConcurrentBag<string>();
         private readonly ConcurrentBag<string> _knownQueues = new ConcurrentBag<string>();
 
-        public AzureQueueManager(NamespaceManager namespaceManager, MessagingFactory messagingFactory, MaxDeliveryAttemptSetting maxDeliveryAttempts, ILogger logger)
+        public AzureQueueManager(Func<NamespaceManager> namespaceManager,
+                                 Func<MessagingFactory> messagingFactory,
+                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                                 ILogger logger)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -32,25 +35,25 @@ namespace Nimbus.Infrastructure
         public MessageSender CreateMessageSender(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return _messagingFactory.CreateMessageSender(queuePath);
+            return _messagingFactory().CreateMessageSender(queuePath);
         }
 
         public MessageReceiver CreateMessageReceiver(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return _messagingFactory.CreateMessageReceiver(queuePath);
+            return _messagingFactory().CreateMessageReceiver(queuePath);
         }
 
         public TopicClient CreateTopicSender(string topicPath)
         {
             EnsureTopicExists(topicPath);
-            return _messagingFactory.CreateTopicClient(topicPath);
+            return _messagingFactory().CreateTopicClient(topicPath);
         }
 
         public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
             EnsureSubscriptionExists(topicPath, subscriptionName);
-            return _messagingFactory.CreateSubscriptionClient(topicPath, subscriptionName);
+            return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName);
         }
 
         public QueueClient CreateQueueClient<T>()
@@ -59,7 +62,7 @@ namespace Nimbus.Infrastructure
             var queueName = PathFactory.QueuePathFor(messageContractType);
 
             EnsureQueueExists(messageContractType);
-            return _messagingFactory.CreateQueueClient(queueName);
+            return _messagingFactory().CreateQueueClient(queueName);
         }
 
         public QueueClient CreateDeadLetterQueueClient<T>()
@@ -68,7 +71,7 @@ namespace Nimbus.Infrastructure
             var queueName = GetDeadLetterQueueName(messageContractType);
 
             EnsureQueueExists(messageContractType);
-            return _messagingFactory.CreateQueueClient(queueName);
+            return _messagingFactory().CreateQueueClient(queueName);
         }
 
         private void EnsureTopicExists(string topicPath)
@@ -91,13 +94,13 @@ namespace Nimbus.Infrastructure
             // update its configuration in a minute anyway.  -andrewh 8/12/2013
             try
             {
-                _namespaceManager.CreateTopic(topicDescription);
+                _namespaceManager().CreateTopic(topicDescription);
             }
             catch (MessagingEntityAlreadyExistsException)
             {
                 try
                 {
-                    _namespaceManager.UpdateTopic(topicDescription);
+                    _namespaceManager().UpdateTopic(topicDescription);
                 }
                 catch (MessagingException)
                 {
@@ -115,7 +118,7 @@ namespace Nimbus.Infrastructure
                 }
             }
 
-            if (!_namespaceManager.TopicExists(topicPath))
+            if (!_namespaceManager().TopicExists(topicPath))
             {
                 throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
             }
@@ -143,13 +146,13 @@ namespace Nimbus.Infrastructure
 
             try
             {
-                _namespaceManager.CreateSubscription(subscriptionDescription);
+                _namespaceManager().CreateSubscription(subscriptionDescription);
             }
             catch (MessagingEntityAlreadyExistsException)
             {
                 try
                 {
-                    _namespaceManager.UpdateSubscription(subscriptionDescription);
+                    _namespaceManager().UpdateSubscription(subscriptionDescription);
                 }
                 catch (MessagingException)
                 {
@@ -160,9 +163,9 @@ namespace Nimbus.Infrastructure
             }
 
             _logger.Debug("Updating subscription '{0}'.", subscriptionKey);
-            _namespaceManager.UpdateSubscription(subscriptionDescription);
+            _namespaceManager().UpdateSubscription(subscriptionDescription);
 
-            if (!_namespaceManager.SubscriptionExists(topicPath, subscriptionName))
+            if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
             {
                 throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
             }
@@ -200,13 +203,13 @@ namespace Nimbus.Infrastructure
             // update its configuration in a minute anyway.  -andrewh 8/12/2013
             try
             {
-                _namespaceManager.CreateQueue(queueDescription);
+                _namespaceManager().CreateQueue(queueDescription);
             }
             catch (MessagingEntityAlreadyExistsException)
             {
                 try
                 {
-                    _namespaceManager.UpdateQueue(queueDescription);
+                    _namespaceManager().UpdateQueue(queueDescription);
                 }
                 catch (MessagingException)
                 {
@@ -224,7 +227,7 @@ namespace Nimbus.Infrastructure
                 }
             }
 
-            if (!_namespaceManager.QueueExists(queuePath))
+            if (!_namespaceManager().QueueExists(queuePath))
             {
                 throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
             }
