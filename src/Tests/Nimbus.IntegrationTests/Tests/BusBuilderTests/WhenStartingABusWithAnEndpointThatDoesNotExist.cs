@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                      .WithConnectionString(@"Endpoint=sb://shouldnotexist.localtest.me/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
+                                      .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandBroker(messageBroker)
                                       .WithRequestBroker(messageBroker)

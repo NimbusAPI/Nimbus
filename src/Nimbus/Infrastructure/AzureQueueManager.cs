@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -17,9 +18,9 @@ namespace Nimbus.Infrastructure
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
-        private readonly ConcurrentBag<string> _knownTopics = new ConcurrentBag<string>();
-        private readonly ConcurrentBag<string> _knownSubscriptions = new ConcurrentBag<string>();
-        private readonly ConcurrentBag<string> _knownQueues = new ConcurrentBag<string>();
+        private readonly Lazy<ConcurrentBag<string>> _knownTopics;
+        private readonly Lazy<ConcurrentBag<string>> _knownSubscriptions;
+        private readonly Lazy<ConcurrentBag<string>> _knownQueues;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
@@ -30,6 +31,10 @@ namespace Nimbus.Infrastructure
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
+
+            _knownTopics = new Lazy<ConcurrentBag<string>>(FetchExistingTopics);
+            _knownSubscriptions = new Lazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
+            _knownQueues = new Lazy<ConcurrentBag<string>>(FetchExistingQueues);
         }
 
         public MessageSender CreateMessageSender(string queuePath)
@@ -74,9 +79,39 @@ namespace Nimbus.Infrastructure
             return _messagingFactory().CreateQueueClient(queueName);
         }
 
+        private ConcurrentBag<string> FetchExistingTopics()
+        {
+            _logger.Debug("Fetching existing topics...");
+
+            var topics = _namespaceManager().GetTopics();
+            return new ConcurrentBag<string>(topics.Select(t => t.Path));
+        }
+
+        private ConcurrentBag<string> FetchExistingSubscriptions()
+        {
+            _logger.Debug("Fetching existing subscriptions...");
+
+            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel()
+                                   from subscriptionName in _namespaceManager().GetSubscriptions(topicPath).Select(s => s.Name)
+                                   select BuildSubscriptionKey(topicPath, subscriptionName);
+
+            return new ConcurrentBag<string>(subscriptionKeys);
+        }
+
+        private ConcurrentBag<string> FetchExistingQueues()
+        {
+            _logger.Debug("Fetching existing queues...");
+
+            var queuesAsync = _namespaceManager().GetQueuesAsync();
+            if (!queuesAsync.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+
+            var queues = queuesAsync.Result;
+            return new ConcurrentBag<string>(queues.Select(q => q.Path));
+        }
+
         private void EnsureTopicExists(string topicPath)
         {
-            if (_knownTopics.Contains(topicPath)) return;
+            if (_knownTopics.Value.Contains(topicPath)) return;
 
             _logger.Debug("Ensuring topic '{0}' exists", topicPath);
 
@@ -98,13 +133,6 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingEntityAlreadyExistsException)
             {
-                try
-                {
-                    _namespaceManager().UpdateTopic(topicDescription);
-                }
-                catch (MessagingException)
-                {
-                }
             }
             catch (MessagingException exc)
             {
@@ -123,13 +151,13 @@ namespace Nimbus.Infrastructure
                 throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
             }
 
-            _knownTopics.Add(topicPath);
+            _knownTopics.Value.Add(topicPath);
         }
 
         private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
         {
-            var subscriptionKey = "{0}/{1}".FormatWith(topicPath, subscriptionName);
-            if (_knownSubscriptions.Contains(subscriptionKey)) return;
+            var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
+            if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
 
             EnsureTopicExists(topicPath);
 
@@ -150,27 +178,22 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingEntityAlreadyExistsException)
             {
-                try
-                {
-                    _namespaceManager().UpdateSubscription(subscriptionDescription);
-                }
-                catch (MessagingException)
-                {
-                }
             }
             catch (MessagingException)
             {
             }
-
-            _logger.Debug("Updating subscription '{0}'.", subscriptionKey);
-            _namespaceManager().UpdateSubscription(subscriptionDescription);
 
             if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
             {
                 throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
             }
 
-            _knownSubscriptions.Add(subscriptionKey);
+            _knownSubscriptions.Value.Add(subscriptionKey);
+        }
+
+        private static string BuildSubscriptionKey(string topicPath, string subscriptionName)
+        {
+            return "{0}/{1}".FormatWith(topicPath, subscriptionName);
         }
 
         private void EnsureQueueExists(Type commandType)
@@ -181,7 +204,7 @@ namespace Nimbus.Infrastructure
 
         private void EnsureQueueExists(string queuePath)
         {
-            if (_knownQueues.Contains(queuePath)) return;
+            if (_knownQueues.Value.Contains(queuePath)) return;
 
             _logger.Debug("Ensuring queue '{0}' exists", queuePath);
 
@@ -207,13 +230,6 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingEntityAlreadyExistsException)
             {
-                try
-                {
-                    _namespaceManager().UpdateQueue(queueDescription);
-                }
-                catch (MessagingException)
-                {
-                }
             }
             catch (MessagingException exc)
             {
@@ -231,7 +247,8 @@ namespace Nimbus.Infrastructure
             {
                 throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
             }
-            _knownQueues.Add(queuePath);
+
+            _knownQueues.Value.Add(queuePath);
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)
