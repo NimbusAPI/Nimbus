@@ -149,6 +149,34 @@ If you're using a bus you should probably be using an IoC container. If you like
         }
     }
 
+### Sending requests
+
+    public static async Task FindOutHowLongItWillTakeToMakeMyPizza()
+    {
+        var response = await _bus.Request(new HowLongDoPizzasTakeRequest());
+
+        Console.WriteLine("Pizzas take about {0} minutes", response.Minutes);
+    }
+
+### Handling requests
+
+    public class HandleWaitTimeRequests : IHandleRequest<HowLongDoPizzasTakeRequest, HowLongDoPizzasTakeResponse>
+    {
+        private readonly IWaitTimeCounter _waitTimeCounter;
+
+        public HandleWaitTimeRequests(IWaitTimeCounter waitTimeCounter)
+        {
+            _waitTimeCounter = waitTimeCounter;
+        }
+
+        public HowLongDoPizzasTakeResponse Handle(HowLongDoPizzasTakeRequest request)
+        {
+            var currentAverage = _waitTimeCounter.GetAveragePizzaTimes();
+
+            return new HowLongDoPizzasTakeResponse {Minutes = currentAverage};
+        }
+    }
+
 ## Can I contribute?
 Absolutely! This is very very very early days for this project. We need things
 like:
