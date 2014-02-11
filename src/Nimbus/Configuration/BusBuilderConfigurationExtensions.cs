@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.InfrastructureContracts;
@@ -11,6 +12,12 @@ namespace Nimbus.Configuration
         {
             configuration.ConnectionString = new ConnectionStringSetting {Value = connectionString};
             return configuration;
+        }
+
+        public static BusBuilderConfiguration WithConnectionStringFromFile(this BusBuilderConfiguration configuration, string filename)
+        {
+            var connectionString = File.ReadAllText(filename).Trim();
+            return configuration.WithConnectionString(connectionString);
         }
 
         /// <summary>
