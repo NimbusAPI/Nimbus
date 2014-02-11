@@ -67,7 +67,35 @@ If you're using a bus you should probably be using an IoC container. If you like
 
     var container = builder.Build();
     return container;
-    
+
+### Configuring the bus with Windsor
+
+    //TODO: Set up your own connection string in app.config
+    var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
+
+    // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care. You can roll your
+    // own by implementing the ILogger interface if you want to hook it to an existing logging implementation.
+    container.Register(Component.For<ILogger>()
+                                .ImplementedBy<SerilogStaticLogger>()
+                                .LifestyleSingleton());
+
+    // This is how you tell Nimbus where to find all your message types and handlers.
+    var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
+
+    container.RegisterNimbus(typeProvider);
+    container.Register(Component.For<IBus>()
+                                .ImplementedBy<Bus>()
+                                .UsingFactoryMethod<IBus>(() => new BusBuilder()
+                                                                .Configure()
+                                                                .WithConnectionString(connectionString)
+                                                                .WithNames("PingPong.Windsor", Environment.MachineName)
+                                                                .WithTypesFrom(typeProvider)
+                                                                .WithWindsorDefaults(container)
+                                                                .Build())
+                                .LifestyleSingleton()
+                                .StartUsingMethod("Start")
+        );
+
 ### Sending commands
 
     public class SomeClassThatSendsCommands
@@ -92,6 +120,32 @@ If you're using a bus you should probably be using an IoC container. If you like
         public void Handle(DoSomethingCommand command)
         {
             //TODO: Do something useful here.
+        }
+    }
+
+### Handling events
+
+    public class ListenForNewOrders : IHandleMulticastEvent<NewOrderRecieved>, IHandleMulticastEvent<PizzaIsReady>
+    {
+        private readonly IWaitTimeCounter _waitTimeCounter;
+
+        public ListenForNewOrders(IWaitTimeCounter waitTimeCounter)
+        {
+            _waitTimeCounter = waitTimeCounter;
+        }
+
+        public void Handle(NewOrderRecieved busEvent)
+        {
+            Console.WriteLine("I heard about a new order");
+
+            _waitTimeCounter.RecordNewPizzaOrder(busEvent.PizzaId);
+        }
+
+        public void Handle(PizzaIsReady busEvent)
+        {
+            Console.WriteLine("I heard about a complete order");
+
+            _waitTimeCounter.RecordPizzaCompleted(busEvent.PizzaId);
         }
     }
 
