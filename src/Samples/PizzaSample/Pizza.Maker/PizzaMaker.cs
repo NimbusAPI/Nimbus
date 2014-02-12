@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Nimbus;
 using Pizza.Maker.Messages;
@@ -10,34 +9,28 @@ namespace Pizza.Maker
     {
         private readonly IBus _bus;
 
+        private readonly List<string> _currentPizzaOrders = new List<string>();
+
         public PizzaMaker(IBus bus)
         {
             _bus = bus;
         }
 
-        private List<int> listOfPizzasToMake = new List<int>(); 
-        public void TakePizzaOrder(int pizzaId)
+        public void TakePizzaOrder(string customerName)
         {
-            if (listOfPizzasToMake.Contains(pizzaId))
-                return;
+            if (_currentPizzaOrders.Contains(customerName)) return;
 
-            
-            listOfPizzasToMake.Add(pizzaId);
-            
-            Console.WriteLine("Have got your order {0}", pizzaId);
+            _currentPizzaOrders.Add(customerName);
 
-
+            Console.WriteLine("Have got your order {0}", customerName);
         }
 
-        public void CompletePizza(int pizzaId)
+        public void CompletePizza(string customerName)
         {
-            if (listOfPizzasToMake.Contains(pizzaId))
-            {
-                listOfPizzasToMake.Remove(pizzaId);
+            if (!_currentPizzaOrders.Contains(customerName)) return;
 
-                _bus.Publish(new PizzaIsReady {PizzaId = pizzaId});
-            }
+            _currentPizzaOrders.Remove(customerName);
+            _bus.Publish(new PizzaIsReady {CustomerName = customerName});
         }
-         
     }
 }

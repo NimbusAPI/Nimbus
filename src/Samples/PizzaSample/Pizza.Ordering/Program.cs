@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Nimbus;
 using Nimbus.Configuration;
@@ -11,90 +8,84 @@ using Nimbus.Infrastructure;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
+#pragma warning disable 4014
+
 namespace Pizza.Ordering
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
             // This is how you tell Nimbus where to find all your message types and handlers.
-            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof(NewOrderRecieved).Assembly, typeof(OrderPizzaCommand).Assembly);
+            var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof (NewOrderRecieved).Assembly, typeof (OrderPizzaCommand).Assembly);
 
             var messageBroker = new DefaultMessageBroker(typeProvider);
 
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
             var bus = new BusBuilder().Configure()
-                                        .WithNames("Ordering", Environment.MachineName)
-                                        .WithConnectionString(connectionString)
-                                        .WithTypesFrom(typeProvider)
-                                        .WithCommandBroker(messageBroker)
-                                        .WithRequestBroker(messageBroker)
-                                        .WithMulticastEventBroker(messageBroker)
-                                        .WithCompetingEventBroker(messageBroker)
-                                        .WithMulticastRequestBroker(messageBroker)
-                                        .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                        .Build();
+                                      .WithNames("Ordering", Environment.MachineName)
+                                      .WithConnectionString(connectionString)
+                                      .WithTypesFrom(typeProvider)
+                                      .WithCommandBroker(messageBroker)
+                                      .WithRequestBroker(messageBroker)
+                                      .WithMulticastEventBroker(messageBroker)
+                                      .WithCompetingEventBroker(messageBroker)
+                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .Build();
             bus.Start();
-
-
-            Console.WriteLine("Press 1 to get the current wait time.");
-            Console.WriteLine("Press 2 to order a pizza.");
-            Console.WriteLine("Press 3 to Quit.");
-
-
-            int nextPizzaId = 1;
 
             while (true)
             {
-
+                Console.WriteLine();
+                Console.WriteLine("Press 1 to get the current wait time.");
+                Console.WriteLine("Press 2 to order a pizza.");
+                Console.WriteLine("Press 3 to Quit.");
                 var input = Console.ReadLine();
 
                 switch (input)
                 {
                     case "1":
 
-#pragma warning disable 4014
-                        FindOutHowLongItWillBe(bus);
-#pragma warning restore 4014
+                        HowLongDoesAPizzaTake(bus);
 
                         break;
 
                     case "2":
 
-                        var command = new OrderPizzaCommand {PizzaId = nextPizzaId};
+                        Console.WriteLine("What's the customer's name?");
+                        var customerName = Console.ReadLine().Trim();
 
-#pragma warning disable 4014
+                        if (string.IsNullOrWhiteSpace(customerName))
+                        {
+                            Console.WriteLine("You need to enter a customer name.");
+                            continue;
+                        }
+
+                        var command = new OrderPizzaCommand {CustomerName = customerName};
+
                         bus.Send(command);
-#pragma warning restore 4014
 
-
-                        Console.WriteLine("Pizza number {0} ordered", nextPizzaId);
-                        nextPizzaId++;
+                        Console.WriteLine("Pizza ordered for {0}", customerName);
 
                         break;
-                    
+
                     case "3":
                         bus.Stop();
                         return;
 
                     default:
                         continue;
-                        
                 }
-
-
             }
-
         }
 
-        public static async Task FindOutHowLongItWillBe(Bus bus)
+        public static async Task HowLongDoesAPizzaTake(Bus bus)
         {
             var response = await bus.Request(new HowLongDoPizzasTakeRequest(), TimeSpan.FromSeconds(10));
 
             Console.WriteLine("Pizzas take about {0} minutes", response.Minutes);
-
         }
     }
 }

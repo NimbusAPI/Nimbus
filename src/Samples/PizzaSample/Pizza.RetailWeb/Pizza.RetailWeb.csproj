@@ -125,13 +125,18 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="AutofacModules\BusModule.cs" />
+    <Compile Include="AutofacModules\ReadModelsModule.cs" />
     <Compile Include="AutofacModules\WebModule.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Models\Home\IndexViewModel.cs" />
+    <Compile Include="Models\Home\OrderStatusWidgetViewModel.cs" />
+    <Compile Include="Models\Home\PizzaOrderStatus.cs" />
+    <Compile Include="Models\Home\AverageWaitTimeWidgetViewModel.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadModels\IAmAReadModel.cs" />
+    <Compile Include="ReadModels\PizzaOrderStatusReadModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -160,10 +165,11 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <Content Include="Views\Home\OrderStatusWidget.cshtml" />
+    <Content Include="Views\Home\AverageWaitTimeWidget.cshtml" />
+    <Content Include="Views\Home\OrderAPizzaWidget.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">
@@ -177,6 +183,10 @@
     <ProjectReference Include="..\..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Pizza.Maker.Messages\Pizza.Maker.Messages.csproj">
+      <Project>{86300BEC-7B51-41D5-8E0D-B2C85945329D}</Project>
+      <Name>Pizza.Maker.Messages</Name>
     </ProjectReference>
     <ProjectReference Include="..\Pizza.Ordering.Messages\Pizza.Ordering.Messages.csproj">
       <Project>{D98B95C3-F4BE-4F6A-BF62-3E3EC0BD384F}</Project>

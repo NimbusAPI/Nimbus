@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Configuration;
-using System.Reflection;
 using Autofac;
 using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
+using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
-using Module = Autofac.Module;
 
 namespace Pizza.RetailWeb.AutofacModules
 {
@@ -26,7 +25,10 @@ namespace Pizza.RetailWeb.AutofacModules
                    .SingleInstance();
 
             // This is how you tell Nimbus where to find all your message types and handlers.
-            var handlerTypesProvider = new AssemblyScanningTypeProvider(ThisAssembly, typeof(HowLongDoPizzasTakeRequest).Assembly);
+            var pizzaOrderingMessagesAssembly = typeof (HowLongDoPizzasTakeRequest).Assembly;
+            var pizzaMakerMessagesAssembly = typeof (PizzaIsReady).Assembly;
+
+            var handlerTypesProvider = new AssemblyScanningTypeProvider(ThisAssembly, pizzaOrderingMessagesAssembly, pizzaMakerMessagesAssembly);
 
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()

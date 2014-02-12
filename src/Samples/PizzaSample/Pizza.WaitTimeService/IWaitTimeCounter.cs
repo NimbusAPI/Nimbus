@@ -2,8 +2,8 @@
 {
     public interface IWaitTimeCounter
     {
-        void RecordNewPizzaOrder(int id);
-        void RecordPizzaCompleted(int id);
+        void RecordNewPizzaOrder(string customerName);
+        void RecordPizzaCompleted(string customerName);
         int GetAveragePizzaTimes();
     }
 }

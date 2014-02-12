@@ -2,7 +2,7 @@
 {
     public interface IPizzaMaker
     {
-        void TakePizzaOrder(int pizzaId);
-        void CompletePizza(int pizzaId);
+        void TakePizzaOrder(string customerName);
+        void CompletePizza(string customerName);
     }
 }

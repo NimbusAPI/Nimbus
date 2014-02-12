@@ -1,0 +1,26 @@
+﻿@model Pizza.RetailWeb.Models.Home.OrderStatusWidgetViewModel
+<h2>Orders in the system</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Pizza ordered at</th>
+            <th>Pizza ready at</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var order in Model.Orders)
+        {
+            <tr>
+                <td>@order.CustomerName</td>
+                <td>@order.Ordered</td>
+                <td>@order.Ready</td>
+
+            </tr>
+        }
+
+
+    </tbody>
+</table>

@@ -17,14 +17,14 @@ namespace Pizza.WaitTimeService.Handlers
         {
             Console.WriteLine("I heard about a new order");
 
-            _waitTimeCounter.RecordNewPizzaOrder(busEvent.PizzaId);
+            _waitTimeCounter.RecordNewPizzaOrder(busEvent.CustomerName);
         }
 
         public void Handle(PizzaIsReady busEvent)
         {
             Console.WriteLine("I heard about a complete order");
 
-            _waitTimeCounter.RecordPizzaCompleted(busEvent.PizzaId);
+            _waitTimeCounter.RecordPizzaCompleted(busEvent.CustomerName);
         }
     }
 }

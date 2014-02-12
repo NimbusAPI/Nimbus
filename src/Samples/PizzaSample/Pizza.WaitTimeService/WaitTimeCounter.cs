@@ -6,25 +6,24 @@ namespace Pizza.WaitTimeService
 {
     public class WaitTimeCounter : IWaitTimeCounter
     {
-        private readonly ConcurrentDictionary<int, PizzaTime> _pizzaTimes = new ConcurrentDictionary<int, PizzaTime>();
+        private readonly ConcurrentDictionary<string, PizzaTime> _pizzaTimes = new ConcurrentDictionary<string, PizzaTime>();
 
-        public void RecordNewPizzaOrder(int id)
+        public void RecordNewPizzaOrder(string customerName)
         {
-            _pizzaTimes[id] = new PizzaTime {OrderRecieved = DateTime.Now};
+            _pizzaTimes[customerName] = new PizzaTime { OrderRecieved = DateTime.Now };
         }
 
-        public void RecordPizzaCompleted(int id)
+        public void RecordPizzaCompleted(string customerName)
         {
             PizzaTime cookedPizzaTime;
-            if (!_pizzaTimes.TryGetValue(id, out cookedPizzaTime)) return;
+            if (!_pizzaTimes.TryGetValue(customerName, out cookedPizzaTime)) return;
 
             cookedPizzaTime.PizzaCooked = DateTime.Now;
         }
 
         public int GetAveragePizzaTimes()
         {
-            if (!_pizzaTimes.Any())
-                return 10;
+            if (!_pizzaTimes.Any()) return 10;
 
             var cookedPizzas = _pizzaTimes.Values.Where(pi => pi.PizzaCooked.HasValue).ToArray();
 

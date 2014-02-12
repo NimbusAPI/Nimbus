@@ -8,7 +8,7 @@ namespace Pizza.Ordering.Handlers
     {
         public void Handle(PizzaIsReady busEvent)
         {
-            Console.WriteLine("Pizza Chef says order {0} is ready", busEvent.PizzaId);
+            Console.WriteLine("Pizza Chef says, '{0}! Your order is ready!'", busEvent.CustomerName);
         }
     }
 }

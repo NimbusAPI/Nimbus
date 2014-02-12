@@ -1,42 +1,63 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Nimbus;
 using Pizza.Ordering.Messages;
 using Pizza.RetailWeb.Models.Home;
+using Pizza.RetailWeb.ReadModels;
 
 namespace Pizza.RetailWeb.Controllers
 {
     public class HomeController : AsyncController
     {
         private readonly IBus _bus;
+        private readonly PizzaOrderStatusReadModel _orderStatusReadModel;
 
-        public HomeController(IBus bus)
+        public HomeController(IBus bus, PizzaOrderStatusReadModel orderStatusReadModel)
         {
             _bus = bus;
+            _orderStatusReadModel = orderStatusReadModel;
         }
 
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public async Task<ActionResult> PlaceOrder(string customerName)
+        {
+            await _bus.Send(new OrderPizzaCommand {CustomerName = customerName});
+
+            return Redirect("/");
+        }
+
+        public PartialViewResult OrderAPizzaWidget()
+        {
+            return PartialView();
+        }
+
+        public async Task<PartialViewResult> AverageWaitTimeWidget()
         {
             var averageWaitTime = await _bus.Request(new HowLongDoPizzasTakeRequest());
-            var model = new IndexViewModel
-                        {
-                            AverageWaitTime = averageWaitTime.Minutes,
-                        };
-            return View(model);
+
+            var viewModel = new AverageWaitTimeWidgetViewModel
+                            {
+                                AverageWaitTime = averageWaitTime.Minutes,
+                            };
+
+            return PartialView(viewModel);
         }
 
-        public ActionResult About()
+        public async Task<PartialViewResult> OrderStatusWidget()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            var viewModel = new OrderStatusWidgetViewModel
+                            {
+                                Orders = _orderStatusReadModel
+                                    .Orders
+                                    .OrderByDescending(o => o.Ordered)
+                                    .ToArray(),
+                            };
+            return PartialView(viewModel);
         }
     }
 }

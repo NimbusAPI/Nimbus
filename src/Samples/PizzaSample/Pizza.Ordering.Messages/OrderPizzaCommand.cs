@@ -4,7 +4,6 @@ namespace Pizza.Ordering.Messages
 {
     public class OrderPizzaCommand : IBusCommand
     {
-        public int PizzaId { get; set; }
-         
+        public string CustomerName { get; set; }
     }
 }

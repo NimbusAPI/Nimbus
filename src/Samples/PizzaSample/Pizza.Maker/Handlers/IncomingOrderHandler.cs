@@ -18,12 +18,8 @@ namespace Pizza.Maker.Handlers
 
         public void Handle(OrderPizzaCommand busCommand)
         {
-
-            _pizzaMaker.TakePizzaOrder(busCommand.PizzaId);
-
-
-            _bus.Publish(new NewOrderRecieved {PizzaId = busCommand.PizzaId});
-
+            _pizzaMaker.TakePizzaOrder(busCommand.CustomerName);
+            _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
         }
     }
 }
