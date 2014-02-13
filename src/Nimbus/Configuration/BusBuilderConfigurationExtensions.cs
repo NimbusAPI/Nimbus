@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Settings;
+using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
@@ -66,6 +67,18 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestBroker requestBroker)
         {
             configuration.MulticastRequestBroker = requestBroker;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration,
+            DefaultMessageBroker messageBroker)
+        {
+            configuration
+                .WithCommandBroker(messageBroker)
+                .WithRequestBroker(messageBroker)
+                .WithMulticastRequestBroker(messageBroker)
+                .WithCompetingEventBroker(messageBroker)
+                .WithMulticastEventBroker(messageBroker);
             return configuration;
         }
 

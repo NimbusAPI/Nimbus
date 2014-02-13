@@ -27,11 +27,7 @@ namespace Pizza.Ordering
                                       .WithNames("Ordering", Environment.MachineName)
                                       .WithConnectionString(connectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(messageBroker)
-                                      .WithRequestBroker(messageBroker)
-                                      .WithMulticastEventBroker(messageBroker)
-                                      .WithCompetingEventBroker(messageBroker)
-                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithDefaultBroker(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .Build();
             bus.Start();
