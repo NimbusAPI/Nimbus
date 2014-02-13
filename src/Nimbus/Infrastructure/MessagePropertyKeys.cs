@@ -2,11 +2,14 @@
 {
     public static class MessagePropertyKeys
     {
-        public const string RequestTimeoutInMillisecondsKey = "RequestTimeoutInMilliseconds";
-        public const string RequestSuccessfulKey = "RequestSuccessful";
-        public const string ExceptionMessageKey = "ExceptionMessage";
-        public const string ExceptionTypeKey = "ExceptionType";
-        public const string ExceptionStackTraceKey = "ExceptionStackTrace";
+        public const string RequestTimeoutInMilliseconds = "RequestTimeoutInMilliseconds";
+        public const string RequestSuccessful = "RequestSuccessful";
+        public const string ExceptionMessage = "ExceptionMessage";
+        public const string ExceptionType = "ExceptionType";
+        public const string ExceptionStackTrace = "ExceptionStackTrace";
+        public const string ExceptionTimestamp = "ExceptionTimestamp";
+        public const string ExceptionMachineName = "ExceptionMachineName";
+        public const string ExceptionIdentityName = "ExceptionIdentityName";
         public const string MessageType = "MessageType";
     }
 }

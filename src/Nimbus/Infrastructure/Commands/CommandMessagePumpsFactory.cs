@@ -15,6 +15,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ICommandBroker _commandBroker;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -22,13 +23,15 @@ namespace Nimbus.Infrastructure.Commands
                                           CommandHandlerTypesSetting commandHandlerTypes,
                                           ICommandBroker commandBroker,
                                           DefaultBatchSizeSetting defaultBatchSize,
-                                          INimbusMessagingFactory messagingFactory)
+                                          INimbusMessagingFactory messagingFactory,
+                                          IClock clock)
         {
             _logger = logger;
             _commandHandlerTypes = commandHandlerTypes;
             _commandBroker = commandBroker;
             _defaultBatchSize = defaultBatchSize;
             _messagingFactory = messagingFactory;
+            _clock = clock;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -51,7 +54,7 @@ namespace Nimbus.Infrastructure.Commands
                 var dispatcher = new CommandMessageDispatcher(_commandBroker, commandType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

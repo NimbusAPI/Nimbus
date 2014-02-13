@@ -11,6 +11,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly IClock _clock;
         private readonly ResponseMessagePumpDispatcher _dispatcher;
         private readonly IQueueManager _queueManager;
 
@@ -20,12 +21,14 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             ResponseMessagePumpDispatcher dispatcher,
                                             ILogger logger,
                                             ReplyQueueNameSetting replyQueueName,
-                                            DefaultBatchSizeSetting defaultBatchSize)
+                                            DefaultBatchSizeSetting defaultBatchSize,
+                                            IClock clock)
         {
             _logger = logger;
             _queueManager = queueManager;
             _replyQueueName = replyQueueName;
             _defaultBatchSize = defaultBatchSize;
+            _clock = clock;
             _dispatcher = dispatcher;
         }
 
@@ -34,7 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName);
             _garbageMan.Add(receiver);
 
-            var pump = new MessagePump(receiver, _dispatcher, _logger, _defaultBatchSize);
+            var pump = new MessagePump(receiver, _dispatcher, _logger, _defaultBatchSize, _clock);
             _garbageMan.Add(pump);
 
             return pump;

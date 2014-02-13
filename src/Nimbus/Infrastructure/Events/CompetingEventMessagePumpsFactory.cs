@@ -17,6 +17,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ILogger _logger;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -25,7 +26,8 @@ namespace Nimbus.Infrastructure.Events
                                                  ICompetingEventBroker competingEventBroker,
                                                  ILogger logger,
                                                  DefaultBatchSizeSetting defaultBatchSize,
-                                                 INimbusMessagingFactory messagingFactory)
+                                                 INimbusMessagingFactory messagingFactory,
+                                                 IClock clock)
         {
             _applicationName = applicationName;
             _competingEventHandlerTypes = competingEventHandlerTypes;
@@ -33,6 +35,7 @@ namespace Nimbus.Infrastructure.Events
             _logger = logger;
             _defaultBatchSize = defaultBatchSize;
             _messagingFactory = messagingFactory;
+            _clock = clock;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -56,7 +59,7 @@ namespace Nimbus.Infrastructure.Events
                 var dispatcher = new CompetingEventMessageDispatcher(_competingEventBroker, eventType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize);
+                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

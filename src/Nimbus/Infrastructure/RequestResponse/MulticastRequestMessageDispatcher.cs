@@ -31,14 +31,14 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var busRequest = requestMessage.GetBody(_requestType);
 
-            var requestTimeoutInMilliseconds = (int) requestMessage.Properties[MessagePropertyKeys.RequestTimeoutInMillisecondsKey];
+            var requestTimeoutInMilliseconds = (int) requestMessage.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
             var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
 
             var responses = InvokeGenericHandleMethod(_multicastRequestBroker, busRequest, timeout);
             foreach (var response in responses)
             {
                 var responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
+                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
                 responseMessage.CorrelationId = requestMessage.CorrelationId;
                 await replyQueueClient.Send(responseMessage);
             }
