@@ -98,25 +98,17 @@
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
-    <Compile Include="InfrastructureContracts\IMulticastRequestBroker.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusMulticastRequestSender.cs" />
     <Compile Include="Extensions\HandlerTypesProviderExtensions.cs" />
     <Compile Include="Exceptions\BusConfigurationException.cs" />
     <Compile Include="Exceptions\RequestFailedException.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="InfrastructureContracts\IMulticastRequestSender.cs" />
-    <Compile Include="InfrastructureContracts\ICompetingEventBroker.cs" />
-    <Compile Include="InfrastructureContracts\IHandleCompetingEvent.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
-    <Compile Include="PoisonMessages\IDeadLetterQueue.cs" />
-    <Compile Include="PoisonMessages\IDeadLetterQueues.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />
     <Compile Include="Logger\NullLogger.cs" />
-    <Compile Include="InfrastructureContracts\ILogger.cs" />
-    <Compile Include="InfrastructureContracts\ITypeProvider.cs" />
     <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="Bus.cs" />
     <Compile Include="Configuration\BusBuilder.cs" />
@@ -127,17 +119,10 @@
     <Compile Include="Infrastructure\Events\BusEventSender.cs" />
     <Compile Include="Infrastructure\DefaultMessageBroker.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="IBus.cs" />
-    <Compile Include="InfrastructureContracts\ICommandBroker.cs" />
     <Compile Include="Infrastructure\Commands\ICommandSender.cs" />
-    <Compile Include="InfrastructureContracts\IMulticastEventBroker.cs" />
     <Compile Include="Infrastructure\Events\IEventSender.cs" />
-    <Compile Include="InfrastructureContracts\IHandleCommand.cs" />
-    <Compile Include="InfrastructureContracts\IHandleMulticastEvent.cs" />
-    <Compile Include="InfrastructureContracts\IHandleRequest.cs" />
     <Compile Include="Infrastructure\IMessagePump.cs" />
     <Compile Include="Infrastructure\IQueueManager.cs" />
-    <Compile Include="InfrastructureContracts\IRequestBroker.cs" />
     <Compile Include="Infrastructure\RequestResponse\IRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\RequestResponse\IRequestSender.cs" />
     <Compile Include="Infrastructure\ITopicClientFactory.cs" />
@@ -155,6 +140,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
+      <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
+      <Name>Nimbus.InfrastructureContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>

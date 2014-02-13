@@ -80,6 +80,10 @@
       <Project>{6b665505-3c52-49d3-914a-7c295af3f877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
+      <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
+      <Name>Nimbus.InfrastructureContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>

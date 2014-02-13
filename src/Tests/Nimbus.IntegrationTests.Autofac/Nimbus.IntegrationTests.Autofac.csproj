@@ -57,6 +57,10 @@
       <Project>{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}</Project>
       <Name>Nimbus.Autofac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
+      <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
+      <Name>Nimbus.InfrastructureContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
       <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
       <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>
