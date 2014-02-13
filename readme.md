@@ -29,11 +29,7 @@ If you're using a bus you should probably be using an IoC container. If you like
                                 .WithNames("MyTestSuite", Environment.MachineName)
                                 .WithConnectionString(CommonResources.ConnectionString)
                                 .WithTypesFrom(typeProvider)
-                                .WithCommandBroker(messageBroker)
-                                .WithRequestBroker(messageBroker)
-                                .WithMulticastEventBroker(messageBroker)
-                                .WithCompetingEventBroker(messageBroker)
-                                .WithMulticastRequestBroker(messageBroker)
+                                .WithDefaultBroker(messageBroker)
                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                 .Build();
     bus.Start();
