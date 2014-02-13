@@ -18,15 +18,17 @@ namespace Nimbus.Infrastructure
         private readonly IMessageDispatcher _dispatcher;
         private readonly ILogger _logger;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly IClock _clock;
 
         private Task _internalMessagePump;
 
-        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, DefaultBatchSizeSetting defaultBatchSize)
+        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, DefaultBatchSizeSetting defaultBatchSize, IClock clock)
         {
             _receiver = receiver;
             _dispatcher = dispatcher;
             _logger = logger;
             _defaultBatchSize = defaultBatchSize;
+            _clock = clock;
         }
 
         public async Task Start()
@@ -121,7 +123,7 @@ namespace Nimbus.Infrastructure
             _logger.Error(exception, "Message dispatch failed");
 
             _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
-            await message.AbandonAsync(exception.ExceptionDetailsAsProperties());
+            await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
             _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
         }
 

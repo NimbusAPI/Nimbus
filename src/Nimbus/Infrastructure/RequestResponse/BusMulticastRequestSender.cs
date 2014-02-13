@@ -44,7 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                               ReplyTo = _replyQueueName,
                           };
             message.Properties.Add(MessagePropertyKeys.MessageType, typeof (TRequest).FullName);
-            message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMillisecondsKey, (int) timeout.TotalMilliseconds);
+            message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMilliseconds, (int) timeout.TotalMilliseconds);
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(correlationId, expiresAfter);
 

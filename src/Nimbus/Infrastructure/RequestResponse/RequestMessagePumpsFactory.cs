@@ -17,6 +17,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly IRequestBroker _requestBroker;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -25,7 +26,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                           IQueueManager queueManager,
                                           DefaultBatchSizeSetting defaultBatchSize,
                                           IRequestBroker requestBroker,
-                                          INimbusMessagingFactory messagingFactory)
+                                          INimbusMessagingFactory messagingFactory,
+                                          IClock clock)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -33,6 +35,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _defaultBatchSize = defaultBatchSize;
             _requestBroker = requestBroker;
             _messagingFactory = messagingFactory;
+            _clock = clock;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -53,10 +56,10 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestBroker);
+                var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestBroker, _clock);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

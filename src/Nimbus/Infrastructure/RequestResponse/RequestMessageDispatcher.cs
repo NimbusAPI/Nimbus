@@ -14,12 +14,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly Type _messageType;
         private readonly IRequestBroker _requestBroker;
+        private readonly IClock _clock;
 
-        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker)
+        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker, IClock clock)
         {
             _messagingFactory = messagingFactory;
             _messageType = messageType;
             _requestBroker = requestBroker;
+            _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -34,14 +36,14 @@ namespace Nimbus.Infrastructure.RequestResponse
             {
                 var response = InvokeGenericHandleMethod(_requestBroker, request);
                 responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, true);
+                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
                 responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
             }
             catch (Exception exc)
             {
                 responseMessage = new BrokeredMessage();
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessfulKey, false);
-                foreach (var prop in exc.ExceptionDetailsAsProperties()) responseMessage.Properties.Add(prop.Key, prop.Value);
+                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, false);
+                foreach (var prop in exc.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
             }
 
             responseMessage.CorrelationId = message.CorrelationId;

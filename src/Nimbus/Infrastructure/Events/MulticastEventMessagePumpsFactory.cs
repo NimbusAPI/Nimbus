@@ -19,6 +19,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ILogger _logger;
         private readonly IMulticastEventBroker _multicastEventBroker;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -28,7 +29,8 @@ namespace Nimbus.Infrastructure.Events
                                                    MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
                                                    IMulticastEventBroker multicastEventBroker,
-                                                   DefaultBatchSizeSetting defaultBatchSize)
+                                                   DefaultBatchSizeSetting defaultBatchSize,
+                                                   IClock clock)
         {
             _queueManager = queueManager;
             _applicationName = applicationName;
@@ -37,6 +39,7 @@ namespace Nimbus.Infrastructure.Events
             _logger = logger;
             _multicastEventBroker = multicastEventBroker;
             _defaultBatchSize = defaultBatchSize;
+            _clock = clock;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -62,7 +65,7 @@ namespace Nimbus.Infrastructure.Events
                 var dispatcher = new MulticastEventMessageDispatcher(_multicastEventBroker, eventType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize);
+                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;
