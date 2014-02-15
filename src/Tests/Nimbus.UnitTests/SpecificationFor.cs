@@ -26,6 +26,11 @@ namespace Nimbus.UnitTests
             Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
         }
 
+        protected TimeSpan ElapsedTime
+        {
+            get { return _sw.Elapsed; }
+        }
+
         [TearDown]
         public virtual void TearDown()
         {

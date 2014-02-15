@@ -50,8 +50,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var sender = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(busRequest.GetType()));
             await sender.Send(message);
-            var response = responseCorrelationWrapper.WaitForResponses(timeout);
 
+            var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
             return response;
         }
 

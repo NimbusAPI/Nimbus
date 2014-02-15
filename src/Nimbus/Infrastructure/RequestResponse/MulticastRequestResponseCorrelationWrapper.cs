@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
+using System.Diagnostics;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class MulticastRequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper
+    internal class MulticastRequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper, IDisposable
     {
         private readonly DateTimeOffset _expiresAfter;
-        private readonly ConcurrentBag<TResponse> _responses = new ConcurrentBag<TResponse>();
+        private readonly BlockingCollection<TResponse> _responses = new BlockingCollection<TResponse>();
 
         public MulticastRequestResponseCorrelationWrapper(DateTimeOffset expiresAfter)
         {
@@ -35,11 +35,27 @@ namespace Nimbus.Infrastructure.RequestResponse
             // don't care.
         }
 
-        public IEnumerable<TResponse> WaitForResponses(TimeSpan timeout)
+        public IEnumerable<TResponse> ReturnResponsesOpportunistically(TimeSpan timeout)
         {
-            Thread.Sleep(timeout); // NOT for debugging - we actually just want to wait for however long we were told to
-            var snapshot = _responses.ToArray(); // in case anyone arrives after we've expired
-            return snapshot;
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < timeout)
+            {
+                var remainingTime = timeout - sw.Elapsed;
+                TResponse response;
+                if (_responses.TryTake(out response, remainingTime)) yield return response;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _responses.Dispose();
         }
     }
 }
