@@ -49,8 +49,10 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal void RemoveWrapper(Guid correlationId)
         {
-            IRequestResponseCorrelationWrapper dummy;
-            _requestWrappers.TryRemove(correlationId, out dummy);
+            IRequestResponseCorrelationWrapper wrapper;
+            _requestWrappers.TryRemove(correlationId, out wrapper);
+            var disposable = wrapper as IDisposable;
+            if (disposable != null) disposable.Dispose();
         }
 
         private void RecordMessageProcessed()

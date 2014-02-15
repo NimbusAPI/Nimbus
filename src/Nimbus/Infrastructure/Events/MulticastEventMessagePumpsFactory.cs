@@ -78,11 +78,6 @@ namespace Nimbus.Infrastructure.Events
             GC.SuppressFinalize(this);
         }
 
-        ~MulticastEventMessagePumpsFactory()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

@@ -77,11 +77,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             GC.SuppressFinalize(this);
         }
 
-        ~MulticastRequestMessagePumpsFactory()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

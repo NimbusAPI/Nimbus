@@ -24,11 +24,6 @@ namespace Nimbus.Configuration
             GC.SuppressFinalize(this);
         }
 
-        ~GarbageMan()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

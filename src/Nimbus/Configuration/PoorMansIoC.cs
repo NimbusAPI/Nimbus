@@ -108,11 +108,6 @@ namespace Nimbus.Configuration
             GC.SuppressFinalize(this);
         }
 
-        ~PoorMansIoC()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

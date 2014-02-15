@@ -76,11 +76,6 @@ namespace Nimbus.Infrastructure
             GC.SuppressFinalize(this);
         }
 
-        ~NimbusMessagingFactory()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

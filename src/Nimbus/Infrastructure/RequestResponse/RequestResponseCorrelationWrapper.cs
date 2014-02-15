@@ -4,7 +4,7 @@ using Nimbus.Exceptions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class RequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper
+    internal class RequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper, IDisposable
     {
         private readonly DateTimeOffset _expiresAfter;
         private readonly Semaphore _semaphore;
@@ -57,6 +57,19 @@ namespace Nimbus.Infrastructure.RequestResponse
             if (!_requestWasSuccessful) throw new RequestFailedException(_exceptionMessage, _exceptionStackTrace);
 
             return _response;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            _semaphore.Dispose();
         }
     }
 }

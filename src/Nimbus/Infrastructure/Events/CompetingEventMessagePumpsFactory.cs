@@ -72,11 +72,6 @@ namespace Nimbus.Infrastructure.Events
             GC.SuppressFinalize(this);
         }
 
-        ~CompetingEventMessagePumpsFactory()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

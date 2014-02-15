@@ -67,11 +67,6 @@ namespace Nimbus.Infrastructure.Commands
             GC.SuppressFinalize(this);
         }
 
-        ~CommandMessagePumpsFactory()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

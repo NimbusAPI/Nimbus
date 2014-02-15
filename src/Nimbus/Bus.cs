@@ -128,11 +128,6 @@ namespace Nimbus
             GC.SuppressFinalize(this);
         }
 
-        ~Bus()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
