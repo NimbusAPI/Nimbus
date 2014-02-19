@@ -218,7 +218,7 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager().CreateQueue(queueDescription);
             }
-            catch (MessagingEntityAlreadyExistsException exc)
+            catch (MessagingEntityAlreadyExistsException)
             {
             }
             catch (MessagingException exc)
