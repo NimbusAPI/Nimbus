@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
@@ -13,33 +10,43 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
-        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
-        private readonly Lazy<SubscriptionClient> _subscriptionClient;
+        private SubscriptionClient _subscriptionClient;
+        private readonly object _mutex = new object();
 
-        public NimbusSubscriptionMessageReceiver(IQueueManager queueManager, string topicPath, string subscriptionName, BatchReceiveTimeoutSetting batchReceiveTimeout)
+        public NimbusSubscriptionMessageReceiver(IQueueManager queueManager, string topicPath, string subscriptionName)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
-            _batchReceiveTimeout = batchReceiveTimeout;
-
-            _subscriptionClient = new Lazy<SubscriptionClient>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public Task WaitUntilReady()
+        public void Start(Func<BrokeredMessage, Task> callback)
         {
-            return Task.Run(() => { var dummy = _subscriptionClient.Value; });
+            lock (_mutex)
+            {
+                if (_subscriptionClient != null) throw new InvalidOperationException("Already started!");
+                _subscriptionClient = _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
+
+                _subscriptionClient.OnMessageAsync(callback,
+                                                   new OnMessageOptions
+                                                   {
+                                                       AutoComplete = false,
+                                                       MaxConcurrentCalls = 1, //FIXME need to expose this. Remove BatchSize in favour of MaxConcurrentRequests?
+                                                   });
+            }
         }
 
-        public Task<IEnumerable<BrokeredMessage>> Receive(int batchSize)
+        public void Stop()
         {
-            return _subscriptionClient.Value.ReceiveBatchAsync(batchSize, _batchReceiveTimeout);
-        }
+            lock (_mutex)
+            {
+                var subscriptionClient = _subscriptionClient;
+                if (subscriptionClient == null) return;
 
-        private SubscriptionClient CreateMessageReceiver()
-        {
-            return _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
+                subscriptionClient.Close();
+                _subscriptionClient = null;
+            }
         }
 
         public override string ToString()
@@ -49,8 +56,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public void Dispose()
         {
-            if (!_subscriptionClient.IsValueCreated) return;
-            _subscriptionClient.Value.Close();
+            Stop();
         }
     }
 }

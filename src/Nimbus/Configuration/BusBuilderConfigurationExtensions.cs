@@ -105,12 +105,6 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithBatchReceiveTimeout(this BusBuilderConfiguration configuration, TimeSpan batchReceiveTimeout)
-        {
-            configuration.BatchReceiveTimeout = new BatchReceiveTimeoutSetting {Value = batchReceiveTimeout};
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithMaxDeliveryAttempts(this BusBuilderConfiguration configuration, int maxDeliveryAttempts)
         {
             if (maxDeliveryAttempts < 1) throw new ArgumentOutOfRangeException("maxDeliveryAttempts", "You must attempt to deliver a message at least once.");

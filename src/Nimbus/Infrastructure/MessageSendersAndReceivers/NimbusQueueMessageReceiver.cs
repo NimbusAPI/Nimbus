@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -11,32 +8,42 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
-        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
-        private readonly Lazy<MessageReceiver> _messageReceiver;
+        private MessageReceiver _messageReceiver;
+        private readonly object _mutex = new object();
 
-        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, BatchReceiveTimeoutSetting batchReceiveTimeout)
+        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
-            _batchReceiveTimeout = batchReceiveTimeout;
-
-            _messageReceiver = new Lazy<MessageReceiver>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        private MessageReceiver CreateMessageReceiver()
+        public void Start(Func<BrokeredMessage, Task> callback)
         {
-            return _queueManager.CreateMessageReceiver(_queuePath);
+            lock (_mutex)
+            {
+                if (_messageReceiver != null) throw new InvalidOperationException("Already started!");
+
+                _messageReceiver = _queueManager.CreateMessageReceiver(_queuePath);
+                _messageReceiver.OnMessageAsync(callback,
+                                                new OnMessageOptions
+                                                {
+                                                    AutoComplete = false,
+                                                    MaxConcurrentCalls = 1, //FIXME need to expose this. Remove BatchSize in favour of MaxConcurrentRequests?
+                                                });
+            }
         }
 
-        public Task WaitUntilReady()
+        public void Stop()
         {
-            return Task.Run(() => { var dummy = _messageReceiver.Value; });
-        }
+            lock (_mutex)
+            {
+                var messageReceiver = _messageReceiver;
+                if (messageReceiver == null) return;
 
-        public Task<IEnumerable<BrokeredMessage>> Receive(int batchSize)
-        {
-            return _messageReceiver.Value.ReceiveBatchAsync(batchSize, _batchReceiveTimeout);
+                messageReceiver.Close();
+                _messageReceiver = null;
+            }
         }
 
         public override string ToString()
@@ -46,8 +53,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public void Dispose()
         {
-            if (!_messageReceiver.IsValueCreated) return;
-            _messageReceiver.Value.Close();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            Stop();
         }
     }
 }

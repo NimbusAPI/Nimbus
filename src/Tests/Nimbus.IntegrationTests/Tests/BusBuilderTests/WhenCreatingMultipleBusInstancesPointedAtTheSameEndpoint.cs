@@ -62,7 +62,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                              .WithCompetingEventBroker(messageBroker)
                                              .WithMulticastRequestBroker(messageBroker)
                                              .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                             .WithBatchReceiveTimeout(TimeSpan.FromSeconds(1))
                                              .WithLogger(logger)
                                              .WithDebugOptions(
                                                  dc =>

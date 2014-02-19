@@ -55,7 +55,6 @@
   <ItemGroup>
     <Compile Include="BackwardCompatibilityAdaptorExtensions.cs" />
     <Compile Include="BatchSendingExtensions.cs" />
-    <Compile Include="Configuration\Settings\BatchReceiveTimeoutSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />

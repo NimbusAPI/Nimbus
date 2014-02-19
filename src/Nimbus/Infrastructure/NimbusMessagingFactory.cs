@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
@@ -16,12 +15,10 @@ namespace Nimbus.Infrastructure
         private readonly ConcurrentDictionary<string, INimbusMessageSender> _topicMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
         private readonly ConcurrentDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ConcurrentDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
-        public NimbusMessagingFactory(IQueueManager queueManager, BatchReceiveTimeoutSetting batchReceiveTimeout)
+        public NimbusMessagingFactory(IQueueManager queueManager)
         {
             _queueManager = queueManager;
-            _batchReceiveTimeout = batchReceiveTimeout;
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -54,7 +51,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _batchReceiveTimeout);
+            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
             _garbageMan.Add(receiver);
             return receiver;
         }
@@ -68,7 +65,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _batchReceiveTimeout);
+            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
             _garbageMan.Add(receiver);
             return receiver;
         }
