@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -136,19 +135,10 @@ namespace Nimbus.Infrastructure
             }
             catch (MessagingException exc)
             {
-                if (exc.Message.Contains("SubCode=40901"))
-                {
-                    // SubCode=40901. Another conflicting operation is in progress. Ignore.
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                if (!exc.Message.Contains("SubCode=40901")) throw;
 
-            if (!_namespaceManager().TopicExists(topicPath))
-            {
-                throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
+                if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
             }
 
             _knownTopics.Value.Add(topicPath);
@@ -179,13 +169,13 @@ namespace Nimbus.Infrastructure
             catch (MessagingEntityAlreadyExistsException)
             {
             }
-            catch (MessagingException)
+            catch (MessagingException exc)
             {
-            }
+                if (!exc.Message.Contains("SubCode=40901")) throw;
 
-            if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
-            {
-                throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
+                if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
+                    throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
             }
 
             _knownSubscriptions.Value.Add(subscriptionKey);
@@ -228,24 +218,15 @@ namespace Nimbus.Infrastructure
             {
                 _namespaceManager().CreateQueue(queueDescription);
             }
-            catch (MessagingEntityAlreadyExistsException)
+            catch (MessagingEntityAlreadyExistsException exc)
             {
             }
             catch (MessagingException exc)
             {
-                if (exc.Message.Contains("SubCode=40901"))
-                {
-                    // SubCode=40901. Another conflicting operation is in progress. Ignore.
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                if (!exc.Message.Contains("SubCode=40901")) throw;
 
-            if (!_namespaceManager().QueueExists(queuePath))
-            {
-                throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
+                if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
             }
 
             _knownQueues.Value.Add(queuePath);
