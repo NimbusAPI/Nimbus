@@ -1,4 +1,4 @@
-﻿namespace Nimbus.UnitTests.InfrastructureTests
+﻿namespace Nimbus.UnitTests.InfrastructureTests.MessageContracts
 {
     public class MyCommand<T>
     {
