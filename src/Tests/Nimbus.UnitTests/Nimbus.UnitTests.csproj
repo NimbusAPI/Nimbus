@@ -95,6 +95,10 @@
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
+    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\FirstFooEventHandler.cs" />
+    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\SecondFooEventHandler.cs" />
+    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\MessageContracts\FooEvent.cs" />
+    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\WhenDispatchingASingleMulticastEvent.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\AutofacCommandBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\DefaultMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
