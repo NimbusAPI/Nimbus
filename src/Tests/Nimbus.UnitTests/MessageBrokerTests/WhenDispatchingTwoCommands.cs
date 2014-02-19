@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Nimbus.Infrastructure;
+﻿using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
 using Nimbus.UnitTests.MessageBrokerTests.Handlers;
 using Nimbus.UnitTests.MessageBrokerTests.MessageContracts;
@@ -8,25 +7,23 @@ using NUnit.Framework;
 namespace Nimbus.UnitTests.MessageBrokerTests
 {
     [TestFixture]
-    public class WhenDispatchingTwoCommands : SpecificationFor<ICommandBroker>
+    public class WhenDispatchingTwoCommands : TestForAll<ICommandBroker>
     {
         private BrokerTestCommand _command;
 
-        public override ICommandBroker Given()
-        {
-            var typeProvider = new TestHarnessTypeProvider(new[] {Assembly.GetExecutingAssembly()}, new[] {GetType().Namespace});
-            return new DefaultMessageBroker(typeProvider);
-        }
-
-        public override void When()
+        protected override async Task When()
         {
             _command = new BrokerTestCommand();
             Subject.Dispatch(_command);
         }
 
         [Test]
-        public void ItShouldBeDispatchedToTheCorrectHandler()
+        [TestCaseSource("TestCases")]
+        public async Task ItShouldBeDispatchedToTheCorrectHandler(AllSubjectsTestContext context)
         {
+            await Given(context);
+            await When();
+
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(_command));
         }
     }

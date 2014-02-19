@@ -30,6 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>..\..\packages\Castle.Core.3.2.2\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.3.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
@@ -85,9 +95,14 @@
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
+    <Compile Include="MessageBrokerTests\AutofacCommandBrokerFactory.cs" />
+    <Compile Include="MessageBrokerTests\DefaultMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
+    <Compile Include="MessageBrokerTests\ICreateMessageBroker.cs" />
     <Compile Include="MessageBrokerTests\MessageContracts\BrokerTestCommand.cs" />
+    <Compile Include="MessageBrokerTests\TestForAll.cs" />
     <Compile Include="MessageBrokerTests\WhenDispatchingTwoCommands.cs" />
+    <Compile Include="MessageBrokerTests\WindsorCommandBrokerFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingASingleResponse.cs" />
