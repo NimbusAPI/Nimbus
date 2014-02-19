@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.UnitTests.MessageBrokerTests
+namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
 {
     public class DefaultMessageBrokerFactory : ICreateMessageBroker<ICommandBroker>
     {

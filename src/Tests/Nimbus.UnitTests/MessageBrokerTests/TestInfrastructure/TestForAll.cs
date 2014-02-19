@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.MessageBrokerTests
+namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
 {
     public abstract class TestForAll<TSubject>
     {

@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
-using Nimbus.UnitTests.MessageBrokerTests.Handlers;
-using Nimbus.UnitTests.MessageBrokerTests.MessageContracts;
+using Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests.Handlers;
+using Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests.MessageContracts;
+using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.MessageBrokerTests
+namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests
 {
     [TestFixture]
     public class WhenDispatchingTwoCommands : TestForAll<ICommandBroker>
