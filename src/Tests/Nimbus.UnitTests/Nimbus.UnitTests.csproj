@@ -85,6 +85,10 @@
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
+    <Compile Include="MessageBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
+    <Compile Include="MessageBrokerTests\MessageContracts\BrokerTestCommand.cs" />
+    <Compile Include="MessageBrokerTests\WhenDispatchingTwoCommands.cs" />
+    <Compile Include="MethodCallCounter.cs" />
     <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingASingleResponse.cs" />
     <Compile Include="MulticastRequestResponseTests\GivenAWrapperWithTwoResponses.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="TaskExtensionTests\GivenOneTaskThatSucceedsAndOneTaskThatThrows.cs" />
     <Compile Include="TaskExtensionTests\GivenThreeTasksOfVaryingDuration.cs" />
     <Compile Include="TaskExtensionTests\GivenThreeCompletedTasks.cs" />
+    <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
     <Compile Include="WhenExtractingAHandlerMethodForARequest.cs" />
@@ -136,9 +141,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MessageBrokerTests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

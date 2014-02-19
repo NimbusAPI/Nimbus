@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Nimbus.Extensions;
+using Nimbus.IntegrationTests.Extensions;
 using NUnit.Framework;
 using Shouldly;
 

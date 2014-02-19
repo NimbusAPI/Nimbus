@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Nimbus.Infrastructure;
-using Nimbus.IntegrationTests.Autofac;
 using Nimbus.IntegrationTests.InfrastructureContracts;
-using Nimbus.IntegrationTests.Windsor;
 
 namespace Nimbus.IntegrationTests
 {
@@ -23,8 +21,6 @@ namespace Nimbus.IntegrationTests
             var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
 
             yield return new DefaultBusFactory(typeProvider);
-            yield return new AutofacBusFactory(typeProvider, CommonResources.ConnectionString);
-            yield return new WindsorBusFactory(typeProvider, CommonResources.ConnectionString);
         }
 
         public class DefaultBusFactory : ITestHarnessBusFactory

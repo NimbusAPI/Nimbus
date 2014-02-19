@@ -60,7 +60,6 @@
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="GivenADefaultNimbusRegistrationWithWindsor.cs" />
     <Compile Include="ThenAttribute.cs" />
-    <Compile Include="WindsorBusFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

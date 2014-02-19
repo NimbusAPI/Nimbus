@@ -31,18 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Autofac.3.2.0\lib\net40\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Castle.Core.3.2.2\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor, Version=3.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -61,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonResources.cs" />
+    <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
@@ -139,10 +128,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nimbus.IntegrationTests.Autofac\Nimbus.IntegrationTests.Autofac.csproj">
-      <Project>{ebeb2241-1c54-43ef-b88e-dac0ed8b7f1b}</Project>
-      <Name>Nimbus.IntegrationTests.Autofac</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
       <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
       <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>
@@ -154,10 +139,6 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.IntegrationTests.Windsor\Nimbus.IntegrationTests.Windsor.csproj">
-      <Project>{1f1ce629-7ffe-48a7-b114-a218ff21129a}</Project>
-      <Name>Nimbus.IntegrationTests.Windsor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
