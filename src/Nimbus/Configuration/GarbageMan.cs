@@ -33,7 +33,14 @@ namespace Nimbus.Configuration
             {
                 Trace.WriteLine("Disposing {0} ({1})".FormatWith(component.GetType().FullName, component.ToString()), "Nimbus.GarbageMan");
 
-                component.Dispose();
+                try
+                {
+                    component.Dispose();
+                }
+                catch (Exception exc)
+                {
+                    Trace.TraceError(exc.ToString());
+                }
             }
         }
     }
