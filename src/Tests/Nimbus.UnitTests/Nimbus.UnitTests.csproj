@@ -99,7 +99,7 @@
     <Compile Include="MessageBrokerTests\TestInfrastructure\DefaultMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\ICreateMessageBroker.cs" />
-    <Compile Include="MessageBrokerTests\CommandBrokerTests\MessageContracts\BrokerTestCommand.cs" />
+    <Compile Include="MessageBrokerTests\CommandBrokerTests\MessageContracts\FooCommand.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\TestForAll.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\WhenDispatchingTwoCommands.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\WindsorCommandBrokerFactory.cs" />

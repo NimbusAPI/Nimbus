@@ -3,9 +3,9 @@ using Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests.MessageContracts;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests.Handlers
 {
-    public class BrokerTestCommandHandler : IHandleCommand<BrokerTestCommand>
+    public class BrokerTestCommandHandler : IHandleCommand<FooCommand>
     {
-        public void Handle(BrokerTestCommand busCommand)
+        public void Handle(FooCommand busCommand)
         {
             MethodCallCounter.RecordCall<BrokerTestCommandHandler>(h => h.Handle(busCommand));
         }

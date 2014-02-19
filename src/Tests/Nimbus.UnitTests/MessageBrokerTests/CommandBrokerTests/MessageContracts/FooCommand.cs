@@ -2,7 +2,7 @@
 
 namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests.MessageContracts
 {
-    public class BrokerTestCommand : IBusCommand
+    public class FooCommand : IBusCommand
     {
     }
 }
