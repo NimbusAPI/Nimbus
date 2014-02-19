@@ -14,6 +14,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
         private readonly ResponseMessagePumpDispatcher _dispatcher;
         private readonly IQueueManager _queueManager;
+        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -22,19 +23,21 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             ILogger logger,
                                             ReplyQueueNameSetting replyQueueName,
                                             DefaultBatchSizeSetting defaultBatchSize,
-                                            IClock clock)
+                                            IClock clock,
+                                            BatchReceiveTimeoutSetting batchReceiveTimeout)
         {
             _logger = logger;
             _queueManager = queueManager;
             _replyQueueName = replyQueueName;
             _defaultBatchSize = defaultBatchSize;
             _clock = clock;
+            _batchReceiveTimeout = batchReceiveTimeout;
             _dispatcher = dispatcher;
         }
 
         public IMessagePump Create()
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName);
+            var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _batchReceiveTimeout);
             _garbageMan.Add(receiver);
 
             var pump = new MessagePump(receiver, _dispatcher, _logger, _defaultBatchSize, _clock);

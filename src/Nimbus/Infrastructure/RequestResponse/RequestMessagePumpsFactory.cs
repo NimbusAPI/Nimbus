@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
@@ -27,7 +28,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                           DefaultBatchSizeSetting defaultBatchSize,
                                           IRequestBroker requestBroker,
                                           INimbusMessagingFactory messagingFactory,
-                                          IClock clock)
+                                          IClock clock,
+                                          BatchReceiveTimeoutSetting batchReceiveTimeout)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -36,6 +38,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _requestBroker = requestBroker;
             _messagingFactory = messagingFactory;
             _clock = clock;
+            _batchReceiveTimeout = batchReceiveTimeout;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -53,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 _logger.Debug("Creating message pump for request type {0}", requestType.Name);
 
                 var queuePath = PathFactory.QueuePathFor(requestType);
-                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
+                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _batchReceiveTimeout);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestBroker, _clock);

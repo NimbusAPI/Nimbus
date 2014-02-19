@@ -25,6 +25,7 @@ namespace Nimbus.Configuration
         internal CompetingEventHandlerTypesSetting CompetingEventHandlerTypes { get; set; }
         internal EventTypesSetting EventTypes { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
+        internal BatchReceiveTimeoutSetting BatchReceiveTimeout { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
         internal DefaultBatchSizeSetting DefaultBatchSize { get; set; }
         internal ILogger Logger { get; set; }

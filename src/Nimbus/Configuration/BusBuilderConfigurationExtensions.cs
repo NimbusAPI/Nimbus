@@ -71,7 +71,7 @@ namespace Nimbus.Configuration
         }
 
         public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration,
-            DefaultMessageBroker messageBroker)
+                                                                DefaultMessageBroker messageBroker)
         {
             configuration
                 .WithCommandBroker(messageBroker)
@@ -102,6 +102,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
             configuration.DefaultTimeout = new DefaultTimeoutSetting {Value = defaultTimeout};
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithBatchReceiveTimeout(this BusBuilderConfiguration configuration, TimeSpan batchReceiveTimeout)
+        {
+            configuration.BatchReceiveTimeout = new BatchReceiveTimeoutSetting {Value = batchReceiveTimeout};
             return configuration;
         }
 

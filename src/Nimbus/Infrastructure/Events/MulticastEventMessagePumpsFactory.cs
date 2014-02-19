@@ -22,6 +22,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
         internal MulticastEventMessagePumpsFactory(IQueueManager queueManager,
                                                    ApplicationNameSetting applicationName,
@@ -30,7 +31,8 @@ namespace Nimbus.Infrastructure.Events
                                                    ILogger logger,
                                                    IMulticastEventBroker multicastEventBroker,
                                                    DefaultBatchSizeSetting defaultBatchSize,
-                                                   IClock clock)
+                                                   IClock clock,
+                                                   BatchReceiveTimeoutSetting batchReceiveTimeout)
         {
             _queueManager = queueManager;
             _applicationName = applicationName;
@@ -40,6 +42,7 @@ namespace Nimbus.Infrastructure.Events
             _multicastEventBroker = multicastEventBroker;
             _defaultBatchSize = defaultBatchSize;
             _clock = clock;
+            _batchReceiveTimeout = batchReceiveTimeout;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -59,7 +62,7 @@ namespace Nimbus.Infrastructure.Events
 
                 var topicPath = PathFactory.TopicPathFor(eventType);
                 var subscriptionName = String.Format("{0}.{1}", _applicationName, _instanceName);
-                var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
+                var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _batchReceiveTimeout);
                 _garbageMan.Add(receiver);
 
                 var dispatcher = new MulticastEventMessageDispatcher(_multicastEventBroker, eventType);

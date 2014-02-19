@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -10,13 +11,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
+        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
         private readonly Lazy<MessageReceiver> _messageReceiver;
 
-        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath)
+        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, BatchReceiveTimeoutSetting batchReceiveTimeout)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _batchReceiveTimeout = batchReceiveTimeout;
 
             _messageReceiver = new Lazy<MessageReceiver>(CreateMessageReceiver, LazyThreadSafetyMode.PublicationOnly);
         }
@@ -33,7 +36,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public Task<IEnumerable<BrokeredMessage>> Receive(int batchSize)
         {
-            return _messageReceiver.Value.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(1));
+            return _messageReceiver.Value.ReceiveBatchAsync(batchSize, _batchReceiveTimeout);
         }
 
         public override string ToString()

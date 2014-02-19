@@ -21,6 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly BatchReceiveTimeoutSetting _batchReceiveTimeout;
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
                                                    RequestHandlerTypesSetting requestHandlerTypes,
@@ -29,7 +30,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    IMulticastRequestBroker multicastRequestBroker,
                                                    DefaultBatchSizeSetting defaultBatchSize,
                                                    INimbusMessagingFactory messagingFactory,
-                                                   IClock clock)
+                                                   IClock clock,
+                                                   BatchReceiveTimeoutSetting batchReceiveTimeout)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -39,6 +41,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _defaultBatchSize = defaultBatchSize;
             _messagingFactory = messagingFactory;
             _clock = clock;
+            _batchReceiveTimeout = batchReceiveTimeout;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -58,7 +61,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
 
-                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
+                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _batchReceiveTimeout);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);

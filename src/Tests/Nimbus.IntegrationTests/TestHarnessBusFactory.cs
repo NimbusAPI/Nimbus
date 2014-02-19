@@ -23,6 +23,7 @@ namespace Nimbus.IntegrationTests
                                       .WithCompetingEventBroker(messageBroker)
                                       .WithMulticastRequestBroker(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithBatchReceiveTimeout(TimeSpan.FromSeconds(1)) // short loop so that bus teardown is fast for tests
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
