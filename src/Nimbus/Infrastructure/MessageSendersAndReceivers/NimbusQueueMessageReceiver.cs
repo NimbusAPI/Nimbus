@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                 new OnMessageOptions
                                                 {
                                                     AutoComplete = false,
-                                                    MaxConcurrentCalls = 1, //FIXME need to expose this. Remove BatchSize in favour of MaxConcurrentRequests?
+                                                    MaxConcurrentCalls = Environment.ProcessorCount,
                                                 });
             }
         }
