@@ -1,18 +1,19 @@
 using System.Threading.Tasks;
-using Castle.Windsor;
+using Autofac;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
+namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
-    public class WindsorCommandBrokerFactory : ICreateMessageBroker<ICommandBroker>
+    public class AutofacCommandBrokerFactory : ICreateMessageBroker<ICommandBroker>
     {
-        private IWindsorContainer _container;
+        private IContainer _container;
 
         public async Task<ICommandBroker> Create(ITypeProvider typeProvider)
         {
-            _container = new WindsorContainer();
-            _container.RegisterNimbus(typeProvider);
+            var builder = new ContainerBuilder();
+            builder.RegisterNimbus(typeProvider);
+            _container = builder.Build();
 
             return _container.Resolve<ICommandBroker>();
         }

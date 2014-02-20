@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
+using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories;
 using NUnit.Framework;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
