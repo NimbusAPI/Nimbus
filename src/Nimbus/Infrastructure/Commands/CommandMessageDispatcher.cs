@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.Commands
 
             using (var handler = GetHandler((dynamic)busCommand))
             {
-                await handler.Value.Handle(busCommand);
+                await handler.Component.Handle((dynamic)busCommand);
             }
         }
 
