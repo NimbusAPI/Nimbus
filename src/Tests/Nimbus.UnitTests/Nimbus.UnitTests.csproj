@@ -80,6 +80,7 @@
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllSettingsClasses.cs" />
+    <Compile Include="Conventions\TheBusInterface.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="InfrastructureTests\MyCommand.cs" />
