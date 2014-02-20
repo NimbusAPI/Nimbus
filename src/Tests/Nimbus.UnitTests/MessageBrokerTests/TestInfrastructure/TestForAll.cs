@@ -43,9 +43,9 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
 
             return AssembliesToScan
                 .SelectMany(a => a.GetExportedTypes())
-                .Where(t => typeof (ICreateMessageBroker<TSubject>).IsAssignableFrom(t))
+                .Where(t => typeof (ICreateMessageHandlerFactory<TSubject>).IsAssignableFrom(t))
                 .Select(Activator.CreateInstance)
-                .Cast<ICreateMessageBroker<TSubject>>()
+                .Cast<ICreateMessageHandlerFactory<TSubject>>()
                 .Select(factory => new AllSubjectsTestContext(factory, typeProvider))
                 .Select(context => new TestCaseData(context).SetName(context.TestName))
                 ;
@@ -53,10 +53,10 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure
 
         public class AllSubjectsTestContext
         {
-            private readonly ICreateMessageBroker<TSubject> _factory;
+            private readonly ICreateMessageHandlerFactory<TSubject> _factory;
             private readonly ITypeProvider _typeProvider;
 
-            public AllSubjectsTestContext(ICreateMessageBroker<TSubject> factory, ITypeProvider typeProvider)
+            public AllSubjectsTestContext(ICreateMessageHandlerFactory<TSubject> factory, ITypeProvider typeProvider)
             {
                 _factory = factory;
                 _typeProvider = typeProvider;

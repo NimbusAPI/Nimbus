@@ -1,4 +1,5 @@
-﻿using Nimbus.InfrastructureContracts;
+﻿using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
 using Pizza.Ordering.Messages;
 
 namespace Pizza.WaitTimeService.Handlers
@@ -12,7 +13,7 @@ namespace Pizza.WaitTimeService.Handlers
             _waitTimeCounter = waitTimeCounter;
         }
 
-        public HowLongDoPizzasTakeResponse Handle(HowLongDoPizzasTakeRequest request)
+        public async Task<HowLongDoPizzasTakeResponse> Handle(HowLongDoPizzasTakeRequest request)
         {
             var currentAverage = _waitTimeCounter.GetAveragePizzaTimes();
 

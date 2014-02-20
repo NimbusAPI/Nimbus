@@ -52,9 +52,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithCommandBroker(this BusBuilderConfiguration configuration, ICommandBroker commandBroker)
+        public static BusBuilderConfiguration WithCommandHandlerFactory(this BusBuilderConfiguration configuration, ICommandHandlerFactory commandHandlerFactory)
         {
-            configuration.CommandBroker = commandBroker;
+            configuration.CommandHandlerFactory = commandHandlerFactory;
             return configuration;
         }
 
@@ -71,14 +71,14 @@ namespace Nimbus.Configuration
         }
 
         public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration,
-                                                                DefaultMessageBroker messageBroker)
+                                                                DefaultMessageHandlerFactory messageHandlerFactory)
         {
             configuration
-                .WithCommandBroker(messageBroker)
-                .WithRequestBroker(messageBroker)
-                .WithMulticastRequestBroker(messageBroker)
-                .WithCompetingEventBroker(messageBroker)
-                .WithMulticastEventBroker(messageBroker);
+                .WithCommandHandlerFactory(messageHandlerFactory)
+                .WithRequestBroker(messageHandlerFactory)
+                .WithMulticastRequestBroker(messageHandlerFactory)
+                .WithCompetingEventBroker(messageHandlerFactory)
+                .WithMulticastEventBroker(messageHandlerFactory);
             return configuration;
         }
 

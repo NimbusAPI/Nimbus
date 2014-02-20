@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
 using Pizza.Maker.Messages;
 
@@ -13,14 +14,14 @@ namespace Pizza.WaitTimeService.Handlers
             _waitTimeCounter = waitTimeCounter;
         }
 
-        public void Handle(NewOrderRecieved busEvent)
+        public async Task Handle(NewOrderRecieved busEvent)
         {
             Console.WriteLine("I heard about a new order");
 
             _waitTimeCounter.RecordNewPizzaOrder(busEvent.CustomerName);
         }
 
-        public void Handle(PizzaIsReady busEvent)
+        public async Task Handle(PizzaIsReady busEvent)
         {
             Console.WriteLine("I heard about a complete order");
 

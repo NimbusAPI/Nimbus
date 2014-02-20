@@ -17,7 +17,7 @@ namespace Nimbus.Configuration
                 Classes.From(typeProvider.AllHandlerTypes()).Pick().WithServiceAllInterfaces().LifestyleScoped(),
                 Component.For<IMulticastEventBroker>().ImplementedBy<WindsorMulticastEventBroker>().LifestyleSingleton(),
                 Component.For<ICompetingEventBroker>().ImplementedBy<WindsorCompetingEventBroker>().LifestyleSingleton(),
-                Component.For<ICommandBroker>().ImplementedBy<WindsorCommandBroker>().LifestyleSingleton(),
+                Component.For<ICommandHandlerFactory>().ImplementedBy<WindsorCommandHandlerFactory>().LifestyleSingleton(),
                 Component.For<IRequestBroker>().ImplementedBy<WindsorRequestBroker>().LifestyleSingleton(),
                 Component.For<IMulticastRequestBroker>().ImplementedBy<WindsorMulticastRequestBroker>().LifestyleSingleton()
                 );

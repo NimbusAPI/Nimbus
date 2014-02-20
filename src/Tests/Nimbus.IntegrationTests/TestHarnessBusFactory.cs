@@ -9,7 +9,7 @@ namespace Nimbus.IntegrationTests
 {
     public static class TestHarnessBusFactory
     {
-        public static Bus CreateAndStart(ITypeProvider typeProvider, DefaultMessageBroker messageBroker)
+        public static Bus CreateAndStart(ITypeProvider typeProvider, DefaultMessageHandlerFactory messageHandlerFactory)
         {
             var logger = new ConsoleLogger();
 
@@ -17,11 +17,11 @@ namespace Nimbus.IntegrationTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(messageBroker)
-                                      .WithRequestBroker(messageBroker)
-                                      .WithMulticastEventBroker(messageBroker)
-                                      .WithCompetingEventBroker(messageBroker)
-                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithCommandHandlerFactory(messageHandlerFactory)
+                                      .WithRequestBroker(messageHandlerFactory)
+                                      .WithMulticastEventBroker(messageHandlerFactory)
+                                      .WithCompetingEventBroker(messageHandlerFactory)
+                                      .WithMulticastRequestBroker(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(

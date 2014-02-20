@@ -12,7 +12,7 @@ namespace Nimbus.Configuration
             return configuration
                 .WithMulticastEventBroker(container.Resolve<IMulticastEventBroker>())
                 .WithCompetingEventBroker(container.Resolve<ICompetingEventBroker>())
-                .WithCommandBroker(container.Resolve<ICommandBroker>())
+                .WithCommandHandlerFactory(container.Resolve<ICommandHandlerFactory>())
                 .WithRequestBroker(container.Resolve<IRequestBroker>())
                 .WithMulticastRequestBroker(container.Resolve<IMulticastRequestBroker>())
                 .WithLogger(container.Resolve<ILogger>());

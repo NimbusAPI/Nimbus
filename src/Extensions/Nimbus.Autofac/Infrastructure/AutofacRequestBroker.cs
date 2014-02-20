@@ -24,7 +24,7 @@ namespace Nimbus.Autofac.Infrastructure
                 var handler = (IHandleRequest<TBusRequest, TBusResponse>) scope.Resolve(type);
                 var response = handler.Handle(request);
 
-                return response;
+                return response.Result;
             }
         }
     }

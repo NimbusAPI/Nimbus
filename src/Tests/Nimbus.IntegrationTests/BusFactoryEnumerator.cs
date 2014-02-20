@@ -39,7 +39,7 @@ namespace Nimbus.IntegrationTests
 
             public IBus Create()
             {
-                var messageBroker = new DefaultMessageBroker(_typeProvider);
+                var messageBroker = new DefaultMessageHandlerFactory(_typeProvider);
 
                 var bus = TestHarnessBusFactory.CreateAndStart(_typeProvider, messageBroker);
                 return bus;

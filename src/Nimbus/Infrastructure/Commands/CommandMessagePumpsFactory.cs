@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly ILogger _logger;
         private readonly CommandHandlerTypesSetting _commandHandlerTypes;
-        private readonly ICommandBroker _commandBroker;
+        private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
@@ -21,14 +21,14 @@ namespace Nimbus.Infrastructure.Commands
 
         public CommandMessagePumpsFactory(ILogger logger,
                                           CommandHandlerTypesSetting commandHandlerTypes,
-                                          ICommandBroker commandBroker,
+                                          ICommandHandlerFactory commandHandlerFactory,
                                           DefaultBatchSizeSetting defaultBatchSize,
                                           INimbusMessagingFactory messagingFactory,
                                           IClock clock)
         {
             _logger = logger;
             _commandHandlerTypes = commandHandlerTypes;
-            _commandBroker = commandBroker;
+            _commandHandlerFactory = commandHandlerFactory;
             _defaultBatchSize = defaultBatchSize;
             _messagingFactory = messagingFactory;
             _clock = clock;
@@ -51,7 +51,7 @@ namespace Nimbus.Infrastructure.Commands
                 var queuePath = PathFactory.QueuePathFor(commandType);
                 var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                var dispatcher = new CommandMessageDispatcher(_commandBroker, commandType);
+                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, commandType);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);

@@ -1,4 +1,5 @@
-﻿using Nimbus.InfrastructureContracts;
+﻿using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
@@ -20,35 +21,35 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
                                  IHandleCommand<BazCommand>,
                                  IHandleCommand<QuxCommand>
     {
-        public void Handle(FooEvent busEvent)
+        public async Task Handle(FooEvent busEvent)
         {
         }
 
-        public void Handle(BarEvent busEvent)
+        public async Task Handle(BarEvent busEvent)
         {
         }
 
-        public void Handle(BazEvent busEvent)
+        public async Task Handle(BazEvent busEvent)
         {
         }
 
-        public void Handle(QuxEvent busEvent)
+        public async Task Handle(QuxEvent busEvent)
         {
         }
 
-        public void Handle(FooCommand busCommand)
+        public async Task Handle(FooCommand busCommand)
         {
         }
 
-        public void Handle(BarCommand busCommand)
+        public async Task Handle(BarCommand busCommand)
         {
         }
 
-        public void Handle(BazCommand busCommand)
+        public async Task Handle(BazCommand busCommand)
         {
         }
 
-        public void Handle(QuxCommand busCommand)
+        public async Task Handle(QuxCommand busCommand)
         {
         }
     }

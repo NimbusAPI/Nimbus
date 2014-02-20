@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
@@ -43,7 +44,7 @@ namespace Nimbus.UnitTests.ConfigurationTests
 
         public class MyCommandHandler : IHandleCommand<MyCommand>
         {
-            public void Handle(MyCommand busCommand)
+            public async Task Handle(MyCommand busCommand)
             {
                 throw new NotImplementedException();
             }

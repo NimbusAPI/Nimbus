@@ -35,7 +35,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(_typeProvider)
-                                      .WithCommandBroker(_broker)
+                                      .WithCommandHandlerFactory(_broker)
                                       .WithRequestBroker(_broker)
                                       .WithMulticastRequestBroker(_broker)
                                       .WithMulticastEventBroker(_broker)

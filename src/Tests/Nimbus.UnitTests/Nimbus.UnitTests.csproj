@@ -116,7 +116,7 @@
     <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\AutofacMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\DefaultMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
-    <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\ICreateMessageBroker.cs" />
+    <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\ICreateMessageHandlerFactory.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\MessageContracts\FooCommand.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\TestForAll.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\WhenDispatchingTwoCommands.cs" />

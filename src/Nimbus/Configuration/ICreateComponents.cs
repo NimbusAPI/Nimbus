@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration
 {
-    public interface ICreateComponents: IDisposable
+    public interface ICreateComponents : IDisposable
     {
     }
 }

@@ -9,7 +9,7 @@ namespace PingPong.Windsor
 {
     public class Ponger : IHandleRequest<Ping, Pong>
     {
-        public Pong Handle(Ping request)
+        public async Task<Pong> Handle(Ping request)
         {
             return new Pong { Message = request.Message };
         }

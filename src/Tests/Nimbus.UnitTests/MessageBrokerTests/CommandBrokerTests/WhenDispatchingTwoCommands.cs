@@ -10,7 +10,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests
 {
     [TestFixture]
-    public class WhenDispatchingTwoCommands : TestForAll<ICommandBroker>
+    public class WhenDispatchingTwoCommands : TestForAll<ICommandHandlerFactory>
     {
         private FooCommand _command1;
         private FooCommand _command2;
@@ -20,8 +20,12 @@ namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests
             _command1 = new FooCommand();
             _command2 = new FooCommand();
 
-            Subject.Dispatch(_command1);
-            Subject.Dispatch(_command2);
+            using (var handler = Subject.GetHandler<FooCommand>())
+            {
+                await Task.WhenAll(handler.Component.Handle(_command1),
+                                   handler.Component.Handle(_command2)
+                    );
+            }
         }
 
         [Test]

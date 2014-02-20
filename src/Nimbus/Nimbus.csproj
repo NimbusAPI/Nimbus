@@ -122,7 +122,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\Commands\BusCommandSender.cs" />
     <Compile Include="Infrastructure\Events\BusEventSender.cs" />
-    <Compile Include="Infrastructure\DefaultMessageBroker.cs" />
+    <Compile Include="Infrastructure\DefaultMessageHandlerFactory.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Infrastructure\Commands\ICommandSender.cs" />
     <Compile Include="Infrastructure\Events\IEventSender.cs" />

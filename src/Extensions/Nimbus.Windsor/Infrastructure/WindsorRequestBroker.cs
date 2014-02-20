@@ -23,7 +23,7 @@ namespace Nimbus.Windsor.Infrastructure
                 var handler = (IHandleRequest<TBusRequest, TBusResponse>) _container.Resolve(type);
                 var response = handler.Handle(request);
 
-                return response;
+                return response.Result;
             }
         }
     }

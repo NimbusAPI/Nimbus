@@ -11,7 +11,7 @@ namespace Nimbus.Configuration
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
         internal ConnectionStringSetting ConnectionString { get; set; }
-        internal ICommandBroker CommandBroker { get; set; }
+        internal ICommandHandlerFactory CommandHandlerFactory { get; set; }
         internal IRequestBroker RequestBroker { get; set; }
         internal IMulticastRequestBroker MulticastRequestBroker { get; set; }
         internal IMulticastEventBroker MulticastEventBroker { get; set; }

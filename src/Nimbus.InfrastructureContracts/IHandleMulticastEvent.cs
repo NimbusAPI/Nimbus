@@ -1,9 +1,10 @@
-﻿using Nimbus.MessageContracts;
+﻿using System.Threading.Tasks;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.InfrastructureContracts
 {
     public interface IHandleMulticastEvent<TBusEvent> where TBusEvent : IBusEvent
     {
-        void Handle(TBusEvent busEvent);
+        Task Handle(TBusEvent busEvent);
     }
 }

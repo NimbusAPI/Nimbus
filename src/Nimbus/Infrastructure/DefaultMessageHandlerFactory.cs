@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -9,24 +10,25 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageBroker : ICommandBroker, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventBroker
+    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventBroker
     {
         private readonly ITypeProvider _typeProvider;
 
-        public DefaultMessageBroker(ITypeProvider typeProvider)
+        public DefaultMessageHandlerFactory(ITypeProvider typeProvider)
         {
             _typeProvider = typeProvider;
         }
 
         // ReSharper disable ConvertClosureToMethodGroup
 
-        public virtual void Dispatch<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
+        public OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>() where TBusCommand : IBusCommand
         {
-            _typeProvider.CommandHandlerTypes
-                         .Where(t => typeof (IHandleCommand<TBusCommand>).IsAssignableFrom(t))
-                         .Select(type => CreateInstance<IHandleCommand<TBusCommand>>(type))
-                         .First()
-                         .Handle(busCommand);
+            var handler = _typeProvider.CommandHandlerTypes
+                          .Where(t => typeof(IHandleCommand<TBusCommand>).IsAssignableFrom(t))
+                          .Select(type => CreateInstance<IHandleCommand<TBusCommand>>(type))
+                          .First();
+
+            return new OwnedComponent<IHandleCommand<TBusCommand>>(handler, handler as IDisposable);
         }
 
         public virtual TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
@@ -37,7 +39,7 @@ namespace Nimbus.Infrastructure
                                 .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
                                 .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
                                 .First()
-                                .Handle(request);
+                                .Handle(request).Result;
         }
 
         public virtual IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)

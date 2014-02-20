@@ -40,7 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBus.cs" />
-    <Compile Include="ICommandBroker.cs" />
+    <Compile Include="OwnedComponent.cs" />
+    <Compile Include="ICommandHandlerFactory.cs" />
     <Compile Include="ICompetingEventBroker.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />

@@ -6,43 +6,43 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
-    public class AutofacMessageBrokerFactory : ICreateMessageBroker<ICommandBroker>,
-                                               ICreateMessageBroker<IMulticastEventBroker>,
-                                               ICreateMessageBroker<ICompetingEventBroker>,
-                                               ICreateMessageBroker<IRequestBroker>,
-                                               ICreateMessageBroker<IMulticastRequestBroker>
+    public class AutofacMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
+                                               ICreateMessageHandlerFactory<IMulticastEventBroker>,
+                                               ICreateMessageHandlerFactory<ICompetingEventBroker>,
+                                               ICreateMessageHandlerFactory<IRequestBroker>,
+                                               ICreateMessageHandlerFactory<IMulticastRequestBroker>
     {
         private IContainer _container;
 
-        async Task<IMulticastEventBroker> ICreateMessageBroker<IMulticastEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastEventBroker> ICreateMessageHandlerFactory<IMulticastEventBroker>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
             return _container.Resolve<IMulticastEventBroker>();
         }
 
-        async Task<ICommandBroker> ICreateMessageBroker<ICommandBroker>.Create(ITypeProvider typeProvider)
+        async Task<ICommandHandlerFactory> ICreateMessageHandlerFactory<ICommandHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
-            return _container.Resolve<ICommandBroker>();
+            return _container.Resolve<ICommandHandlerFactory>();
         }
 
-        async Task<ICompetingEventBroker> ICreateMessageBroker<ICompetingEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<ICompetingEventBroker> ICreateMessageHandlerFactory<ICompetingEventBroker>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
             return _container.Resolve<ICompetingEventBroker>();
         }
 
-        async Task<IRequestBroker> ICreateMessageBroker<IRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IRequestBroker> ICreateMessageHandlerFactory<IRequestBroker>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
             return _container.Resolve<IRequestBroker>();
         }
 
-        async Task<IMulticastRequestBroker> ICreateMessageBroker<IMulticastRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastRequestBroker> ICreateMessageHandlerFactory<IMulticastRequestBroker>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
