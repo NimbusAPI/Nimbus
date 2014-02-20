@@ -139,6 +139,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
+      <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
+      <Name>Nimbus.InfrastructureContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.IntegrationTests.Autofac\Nimbus.IntegrationTests.Autofac.csproj">
       <Project>{ebeb2241-1c54-43ef-b88e-dac0ed8b7f1b}</Project>
       <Name>Nimbus.IntegrationTests.Autofac</Name>

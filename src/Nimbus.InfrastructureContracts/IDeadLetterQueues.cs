@@ -1,4 +1,6 @@
-﻿namespace Nimbus.PoisonMessages
+﻿// ReSharper disable CheckNamespace
+namespace Nimbus.PoisonMessages
+// ReSharper restore CheckNamespace
 {
     /// <summary>
     ///     Wrapper for our dead letter queues. This interface is just a facade over a couple of queues so that they're not
