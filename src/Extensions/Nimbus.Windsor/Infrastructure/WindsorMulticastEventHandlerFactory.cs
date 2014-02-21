@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Castle.MicroKernel;
+using Castle.MicroKernel.Lifestyle;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
@@ -16,8 +17,9 @@ namespace Nimbus.Windsor.Infrastructure
 
         public OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>> GetHandlers<TBusEvent>() where TBusEvent : IBusEvent
         {
+            var scope = _container.BeginScope();
             var handlers = _container.ResolveAll<IHandleMulticastEvent<TBusEvent>>();
-            return new OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>>(handlers); //FIXME memory leak!
+            return new OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>>(handlers,scope);
         }
     }
 }

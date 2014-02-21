@@ -95,6 +95,7 @@
     <Compile Include="Conventions\TheBusInterface.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
+    <Compile Include="DispatcherTests\WhenDispatchingACommandToItsHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
@@ -105,12 +106,12 @@
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\FirstFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\SecondFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\WhenDispatchingASingleMulticastEvent.cs" />
+    <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\WhenResolvingHandlersForAnEventWithTwoHandlers.cs" />
     <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\Handlers\FirstFooRequestHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\Handlers\SecondFooRequestHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\MessageContracts\FooRequest.cs" />
     <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\WhenDispatchingASingleRequest.cs" />
+    <Compile Include="MessageBrokerTests\MulticastRequestResponseTests\WhenResolvingHandlersForAMulticastRequestWithTwoHandlers.cs" />
     <Compile Include="MessageBrokerTests\RequestResponseTests\Handlers\FooRequestHandler.cs" />
     <Compile Include="MessageBrokerTests\RequestResponseTests\MessageContracts\FooRequest.cs" />
     <Compile Include="MessageBrokerTests\RequestResponseTests\MessageContracts\FooResponse.cs" />

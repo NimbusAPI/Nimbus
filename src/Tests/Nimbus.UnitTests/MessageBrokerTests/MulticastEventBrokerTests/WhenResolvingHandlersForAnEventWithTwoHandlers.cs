@@ -2,18 +2,18 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.InfrastructureContracts;
-using Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.Handlers;
-using Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.MessageContracts;
+using Nimbus.UnitTests.MessageBrokerTests.MulticastEventBrokerTests.Handlers;
+using Nimbus.UnitTests.MessageBrokerTests.MulticastEventBrokerTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests
+namespace Nimbus.UnitTests.MessageBrokerTests.MulticastEventBrokerTests
 {
     [TestFixture]
-    public class WhenResolvingHandlersForAnEventWithTwoHandlers : TestForAll<ICompetingEventHandlerFactory>
+    public class WhenResolvingHandlersForAnEventWithTwoHandlers : TestForAll<IMulticastEventHandlerFactory>
     {
-        private OwnedComponent<IEnumerable<IHandleCompetingEvent<FooEvent>>> _handlers;
+        private OwnedComponent<IEnumerable<IHandleMulticastEvent<FooEvent>>> _handlers;
 
         protected override async Task When()
         {

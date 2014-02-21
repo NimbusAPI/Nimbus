@@ -16,10 +16,8 @@ namespace Nimbus.Windsor.Infrastructure
 
         public OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>() where TBusCommand : IBusCommand
         {
-            var type = typeof (IHandleCommand<TBusCommand>);
             var scope = _container.BeginScope();
-            var handler = (IHandleCommand<TBusCommand>) _container.Resolve(type);
-
+            var handler = _container.Resolve<IHandleCommand<TBusCommand>>();
             return new OwnedComponent<IHandleCommand<TBusCommand>>(handler, scope);
         }
     }

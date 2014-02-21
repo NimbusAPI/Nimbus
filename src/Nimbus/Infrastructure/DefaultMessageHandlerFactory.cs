@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
-using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
@@ -24,7 +22,7 @@ namespace Nimbus.Infrastructure
 
         // ReSharper disable ConvertClosureToMethodGroup
 
-        public OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>() where TBusCommand : IBusCommand
+        OwnedComponent<IHandleCommand<TBusCommand>> ICommandHandlerFactory.GetHandler<TBusCommand>()
         {
             var handler = _typeProvider.CommandHandlerTypes
                                        .Where(t => typeof (IHandleCommand<TBusCommand>).IsAssignableFrom(t))
@@ -34,35 +32,37 @@ namespace Nimbus.Infrastructure
             return new OwnedComponent<IHandleCommand<TBusCommand>>(handler, handler as IDisposable);
         }
 
-        public virtual TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
+        OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> IRequestHandlerFactory.GetHandler<TBusRequest, TBusResponse>()
+
         {
-            return _typeProvider.RequestHandlerTypes
-                                .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
-                                .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
-                                .First()
-                                .Handle(request).Result;
+            var handler = _typeProvider.RequestHandlerTypes
+                                       .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
+                                       .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
+                                       .First();
+
+            return new OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>>(handler, handler as IDisposable);
         }
 
-        public virtual IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
+        OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> IMulticastRequestHandlerFactory.GetHandlers<TBusRequest, TBusResponse>()
         {
-            return _typeProvider.RequestHandlerTypes
-                                .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
-                                .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
-                                .Select(handler => Task.Run(() => handler.Handle(request)))
-                                .ReturnOpportunistically(timeout);
+            var handlers = _typeProvider.RequestHandlerTypes
+                                        .Where(t => typeof (IHandleRequest<TBusRequest, TBusResponse>).IsAssignableFrom(t))
+                                        .Select(type => CreateInstance<IHandleRequest<TBusRequest, TBusResponse>>(type))
+                                        .ToArray();
+            var wrapper = new DisposableWrapper(handlers.Cast<object>().ToArray());
+
+            return new OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>>(handlers, wrapper);
         }
 
-        public virtual void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>> IMulticastEventHandlerFactory.GetHandlers<TBusEvent>()
         {
-            _typeProvider.MulticastEventHandlerTypes
-                         .Where(t => typeof (IHandleMulticastEvent<TBusEvent>).IsAssignableFrom(t))
-                         .Select(type => CreateInstance<IHandleMulticastEvent<TBusEvent>>(type))
-                         .Do(handler => handler.Handle(busEvent))
-                         .Done();
+            var handlers = _typeProvider.MulticastEventHandlerTypes
+                                        .Where(t => typeof (IHandleMulticastEvent<TBusEvent>).IsAssignableFrom(t))
+                                        .Select(type => CreateInstance<IHandleMulticastEvent<TBusEvent>>(type))
+                                        .ToArray();
+            var wrapper = new DisposableWrapper(handlers.Cast<object>().ToArray());
+
+            return new OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>>(handlers, wrapper);
         }
 
         OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandlers<TBusEvent>()
@@ -95,25 +95,6 @@ namespace Nimbus.Infrastructure
 
                 throw new BusException(message, exc);
             }
-        }
-
-        OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>> IMulticastEventHandlerFactory.GetHandlers<TBusEvent>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>()
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
-        {
-            throw new NotImplementedException();
-        }
-
-        public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>()
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

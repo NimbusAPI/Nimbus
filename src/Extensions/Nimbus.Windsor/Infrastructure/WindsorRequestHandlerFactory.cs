@@ -1,4 +1,5 @@
 ﻿using Castle.MicroKernel;
+using Castle.MicroKernel.Lifestyle;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
@@ -16,8 +17,9 @@ namespace Nimbus.Windsor.Infrastructure
         public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
+            var scope = _container.BeginScope();
             var handler = _container.Resolve<IHandleRequest<TBusRequest, TBusResponse>>();
-            return new OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>>(handler); //FIXME memory leak
+            return new OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>>(handler, scope);
         }
     }
 }

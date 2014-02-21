@@ -9,36 +9,30 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.RequestResponseTests
 {
     [TestFixture]
-    public class WhenDispatchingASingleRequest : TestForAll<IRequestHandlerFactory>
+    public class WhenResolvingAHandlersForASimpleRequest : TestForAll<IRequestHandlerFactory>
     {
-        private FooRequest _request;
-        private FooResponse _response;
+        private OwnedComponent<IHandleRequest<FooRequest, FooResponse>> _handler;
 
         protected override async Task When()
         {
-            _request = new FooRequest();
-            Assert.Fail();
-            //_response = Subject.Handle<FooRequest, FooResponse>(_request);
+            _handler = Subject.GetHandler<FooRequest, FooResponse>();
         }
 
         [Test]
         [TestCaseSource("TestCases")]
-        public async Task TheFirstEventHandlerShouldReceiveACopy(AllSubjectsTestContext context)
+        public async Task ThereShouldBeAFooRequestHandler(AllSubjectsTestContext context)
         {
             await Given(context);
             await When();
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<FooRequestHandler>(h => h.Handle(_request)).ShouldContain(_request);
+            _handler.Component.ShouldBeTypeOf<FooRequestHandler>();
         }
 
-        [Test]
-        [TestCaseSource("TestCases")]
-        public async Task TheResponseShouldBeAFooResponse(AllSubjectsTestContext context)
+        [TearDown]
+        public override void TearDown()
         {
-            await Given(context);
-            await When();
-
-            _response.ShouldBeTypeOf<FooResponse>();
+            base.TearDown();
+            _handler.Dispose();
         }
     }
 }
