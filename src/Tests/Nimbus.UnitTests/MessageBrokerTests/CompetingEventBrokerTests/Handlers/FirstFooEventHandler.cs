@@ -2,6 +2,8 @@
 using Nimbus.InfrastructureContracts;
 using Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.MessageContracts;
 
+#pragma warning disable 4014
+
 namespace Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.Handlers
 {
     public class FirstFooEventHandler : IHandleCompetingEvent<FooEvent>

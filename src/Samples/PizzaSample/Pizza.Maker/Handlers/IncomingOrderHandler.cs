@@ -20,7 +20,7 @@ namespace Pizza.Maker.Handlers
         public async Task Handle(OrderPizzaCommand busCommand)
         {
             _pizzaMaker.TakePizzaOrder(busCommand.CustomerName);
-            _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
+            await _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
         }
     }
 }

@@ -8,6 +8,8 @@ using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
+#pragma warning disable 4014
+
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
     [TestFixture]

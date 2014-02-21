@@ -7,6 +7,8 @@ using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
 using NUnit.Framework;
 using Shouldly;
 
+#pragma warning disable 4014
+
 namespace Nimbus.UnitTests.MessageBrokerTests.CommandBrokerTests
 {
     [TestFixture]

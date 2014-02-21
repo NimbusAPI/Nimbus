@@ -2,6 +2,8 @@
 using Nimbus.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 
+#pragma warning disable 4014
+
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers
 {
     public class SomeCommandHandler : IHandleCommand<SomeCommand>
