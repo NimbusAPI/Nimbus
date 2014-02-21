@@ -7,7 +7,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageHandlerFactory : ICommandHandlerFactory,
+    public sealed class DefaultMessageHandlerFactory : ICommandHandlerFactory,
                                                 IRequestHandlerFactory,
                                                 IMulticastRequestHandlerFactory,
                                                 IMulticastEventHandlerFactory,

@@ -70,8 +70,7 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration,
-                                                                DefaultMessageHandlerFactory messageHandlerFactory)
+        public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration, DefaultMessageHandlerFactory messageHandlerFactory)
         {
             configuration
                 .WithCommandHandlerFactory(messageHandlerFactory)
