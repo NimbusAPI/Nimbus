@@ -14,7 +14,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly IQueueManager _queueManager;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly IRequestBroker _requestBroker;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
@@ -24,7 +23,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
                                           IQueueManager queueManager,
-                                          DefaultBatchSizeSetting defaultBatchSize,
                                           IRequestBroker requestBroker,
                                           INimbusMessagingFactory messagingFactory,
                                           IClock clock)
@@ -32,7 +30,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
             _queueManager = queueManager;
-            _defaultBatchSize = defaultBatchSize;
             _requestBroker = requestBroker;
             _messagingFactory = messagingFactory;
             _clock = clock;
@@ -59,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestBroker, _clock);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

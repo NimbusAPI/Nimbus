@@ -59,7 +59,6 @@
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />
-    <Compile Include="Configuration\Settings\DefaultBatchSizeSetting.cs" />
     <Compile Include="Configuration\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />

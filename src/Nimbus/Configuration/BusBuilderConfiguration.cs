@@ -26,7 +26,6 @@ namespace Nimbus.Configuration
         internal EventTypesSetting EventTypes { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
-        internal DefaultBatchSizeSetting DefaultBatchSize { get; set; }
         internal ILogger Logger { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
@@ -34,7 +33,6 @@ namespace Nimbus.Configuration
         {
             DefaultTimeout = new DefaultTimeoutSetting {Value = TimeSpan.FromSeconds(10)}; //FIXME refactor these to override the Default property on their setting class
             MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = 5};
-            DefaultBatchSize = new DefaultBatchSizeSetting {Value = 16};
             Logger = new NullLogger();
 
             Debugging = new BusDebuggingConfiguration();

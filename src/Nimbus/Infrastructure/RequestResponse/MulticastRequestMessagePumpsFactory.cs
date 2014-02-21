@@ -16,7 +16,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ApplicationNameSetting _applicationName;
         private readonly IQueueManager _queueManager;
         private readonly IMulticastRequestBroker _multicastRequestBroker;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
 
@@ -27,7 +26,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    ApplicationNameSetting applicationName,
                                                    IQueueManager queueManager,
                                                    IMulticastRequestBroker multicastRequestBroker,
-                                                   DefaultBatchSizeSetting defaultBatchSize,
                                                    INimbusMessagingFactory messagingFactory,
                                                    IClock clock)
         {
@@ -36,7 +34,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _applicationName = applicationName;
             _queueManager = queueManager;
             _multicastRequestBroker = multicastRequestBroker;
-            _defaultBatchSize = defaultBatchSize;
             _messagingFactory = messagingFactory;
             _clock = clock;
         }
@@ -64,7 +61,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestBroker, requestType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;
