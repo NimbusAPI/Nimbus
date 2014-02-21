@@ -13,14 +13,14 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly Type _messageType;
-        private readonly IRequestBroker _requestBroker;
+        private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly IClock _clock;
 
-        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker, IClock clock)
+        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestHandlerFactory requestHandlerFactory, IClock clock)
         {
             _messagingFactory = messagingFactory;
             _messageType = messageType;
-            _requestBroker = requestBroker;
+            _requestHandlerFactory = requestHandlerFactory;
             _clock = clock;
         }
 
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             BrokeredMessage responseMessage;
             try
             {
-                var response = InvokeGenericHandleMethod(_requestBroker, request);
+                var response = InvokeGenericHandleMethod(_requestHandlerFactory, request);
                 responseMessage = new BrokeredMessage(response);
                 responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
                 responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
@@ -50,12 +50,12 @@ namespace Nimbus.Infrastructure.RequestResponse
             await replyQueueClient.Send(responseMessage);
         }
 
-        private static object InvokeGenericHandleMethod(IRequestBroker requestBroker, object request)
+        private static object InvokeGenericHandleMethod(IRequestHandlerFactory requestHandlerFactory, object request)
         {
             // We can't use dynamic dispatch here as the DLR isn't so great at figuring things out when we have
             // multiple generic parameters.  -andrewh 19/01/2014
             var handleMethod = ExtractHandlerMethodInfo(request);
-            var response = handleMethod.Invoke(requestBroker, new[] {request});
+            var response = handleMethod.Invoke(requestHandlerFactory, new[] {request});
             return response;
         }
 
@@ -70,7 +70,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof (IRequestBroker).GetMethod("Handle");
+            var genericHandleMethod = typeof (IRequestHandlerFactory).GetMethod("Handle");
             var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
             return handleMethod;
         }

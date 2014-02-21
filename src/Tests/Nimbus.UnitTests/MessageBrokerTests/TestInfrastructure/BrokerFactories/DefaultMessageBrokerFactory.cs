@@ -7,7 +7,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
     public class DefaultMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
-                                               ICreateMessageHandlerFactory<IRequestBroker>,
+                                               ICreateMessageHandlerFactory<IRequestHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>
     {
         async Task<ICommandHandlerFactory> ICreateMessageHandlerFactory<ICommandHandlerFactory>.Create(ITypeProvider typeProvider)
@@ -25,7 +25,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
             return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<IRequestBroker> ICreateMessageHandlerFactory<IRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IRequestHandlerFactory> ICreateMessageHandlerFactory<IRequestHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             return new DefaultMessageHandlerFactory(typeProvider);
         }

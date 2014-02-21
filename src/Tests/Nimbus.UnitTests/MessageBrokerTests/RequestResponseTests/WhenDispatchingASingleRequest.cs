@@ -9,7 +9,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.RequestResponseTests
 {
     [TestFixture]
-    public class WhenDispatchingASingleRequest : TestForAll<IRequestBroker>
+    public class WhenDispatchingASingleRequest : TestForAll<IRequestHandlerFactory>
     {
         private FooRequest _request;
         private FooResponse _response;
@@ -17,7 +17,8 @@ namespace Nimbus.UnitTests.MessageBrokerTests.RequestResponseTests
         protected override async Task When()
         {
             _request = new FooRequest();
-            _response = Subject.Handle<FooRequest, FooResponse>(_request);
+            Assert.Fail();
+            //_response = Subject.Handle<FooRequest, FooResponse>(_request);
         }
 
         [Test]

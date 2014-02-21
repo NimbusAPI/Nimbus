@@ -10,7 +10,7 @@ using Nimbus.MessageContracts.Exceptions;
 namespace Nimbus.Infrastructure
 {
     public class DefaultMessageHandlerFactory : ICommandHandlerFactory,
-                                                IRequestBroker,
+                                                IRequestHandlerFactory,
                                                 IMulticastRequestHandlerFactory,
                                                 IMulticastEventHandlerFactory,
                                                 ICompetingEventHandlerFactory
@@ -103,7 +103,15 @@ namespace Nimbus.Infrastructure
         }
 
         public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>()
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
+            throw new NotImplementedException();
+        }
+
+        public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>()
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
         {
             throw new NotImplementedException();
         }

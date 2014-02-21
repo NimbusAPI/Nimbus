@@ -12,7 +12,7 @@ namespace Nimbus.Configuration
         internal InstanceNameSetting InstanceName { get; set; }
         internal ConnectionStringSetting ConnectionString { get; set; }
         internal ICommandHandlerFactory CommandHandlerFactory { get; set; }
-        internal IRequestBroker RequestBroker { get; set; }
+        internal IRequestHandlerFactory RequestHandlerFactory { get; set; }
         internal IMulticastRequestHandlerFactory MulticastRequestHandlerFactory { get; set; }
         internal IMulticastEventHandlerFactory MulticastEventHandlerFactory { get; set; }
         internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }

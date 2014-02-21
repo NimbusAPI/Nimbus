@@ -7,7 +7,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
 {
-    public class FakeHandlerFactory : ICommandHandlerFactory, IMulticastEventHandlerFactory, ICompetingEventHandlerFactory, IRequestBroker, IMulticastRequestHandlerFactory
+    public class FakeHandlerFactory : ICommandHandlerFactory, IMulticastEventHandlerFactory, ICompetingEventHandlerFactory, IRequestHandlerFactory, IMulticastRequestHandlerFactory
     {
         private readonly int _expectedNumMessagesReceived;
         private int _actualNumMessagesReceived;
@@ -53,7 +53,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             RecordMessageReceipt();
         }
 
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
+        private TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
@@ -93,6 +93,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
         }
 
         public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        {
+            throw new NotImplementedException();
+        }
+
+        public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
         {
             throw new NotImplementedException();
         }

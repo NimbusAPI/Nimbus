@@ -9,7 +9,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
     public class AutofacMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
-                                               ICreateMessageHandlerFactory<IRequestBroker>,
+                                               ICreateMessageHandlerFactory<IRequestHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>
     {
         private IContainer _container;
@@ -35,11 +35,11 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
             return _container.Resolve<ICompetingEventHandlerFactory>();
         }
 
-        async Task<IRequestBroker> ICreateMessageHandlerFactory<IRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IRequestHandlerFactory> ICreateMessageHandlerFactory<IRequestHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
-            return _container.Resolve<IRequestBroker>();
+            return _container.Resolve<IRequestHandlerFactory>();
         }
 
         async Task<IMulticastRequestHandlerFactory> ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>.Create(ITypeProvider typeProvider)

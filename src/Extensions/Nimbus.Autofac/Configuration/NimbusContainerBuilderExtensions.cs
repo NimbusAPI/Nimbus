@@ -27,7 +27,7 @@ namespace Nimbus.Configuration
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacRequestBroker>()
+            builder.RegisterType<AutofacRequestHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
