@@ -67,7 +67,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
             return closedGenericMethod;
         }
