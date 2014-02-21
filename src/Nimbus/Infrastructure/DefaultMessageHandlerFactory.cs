@@ -10,7 +10,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventBroker
+    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventHandlerFactory
     {
         private readonly ITypeProvider _typeProvider;
 
@@ -62,13 +62,16 @@ namespace Nimbus.Infrastructure
                          .Done();
         }
 
-        public virtual void PublishCompeting<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandler<TBusEvent>()
         {
-            _typeProvider.CompetingEventHandlerTypes
-                         .Where(t => typeof (IHandleCompetingEvent<TBusEvent>).IsAssignableFrom(t))
+            var handlers = _typeProvider.CompetingEventHandlerTypes
+                         .Where(t => typeof(IHandleCompetingEvent<TBusEvent>).IsAssignableFrom(t))
                          .Select(type => CreateInstance<IHandleCompetingEvent<TBusEvent>>(type))
-                         .Do(handler => handler.Handle(busEvent))
-                         .Done();
+                         .ToArray();
+            var wrapper = new DisposableWrapper(handlers.Cast<object>().ToArray());
+
+            return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(handlers, wrapper);
+
         }
 
         // ReSharper restore ConvertClosureToMethodGroup

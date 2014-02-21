@@ -42,7 +42,7 @@
     <Compile Include="IBus.cs" />
     <Compile Include="OwnedComponent.cs" />
     <Compile Include="ICommandHandlerFactory.cs" />
-    <Compile Include="ICompetingEventBroker.cs" />
+    <Compile Include="ICompetingEventHandlerFactory.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />
     <Compile Include="IHandleCommand.cs" />

@@ -11,7 +11,7 @@ namespace Nimbus.Configuration
         {
             return configuration
                 .WithMulticastEventBroker(componentContext.Resolve<IMulticastEventBroker>())
-                .WithCompetingEventBroker(componentContext.Resolve<ICompetingEventBroker>())
+                .WithCompetingEventHandlerFactory(componentContext.Resolve<ICompetingEventHandlerFactory>())
                 .WithCommandHandlerFactory(componentContext.Resolve<ICommandHandlerFactory>())
                 .WithRequestBroker(componentContext.Resolve<IRequestBroker>())
                 .WithMulticastRequestBroker(componentContext.Resolve<IMulticastRequestBroker>())

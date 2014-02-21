@@ -91,7 +91,7 @@
     <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestThatIsNotReturedByTheTypeProvider.cs" />
-    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeBroker.cs" />
+    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeHandlerFactory.cs" />
     <Compile Include="Tests\ThroughputTests\EventHandlers\GreedyHandler.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarEvent.cs" />

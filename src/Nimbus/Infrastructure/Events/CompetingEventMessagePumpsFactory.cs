@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.Events
     {
         private readonly ApplicationNameSetting _applicationName;
         private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
-        private readonly ICompetingEventBroker _competingEventBroker;
+        private readonly ICompetingEventHandlerFactory _competingEventHandlerFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
@@ -22,14 +22,14 @@ namespace Nimbus.Infrastructure.Events
 
         public CompetingEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                  CompetingEventHandlerTypesSetting competingEventHandlerTypes,
-                                                 ICompetingEventBroker competingEventBroker,
+                                                 ICompetingEventHandlerFactory competingEventHandlerFactory,
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
                                                  IClock clock)
         {
             _applicationName = applicationName;
             _competingEventHandlerTypes = competingEventHandlerTypes;
-            _competingEventBroker = competingEventBroker;
+            _competingEventHandlerFactory = competingEventHandlerFactory;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _clock = clock;
@@ -53,7 +53,7 @@ namespace Nimbus.Infrastructure.Events
                 var subscriptionName = String.Format("{0}", _applicationName);
                 var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                var dispatcher = new CompetingEventMessageDispatcher(_competingEventBroker, eventType);
+                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, eventType);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

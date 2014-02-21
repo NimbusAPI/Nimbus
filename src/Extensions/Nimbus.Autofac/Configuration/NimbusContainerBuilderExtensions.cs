@@ -19,7 +19,7 @@ namespace Nimbus.Configuration
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacCompetingEventBroker>()
+            builder.RegisterType<AutofacCompetingEventHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 

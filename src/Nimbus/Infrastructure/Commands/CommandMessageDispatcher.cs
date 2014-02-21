@@ -21,19 +21,15 @@ namespace Nimbus.Infrastructure.Commands
         public async Task Dispatch(BrokeredMessage message)
         {
             var busCommand = message.GetBody(_commandType);
-
-            using (var handler = GetHandler((dynamic)busCommand))
-            {
-                await handler.Component.Handle((dynamic)busCommand);
-            }
+            await Dispatch((dynamic) busCommand, message);
         }
 
-        // ReSharper disable UnusedParameter.Local
-        // The parameter is used for dynamic construction of the correct generic type.
-        private OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
-        // ReSharper restore UnusedParameter.Local
+        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
         {
-            return _commandHandlerFactory.GetHandler<TBusCommand>();
+            using (var handler = _commandHandlerFactory.GetHandler<TBusCommand>())
+            {
+                await handler.Component.Handle(busCommand);
+            }
         }
     }
 }

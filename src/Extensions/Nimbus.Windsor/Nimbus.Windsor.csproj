@@ -50,7 +50,7 @@
     <Compile Include="Configuration\WindsorBusBuilderConfigurationExtensions.cs" />
     <Compile Include="Configuration\NimbusWindsorContainerExtensions.cs" />
     <Compile Include="Infrastructure\WindsorCommandHandlerFactory.cs" />
-    <Compile Include="Infrastructure\WindsorCompetingEventBroker.cs" />
+    <Compile Include="Infrastructure\WindsorCompetingEventHandlerFactory.cs" />
     <Compile Include="Infrastructure\WindsorMulticastEventBroker.cs" />
     <Compile Include="Infrastructure\WindsorMulticastRequestBroker.cs" />
     <Compile Include="Infrastructure\WindsorRequestBroker.cs" />

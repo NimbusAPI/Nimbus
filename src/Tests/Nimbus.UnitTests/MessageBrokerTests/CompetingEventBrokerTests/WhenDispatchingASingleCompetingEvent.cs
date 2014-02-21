@@ -9,7 +9,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests
 {
     [TestFixture]
-    public class WhenDispatchingASingleCompetingEvent : TestForAll<ICompetingEventBroker>
+    public class WhenDispatchingASingleCompetingEvent : TestForAll<ICompetingEventHandlerFactory>
     {
         private FooEvent _fooEvent;
 
@@ -17,7 +17,8 @@ namespace Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests
         {
             _fooEvent = new FooEvent();
 
-            Subject.PublishCompeting(_fooEvent);
+            Assert.Fail();
+            //Subject.PublishCompeting(_fooEvent);
         }
 
         [Test]

@@ -15,7 +15,7 @@ namespace Nimbus.Configuration
         internal IRequestBroker RequestBroker { get; set; }
         internal IMulticastRequestBroker MulticastRequestBroker { get; set; }
         internal IMulticastEventBroker MulticastEventBroker { get; set; }
-        internal ICompetingEventBroker CompetingEventBroker { get; set; }
+        internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
 
         internal CommandHandlerTypesSetting CommandHandlerTypes { get; set; }
         internal CommandTypesSetting CommandTypes { get; set; }
@@ -48,7 +48,7 @@ namespace Nimbus.Configuration
         {
             //FIXME nowhere near done yet.  -andrewh 6/11/2013
             if (MulticastEventBroker == null) throw new BusConfigurationException("MulticastEventBroker", "You must supply a multicast event broker.");
-            if (CompetingEventBroker == null) throw new BusConfigurationException("CompetingEventBroker", "You must supply a competing event broker.");
+            if (CompetingEventHandlerFactory == null) throw new BusConfigurationException("CompetingEventBroker", "You must supply a competing event broker.");
             if (MulticastRequestBroker == null) throw new BusConfigurationException("MulticastRequestBroker", "You must supply a multicast request broker.");
         }
     }

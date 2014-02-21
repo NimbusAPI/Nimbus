@@ -45,7 +45,7 @@
   <ItemGroup>
     <Compile Include="Configuration\AutofacBusBuilderConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\AutofacCommandHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacCompetingEventBroker.cs" />
+    <Compile Include="Infrastructure\AutofacCompetingEventHandlerFactory.cs" />
     <Compile Include="Infrastructure\AutofacMulticastEventBroker.cs" />
     <Compile Include="Infrastructure\AutofacMulticastRequestBroker.cs" />
     <Compile Include="Infrastructure\AutofacRequestBroker.cs" />

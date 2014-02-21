@@ -20,7 +20,7 @@ namespace Nimbus.IntegrationTests
                                       .WithCommandHandlerFactory(messageHandlerFactory)
                                       .WithRequestBroker(messageHandlerFactory)
                                       .WithMulticastEventBroker(messageHandlerFactory)
-                                      .WithCompetingEventBroker(messageHandlerFactory)
+                                      .WithCompetingEventHandlerFactory(messageHandlerFactory)
                                       .WithMulticastRequestBroker(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)

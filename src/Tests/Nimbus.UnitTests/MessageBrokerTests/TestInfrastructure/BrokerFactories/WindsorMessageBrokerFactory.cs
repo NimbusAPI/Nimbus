@@ -8,7 +8,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
     public class WindsorMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastEventBroker>,
-                                               ICreateMessageHandlerFactory<ICompetingEventBroker>,
+                                               ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<IRequestBroker>,
                                                ICreateMessageHandlerFactory<IMulticastRequestBroker>
     {
@@ -21,11 +21,11 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
             return _container.Resolve<IMulticastEventBroker>();
         }
 
-        async Task<ICompetingEventBroker> ICreateMessageHandlerFactory<ICompetingEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<ICompetingEventHandlerFactory> ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
-            return _container.Resolve<ICompetingEventBroker>();
+            return _container.Resolve<ICompetingEventHandlerFactory>();
         }
 
         async Task<ICommandHandlerFactory> ICreateMessageHandlerFactory<ICommandHandlerFactory>.Create(ITypeProvider typeProvider)

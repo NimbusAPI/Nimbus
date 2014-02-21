@@ -28,7 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithCommandHandlerFactory(messageBroker)
                                       .WithRequestBroker(messageBroker)
                                       .WithMulticastEventBroker(messageBroker)
-                                      .WithCompetingEventBroker(messageBroker)
+                                      .WithCompetingEventHandlerFactory(messageBroker)
                                       .WithMulticastRequestBroker(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)

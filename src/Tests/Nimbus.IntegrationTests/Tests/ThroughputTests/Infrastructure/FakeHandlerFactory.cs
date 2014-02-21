@@ -7,12 +7,12 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
 {
-    public class FakeBroker : ICommandHandlerFactory, IMulticastEventBroker, ICompetingEventBroker, IRequestBroker, IMulticastRequestBroker
+    public class FakeHandlerFactory : ICommandHandlerFactory, IMulticastEventBroker, ICompetingEventHandlerFactory, IRequestBroker, IMulticastRequestBroker
     {
         private readonly int _expectedNumMessagesReceived;
         private int _actualNumMessagesReceived;
 
-        public FakeBroker(int expectedNumMessagesReceived)
+        public FakeHandlerFactory(int expectedNumMessagesReceived)
         {
             _expectedNumMessagesReceived = expectedNumMessagesReceived;
         }
@@ -38,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             }
         }
 
-        public void Dispatch<TBusCommand>(TBusCommand busEvent) where TBusCommand : IBusCommand
+        private void Dispatch<TBusCommand>(TBusCommand busEvent) where TBusCommand : IBusCommand
         {
             RecordMessageReceipt();
         }
@@ -48,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             RecordMessageReceipt();
         }
 
-        public void PublishCompeting<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        private void PublishCompeting<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             RecordMessageReceipt();
         }
@@ -78,6 +78,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
         }
 
         public OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>() where TBusCommand : IBusCommand
+        {
+            throw new NotImplementedException();
+        }
+
+        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandler<TBusEvent>()
         {
             throw new NotImplementedException();
         }

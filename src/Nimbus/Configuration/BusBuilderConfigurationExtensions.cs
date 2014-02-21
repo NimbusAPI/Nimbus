@@ -46,9 +46,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithCompetingEventBroker(this BusBuilderConfiguration configuration, ICompetingEventBroker competingEventBroker)
+        public static BusBuilderConfiguration WithCompetingEventHandlerFactory(this BusBuilderConfiguration configuration, ICompetingEventHandlerFactory competingEventHandlerFactory)
         {
-            configuration.CompetingEventBroker = competingEventBroker;
+            configuration.CompetingEventHandlerFactory = competingEventHandlerFactory;
             return configuration;
         }
 
@@ -77,7 +77,7 @@ namespace Nimbus.Configuration
                 .WithCommandHandlerFactory(messageHandlerFactory)
                 .WithRequestBroker(messageHandlerFactory)
                 .WithMulticastRequestBroker(messageHandlerFactory)
-                .WithCompetingEventBroker(messageHandlerFactory)
+                .WithCompetingEventHandlerFactory(messageHandlerFactory)
                 .WithMulticastEventBroker(messageHandlerFactory);
             return configuration;
         }
