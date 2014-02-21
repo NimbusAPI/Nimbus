@@ -95,14 +95,16 @@
     <Compile Include="Conventions\TheBusInterface.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
-    <Compile Include="DispatcherTests\WhenDispatchingACommandToItsHandler.cs" />
+    <Compile Include="DispatcherTests\Handlers\BrokerTestCommandHandler.cs" />
+    <Compile Include="DispatcherTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="DispatcherTests\WhenDispatchingTwoCommands.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
     <Compile Include="MessageBrokerTests\CompetingEventBrokerTests\Handlers\FirstFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\CompetingEventBrokerTests\Handlers\SecondFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\CompetingEventBrokerTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="MessageBrokerTests\CompetingEventBrokerTests\WhenDispatchingASingleCompetingEvent.cs" />
+    <Compile Include="MessageBrokerTests\CompetingEventBrokerTests\WhenResolvingHandlersForAnEventWithTwoHandlers.cs" />
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\FirstFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\Handlers\SecondFooEventHandler.cs" />
     <Compile Include="MessageBrokerTests\MulticastEventBrokerTests\MessageContracts\FooEvent.cs" />
@@ -115,7 +117,7 @@
     <Compile Include="MessageBrokerTests\RequestResponseTests\Handlers\FooRequestHandler.cs" />
     <Compile Include="MessageBrokerTests\RequestResponseTests\MessageContracts\FooRequest.cs" />
     <Compile Include="MessageBrokerTests\RequestResponseTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="MessageBrokerTests\RequestResponseTests\WhenDispatchingASingleRequest.cs" />
+    <Compile Include="MessageBrokerTests\RequestResponseTests\WhenResolvingAHandlersForASimpleRequest.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\AutofacMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\TestInfrastructure\BrokerFactories\DefaultMessageBrokerFactory.cs" />
     <Compile Include="MessageBrokerTests\CommandBrokerTests\Handlers\BrokerTestCommandHandler.cs" />
@@ -141,8 +143,8 @@
     <Compile Include="TaskExtensionTests\GivenThreeCompletedTasks.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="ThenAttribute.cs" />
-    <Compile Include="WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
-    <Compile Include="WhenExtractingADispatchMethodForARequest.cs" />
+    <Compile Include="DispatcherTests\WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
+    <Compile Include="DispatcherTests\WhenExtractingADispatchMethodForARequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

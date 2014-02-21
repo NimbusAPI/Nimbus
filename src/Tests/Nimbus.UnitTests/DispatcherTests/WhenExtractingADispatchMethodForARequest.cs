@@ -3,7 +3,7 @@ using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.UnitTests.DispatcherTests
 {
     public class WhenExtractingADispatchMethodForARequest
     {
