@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -25,33 +24,39 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var requestMessage = message;
-            var replyQueueName = requestMessage.ReplyTo;
+            var request = message.GetBody(_requestType);
+            var dispatchMethod = GetGenericDispatchMethodFor(request);
+            await (Task) dispatchMethod.Invoke(this, new[] {request, message});
+        }
+
+        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
+            var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
-            var busRequest = requestMessage.GetBody(_requestType);
-
-            var requestTimeoutInMilliseconds = (int) requestMessage.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
+            var requestTimeoutInMilliseconds = (int) message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
             var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
 
-            var responses = InvokeGenericHandleMethod(_multicastRequestHandlerFactory, busRequest, timeout);
-            foreach (var response in responses)
+            using (var handlers = _multicastRequestHandlerFactory.GetHandlers<TBusRequest, TBusResponse>())
             {
-                var responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                responseMessage.CorrelationId = requestMessage.CorrelationId;
-                await replyQueueClient.Send(responseMessage);
+                var tasks = handlers.Component
+                                    .Select(h => h.Handle(busRequest)
+                                                  .ContinueWith(async t =>
+                                                                      {
+                                                                          var responseMessage = new BrokeredMessage(t.Result);
+                                                                          responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
+                                                                          responseMessage.CorrelationId = message.CorrelationId;
+                                                                          await replyQueueClient.Send(responseMessage);
+                                                                      }))
+                                    .ToArray();
+
+                await Task.WhenAll(tasks);
             }
         }
 
-        private static IEnumerable<object> InvokeGenericHandleMethod(IMulticastRequestHandlerFactory requestHandlerFactory, object request, TimeSpan timeout)
-        {
-            var handleMethod = ExtractHandleMulticastMethodInfo(request);
-            var response = handleMethod.Invoke(requestHandlerFactory, new[] {request, timeout});
-            return (IEnumerable<object>) response;
-        }
-
-        internal static MethodInfo ExtractHandleMulticastMethodInfo(object request)
+        internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
             var closedGenericTypeOfIBusRequest = request.GetType()
                                                         .GetInterfaces()
@@ -62,9 +67,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof (IMulticastRequestHandlerFactory).GetMethod("HandleMulticast");
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
-            return handleMethod;
+            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            return closedGenericMethod;
         }
     }
 }
