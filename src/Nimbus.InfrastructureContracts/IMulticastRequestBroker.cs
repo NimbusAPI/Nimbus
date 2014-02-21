@@ -4,6 +4,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.InfrastructureContracts
 {
+    [Obsolete("pending refactor")]
     public interface IMulticastRequestBroker
     {
         IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)

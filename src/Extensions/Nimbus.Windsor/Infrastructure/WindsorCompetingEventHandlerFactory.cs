@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Castle.MicroKernel;
-using Castle.MicroKernel.Lifestyle;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
@@ -16,14 +14,10 @@ namespace Nimbus.Windsor.Infrastructure
             _container = container;
         }
 
-        public OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandler<TBusEvent>() where TBusEvent : IBusEvent
+        public OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandlers<TBusEvent>() where TBusEvent : IBusEvent
         {
-            using (_container.BeginScope())
-            {
-                var type = typeof (IHandleCompetingEvent<TBusEvent>);
-                var handlers = _container.ResolveAll(type).Cast<IHandleCompetingEvent<TBusEvent>>().ToArray();
-                return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(handlers); //FIXME memory leak here.
-            }
+            var handlers = _container.ResolveAll<IHandleCompetingEvent<TBusEvent>>();
+            return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(handlers); //FIXME memory leak here.
         }
     }
 }

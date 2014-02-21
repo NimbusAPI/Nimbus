@@ -15,10 +15,10 @@ namespace Nimbus.Autofac.Infrastructure
             _lifetimeScope = lifetimeScope;
         }
 
-        public OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandler<TBusEvent>() where TBusEvent : IBusEvent
+        public OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandlers<TBusEvent>() where TBusEvent : IBusEvent
         {
-            var handlers = _lifetimeScope.Resolve<Owned<IEnumerable<IHandleCompetingEvent<TBusEvent>>>>();
-            return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(handlers.Value, handlers);
+            var owned = _lifetimeScope.Resolve<Owned<IEnumerable<IHandleCompetingEvent<TBusEvent>>>>();
+            return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(owned.Value, owned);
         }
     }
 }

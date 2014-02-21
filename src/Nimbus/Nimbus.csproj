@@ -56,7 +56,6 @@
     <Compile Include="BackwardCompatibilityAdaptorExtensions.cs" />
     <Compile Include="BatchSendingExtensions.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
-    <Compile Include="Infrastructure\DisposableWrapper.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />
@@ -69,7 +68,7 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
     <Compile Include="Infrastructure\NimbusMessagingFactory.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\RequestResponse\MulticastEventMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\ExceptionExtensions.cs" />
     <Compile Include="Infrastructure\IMessageDispatcher.cs" />

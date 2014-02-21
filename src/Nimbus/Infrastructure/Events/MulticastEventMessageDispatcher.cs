@@ -8,14 +8,14 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Events
 {
-    public class CompetingEventMessageDispatcher : IMessageDispatcher
+    public class MulticastEventMessageDispatcher : IMessageDispatcher
     {
-        private readonly ICompetingEventHandlerFactory _competingEventHandlerFactory;
+        private readonly IMulticastEventHandlerFactory _multicastEventHandlerFactory;
         private readonly Type _eventType;
 
-        public CompetingEventMessageDispatcher(ICompetingEventHandlerFactory competingEventHandlerFactory, Type eventType)
+        public MulticastEventMessageDispatcher(IMulticastEventHandlerFactory multicastEventHandlerFactory, Type eventType)
         {
-            _competingEventHandlerFactory = competingEventHandlerFactory;
+            _multicastEventHandlerFactory = multicastEventHandlerFactory;
             _eventType = eventType;
         }
 
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.Events
 
         private async Task Dispatch<TBusEvent>(TBusEvent busEvent, BrokeredMessage message) where TBusEvent : IBusEvent
         {
-            using (var handlers = _competingEventHandlerFactory.GetHandlers<TBusEvent>())
+            using (var handlers = _multicastEventHandlerFactory.GetHandlers<TBusEvent>())
             {
                 await Task.WhenAll(handlers.Component.Select(h => h.Handle(busEvent)));
             }

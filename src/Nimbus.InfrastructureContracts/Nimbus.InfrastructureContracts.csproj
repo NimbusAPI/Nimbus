@@ -50,7 +50,7 @@
     <Compile Include="IHandleMulticastEvent.cs" />
     <Compile Include="IHandleRequest.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="IMulticastEventBroker.cs" />
+    <Compile Include="IMulticastEventHandlerFactory.cs" />
     <Compile Include="IMulticastRequestBroker.cs" />
     <Compile Include="IMulticastRequestSender.cs" />
     <Compile Include="IRequestBroker.cs" />

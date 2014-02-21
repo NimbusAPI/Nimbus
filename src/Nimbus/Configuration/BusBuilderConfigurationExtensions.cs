@@ -40,9 +40,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastEventBroker(this BusBuilderConfiguration configuration, IMulticastEventBroker multicastEventBroker)
+        public static BusBuilderConfiguration WithMulticastEventBroker(this BusBuilderConfiguration configuration, IMulticastEventHandlerFactory multicastEventHandlerFactory)
         {
-            configuration.MulticastEventBroker = multicastEventBroker;
+            configuration.MulticastEventHandlerFactory = multicastEventHandlerFactory;
             return configuration;
         }
 

@@ -11,13 +11,13 @@ namespace Nimbus.SampleApp
         public void DoFoo()
         {
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
-            IMulticastEventBroker multicastEventBroker = new DefaultMessageHandlerFactory(typeProvider);
+            IMulticastEventHandlerFactory multicastEventHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
             var bus = new BusBuilder().Configure()
                                       .WithConnectionString("foo")
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
-                                      .WithMulticastEventBroker(multicastEventBroker)
+                                      .WithMulticastEventBroker(multicastEventHandlerFactory)
                                       .Build();
         }
     }

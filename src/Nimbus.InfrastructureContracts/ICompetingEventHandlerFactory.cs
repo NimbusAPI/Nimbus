@@ -5,6 +5,6 @@ namespace Nimbus.InfrastructureContracts
 {
     public interface ICompetingEventHandlerFactory
     {
-        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandler<TBusEvent>() where TBusEvent : IBusEvent;
+        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> GetHandlers<TBusEvent>() where TBusEvent : IBusEvent;
     }
 }

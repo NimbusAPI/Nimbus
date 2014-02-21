@@ -7,7 +7,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
 {
-    public class FakeHandlerFactory : ICommandHandlerFactory, IMulticastEventBroker, ICompetingEventHandlerFactory, IRequestBroker, IMulticastRequestBroker
+    public class FakeHandlerFactory : ICommandHandlerFactory, IMulticastEventHandlerFactory, ICompetingEventHandlerFactory, IRequestBroker, IMulticastRequestBroker
     {
         private readonly int _expectedNumMessagesReceived;
         private int _actualNumMessagesReceived;
@@ -43,7 +43,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             RecordMessageReceipt();
         }
 
-        public void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
+        private void PublishMulticast<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
             RecordMessageReceipt();
         }
@@ -82,7 +82,12 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             throw new NotImplementedException();
         }
 
-        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandler<TBusEvent>()
+        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandlers<TBusEvent>()
+        {
+            throw new NotImplementedException();
+        }
+
+        public OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>> GetHandlers<TBusEvent>() where TBusEvent : IBusEvent
         {
             throw new NotImplementedException();
         }

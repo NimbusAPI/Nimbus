@@ -5,7 +5,7 @@ using Nimbus.InfrastructureContracts;
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
     public class DefaultMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
-                                               ICreateMessageHandlerFactory<IMulticastEventBroker>,
+                                               ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<IRequestBroker>,
                                                ICreateMessageHandlerFactory<IMulticastRequestBroker>
@@ -15,7 +15,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
             return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<IMulticastEventBroker> ICreateMessageHandlerFactory<IMulticastEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastEventHandlerFactory> ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             return new DefaultMessageHandlerFactory(typeProvider);
         }

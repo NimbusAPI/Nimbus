@@ -15,7 +15,7 @@ namespace Nimbus.Configuration
                    .AsImplementedInterfaces()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<AutofacMulticastEventBroker>()
+            builder.RegisterType<AutofacMulticastEventHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 

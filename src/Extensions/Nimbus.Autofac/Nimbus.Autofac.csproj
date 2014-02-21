@@ -46,7 +46,7 @@
     <Compile Include="Configuration\AutofacBusBuilderConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\AutofacCommandHandlerFactory.cs" />
     <Compile Include="Infrastructure\AutofacCompetingEventHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacMulticastEventBroker.cs" />
+    <Compile Include="Infrastructure\AutofacMulticastEventHandlerFactory.cs" />
     <Compile Include="Infrastructure\AutofacMulticastRequestBroker.cs" />
     <Compile Include="Infrastructure\AutofacRequestBroker.cs" />
     <Compile Include="Configuration\NimbusContainerBuilderExtensions.cs" />

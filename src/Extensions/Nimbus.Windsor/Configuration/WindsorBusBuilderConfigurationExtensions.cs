@@ -10,7 +10,7 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithWindsorDefaults(this BusBuilderConfiguration configuration, IWindsorContainer container)
         {
             return configuration
-                .WithMulticastEventBroker(container.Resolve<IMulticastEventBroker>())
+                .WithMulticastEventBroker(container.Resolve<IMulticastEventHandlerFactory>())
                 .WithCompetingEventHandlerFactory(container.Resolve<ICompetingEventHandlerFactory>())
                 .WithCommandHandlerFactory(container.Resolve<ICommandHandlerFactory>())
                 .WithRequestBroker(container.Resolve<IRequestBroker>())

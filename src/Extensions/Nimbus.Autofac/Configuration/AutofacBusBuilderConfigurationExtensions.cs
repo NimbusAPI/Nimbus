@@ -10,7 +10,7 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithAutofacDefaults(this BusBuilderConfiguration configuration, IComponentContext componentContext)
         {
             return configuration
-                .WithMulticastEventBroker(componentContext.Resolve<IMulticastEventBroker>())
+                .WithMulticastEventBroker(componentContext.Resolve<IMulticastEventHandlerFactory>())
                 .WithCompetingEventHandlerFactory(componentContext.Resolve<ICompetingEventHandlerFactory>())
                 .WithCommandHandlerFactory(componentContext.Resolve<ICommandHandlerFactory>())
                 .WithRequestBroker(componentContext.Resolve<IRequestBroker>())

@@ -10,7 +10,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventBroker, ICompetingEventHandlerFactory
+    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventHandlerFactory, ICompetingEventHandlerFactory
     {
         private readonly ITypeProvider _typeProvider;
 
@@ -62,7 +62,7 @@ namespace Nimbus.Infrastructure
                          .Done();
         }
 
-        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandler<TBusEvent>()
+        OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandlers<TBusEvent>()
         {
             var handlers = _typeProvider.CompetingEventHandlerTypes
                          .Where(t => typeof(IHandleCompetingEvent<TBusEvent>).IsAssignableFrom(t))
@@ -92,6 +92,44 @@ namespace Nimbus.Infrastructure
                               ).FormatWith(GetType().Name);
 
                 throw new BusException(message, exc);
+            }
+        }
+
+        OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>> IMulticastEventHandlerFactory.GetHandlers<TBusEvent>()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Used to encapsulate a bunch of IDisposable objects inside a single wrapper so that we can dispose of them cleanly
+        /// at the end of a message-handling unit of work.
+        /// </summary>
+        internal class DisposableWrapper : IDisposable
+        {
+            private readonly object[] _components;
+
+            public DisposableWrapper(params object[] components)
+            {
+                _components = components;
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposing) return;
+
+                foreach (var component in _components.OfType<IDisposable>())
+                {
+                    try
+                    {
+                        component.Dispose();
+                    }
+                    catch { }
+                }
             }
         }
     }

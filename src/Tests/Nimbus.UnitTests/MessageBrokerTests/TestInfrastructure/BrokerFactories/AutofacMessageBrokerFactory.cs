@@ -7,18 +7,18 @@ using Nimbus.InfrastructureContracts;
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
     public class AutofacMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
-                                               ICreateMessageHandlerFactory<IMulticastEventBroker>,
+                                               ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<IRequestBroker>,
                                                ICreateMessageHandlerFactory<IMulticastRequestBroker>
     {
         private IContainer _container;
 
-        async Task<IMulticastEventBroker> ICreateMessageHandlerFactory<IMulticastEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastEventHandlerFactory> ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
-            return _container.Resolve<IMulticastEventBroker>();
+            return _container.Resolve<IMulticastEventHandlerFactory>();
         }
 
         async Task<ICommandHandlerFactory> ICreateMessageHandlerFactory<ICommandHandlerFactory>.Create(ITypeProvider typeProvider)

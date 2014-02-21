@@ -9,7 +9,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.MulticastEventBrokerTests
 {
     [TestFixture]
-    public class WhenDispatchingASingleMulticastEvent : TestForAll<IMulticastEventBroker>
+    public class WhenDispatchingASingleMulticastEvent : TestForAll<IMulticastEventHandlerFactory>
     {
         private FooEvent _fooEvent;
 
@@ -17,7 +17,8 @@ namespace Nimbus.UnitTests.MessageBrokerTests.MulticastEventBrokerTests
         {
             _fooEvent = new FooEvent();
 
-            Subject.PublishMulticast(_fooEvent);
+            Assert.Fail();
+            //Subject.PublishMulticast(_fooEvent);
         }
 
         [Test]
