@@ -11,7 +11,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MessageBrokerTests.MulticastRequestResponseTests
 {
     [TestFixture]
-    public class WhenDispatchingASingleRequest : TestForAll<IMulticastRequestBroker>
+    public class WhenDispatchingASingleRequest : TestForAll<IMulticastRequestHandlerFactory>
     {
         private FooRequest _request;
         private FooResponse[] _responses;
@@ -19,7 +19,8 @@ namespace Nimbus.UnitTests.MessageBrokerTests.MulticastRequestResponseTests
         protected override async Task When()
         {
             _request = new FooRequest();
-            _responses = Subject.HandleMulticast<FooRequest, FooResponse>(_request, TimeSpan.FromMilliseconds(200)).ToArray();
+            Assert.Fail();
+            //_responses = Subject.HandleMulticast<FooRequest, FooResponse>(_request, TimeSpan.FromMilliseconds(200)).ToArray();
         }
 
         [Test]

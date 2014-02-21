@@ -14,7 +14,7 @@ namespace Nimbus.Configuration
                 .WithCompetingEventHandlerFactory(componentContext.Resolve<ICompetingEventHandlerFactory>())
                 .WithCommandHandlerFactory(componentContext.Resolve<ICommandHandlerFactory>())
                 .WithRequestBroker(componentContext.Resolve<IRequestBroker>())
-                .WithMulticastRequestBroker(componentContext.Resolve<IMulticastRequestBroker>())
+                .WithMulticastRequestBroker(componentContext.Resolve<IMulticastRequestHandlerFactory>())
                 .WithLogger(componentContext.Resolve<ILogger>());
         }
     }

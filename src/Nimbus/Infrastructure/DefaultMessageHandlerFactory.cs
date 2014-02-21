@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
@@ -10,7 +9,11 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class DefaultMessageHandlerFactory : ICommandHandlerFactory, IRequestBroker, IMulticastRequestBroker, IMulticastEventHandlerFactory, ICompetingEventHandlerFactory
+    public class DefaultMessageHandlerFactory : ICommandHandlerFactory,
+                                                IRequestBroker,
+                                                IMulticastRequestHandlerFactory,
+                                                IMulticastEventHandlerFactory,
+                                                ICompetingEventHandlerFactory
     {
         private readonly ITypeProvider _typeProvider;
 
@@ -24,9 +27,9 @@ namespace Nimbus.Infrastructure
         public OwnedComponent<IHandleCommand<TBusCommand>> GetHandler<TBusCommand>() where TBusCommand : IBusCommand
         {
             var handler = _typeProvider.CommandHandlerTypes
-                          .Where(t => typeof(IHandleCommand<TBusCommand>).IsAssignableFrom(t))
-                          .Select(type => CreateInstance<IHandleCommand<TBusCommand>>(type))
-                          .First();
+                                       .Where(t => typeof (IHandleCommand<TBusCommand>).IsAssignableFrom(t))
+                                       .Select(type => CreateInstance<IHandleCommand<TBusCommand>>(type))
+                                       .First();
 
             return new OwnedComponent<IHandleCommand<TBusCommand>>(handler, handler as IDisposable);
         }
@@ -65,13 +68,12 @@ namespace Nimbus.Infrastructure
         OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>> ICompetingEventHandlerFactory.GetHandlers<TBusEvent>()
         {
             var handlers = _typeProvider.CompetingEventHandlerTypes
-                         .Where(t => typeof(IHandleCompetingEvent<TBusEvent>).IsAssignableFrom(t))
-                         .Select(type => CreateInstance<IHandleCompetingEvent<TBusEvent>>(type))
-                         .ToArray();
+                                        .Where(t => typeof (IHandleCompetingEvent<TBusEvent>).IsAssignableFrom(t))
+                                        .Select(type => CreateInstance<IHandleCompetingEvent<TBusEvent>>(type))
+                                        .ToArray();
             var wrapper = new DisposableWrapper(handlers.Cast<object>().ToArray());
 
             return new OwnedComponent<IEnumerable<IHandleCompetingEvent<TBusEvent>>>(handlers, wrapper);
-
         }
 
         // ReSharper restore ConvertClosureToMethodGroup
@@ -86,10 +88,10 @@ namespace Nimbus.Infrastructure
             catch (Exception exc)
             {
                 var message = (
-                                  "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters). " +
-                                  "If you'd like to use constructor injection on your handlers, have a look at the examples provided in the README " +
-                                  "about how to wire things up via an IoC container."
-                              ).FormatWith(GetType().Name);
+                    "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters). " +
+                    "If you'd like to use constructor injection on your handlers, have a look at the examples provided in the README " +
+                    "about how to wire things up via an IoC container."
+                    ).FormatWith(GetType().Name);
 
                 throw new BusException(message, exc);
             }
@@ -100,9 +102,15 @@ namespace Nimbus.Infrastructure
             throw new NotImplementedException();
         }
 
+        public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>()
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
-        /// Used to encapsulate a bunch of IDisposable objects inside a single wrapper so that we can dispose of them cleanly
-        /// at the end of a message-handling unit of work.
+        ///     Used to encapsulate a bunch of IDisposable objects inside a single wrapper so that we can dispose of them cleanly
+        ///     at the end of a message-handling unit of work.
         /// </summary>
         internal class DisposableWrapper : IDisposable
         {
@@ -128,7 +136,9 @@ namespace Nimbus.Infrastructure
                     {
                         component.Dispose();
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
             }
         }

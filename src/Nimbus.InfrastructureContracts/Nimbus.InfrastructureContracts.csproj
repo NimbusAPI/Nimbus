@@ -51,7 +51,7 @@
     <Compile Include="IHandleRequest.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IMulticastEventHandlerFactory.cs" />
-    <Compile Include="IMulticastRequestBroker.cs" />
+    <Compile Include="IMulticastRequestHandlerFactory.cs" />
     <Compile Include="IMulticastRequestSender.cs" />
     <Compile Include="IRequestBroker.cs" />
     <Compile Include="ITypeProvider.cs" />

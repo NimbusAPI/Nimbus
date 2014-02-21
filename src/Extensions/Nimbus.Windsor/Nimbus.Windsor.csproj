@@ -52,7 +52,7 @@
     <Compile Include="Infrastructure\WindsorCommandHandlerFactory.cs" />
     <Compile Include="Infrastructure\WindsorCompetingEventHandlerFactory.cs" />
     <Compile Include="Infrastructure\WindsorMulticastEventHandlerFactory.cs" />
-    <Compile Include="Infrastructure\WindsorMulticastRequestBroker.cs" />
+    <Compile Include="Infrastructure\WindsorMulticastRequestHandlerFactory.cs" />
     <Compile Include="Infrastructure\WindsorRequestBroker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -13,13 +13,13 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly IMulticastRequestBroker _multicastRequestBroker;
+        private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly Type _requestType;
 
-        public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory, IMulticastRequestBroker multicastRequestBroker, Type requestType)
+        public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory, IMulticastRequestHandlerFactory multicastRequestHandlerFactory, Type requestType)
         {
             _messagingFactory = messagingFactory;
-            _multicastRequestBroker = multicastRequestBroker;
+            _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _requestType = requestType;
         }
 
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestTimeoutInMilliseconds = (int) requestMessage.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
             var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
 
-            var responses = InvokeGenericHandleMethod(_multicastRequestBroker, busRequest, timeout);
+            var responses = InvokeGenericHandleMethod(_multicastRequestHandlerFactory, busRequest, timeout);
             foreach (var response in responses)
             {
                 var responseMessage = new BrokeredMessage(response);
@@ -44,10 +44,10 @@ namespace Nimbus.Infrastructure.RequestResponse
             }
         }
 
-        private static IEnumerable<object> InvokeGenericHandleMethod(IMulticastRequestBroker requestBroker, object request, TimeSpan timeout)
+        private static IEnumerable<object> InvokeGenericHandleMethod(IMulticastRequestHandlerFactory requestHandlerFactory, object request, TimeSpan timeout)
         {
             var handleMethod = ExtractHandleMulticastMethodInfo(request);
-            var response = handleMethod.Invoke(requestBroker, new[] {request, timeout});
+            var response = handleMethod.Invoke(requestHandlerFactory, new[] {request, timeout});
             return (IEnumerable<object>) response;
         }
 
@@ -62,7 +62,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof (IMulticastRequestBroker).GetMethod("HandleMulticast");
+            var genericHandleMethod = typeof (IMulticastRequestHandlerFactory).GetMethod("HandleMulticast");
             var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
             return handleMethod;
         }

@@ -19,7 +19,7 @@ namespace Nimbus.Configuration
                 Component.For<ICompetingEventHandlerFactory>().ImplementedBy<WindsorCompetingEventHandlerFactory>().LifestyleSingleton(),
                 Component.For<ICommandHandlerFactory>().ImplementedBy<WindsorCommandHandlerFactory>().LifestyleSingleton(),
                 Component.For<IRequestBroker>().ImplementedBy<WindsorRequestBroker>().LifestyleSingleton(),
-                Component.For<IMulticastRequestBroker>().ImplementedBy<WindsorMulticastRequestBroker>().LifestyleSingleton()
+                Component.For<IMulticastRequestHandlerFactory>().ImplementedBy<WindsorMulticastRequestHandlerFactory>().LifestyleSingleton()
                 );
 
             return container;

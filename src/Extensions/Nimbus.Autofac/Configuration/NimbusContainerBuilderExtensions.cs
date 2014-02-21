@@ -31,7 +31,7 @@ namespace Nimbus.Configuration
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacMulticastRequestBroker>()
+            builder.RegisterType<AutofacMulticastRequestHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 

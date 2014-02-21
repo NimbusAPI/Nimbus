@@ -10,7 +10,7 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
                                                ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<IRequestBroker>,
-                                               ICreateMessageHandlerFactory<IMulticastRequestBroker>
+                                               ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>
     {
         private IContainer _container;
 
@@ -42,11 +42,11 @@ namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
             return _container.Resolve<IRequestBroker>();
         }
 
-        async Task<IMulticastRequestBroker> ICreateMessageHandlerFactory<IMulticastRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastRequestHandlerFactory> ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>.Create(ITypeProvider typeProvider)
         {
             BuildContainer(typeProvider);
 
-            return _container.Resolve<IMulticastRequestBroker>();
+            return _container.Resolve<IMulticastRequestHandlerFactory>();
         }
 
         private void BuildContainer(ITypeProvider typeProvider)

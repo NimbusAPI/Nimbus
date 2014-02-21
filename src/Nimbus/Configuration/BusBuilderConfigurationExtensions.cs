@@ -64,9 +64,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestBroker requestBroker)
+        public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestHandlerFactory requestHandlerFactory)
         {
-            configuration.MulticastRequestBroker = requestBroker;
+            configuration.MulticastRequestHandlerFactory = requestHandlerFactory;
             return configuration;
         }
 
