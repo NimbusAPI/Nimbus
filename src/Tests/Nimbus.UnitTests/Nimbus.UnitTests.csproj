@@ -141,7 +141,7 @@
     <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
-    <Compile Include="WhenExtractingAHandlerMethodForARequest.cs" />
+    <Compile Include="WhenExtractingADispatchMethodForARequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

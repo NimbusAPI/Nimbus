@@ -1,18 +1,17 @@
-﻿using Nimbus.Configuration;
-using Nimbus.Infrastructure.RequestResponse;
+﻿using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests
 {
-    public class WhenExtractingAHandlerMethodForARequest
+    public class WhenExtractingADispatchMethodForARequest
     {
         [Test]
         public void WeShouldGetTheRightMethod()
         {
             var request = new SomeInternalRequest();
-            var handlerMethod = RequestMessageDispatcher.ExtractHandlerMethodInfo(request);
+            var handlerMethod = RequestMessageDispatcher.GetGenericDispatchMethodFor(request);
 
             handlerMethod.ShouldNotBe(null);
         }

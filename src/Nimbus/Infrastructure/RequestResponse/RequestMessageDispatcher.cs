@@ -26,18 +26,28 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
+            var request = message.GetBody(_messageType);
+            var dispatchMethod = GetGenericDispatchMethodFor(request);
+            await (Task) dispatchMethod.Invoke(this, new[] {request, message});
+        }
+
+        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
             var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
-
-            var request = message.GetBody(_messageType);
 
             BrokeredMessage responseMessage;
             try
             {
-                var response = InvokeGenericHandleMethod(_requestHandlerFactory, request);
-                responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                using (var handler = _requestHandlerFactory.GetHandler<TBusRequest, TBusResponse>())
+                {
+                    var response = await handler.Component.Handle(busRequest);
+                    responseMessage = new BrokeredMessage(response);
+                    responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
+                    responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                }
             }
             catch (Exception exc)
             {
@@ -50,16 +60,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             await replyQueueClient.Send(responseMessage);
         }
 
-        private static object InvokeGenericHandleMethod(IRequestHandlerFactory requestHandlerFactory, object request)
-        {
-            // We can't use dynamic dispatch here as the DLR isn't so great at figuring things out when we have
-            // multiple generic parameters.  -andrewh 19/01/2014
-            var handleMethod = ExtractHandlerMethodInfo(request);
-            var response = handleMethod.Invoke(requestHandlerFactory, new[] {request});
-            return response;
-        }
-
-        internal static MethodInfo ExtractHandlerMethodInfo(object request)
+        internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
             var closedGenericTypeOfIBusRequest = request.GetType()
                                                         .GetInterfaces()
@@ -70,9 +71,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof (IRequestHandlerFactory).GetMethod("Handle");
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
-            return handleMethod;
+            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            return closedGenericMethod;
         }
     }
 }
