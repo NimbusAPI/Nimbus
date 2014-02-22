@@ -6,6 +6,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {

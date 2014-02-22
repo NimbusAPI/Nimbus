@@ -16,7 +16,7 @@ namespace Nimbus.IntegrationTests
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultHandlerFactory(messageHandlerFactory)
-S                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
