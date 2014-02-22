@@ -2,5 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    public class CommandTypesSetting : Setting<Type[]> { }
+    public class CommandTypesSetting : Setting<Type[]>
+    {
+    }
 }

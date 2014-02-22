@@ -93,12 +93,14 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             throw new NotImplementedException();
         }
 
-        public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        public OwnedComponent<IEnumerable<IHandleRequest<TBusRequest, TBusResponse>>> GetHandlers<TBusRequest, TBusResponse>()
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
         {
             throw new NotImplementedException();
         }
 
-        public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse> where TBusResponse : IBusResponse
+        public OwnedComponent<IHandleRequest<TBusRequest, TBusResponse>> GetHandler<TBusRequest, TBusResponse>() where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
         {
             throw new NotImplementedException();
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Nimbus.Extensions
@@ -11,7 +10,7 @@ namespace Nimbus.Extensions
             if (!openGenericType.IsGenericType) throw new ArgumentException("It's a bit difficult to have a closed type of a non-open-generic type", "openGenericType");
 
             var interfaces = type.GetInterfaces();
-            var baseTypes = new[] { type }.DepthFirst(t => t.BaseType == null ? new Type[0] : new[] { t.BaseType });
+            var baseTypes = new[] {type}.DepthFirst(t => t.BaseType == null ? new Type[0] : new[] {t.BaseType});
             var typeAndAllThatThatEntails = new[] {type}.Union(interfaces).Union(baseTypes).ToArray();
             var genericTypes = typeAndAllThatThatEntails.Where(i => i.IsGenericType);
             var closedGenericTypes = genericTypes.Where(i => !i.IsGenericTypeDefinition);
@@ -41,6 +40,5 @@ namespace Nimbus.Extensions
                                         .ToArray();
             return genericInterfaces;
         }
-
     }
 }

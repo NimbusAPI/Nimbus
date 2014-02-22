@@ -30,7 +30,7 @@ namespace Nimbus.UnitTests.Conventions
                                    .Where(t => t.Name.EndsWith("Factory"))
                                    .Where(t => t.IsInstantiable())
                                    .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null)
-                                   .Where(t => !t.IsAssignableFrom(typeof(DefaultMessageHandlerFactory)))
+                                   .Where(t => !t.IsAssignableFrom(typeof (DefaultMessageHandlerFactory)))
                                    .Select(t => new TestCaseData(t)
                                                .SetName(t.FullName))
                                    .GetEnumerator();

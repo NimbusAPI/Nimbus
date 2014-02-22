@@ -19,7 +19,7 @@ namespace Nimbus.Configuration
         {
         }
 
-        protected DependencyResolutionException(SerializationInfo info,StreamingContext context) : base(info, context)
+        protected DependencyResolutionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

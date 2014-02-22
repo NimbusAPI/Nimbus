@@ -3,6 +3,7 @@ using Nimbus.Autofac.Infrastructure;
 using Nimbus.Extensions;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {

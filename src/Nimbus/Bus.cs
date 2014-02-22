@@ -8,7 +8,6 @@ using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
-using Nimbus.PoisonMessages;
 
 namespace Nimbus
 {

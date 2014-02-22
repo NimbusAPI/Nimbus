@@ -12,9 +12,9 @@ namespace Nimbus.SampleApp.Handlers
             Console.WriteLine("Received question: " + request.Question);
 
             return new WhatIsTheAnswerResponse
-            {
-                TheAnswer = "42",
-            };
+                   {
+                       TheAnswer = "42",
+                   };
         }
     }
 }

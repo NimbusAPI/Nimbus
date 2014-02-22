@@ -26,7 +26,7 @@ namespace Nimbus.UnitTests
             foreach (var argExpression in methodCallExpression.Arguments)
             {
                 // http://stackoverflow.com/questions/2616638/access-the-value-of-a-member-expression
-                var objectMember = Expression.Convert(argExpression, typeof(object));
+                var objectMember = Expression.Convert(argExpression, typeof (object));
                 var getterLambda = Expression.Lambda<Func<object>>(objectMember);
                 var getter = getterLambda.Compile();
                 var arg = getter();

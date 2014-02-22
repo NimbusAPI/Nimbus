@@ -7,7 +7,6 @@ using Nimbus.Extensions;
 using Nimbus.HandlerFactories;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.RequestResponse;
 
 namespace Nimbus.Infrastructure.Events
 {

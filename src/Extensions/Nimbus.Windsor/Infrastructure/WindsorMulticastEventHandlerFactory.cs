@@ -20,7 +20,7 @@ namespace Nimbus.Windsor.Infrastructure
         {
             var scope = _container.BeginScope();
             var handlers = _container.ResolveAll<IHandleMulticastEvent<TBusEvent>>();
-            return new OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>>(handlers,scope);
+            return new OwnedComponent<IEnumerable<IHandleMulticastEvent<TBusEvent>>>(handlers, scope);
         }
     }
 }

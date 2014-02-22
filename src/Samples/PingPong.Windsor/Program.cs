@@ -1,4 +1,9 @@
-﻿using Castle.Facilities.Startable;
+﻿using System;
+using System.Configuration;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Castle.Facilities.Startable;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus;
@@ -6,21 +11,13 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using ILogger = Nimbus.ILogger;
 
 namespace PingPong.Windsor
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.ColoredConsole()
@@ -44,7 +41,7 @@ namespace PingPong.Windsor
         {
             while (true)
             {
-                string input = Console.ReadLine();
+                var input = Console.ReadLine();
                 if (input.ToLowerInvariant() == "exit")
                 {
                     exit.Set();
@@ -60,7 +57,7 @@ namespace PingPong.Windsor
         private static void SetUpBus(IWindsorContainer container)
         {
             //TODO: Set up your own connection string in app.config
-            string connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
+            var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
             // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care. You can roll your
             // own by implementing the ILogger interface if you want to hook it to an existing logging implementation.
@@ -71,14 +68,14 @@ namespace PingPong.Windsor
 
             container.RegisterNimbus(typeProvider);
             container.Register(Component.For<IBus>().ImplementedBy<Bus>().UsingFactoryMethod<IBus>(() => new BusBuilder()
-                .Configure()
-                .WithConnectionString(connectionString)
-                .WithNames("PingPong.Windsor", Environment.MachineName)
-                .WithTypesFrom(typeProvider)
-                .WithWindsorDefaults(container)
-                .Build())
-                .LifestyleSingleton()
-                .StartUsingMethod("Start")
+                                                                                                       .Configure()
+                                                                                                       .WithConnectionString(connectionString)
+                                                                                                       .WithNames("PingPong.Windsor", Environment.MachineName)
+                                                                                                       .WithTypesFrom(typeProvider)
+                                                                                                       .WithWindsorDefaults(container)
+                                                                                                       .Build())
+                                        .LifestyleSingleton()
+                                        .StartUsingMethod("Start")
                 );
         }
     }

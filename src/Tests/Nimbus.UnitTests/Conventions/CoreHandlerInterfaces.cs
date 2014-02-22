@@ -12,7 +12,7 @@ namespace Nimbus.UnitTests.Conventions
     public class CoreHandlerInterfaces
     {
         [Test]
-        [TestCaseSource(typeof(TestCases))]
+        [TestCaseSource(typeof (TestCases))]
         public void MustBeInTheCorrectNamespaceNamespace(Type type)
         {
             type.Namespace.ShouldBe("Nimbus.Handlers");

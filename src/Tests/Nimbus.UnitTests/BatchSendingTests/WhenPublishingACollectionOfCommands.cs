@@ -5,7 +5,6 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.MessageContracts;
-using Nimbus.PoisonMessages;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;

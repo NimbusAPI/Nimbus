@@ -1,6 +1,5 @@
 ﻿using System;
 using Serilog;
-using ILogger = Nimbus.ILogger;
 
 namespace Nimbus.Logger.Serilog
 {

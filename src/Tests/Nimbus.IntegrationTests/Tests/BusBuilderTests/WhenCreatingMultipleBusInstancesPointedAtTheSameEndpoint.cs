@@ -6,12 +6,11 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(60 * 1000)]
+    [Timeout(60*1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
         private Bus[] _buses;
@@ -57,10 +56,10 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                              .WithConnectionString(CommonResources.ConnectionString)
                                              .WithTypesFrom(typeProvider)
                                              .WithCommandHandlerFactory(messageBroker)
-                                             .WithRequestBroker(messageBroker)
-                                             .WithMulticastEventBroker(messageBroker)
+                                             .WithRequestHandlerFactory(messageBroker)
+                                             .WithMulticastEventHandlerFactory(messageBroker)
                                              .WithCompetingEventHandlerFactory(messageBroker)
-                                             .WithMulticastRequestBroker(messageBroker)
+                                             .WithMulticastRequestHandlerFactory(messageBroker)
                                              .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                              .WithLogger(logger)
                                              .WithDebugOptions(
@@ -91,10 +90,10 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                                           .WithConnectionString(CommonResources.ConnectionString)
                                                           .WithTypesFrom(typeProvider)
                                                           .WithCommandHandlerFactory(messageBroker)
-                                                          .WithRequestBroker(messageBroker)
-                                                          .WithMulticastEventBroker(messageBroker)
+                                                          .WithRequestHandlerFactory(messageBroker)
+                                                          .WithMulticastEventHandlerFactory(messageBroker)
                                                           .WithCompetingEventHandlerFactory(messageBroker)
-                                                          .WithMulticastRequestBroker(messageBroker)
+                                                          .WithMulticastRequestHandlerFactory(messageBroker)
                                                           .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                           .WithLogger(logger)
                                                           .Build();

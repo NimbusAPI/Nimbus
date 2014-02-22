@@ -4,6 +4,7 @@ using Nimbus.Infrastructure;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
+    //FIXME rename
     public class DefaultMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
                                                ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
                                                ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,

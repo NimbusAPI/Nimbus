@@ -9,10 +9,10 @@ using Nimbus.MessageContracts.Exceptions;
 namespace Nimbus.Infrastructure
 {
     public sealed class DefaultMessageHandlerFactory : ICommandHandlerFactory,
-                                                IRequestHandlerFactory,
-                                                IMulticastRequestHandlerFactory,
-                                                IMulticastEventHandlerFactory,
-                                                ICompetingEventHandlerFactory
+                                                       IRequestHandlerFactory,
+                                                       IMulticastRequestHandlerFactory,
+                                                       IMulticastEventHandlerFactory,
+                                                       ICompetingEventHandlerFactory
     {
         private readonly ITypeProvider _typeProvider;
 

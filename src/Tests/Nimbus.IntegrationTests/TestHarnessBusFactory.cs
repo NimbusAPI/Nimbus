@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
@@ -16,12 +15,8 @@ namespace Nimbus.IntegrationTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandHandlerFactory(messageHandlerFactory)
-                                      .WithRequestBroker(messageHandlerFactory)
-                                      .WithMulticastEventBroker(messageHandlerFactory)
-                                      .WithCompetingEventHandlerFactory(messageHandlerFactory)
-                                      .WithMulticastRequestBroker(messageHandlerFactory)
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultHandlerFactory(messageHandlerFactory)
+S                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>

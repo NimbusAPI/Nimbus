@@ -7,8 +7,6 @@ using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
 using Nimbus.SampleApp.MessageContracts;
 using Serilog;
-using ILogger = Nimbus.ILogger;
-
 
 namespace Nimbus.SampleApp
 {
@@ -28,8 +26,6 @@ namespace Nimbus.SampleApp
                 var bus = container.Resolve<IBus>();
                 bus.Send(new JustDoIt());
 
-
-
                 var deepThought = container.Resolve<DeepThought>();
                 deepThought.ComputeTheAnswer().Wait();
                 Console.ReadKey();
@@ -42,10 +38,9 @@ namespace Nimbus.SampleApp
 
             builder.RegisterType<DeepThought>();
 
-			
             builder.RegisterType<SerilogStaticLogger>()
-                .As<ILogger>()
-                .SingleInstance();
+                   .As<ILogger>()
+                   .SingleInstance();
 
             //TODO: Set up your own connection string in app.config
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];

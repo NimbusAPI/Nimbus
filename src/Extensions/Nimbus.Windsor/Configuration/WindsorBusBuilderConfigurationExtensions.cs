@@ -2,6 +2,7 @@
 using Nimbus.HandlerFactories;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {
@@ -10,11 +11,11 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithWindsorDefaults(this BusBuilderConfiguration configuration, IWindsorContainer container)
         {
             return configuration
-                .WithMulticastEventBroker(container.Resolve<IMulticastEventHandlerFactory>())
+                .WithMulticastEventHandlerFactory(container.Resolve<IMulticastEventHandlerFactory>())
                 .WithCompetingEventHandlerFactory(container.Resolve<ICompetingEventHandlerFactory>())
                 .WithCommandHandlerFactory(container.Resolve<ICommandHandlerFactory>())
-                .WithRequestBroker(container.Resolve<IRequestHandlerFactory>())
-                .WithMulticastRequestBroker(container.Resolve<IMulticastRequestHandlerFactory>())
+                .WithRequestHandlerFactory(container.Resolve<IRequestHandlerFactory>())
+                .WithMulticastRequestHandlerFactory(container.Resolve<IMulticastRequestHandlerFactory>())
                 .WithLogger(container.Resolve<ILogger>());
         }
     }

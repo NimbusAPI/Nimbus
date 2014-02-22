@@ -26,10 +26,10 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                                       .WithTypesFrom(typeProvider)
                                       .WithCommandHandlerFactory(messageBroker)
-                                      .WithRequestBroker(messageBroker)
-                                      .WithMulticastEventBroker(messageBroker)
+                                      .WithRequestHandlerFactory(messageBroker)
+                                      .WithMulticastEventHandlerFactory(messageBroker)
                                       .WithCompetingEventHandlerFactory(messageBroker)
-                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithMulticastRequestHandlerFactory(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .Build();

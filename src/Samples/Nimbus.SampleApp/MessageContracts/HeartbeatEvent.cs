@@ -2,10 +2,7 @@
 
 namespace Nimbus.SampleApp.MessageContracts
 {
-    public class HeartbeatEvent: IBusEvent
+    public class HeartbeatEvent : IBusEvent
     {
-
-
-         
     }
 }

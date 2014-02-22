@@ -40,13 +40,14 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastEventBroker(this BusBuilderConfiguration configuration, IMulticastEventHandlerFactory multicastEventHandlerFactory)
+        public static BusBuilderConfiguration WithMulticastEventHandlerFactory(this BusBuilderConfiguration configuration, IMulticastEventHandlerFactory multicastEventHandlerFactory)
         {
             configuration.MulticastEventHandlerFactory = multicastEventHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithCompetingEventHandlerFactory(this BusBuilderConfiguration configuration, ICompetingEventHandlerFactory competingEventHandlerFactory)
+        public static BusBuilderConfiguration WithCompetingEventHandlerFactory(this BusBuilderConfiguration configuration,
+                                                                               ICompetingEventHandlerFactory competingEventHandlerFactory)
         {
             configuration.CompetingEventHandlerFactory = competingEventHandlerFactory;
             return configuration;
@@ -58,26 +59,26 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithRequestBroker(this BusBuilderConfiguration configuration, IRequestHandlerFactory requestHandlerFactory)
+        public static BusBuilderConfiguration WithRequestHandlerFactory(this BusBuilderConfiguration configuration, IRequestHandlerFactory requestHandlerFactory)
         {
             configuration.RequestHandlerFactory = requestHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestHandlerFactory requestHandlerFactory)
+        public static BusBuilderConfiguration WithMulticastRequestHandlerFactory(this BusBuilderConfiguration configuration, IMulticastRequestHandlerFactory requestHandlerFactory)
         {
             configuration.MulticastRequestHandlerFactory = requestHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration, DefaultMessageHandlerFactory messageHandlerFactory)
+        public static BusBuilderConfiguration WithDefaultHandlerFactory(this BusBuilderConfiguration configuration, DefaultMessageHandlerFactory messageHandlerFactory)
         {
             configuration
                 .WithCommandHandlerFactory(messageHandlerFactory)
-                .WithRequestBroker(messageHandlerFactory)
-                .WithMulticastRequestBroker(messageHandlerFactory)
+                .WithRequestHandlerFactory(messageHandlerFactory)
+                .WithMulticastRequestHandlerFactory(messageHandlerFactory)
                 .WithCompetingEventHandlerFactory(messageHandlerFactory)
-                .WithMulticastEventBroker(messageHandlerFactory);
+                .WithMulticastEventHandlerFactory(messageHandlerFactory);
             return configuration;
         }
 

@@ -12,7 +12,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
     [TestFixture]
     [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
-    [Timeout(60 * 1000)]
+    [Timeout(60*1000)]
     public abstract class ThroughputSpecificationForBus : SpecificationFor<Bus>
     {
         private TimeSpan _timeout;
@@ -36,9 +36,9 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(_typeProvider)
                                       .WithCommandHandlerFactory(_handlerFactory)
-                                      .WithRequestBroker(_handlerFactory)
-                                      .WithMulticastRequestBroker(_handlerFactory)
-                                      .WithMulticastEventBroker(_handlerFactory)
+                                      .WithRequestHandlerFactory(_handlerFactory)
+                                      .WithMulticastRequestHandlerFactory(_handlerFactory)
+                                      .WithMulticastEventHandlerFactory(_handlerFactory)
                                       .WithCompetingEventHandlerFactory(_handlerFactory)
                                       .WithDebugOptions(
                                           dc =>

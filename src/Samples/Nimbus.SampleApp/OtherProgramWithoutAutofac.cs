@@ -17,7 +17,7 @@ namespace Nimbus.SampleApp
                                       .WithConnectionString("foo")
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
-                                      .WithMulticastEventBroker(multicastEventHandlerFactory)
+                                      .WithMulticastEventHandlerFactory(multicastEventHandlerFactory)
                                       .Build();
         }
     }

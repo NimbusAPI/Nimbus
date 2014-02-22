@@ -70,19 +70,19 @@ namespace Nimbus.Infrastructure.RequestResponse
         private void RemoveExpiredWrappers()
         {
             Task.Run(() =>
-            {
-                var now = _clock.UtcNow;
+                     {
+                         var now = _clock.UtcNow;
 
-                var toRemove = _requestWrappers
-                    .Where(kvp => kvp.Value.ExpiresAfter >= now)
-                    .ToArray();
+                         var toRemove = _requestWrappers
+                             .Where(kvp => kvp.Value.ExpiresAfter >= now)
+                             .ToArray();
 
-                foreach (var kvp in toRemove)
-                {
-                    RemoveWrapper(kvp.Key);
-                    _logger.Debug("Removing request {0} which timed out at {1}", kvp.Key, kvp.Value.ExpiresAfter);
-                }
-            });
+                         foreach (var kvp in toRemove)
+                         {
+                             RemoveWrapper(kvp.Key);
+                             _logger.Debug("Removing request {0} which timed out at {1}", kvp.Key, kvp.Value.ExpiresAfter);
+                         }
+                     });
         }
     }
 }

@@ -76,22 +76,22 @@ namespace Nimbus.Configuration
             logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
 
             var queueDeletionTasks = namespaceManager().GetQueues()
-                                                     .Select(q => q.Path)
-                                                     .Select(queuePath => Task.Run(async delegate
-                                                                                         {
-                                                                                             logger.Debug("Deleting queue {0}", queuePath);
-                                                                                             await namespaceManager().DeleteQueueAsync(queuePath);
-                                                                                         }))
-                                                     .ToArray();
+                                                       .Select(q => q.Path)
+                                                       .Select(queuePath => Task.Run(async delegate
+                                                                                           {
+                                                                                               logger.Debug("Deleting queue {0}", queuePath);
+                                                                                               await namespaceManager().DeleteQueueAsync(queuePath);
+                                                                                           }))
+                                                       .ToArray();
 
             var topicDeletionTasks = namespaceManager().GetTopics()
-                                                     .Select(t => t.Path)
-                                                     .Select(topicPath => Task.Run(async delegate
-                                                                                         {
-                                                                                             logger.Debug("Deleting topic {0}", topicPath);
-                                                                                             await namespaceManager().DeleteTopicAsync(topicPath);
-                                                                                         }))
-                                                     .ToArray();
+                                                       .Select(t => t.Path)
+                                                       .Select(topicPath => Task.Run(async delegate
+                                                                                           {
+                                                                                               logger.Debug("Deleting topic {0}", topicPath);
+                                                                                               await namespaceManager().DeleteTopicAsync(topicPath);
+                                                                                           }))
+                                                       .ToArray();
 
             var allDeletionTasks = new Task[0]
                 .Union(queueDeletionTasks)

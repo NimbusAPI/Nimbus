@@ -4,6 +4,5 @@ namespace Nimbus.SampleApp.MessageContracts
 {
     public class JustDoIt : IBusCommand
     {
-         
     }
 }
