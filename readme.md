@@ -23,13 +23,13 @@ If you're using a bus you should probably be using an IoC container. If you like
     // This is how you tell Nimbus where to find all your message types and handlers.
     var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
-    var messageBroker = new DefaultMessageBroker(typeProvider);
+    var messageHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
     var bus = new BusBuilder().Configure()
                                 .WithNames("MyTestSuite", Environment.MachineName)
                                 .WithConnectionString(CommonResources.ConnectionString)
                                 .WithTypesFrom(typeProvider)
-                                .WithDefaultBroker(messageBroker)
+                                .WithDefaultHandlerFactory(messageHandlerFactory)
                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                 .Build();
     bus.Start();
@@ -103,9 +103,9 @@ If you're using a bus you should probably be using an IoC container. If you like
             _bus = bus;
         }
         
-        public void SendSomeCommand()
+        public async Task SendSomeCommand()
         {
-            _bus.Send(new DoSomethingCommand());
+            await _bus.Send(new DoSomethingCommand());
         }
     }
 
@@ -113,7 +113,7 @@ If you're using a bus you should probably be using an IoC container. If you like
 
     public class DoSomethingCommandHandler: IHandleCommand<DoSomethingCommand>
     {
-        public void Handle(DoSomethingCommand command)
+        public async Task Handle(DoSomethingCommand command)
         {
             //TODO: Do something useful here.
         }
@@ -130,14 +130,14 @@ If you're using a bus you should probably be using an IoC container. If you like
             _waitTimeCounter = waitTimeCounter;
         }
 
-        public void Handle(NewOrderRecieved busEvent)
+        public async Task Handle(NewOrderRecieved busEvent)
         {
             Console.WriteLine("I heard about a new order");
 
             _waitTimeCounter.RecordNewPizzaOrder(busEvent.PizzaId);
         }
 
-        public void Handle(PizzaIsReady busEvent)
+        public async Task Handle(PizzaIsReady busEvent)
         {
             Console.WriteLine("I heard about a complete order");
 
@@ -165,7 +165,7 @@ If you're using a bus you should probably be using an IoC container. If you like
             _waitTimeCounter = waitTimeCounter;
         }
 
-        public HowLongDoPizzasTakeResponse Handle(HowLongDoPizzasTakeRequest request)
+        public async Task<HowLongDoPizzasTakeResponse> Handle(HowLongDoPizzasTakeRequest request)
         {
             var currentAverage = _waitTimeCounter.GetAveragePizzaTimes();
 
