@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.InfrastructureContracts
+namespace Nimbus.HandlerFactories
 {
     public class OwnedComponent<T> : IDisposable
     {

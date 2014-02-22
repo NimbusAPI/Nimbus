@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 

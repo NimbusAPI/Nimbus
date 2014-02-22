@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 
 // ReSharper disable CheckNamespace
 namespace Nimbus.Configuration

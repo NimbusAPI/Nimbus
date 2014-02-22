@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;

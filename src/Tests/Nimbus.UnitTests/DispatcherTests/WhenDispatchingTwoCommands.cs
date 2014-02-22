@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure.Commands;
-using Nimbus.InfrastructureContracts;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;

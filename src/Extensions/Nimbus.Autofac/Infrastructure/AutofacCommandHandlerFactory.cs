@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Features.OwnedInstances;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Autofac.Infrastructure

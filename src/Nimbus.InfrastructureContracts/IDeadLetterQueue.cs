@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 
 // ReSharper disable CheckNamespace
-namespace Nimbus.PoisonMessages
+
+namespace Nimbus
 // ReSharper restore CheckNamespace
 {
     public interface IDeadLetterQueue

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 using NUnit.Framework;
 using Shouldly;
 

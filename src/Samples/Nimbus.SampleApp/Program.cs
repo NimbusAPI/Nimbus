@@ -7,7 +7,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
 using Nimbus.SampleApp.MessageContracts;
 using Serilog;
-using ILogger = Nimbus.InfrastructureContracts.ILogger;
+using ILogger = Nimbus.ILogger;
 
 
 namespace Nimbus.SampleApp

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.InfrastructureContracts
+namespace Nimbus
 {
     public interface IMulticastRequestSender
     {

@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Settings;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
 {

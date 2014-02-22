@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Castle.MicroKernel;
 using Castle.MicroKernel.Lifestyle;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Windsor.Infrastructure

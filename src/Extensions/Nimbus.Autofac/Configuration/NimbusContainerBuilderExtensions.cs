@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using Nimbus.Autofac.Infrastructure;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 
 // ReSharper disable CheckNamespace
 namespace Nimbus.Configuration

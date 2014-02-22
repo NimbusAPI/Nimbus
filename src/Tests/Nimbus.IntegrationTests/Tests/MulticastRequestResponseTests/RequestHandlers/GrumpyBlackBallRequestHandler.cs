@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers

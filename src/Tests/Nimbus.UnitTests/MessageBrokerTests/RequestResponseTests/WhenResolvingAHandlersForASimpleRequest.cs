@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.UnitTests.MessageBrokerTests.RequestResponseTests.Handlers;
 using Nimbus.UnitTests.MessageBrokerTests.RequestResponseTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;

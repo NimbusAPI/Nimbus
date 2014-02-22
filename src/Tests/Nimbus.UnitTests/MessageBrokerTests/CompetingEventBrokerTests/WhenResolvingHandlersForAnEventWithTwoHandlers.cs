@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.Handlers;
 using Nimbus.UnitTests.MessageBrokerTests.CompetingEventBrokerTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;

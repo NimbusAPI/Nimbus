@@ -7,7 +7,7 @@
     <ProjectGuid>{D59397D3-F595-45AB-9BF8-4615C298545B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.InfrastructureContracts</RootNamespace>
+    <RootNamespace>Nimbus</RootNamespace>
     <AssemblyName>Nimbus.InfrastructureContracts</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,20 +42,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBus.cs" />
-    <Compile Include="OwnedComponent.cs" />
-    <Compile Include="ICommandHandlerFactory.cs" />
-    <Compile Include="ICompetingEventHandlerFactory.cs" />
+    <Compile Include="HandlerFactories\OwnedComponent.cs" />
+    <Compile Include="HandlerFactories\ICommandHandlerFactory.cs" />
+    <Compile Include="HandlerFactories\ICompetingEventHandlerFactory.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />
-    <Compile Include="IHandleCommand.cs" />
-    <Compile Include="IHandleCompetingEvent.cs" />
-    <Compile Include="IHandleMulticastEvent.cs" />
-    <Compile Include="IHandleRequest.cs" />
+    <Compile Include="Handlers\IHandleCommand.cs" />
+    <Compile Include="Handlers\IHandleCompetingEvent.cs" />
+    <Compile Include="Handlers\IHandleMulticastEvent.cs" />
+    <Compile Include="Handlers\IHandleRequest.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="IMulticastEventHandlerFactory.cs" />
-    <Compile Include="IMulticastRequestHandlerFactory.cs" />
-    <Compile Include="IMulticastRequestSender.cs" />
-    <Compile Include="IRequestHandlerFactory.cs" />
+    <Compile Include="HandlerFactories\IMulticastEventHandlerFactory.cs" />
+    <Compile Include="HandlerFactories\IMulticastRequestHandlerFactory.cs" />
+    <Compile Include="HandlerFactories\IRequestHandlerFactory.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

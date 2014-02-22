@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 

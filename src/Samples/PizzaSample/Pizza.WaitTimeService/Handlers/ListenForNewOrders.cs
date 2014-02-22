@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Pizza.Maker.Messages;
 
 namespace Pizza.WaitTimeService.Handlers

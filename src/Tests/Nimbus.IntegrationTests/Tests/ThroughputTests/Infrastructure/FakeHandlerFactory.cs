@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure

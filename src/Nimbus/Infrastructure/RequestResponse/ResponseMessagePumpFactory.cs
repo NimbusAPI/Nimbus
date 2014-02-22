@@ -2,7 +2,6 @@
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {

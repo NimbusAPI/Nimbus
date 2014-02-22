@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 
 #pragma warning disable 4014

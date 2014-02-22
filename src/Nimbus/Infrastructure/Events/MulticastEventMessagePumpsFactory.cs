@@ -4,9 +4,10 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Events
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using Nimbus.Configuration;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.SampleApp
 {

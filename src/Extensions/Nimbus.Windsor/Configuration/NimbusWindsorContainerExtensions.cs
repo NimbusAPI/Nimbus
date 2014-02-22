@@ -1,8 +1,8 @@
 ﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
+using Nimbus.HandlerFactories;
 using Nimbus.Windsor.Infrastructure;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 using Castle.Windsor;
 
 // ReSharper disable CheckNamespace

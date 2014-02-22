@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Pizza.Ordering.Messages;
 
 namespace Pizza.WaitTimeService.Handlers

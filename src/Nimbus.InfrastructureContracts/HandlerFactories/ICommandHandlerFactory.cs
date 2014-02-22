@@ -1,6 +1,7 @@
-﻿using Nimbus.MessageContracts;
+﻿using Nimbus.Handlers;
+using Nimbus.MessageContracts;
 
-namespace Nimbus.InfrastructureContracts
+namespace Nimbus.HandlerFactories
 {
     public interface ICommandHandlerFactory
     {

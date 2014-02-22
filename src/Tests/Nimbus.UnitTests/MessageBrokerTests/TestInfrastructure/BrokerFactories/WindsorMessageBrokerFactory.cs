@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Castle.Windsor;
 using Nimbus.Configuration;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {

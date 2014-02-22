@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers

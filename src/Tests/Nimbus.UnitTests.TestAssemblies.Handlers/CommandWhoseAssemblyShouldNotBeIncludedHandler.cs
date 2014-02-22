@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Nimbus.UnitTests.TestAssemblies.MessageContracts;
 
 namespace Nimbus.UnitTests.TestAssemblies.Handlers

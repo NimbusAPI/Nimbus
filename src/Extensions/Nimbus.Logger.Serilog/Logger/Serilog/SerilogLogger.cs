@@ -1,6 +1,6 @@
 ﻿using System;
 using Serilog;
-using ILogger = Nimbus.InfrastructureContracts.ILogger;
+using ILogger = Nimbus.ILogger;
 using ISerilogLogger = Serilog.ILogger;
 
 namespace Nimbus.Logger.Serilog

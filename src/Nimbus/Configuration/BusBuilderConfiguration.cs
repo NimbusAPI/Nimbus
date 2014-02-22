@@ -1,7 +1,7 @@
 ﻿using System;
 using Nimbus.Configuration.Settings;
 using Nimbus.Exceptions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 using Nimbus.Logger;
 
 namespace Nimbus.Configuration

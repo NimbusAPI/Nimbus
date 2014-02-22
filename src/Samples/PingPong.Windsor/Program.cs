@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = Nimbus.ILogger;
 
 namespace PingPong.Windsor
 {
@@ -63,7 +64,7 @@ namespace PingPong.Windsor
 
             // You'll want a logger. There's a ConsoleLogger and a NullLogger if you really don't care. You can roll your
             // own by implementing the ILogger interface if you want to hook it to an existing logging implementation.
-            container.Register(Component.For<Nimbus.InfrastructureContracts.ILogger>().ImplementedBy<SerilogStaticLogger>().LifestyleSingleton());
+            container.Register(Component.For<ILogger>().ImplementedBy<SerilogStaticLogger>().LifestyleSingleton());
 
             // This is how you tell Nimbus where to find all your message types and handlers.
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());

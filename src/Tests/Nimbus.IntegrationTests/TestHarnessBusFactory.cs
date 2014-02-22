@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
 
 namespace Nimbus.IntegrationTests

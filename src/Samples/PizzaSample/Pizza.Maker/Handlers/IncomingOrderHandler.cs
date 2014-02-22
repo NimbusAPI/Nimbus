@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nimbus;
-using Nimbus.InfrastructureContracts;
+using Nimbus.Handlers;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 

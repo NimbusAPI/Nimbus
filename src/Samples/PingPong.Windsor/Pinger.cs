@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Nimbus;
-using Nimbus.InfrastructureContracts;
 using System.Threading.Tasks;
 
 namespace PingPong.Windsor
