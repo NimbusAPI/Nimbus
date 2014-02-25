@@ -1,15 +1,13 @@
 using System;
-using System.Threading;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 using Nimbus.Logger;
 
 namespace Nimbus.IntegrationTests
 {
     public static class TestHarnessBusFactory
     {
-        public static Bus CreateAndStart(ITypeProvider typeProvider, DefaultMessageBroker messageBroker)
+        public static Bus CreateAndStart(ITypeProvider typeProvider, DefaultMessageHandlerFactory messageHandlerFactory)
         {
             var logger = new ConsoleLogger();
 
@@ -17,11 +15,7 @@ namespace Nimbus.IntegrationTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(messageBroker)
-                                      .WithRequestBroker(messageBroker)
-                                      .WithMulticastEventBroker(messageBroker)
-                                      .WithCompetingEventBroker(messageBroker)
-                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithDefaultHandlerFactory(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(

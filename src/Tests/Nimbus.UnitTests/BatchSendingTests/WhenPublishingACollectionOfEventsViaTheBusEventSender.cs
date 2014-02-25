@@ -4,7 +4,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;

@@ -6,6 +6,5 @@ namespace Pizza.WaitTimeService
     {
         public DateTime OrderRecieved { get; set; }
         public DateTime? PizzaCooked { get; set; }
-
     }
 }

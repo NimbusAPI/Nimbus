@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -13,31 +13,41 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly Type _messageType;
-        private readonly IRequestBroker _requestBroker;
+        private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly IClock _clock;
 
-        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestBroker requestBroker, IClock clock)
+        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestHandlerFactory requestHandlerFactory, IClock clock)
         {
             _messagingFactory = messagingFactory;
             _messageType = messageType;
-            _requestBroker = requestBroker;
+            _requestHandlerFactory = requestHandlerFactory;
             _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
         {
+            var request = message.GetBody(_messageType);
+            var dispatchMethod = GetGenericDispatchMethodFor(request);
+            await (Task) dispatchMethod.Invoke(this, new[] {request, message});
+        }
+
+        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message)
+            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusResponse
+        {
             var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
-
-            var request = message.GetBody(_messageType);
 
             BrokeredMessage responseMessage;
             try
             {
-                var response = InvokeGenericHandleMethod(_requestBroker, request);
-                responseMessage = new BrokeredMessage(response);
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                using (var handler = _requestHandlerFactory.GetHandler<TBusRequest, TBusResponse>())
+                {
+                    var response = await handler.Component.Handle(busRequest);
+                    responseMessage = new BrokeredMessage(response);
+                    responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
+                    responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                }
             }
             catch (Exception exc)
             {
@@ -50,16 +60,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             await replyQueueClient.Send(responseMessage);
         }
 
-        private static object InvokeGenericHandleMethod(IRequestBroker requestBroker, object request)
-        {
-            // We can't use dynamic dispatch here as the DLR isn't so great at figuring things out when we have
-            // multiple generic parameters.  -andrewh 19/01/2014
-            var handleMethod = ExtractHandlerMethodInfo(request);
-            var response = handleMethod.Invoke(requestBroker, new[] {request});
-            return response;
-        }
-
-        internal static MethodInfo ExtractHandlerMethodInfo(object request)
+        internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
             var closedGenericTypeOfIBusRequest = request.GetType()
                                                         .GetInterfaces()
@@ -70,9 +71,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var genericHandleMethod = typeof (IRequestBroker).GetMethod("Handle");
-            var handleMethod = genericHandleMethod.MakeGenericMethod(new[] {requestType, responseType});
-            return handleMethod;
+            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            return closedGenericMethod;
         }
     }
 }

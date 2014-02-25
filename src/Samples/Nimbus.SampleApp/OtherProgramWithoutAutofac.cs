@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using Nimbus.Configuration;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.SampleApp
 {
@@ -11,13 +11,13 @@ namespace Nimbus.SampleApp
         public void DoFoo()
         {
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
-            IMulticastEventBroker multicastEventBroker = new DefaultMessageBroker(typeProvider);
+            IMulticastEventHandlerFactory multicastEventHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
             var bus = new BusBuilder().Configure()
                                       .WithConnectionString("foo")
                                       .WithNames("MyApp", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
-                                      .WithMulticastEventBroker(multicastEventBroker)
+                                      .WithMulticastEventHandlerFactory(multicastEventHandlerFactory)
                                       .Build();
         }
     }

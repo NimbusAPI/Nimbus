@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {
@@ -12,18 +10,16 @@ namespace Nimbus.Infrastructure
         private readonly INimbusMessageReceiver _receiver;
         private readonly IMessageDispatcher _dispatcher;
         private readonly ILogger _logger;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
         private readonly IClock _clock;
 
         private bool _started;
         private readonly object _mutex = new object();
 
-        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, DefaultBatchSizeSetting defaultBatchSize, IClock clock)
+        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, IClock clock)
         {
             _receiver = receiver;
             _dispatcher = dispatcher;
             _logger = logger;
-            _defaultBatchSize = defaultBatchSize;
             _clock = clock;
         }
 

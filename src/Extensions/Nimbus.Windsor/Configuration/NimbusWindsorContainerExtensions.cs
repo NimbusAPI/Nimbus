@@ -1,11 +1,11 @@
 ﻿using Castle.MicroKernel.Registration;
-using Castle.MicroKernel.SubSystems.Configuration;
-using Nimbus.Windsor.Infrastructure;
-using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 using Castle.Windsor;
+using Nimbus.Extensions;
+using Nimbus.HandlerFactories;
+using Nimbus.Windsor.Infrastructure;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {
@@ -15,11 +15,11 @@ namespace Nimbus.Configuration
         {
             container.Register(
                 Classes.From(typeProvider.AllHandlerTypes()).Pick().WithServiceAllInterfaces().LifestyleScoped(),
-                Component.For<IMulticastEventBroker>().ImplementedBy<WindsorMulticastEventBroker>().LifestyleSingleton(),
-                Component.For<ICompetingEventBroker>().ImplementedBy<WindsorCompetingEventBroker>().LifestyleSingleton(),
-                Component.For<ICommandBroker>().ImplementedBy<WindsorCommandBroker>().LifestyleSingleton(),
-                Component.For<IRequestBroker>().ImplementedBy<WindsorRequestBroker>().LifestyleSingleton(),
-                Component.For<IMulticastRequestBroker>().ImplementedBy<WindsorMulticastRequestBroker>().LifestyleSingleton()
+                Component.For<IMulticastEventHandlerFactory>().ImplementedBy<WindsorMulticastEventHandlerFactory>().LifestyleSingleton(),
+                Component.For<ICompetingEventHandlerFactory>().ImplementedBy<WindsorCompetingEventHandlerFactory>().LifestyleSingleton(),
+                Component.For<ICommandHandlerFactory>().ImplementedBy<WindsorCommandHandlerFactory>().LifestyleSingleton(),
+                Component.For<IRequestHandlerFactory>().ImplementedBy<WindsorRequestHandlerFactory>().LifestyleSingleton(),
+                Component.For<IMulticastRequestHandlerFactory>().ImplementedBy<WindsorMulticastRequestHandlerFactory>().LifestyleSingleton()
                 );
 
             return container;

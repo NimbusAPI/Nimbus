@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
-using Nimbus.InfrastructureContracts;
+using System.Threading.Tasks;
+using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers
@@ -9,7 +10,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandler
         public const string ExceptionMessage = "This is supposed to go bang.";
 
         [DebuggerStepThrough]
-        public RequestThatWillThrowResponse Handle(RequestThatWillThrow request)
+        public async Task<RequestThatWillThrowResponse> Handle(RequestThatWillThrow request)
         {
             throw new DemonstrationException(ExceptionMessage);
         }

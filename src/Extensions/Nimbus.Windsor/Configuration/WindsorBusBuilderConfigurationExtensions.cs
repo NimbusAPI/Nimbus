@@ -1,7 +1,8 @@
 ﻿using Castle.Windsor;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {
@@ -10,11 +11,11 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithWindsorDefaults(this BusBuilderConfiguration configuration, IWindsorContainer container)
         {
             return configuration
-                .WithMulticastEventBroker(container.Resolve<IMulticastEventBroker>())
-                .WithCompetingEventBroker(container.Resolve<ICompetingEventBroker>())
-                .WithCommandBroker(container.Resolve<ICommandBroker>())
-                .WithRequestBroker(container.Resolve<IRequestBroker>())
-                .WithMulticastRequestBroker(container.Resolve<IMulticastRequestBroker>())
+                .WithMulticastEventHandlerFactory(container.Resolve<IMulticastEventHandlerFactory>())
+                .WithCompetingEventHandlerFactory(container.Resolve<ICompetingEventHandlerFactory>())
+                .WithCommandHandlerFactory(container.Resolve<ICommandHandlerFactory>())
+                .WithRequestHandlerFactory(container.Resolve<IRequestHandlerFactory>())
+                .WithMulticastRequestHandlerFactory(container.Resolve<IMulticastRequestHandlerFactory>())
                 .WithLogger(container.Resolve<ILogger>());
         }
     }

@@ -1,5 +1,6 @@
 ﻿// ReSharper disable CheckNamespace
-namespace Nimbus.PoisonMessages
+
+namespace Nimbus
 // ReSharper restore CheckNamespace
 {
     /// <summary>

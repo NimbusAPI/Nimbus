@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Extensions
 {

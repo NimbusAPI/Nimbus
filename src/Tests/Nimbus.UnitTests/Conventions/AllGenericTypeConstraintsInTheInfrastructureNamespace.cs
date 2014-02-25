@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 using NUnit.Framework;
 using Shouldly;
 
@@ -23,7 +23,7 @@ namespace Nimbus.UnitTests.Conventions
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {
-                var referenceType = typeof (ICommandBroker);
+                var referenceType = typeof (ICommandHandlerFactory);
 
                 var interfaceTypes = referenceType.Assembly.GetTypes()
                                                   .Where(t => t.Namespace.StartsWith(referenceType.Namespace))

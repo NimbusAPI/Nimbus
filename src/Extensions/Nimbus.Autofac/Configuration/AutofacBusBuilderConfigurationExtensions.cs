@@ -1,7 +1,8 @@
 ﻿using Autofac;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {
@@ -10,11 +11,11 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithAutofacDefaults(this BusBuilderConfiguration configuration, IComponentContext componentContext)
         {
             return configuration
-                .WithMulticastEventBroker(componentContext.Resolve<IMulticastEventBroker>())
-                .WithCompetingEventBroker(componentContext.Resolve<ICompetingEventBroker>())
-                .WithCommandBroker(componentContext.Resolve<ICommandBroker>())
-                .WithRequestBroker(componentContext.Resolve<IRequestBroker>())
-                .WithMulticastRequestBroker(componentContext.Resolve<IMulticastRequestBroker>())
+                .WithMulticastEventHandlerFactory(componentContext.Resolve<IMulticastEventHandlerFactory>())
+                .WithCompetingEventHandlerFactory(componentContext.Resolve<ICompetingEventHandlerFactory>())
+                .WithCommandHandlerFactory(componentContext.Resolve<ICommandHandlerFactory>())
+                .WithRequestHandlerFactory(componentContext.Resolve<IRequestHandlerFactory>())
+                .WithMulticastRequestHandlerFactory(componentContext.Resolve<IMulticastRequestHandlerFactory>())
                 .WithLogger(componentContext.Resolve<ILogger>());
         }
     }

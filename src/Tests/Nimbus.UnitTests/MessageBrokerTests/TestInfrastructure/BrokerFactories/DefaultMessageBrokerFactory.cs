@@ -1,38 +1,39 @@
 using System.Threading.Tasks;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure.BrokerFactories
 {
-    public class DefaultMessageBrokerFactory : ICreateMessageBroker<ICommandBroker>,
-                                               ICreateMessageBroker<IMulticastEventBroker>,
-                                               ICreateMessageBroker<ICompetingEventBroker>,
-                                               ICreateMessageBroker<IRequestBroker>,
-                                               ICreateMessageBroker<IMulticastRequestBroker>
+    //FIXME rename
+    public class DefaultMessageBrokerFactory : ICreateMessageHandlerFactory<ICommandHandlerFactory>,
+                                               ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>,
+                                               ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>,
+                                               ICreateMessageHandlerFactory<IRequestHandlerFactory>,
+                                               ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>
     {
-        async Task<ICommandBroker> ICreateMessageBroker<ICommandBroker>.Create(ITypeProvider typeProvider)
+        async Task<ICommandHandlerFactory> ICreateMessageHandlerFactory<ICommandHandlerFactory>.Create(ITypeProvider typeProvider)
         {
-            return new DefaultMessageBroker(typeProvider);
+            return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<IMulticastEventBroker> ICreateMessageBroker<IMulticastEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastEventHandlerFactory> ICreateMessageHandlerFactory<IMulticastEventHandlerFactory>.Create(ITypeProvider typeProvider)
         {
-            return new DefaultMessageBroker(typeProvider);
+            return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<ICompetingEventBroker> ICreateMessageBroker<ICompetingEventBroker>.Create(ITypeProvider typeProvider)
+        async Task<ICompetingEventHandlerFactory> ICreateMessageHandlerFactory<ICompetingEventHandlerFactory>.Create(ITypeProvider typeProvider)
         {
-            return new DefaultMessageBroker(typeProvider);
+            return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<IRequestBroker> ICreateMessageBroker<IRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IRequestHandlerFactory> ICreateMessageHandlerFactory<IRequestHandlerFactory>.Create(ITypeProvider typeProvider)
         {
-            return new DefaultMessageBroker(typeProvider);
+            return new DefaultMessageHandlerFactory(typeProvider);
         }
 
-        async Task<IMulticastRequestBroker> ICreateMessageBroker<IMulticastRequestBroker>.Create(ITypeProvider typeProvider)
+        async Task<IMulticastRequestHandlerFactory> ICreateMessageHandlerFactory<IMulticastRequestHandlerFactory>.Create(ITypeProvider typeProvider)
         {
-            return new DefaultMessageBroker(typeProvider);
+            return new DefaultMessageHandlerFactory(typeProvider);
         }
 
         public void Dispose()

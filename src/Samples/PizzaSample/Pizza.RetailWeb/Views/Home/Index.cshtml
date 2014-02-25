@@ -20,22 +20,22 @@
 
 @section scripts{
     <script type="text/javascript">
-        $(function () {
+        $(function() {
 
             $.ajax({ url: "/Home/OrderAPizzaWidget" })
-           .success(function (html) {
-               $("#OrderAPizzaWidget").html(html);
-           });
+                .success(function(html) {
+                    $("#OrderAPizzaWidget").html(html);
+                });
 
             $.ajax({ url: "/Home/OrderStatusWidget" })
-           .success(function (html) {
-               $("#OrderStatusWidget").html(html);
-           });
+                .success(function(html) {
+                    $("#OrderStatusWidget").html(html);
+                });
 
             $.ajax({ url: "/Home/AverageWaitTimeWidget" })
-            .success(function (html) {
-                $("#AverageWaitTimeWidget").html(html);
-            });
+                .success(function(html) {
+                    $("#AverageWaitTimeWidget").html(html);
+                });
 
         });
     </script>

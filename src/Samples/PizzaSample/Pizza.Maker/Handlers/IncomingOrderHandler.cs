@@ -1,5 +1,6 @@
-﻿using Nimbus;
-using Nimbus.InfrastructureContracts;
+﻿using System.Threading.Tasks;
+using Nimbus;
+using Nimbus.Handlers;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
@@ -16,10 +17,10 @@ namespace Pizza.Maker.Handlers
             _pizzaMaker = pizzaMaker;
         }
 
-        public void Handle(OrderPizzaCommand busCommand)
+        public async Task Handle(OrderPizzaCommand busCommand)
         {
             _pizzaMaker.TakePizzaOrder(busCommand.CustomerName);
-            _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
+            await _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
         }
     }
 }

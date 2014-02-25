@@ -5,7 +5,6 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure

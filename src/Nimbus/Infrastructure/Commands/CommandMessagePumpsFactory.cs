@@ -4,7 +4,8 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 
 namespace Nimbus.Infrastructure.Commands
 {
@@ -12,8 +13,7 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly ILogger _logger;
         private readonly CommandHandlerTypesSetting _commandHandlerTypes;
-        private readonly ICommandBroker _commandBroker;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
 
@@ -21,15 +21,13 @@ namespace Nimbus.Infrastructure.Commands
 
         public CommandMessagePumpsFactory(ILogger logger,
                                           CommandHandlerTypesSetting commandHandlerTypes,
-                                          ICommandBroker commandBroker,
-                                          DefaultBatchSizeSetting defaultBatchSize,
+                                          ICommandHandlerFactory commandHandlerFactory,
                                           INimbusMessagingFactory messagingFactory,
                                           IClock clock)
         {
             _logger = logger;
             _commandHandlerTypes = commandHandlerTypes;
-            _commandBroker = commandBroker;
-            _defaultBatchSize = defaultBatchSize;
+            _commandHandlerFactory = commandHandlerFactory;
             _messagingFactory = messagingFactory;
             _clock = clock;
         }
@@ -51,10 +49,10 @@ namespace Nimbus.Infrastructure.Commands
                 var queuePath = PathFactory.QueuePathFor(commandType);
                 var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                var dispatcher = new CommandMessageDispatcher(_commandBroker, commandType);
+                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, commandType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

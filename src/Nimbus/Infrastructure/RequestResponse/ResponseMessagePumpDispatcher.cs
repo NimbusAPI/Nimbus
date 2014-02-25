@@ -20,7 +20,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
             if (responseCorrelationWrapper == null) return;
 
-            var success = (bool)message.Properties[MessagePropertyKeys.RequestSuccessful];
+            var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];
             if (success)
             {
                 var responseType = responseCorrelationWrapper.ResponseType;
@@ -29,8 +29,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             }
             else
             {
-                var exceptionMessage = (string)message.Properties[MessagePropertyKeys.ExceptionMessage];
-                var exceptionStackTrace = (string)message.Properties[MessagePropertyKeys.ExceptionStackTrace];
+                var exceptionMessage = (string) message.Properties[MessagePropertyKeys.ExceptionMessage];
+                var exceptionStackTrace = (string) message.Properties[MessagePropertyKeys.ExceptionStackTrace];
                 responseCorrelationWrapper.Throw(exceptionMessage, exceptionStackTrace);
             }
         }

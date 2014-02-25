@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Settings;
+using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
 {
@@ -40,45 +40,45 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastEventBroker(this BusBuilderConfiguration configuration, IMulticastEventBroker multicastEventBroker)
+        public static BusBuilderConfiguration WithMulticastEventHandlerFactory(this BusBuilderConfiguration configuration, IMulticastEventHandlerFactory multicastEventHandlerFactory)
         {
-            configuration.MulticastEventBroker = multicastEventBroker;
+            configuration.MulticastEventHandlerFactory = multicastEventHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithCompetingEventBroker(this BusBuilderConfiguration configuration, ICompetingEventBroker competingEventBroker)
+        public static BusBuilderConfiguration WithCompetingEventHandlerFactory(this BusBuilderConfiguration configuration,
+                                                                               ICompetingEventHandlerFactory competingEventHandlerFactory)
         {
-            configuration.CompetingEventBroker = competingEventBroker;
+            configuration.CompetingEventHandlerFactory = competingEventHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithCommandBroker(this BusBuilderConfiguration configuration, ICommandBroker commandBroker)
+        public static BusBuilderConfiguration WithCommandHandlerFactory(this BusBuilderConfiguration configuration, ICommandHandlerFactory commandHandlerFactory)
         {
-            configuration.CommandBroker = commandBroker;
+            configuration.CommandHandlerFactory = commandHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithRequestBroker(this BusBuilderConfiguration configuration, IRequestBroker requestBroker)
+        public static BusBuilderConfiguration WithRequestHandlerFactory(this BusBuilderConfiguration configuration, IRequestHandlerFactory requestHandlerFactory)
         {
-            configuration.RequestBroker = requestBroker;
+            configuration.RequestHandlerFactory = requestHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastRequestBroker(this BusBuilderConfiguration configuration, IMulticastRequestBroker requestBroker)
+        public static BusBuilderConfiguration WithMulticastRequestHandlerFactory(this BusBuilderConfiguration configuration, IMulticastRequestHandlerFactory requestHandlerFactory)
         {
-            configuration.MulticastRequestBroker = requestBroker;
+            configuration.MulticastRequestHandlerFactory = requestHandlerFactory;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithDefaultBroker(this BusBuilderConfiguration configuration,
-                                                                DefaultMessageBroker messageBroker)
+        public static BusBuilderConfiguration WithDefaultHandlerFactory(this BusBuilderConfiguration configuration, DefaultMessageHandlerFactory messageHandlerFactory)
         {
             configuration
-                .WithCommandBroker(messageBroker)
-                .WithRequestBroker(messageBroker)
-                .WithMulticastRequestBroker(messageBroker)
-                .WithCompetingEventBroker(messageBroker)
-                .WithMulticastEventBroker(messageBroker);
+                .WithCommandHandlerFactory(messageHandlerFactory)
+                .WithRequestHandlerFactory(messageHandlerFactory)
+                .WithMulticastRequestHandlerFactory(messageHandlerFactory)
+                .WithCompetingEventHandlerFactory(messageHandlerFactory)
+                .WithMulticastEventHandlerFactory(messageHandlerFactory);
             return configuration;
         }
 
@@ -110,13 +110,6 @@ namespace Nimbus.Configuration
             if (maxDeliveryAttempts < 1) throw new ArgumentOutOfRangeException("maxDeliveryAttempts", "You must attempt to deliver a message at least once.");
 
             configuration.MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = maxDeliveryAttempts};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithDefaultBatchSize(this BusBuilderConfiguration configuration, int defaultBatchSize)
-        {
-            if (defaultBatchSize < 1) throw new ArgumentOutOfRangeException("defaultBatchSize", "Batch size must be at least one.");
-            configuration.DefaultBatchSize = new DefaultBatchSizeSetting {Value = defaultBatchSize};
             return configuration;
         }
 

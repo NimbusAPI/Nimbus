@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using NUnit.Framework;
 using Shouldly;
 
@@ -29,6 +30,7 @@ namespace Nimbus.UnitTests.Conventions
                                    .Where(t => t.Name.EndsWith("Factory"))
                                    .Where(t => t.IsInstantiable())
                                    .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null)
+                                   .Where(t => !t.IsAssignableFrom(typeof (DefaultMessageHandlerFactory)))
                                    .Select(t => new TestCaseData(t)
                                                .SetName(t.FullName))
                                    .GetEnumerator();

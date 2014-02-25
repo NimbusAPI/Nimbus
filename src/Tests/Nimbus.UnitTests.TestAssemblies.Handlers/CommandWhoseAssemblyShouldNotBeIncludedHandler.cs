@@ -1,12 +1,13 @@
 ﻿using System;
-using Nimbus.InfrastructureContracts;
+using System.Threading.Tasks;
+using Nimbus.Handlers;
 using Nimbus.UnitTests.TestAssemblies.MessageContracts;
 
 namespace Nimbus.UnitTests.TestAssemblies.Handlers
 {
     public class CommandWhoseAssemblyShouldNotBeIncludedHandler : IHandleCommand<CommandWhoseAssemblyShouldNotBeIncluded>
     {
-        public void Handle(CommandWhoseAssemblyShouldNotBeIncluded busCommand)
+        public async Task Handle(CommandWhoseAssemblyShouldNotBeIncluded busCommand)
         {
             throw new NotImplementedException();
         }

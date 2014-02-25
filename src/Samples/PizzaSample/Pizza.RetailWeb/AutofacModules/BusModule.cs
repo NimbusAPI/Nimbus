@@ -31,13 +31,13 @@ namespace Pizza.RetailWeb.AutofacModules
             var handlerTypesProvider = new AssemblyScanningTypeProvider(ThisAssembly, pizzaOrderingMessagesAssembly, pizzaMakerMessagesAssembly);
 
             builder.RegisterNimbus(handlerTypesProvider);
-            builder.Register(componentContext => new BusBuilder()
-                                 .Configure()
-                                 .WithConnectionString(connectionString)
-                                 .WithNames("MyApp", Environment.MachineName)
-                                 .WithTypesFrom(handlerTypesProvider)
-                                 .WithAutofacDefaults(componentContext)
-                                 .Build())
+            builder.Register(componentContext => BusBuilderConfigurationExtensions.WithTypesFrom(new BusBuilder()
+                                                                                                     .Configure()
+                                                                                                     .WithConnectionString(connectionString)
+                                                                                                     .WithNames("MyApp", Environment.MachineName),
+                                                                                                 handlerTypesProvider)
+                                                                                  .WithAutofacDefaults(componentContext)
+                                                                                  .Build())
                    .As<IBus>()
                    .AutoActivate()
                    .OnActivated(c => c.Instance.Start())

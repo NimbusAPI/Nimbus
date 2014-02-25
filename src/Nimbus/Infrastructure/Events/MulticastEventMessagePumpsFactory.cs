@@ -4,9 +4,9 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -17,8 +17,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly InstanceNameSetting _instanceName;
         private readonly MulticastEventHandlerTypesSetting _multicastEventHandlerTypes;
         private readonly ILogger _logger;
-        private readonly IMulticastEventBroker _multicastEventBroker;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
+        private readonly IMulticastEventHandlerFactory _multicastEventHandlerFactory;
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -28,8 +27,7 @@ namespace Nimbus.Infrastructure.Events
                                                    InstanceNameSetting instanceName,
                                                    MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
-                                                   IMulticastEventBroker multicastEventBroker,
-                                                   DefaultBatchSizeSetting defaultBatchSize,
+                                                   IMulticastEventHandlerFactory multicastEventHandlerFactory,
                                                    IClock clock)
         {
             _queueManager = queueManager;
@@ -37,8 +35,7 @@ namespace Nimbus.Infrastructure.Events
             _instanceName = instanceName;
             _multicastEventHandlerTypes = multicastEventHandlerTypes;
             _logger = logger;
-            _multicastEventBroker = multicastEventBroker;
-            _defaultBatchSize = defaultBatchSize;
+            _multicastEventHandlerFactory = multicastEventHandlerFactory;
             _clock = clock;
         }
 
@@ -62,10 +59,10 @@ namespace Nimbus.Infrastructure.Events
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
                 _garbageMan.Add(receiver);
 
-                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventBroker, eventType);
+                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, eventType);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger, _defaultBatchSize, _clock);
+                var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

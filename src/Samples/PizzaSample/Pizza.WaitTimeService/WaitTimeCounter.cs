@@ -10,7 +10,7 @@ namespace Pizza.WaitTimeService
 
         public void RecordNewPizzaOrder(string customerName)
         {
-            _pizzaTimes[customerName] = new PizzaTime { OrderRecieved = DateTime.Now };
+            _pizzaTimes[customerName] = new PizzaTime {OrderRecieved = DateTime.Now};
         }
 
         public void RecordPizzaCompleted(string customerName)

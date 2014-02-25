@@ -2,28 +2,34 @@
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
+using Nimbus.HandlerFactories;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Commands
 {
     internal class CommandMessageDispatcher : IMessageDispatcher
     {
-        private readonly ICommandBroker _commandBroker;
+        private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly Type _commandType;
 
-        public CommandMessageDispatcher(ICommandBroker commandBroker, Type commandType)
+        public CommandMessageDispatcher(ICommandHandlerFactory commandHandlerFactory, Type commandType)
         {
-            _commandBroker = commandBroker;
+            _commandHandlerFactory = commandHandlerFactory;
             _commandType = commandType;
         }
 
-        public Task Dispatch(BrokeredMessage message)
+        public async Task Dispatch(BrokeredMessage message)
         {
-            return Task.Run(() =>
-                            {
-                                var busCommand = message.GetBody(_commandType);
-                                _commandBroker.Dispatch((dynamic) busCommand);
-                            });
+            var busCommand = message.GetBody(_commandType);
+            await Dispatch((dynamic) busCommand, message);
+        }
+
+        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
+        {
+            using (var handler = _commandHandlerFactory.GetHandler<TBusCommand>())
+            {
+                await handler.Component.Handle(busCommand);
+            }
         }
     }
 }

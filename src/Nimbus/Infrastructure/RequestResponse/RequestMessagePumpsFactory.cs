@@ -4,8 +4,9 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -14,8 +15,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly IQueueManager _queueManager;
-        private readonly DefaultBatchSizeSetting _defaultBatchSize;
-        private readonly IRequestBroker _requestBroker;
+        private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
 
@@ -24,16 +24,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
                                           IQueueManager queueManager,
-                                          DefaultBatchSizeSetting defaultBatchSize,
-                                          IRequestBroker requestBroker,
+                                          IRequestHandlerFactory requestHandlerFactory,
                                           INimbusMessagingFactory messagingFactory,
                                           IClock clock)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
             _queueManager = queueManager;
-            _defaultBatchSize = defaultBatchSize;
-            _requestBroker = requestBroker;
+            _requestHandlerFactory = requestHandlerFactory;
             _messagingFactory = messagingFactory;
             _clock = clock;
         }
@@ -56,10 +54,10 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestBroker, _clock);
+                var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestHandlerFactory, _clock);
                 _garbageMan.Add(dispatcher);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _defaultBatchSize, _clock);
+                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
                 _garbageMan.Add(pump);
 
                 yield return pump;

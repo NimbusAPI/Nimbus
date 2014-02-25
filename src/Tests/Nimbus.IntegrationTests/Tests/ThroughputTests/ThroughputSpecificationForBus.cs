@@ -12,13 +12,13 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
     [TestFixture]
     [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
-    [Timeout(60 * 1000)]
+    [Timeout(60*1000)]
     public abstract class ThroughputSpecificationForBus : SpecificationFor<Bus>
     {
         private TimeSpan _timeout;
         private AssemblyScanningTypeProvider _typeProvider;
 
-        private FakeBroker _broker;
+        private FakeHandlerFactory _handlerFactory;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
 
@@ -27,7 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         public override async Task<Bus> Given()
         {
-            _broker = new FakeBroker(NumMessagesToSend);
+            _handlerFactory = new FakeHandlerFactory(NumMessagesToSend);
             _timeout = TimeSpan.FromSeconds(30);
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
@@ -35,11 +35,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(_typeProvider)
-                                      .WithCommandBroker(_broker)
-                                      .WithRequestBroker(_broker)
-                                      .WithMulticastRequestBroker(_broker)
-                                      .WithMulticastEventBroker(_broker)
-                                      .WithCompetingEventBroker(_broker)
+                                      .WithCommandHandlerFactory(_handlerFactory)
+                                      .WithRequestHandlerFactory(_handlerFactory)
+                                      .WithMulticastRequestHandlerFactory(_handlerFactory)
+                                      .WithMulticastEventHandlerFactory(_handlerFactory)
+                                      .WithCompetingEventHandlerFactory(_handlerFactory)
                                       .WithDebugOptions(
                                           dc =>
                                               dc.RemoveAllExistingNamespaceElementsOnStartup(
@@ -58,11 +58,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            _broker.WaitUntilDone(_timeout);
+            _handlerFactory.WaitUntilDone(_timeout);
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
-            _messagesPerSecond = _broker.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
+            _messagesPerSecond = _handlerFactory.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 
@@ -74,7 +74,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             Subject = await Given();
             await When();
 
-            _broker.ActualNumMessagesReceived.ShouldBe(_broker.ExpectedNumMessagesReceived);
+            _handlerFactory.ActualNumMessagesReceived.ShouldBe(_handlerFactory.ExpectedNumMessagesReceived);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         public override void TearDown()
         {
             Subject.Stop();
-            _broker = null;
+            _handlerFactory = null;
         }
     }
 }

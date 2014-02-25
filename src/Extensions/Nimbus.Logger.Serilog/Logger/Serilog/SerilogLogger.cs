@@ -1,13 +1,12 @@
 ﻿using System;
 using Serilog;
-using ILogger = Nimbus.InfrastructureContracts.ILogger;
 using ISerilogLogger = Serilog.ILogger;
 
 namespace Nimbus.Logger.Serilog
 {
     public class SerilogLogger : ILogger
     {
-        readonly ISerilogLogger _logger;
+        private readonly ISerilogLogger _logger;
 
         public SerilogLogger(ISerilogLogger logger)
         {

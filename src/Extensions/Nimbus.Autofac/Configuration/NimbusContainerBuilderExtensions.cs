@@ -1,9 +1,9 @@
 ﻿using Autofac;
 using Nimbus.Autofac.Infrastructure;
 using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 
 // ReSharper disable CheckNamespace
+
 namespace Nimbus.Configuration
 // ReSharper restore CheckNamespace
 {
@@ -15,23 +15,23 @@ namespace Nimbus.Configuration
                    .AsImplementedInterfaces()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<AutofacMulticastEventBroker>()
+            builder.RegisterType<AutofacMulticastEventHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacCompetingEventBroker>()
+            builder.RegisterType<AutofacCompetingEventHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacCommandBroker>()
+            builder.RegisterType<AutofacCommandHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacRequestBroker>()
+            builder.RegisterType<AutofacRequestHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 
-            builder.RegisterType<AutofacMulticastRequestBroker>()
+            builder.RegisterType<AutofacMulticastRequestHandlerFactory>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
 

@@ -17,7 +17,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         public async Task ItShouldGoBangQuickly()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var messageBroker = new DefaultMessageBroker(typeProvider);
+            var messageBroker = new DefaultMessageHandlerFactory(typeProvider);
 
             var logger = new ConsoleLogger();
 
@@ -25,11 +25,11 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithNames("IntegrationTestHarness", Environment.MachineName)
                                       .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                                       .WithTypesFrom(typeProvider)
-                                      .WithCommandBroker(messageBroker)
-                                      .WithRequestBroker(messageBroker)
-                                      .WithMulticastEventBroker(messageBroker)
-                                      .WithCompetingEventBroker(messageBroker)
-                                      .WithMulticastRequestBroker(messageBroker)
+                                      .WithCommandHandlerFactory(messageBroker)
+                                      .WithRequestHandlerFactory(messageBroker)
+                                      .WithMulticastEventHandlerFactory(messageBroker)
+                                      .WithCompetingEventHandlerFactory(messageBroker)
+                                      .WithMulticastRequestHandlerFactory(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .Build();

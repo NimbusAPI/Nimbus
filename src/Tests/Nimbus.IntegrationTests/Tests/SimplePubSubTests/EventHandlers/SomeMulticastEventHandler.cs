@@ -1,16 +1,19 @@
-﻿using Nimbus.InfrastructureContracts;
+﻿using System.Threading.Tasks;
+using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+
+#pragma warning disable 4014
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers
 {
     public class SomeMulticastEventHandler : IHandleMulticastEvent<SomeEventWeOnlyHandleViaMulticast>, IHandleMulticastEvent<SomeEventWeHandleViaMulticastAndCompetition>
     {
-        public void Handle(SomeEventWeOnlyHandleViaMulticast busEvent)
+        public async Task Handle(SomeEventWeOnlyHandleViaMulticast busEvent)
         {
             MethodCallCounter.RecordCall<SomeMulticastEventHandler>(h => h.Handle(busEvent));
         }
 
-        public void Handle(SomeEventWeHandleViaMulticastAndCompetition busEvent)
+        public async Task Handle(SomeEventWeHandleViaMulticastAndCompetition busEvent)
         {
             MethodCallCounter.RecordCall<SomeMulticastEventHandler>(h => h.Handle(busEvent));
         }

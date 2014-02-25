@@ -19,7 +19,7 @@ namespace Pizza.Ordering
             // This is how you tell Nimbus where to find all your message types and handlers.
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof (NewOrderRecieved).Assembly, typeof (OrderPizzaCommand).Assembly);
 
-            var messageBroker = new DefaultMessageBroker(typeProvider);
+            var messageBroker = new DefaultMessageHandlerFactory(typeProvider);
 
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
@@ -27,7 +27,7 @@ namespace Pizza.Ordering
                                       .WithNames("Ordering", Environment.MachineName)
                                       .WithConnectionString(connectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithDefaultBroker(messageBroker)
+                                      .WithDefaultHandlerFactory(messageBroker)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .Build();
             bus.Start();
