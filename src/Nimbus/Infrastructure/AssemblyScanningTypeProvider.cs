@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.ServiceModel;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.MessageContracts;
@@ -150,6 +154,36 @@ namespace Nimbus.Infrastructure
         {
             AssertAllHandledMessageTypesAreIncludedDirectly();
             AssertThatWeWontDuplicateQueueNames();
+            AssertAllMessageTypesAreSerlizable();
+        }
+
+        private void AssertAllMessageTypesAreSerlizable()
+        {
+            var messageTypes = CommandTypes
+                .Union(RequestTypes)
+                .Union(EventTypes)
+                .ToArray();
+
+            foreach (var messageType in messageTypes)
+            {
+                try
+                {
+                    using (var mem = new MemoryStream())
+                    {
+                        var serializer = new DataContractSerializer(messageType);
+                        var instance = Activator.CreateInstance(messageType);
+                        serializer.WriteObject(mem, instance);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var message = "The message contract type {0} is not serializable."
+                        .FormatWith(
+                            messageType.FullName);
+
+                    throw new BusException(message);
+                }    
+            }
         }
 
         private void AssertThatWeWontDuplicateQueueNames()
