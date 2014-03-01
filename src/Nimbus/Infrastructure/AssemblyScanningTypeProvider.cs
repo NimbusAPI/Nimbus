@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.ServiceModel;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.MessageContracts;
