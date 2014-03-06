@@ -25,7 +25,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                        {
                            Task.Run(() =>
                                     {
-                                        Thread.Sleep(TimeSpan.FromMilliseconds(200));
+                                        Thread.Sleep(TimeSpan.FromMilliseconds(300));
                                         return 200;
                                     }),
                            Task.Run(() =>
@@ -67,7 +67,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             [Test]
             public void TheElapsedTimeShouldBeLessThanTheSlowestTasksDuration()
             {
-                _sw.ElapsedMilliseconds.ShouldBeLessThan(200);
+                _sw.ElapsedMilliseconds.ShouldBeLessThan(300);
             }
         }
     }
