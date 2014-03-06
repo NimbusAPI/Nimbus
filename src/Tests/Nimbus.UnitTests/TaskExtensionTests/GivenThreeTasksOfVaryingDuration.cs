@@ -43,7 +43,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
 
             public override void When()
             {
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(100)).ToArray();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(200)).ToArray();
                 _sw.Stop();
             }
 
