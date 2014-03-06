@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure.Events
             var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(eventType));
             await client.Send(brokeredMessage);
 
-            _logger.Debug("Published event: {0}", brokeredMessage);
+            _logger.Debug("Published event: {0}", busEvent);
         }
 
         private void AssertValidEventType(Type eventType)
