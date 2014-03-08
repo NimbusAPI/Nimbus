@@ -25,7 +25,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                        {
                            Task.Run(() =>
                                     {
-                                        Thread.Sleep(TimeSpan.FromMilliseconds(300));
+                                        Thread.Sleep(TimeSpan.FromMilliseconds(200));
                                         return 200;
                                     }),
                            Task.Run(() =>
@@ -43,7 +43,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
 
             public override void When()
             {
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(200)).ToArray();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(100)).ToArray();
                 _sw.Stop();
             }
 
@@ -58,16 +58,11 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             {
                 _result[0].ShouldBe(10);
             }
-
-            [Test]
-            public void TheSecondResultShouldBe50()
-            {
-            }
-
+            
             [Test]
             public void TheElapsedTimeShouldBeLessThanTheSlowestTasksDuration()
             {
-                _sw.ElapsedMilliseconds.ShouldBeLessThan(300);
+                _sw.ElapsedMilliseconds.ShouldBeLessThan(100);
             }
         }
     }
