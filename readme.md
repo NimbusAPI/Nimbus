@@ -10,9 +10,9 @@ Nimbus provides implementations of all of the common messaging patterns for buil
 
 ## How to get started?
 
-We've got a Wiki which has step by step instructions for getting up and running with Nimbus as well as an explaination of Nimbus's messaging patterns and how to implement them. [Go there for a quick and easy guide](./wiki) to building applications with Nimbus.
+We've got a Wiki which has step by step instructions for getting up and running with Nimbus as well as an explaination of Nimbus's messaging patterns and how to implement them. [Go there for a quick and easy guide](https://github.com/DamianMac/Nimbus/wiki) to building applications with Nimbus.
 
-If you want more code, clone the source and have a look at the [Sample Applications](./tree/master/src/Samples).
+If you want more code, clone the source and have a look at the [Sample Applications](https://github.com/DamianMac/Nimbus/tree/master/src/Samples).
 
 
 ## Can I contribute?
