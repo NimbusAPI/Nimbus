@@ -23,6 +23,8 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         protected override async Task Given(AllSubjectsTestContext context)
         {
+            MethodCallCounter.Clear();
+
             await base.Given(context);
 
             _commandDispatcher = new CommandMessageDispatcher(Subject, typeof (FooCommand), new SystemClock());
