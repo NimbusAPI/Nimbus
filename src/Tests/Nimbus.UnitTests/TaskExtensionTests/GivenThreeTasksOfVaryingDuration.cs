@@ -15,55 +15,77 @@ namespace Nimbus.UnitTests.TaskExtensionTests
         public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<Task<int>[]>
         {
             private int[] _result;
-            private Stopwatch _sw;
+            private Semaphore _semaphore1;
+            private Semaphore _semaphore2;
+            private Semaphore _semaphore3;
+            private Stopwatch _stopwatch;
+
 
             public override Task<int>[] Given()
             {
-                _sw = Stopwatch.StartNew();
+                _stopwatch = Stopwatch.StartNew();
+
+                _semaphore1 = new Semaphore(0, 1);
+                _semaphore2 = new Semaphore(0, 1);
+                _semaphore3 = new Semaphore(0, 1);
+
 
                 return new[]
                        {
                            Task.Run(() =>
-                                    {
-                                        Thread.Sleep(TimeSpan.FromMilliseconds(200));
-                                        return 200;
+                           {
+                               _semaphore1.WaitOne();
+                                        return 1;
                                     }),
                            Task.Run(() =>
-                                    {
-                                        Thread.Sleep(TimeSpan.FromMilliseconds(50));
-                                        return 20;
+                           {
+                               _semaphore2.WaitOne();
+                                        return 2;
                                     }),
                            Task.Run(() =>
-                                    {
-                                        Thread.Sleep(TimeSpan.FromMilliseconds(10));
-                                        return 10;
+                           {
+                               _semaphore3.WaitOne();
+                                        return 3;
                                     })
                        };
             }
 
             public override void When()
             {
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(100)).ToArray();
-                _sw.Stop();
             }
 
             [Test]
-            public void ThereShouldBeTwoResults()
+            public void WhenOneTaskReturnsInTime_WeGetOneResult()
             {
+                _semaphore1.Release();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(500)).ToArray();
+                
+                _result[0].ShouldBe(1);
+            }
+
+            [Test]
+            public void WhenTwoTaskReturnsInTime_WeGetTwoResults()
+            {
+                _semaphore1.Release();
+                _semaphore2.Release();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(500)).ToArray();
+
                 _result.Count().ShouldBe(2);
             }
 
-            [Test]
-            public void TheFirstResultShouldBe10()
+            [Then]
+            public void WhenTheThirdResultDoesntComeInTime_WeGetTwoResults()
             {
-                _result[0].ShouldBe(10);
+                _semaphore1.Release();
+                _semaphore2.Release();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(1000)).ToArray();
+
+                _stopwatch.Stop();
+
+                _stopwatch.Elapsed.TotalMilliseconds.ShouldBeGreaterThan(1000);
+                _result.Count().ShouldBe(2);
             }
-            
-            [Test]
-            public void TheElapsedTimeShouldBeLessThanTheSlowestTasksDuration()
-            {
-                _sw.ElapsedMilliseconds.ShouldBeLessThan(100);
-            }
+
         }
     }
 }
