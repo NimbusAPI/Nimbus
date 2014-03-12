@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
@@ -82,9 +81,16 @@ namespace Nimbus.Infrastructure
 
                 _logger.Error(exception, "Message dispatch failed");
 
-                _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
-                await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
-                _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+                try
+                {
+                    _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
+                    await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
+                    _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+                }
+                catch (Exception exc)
+                {
+                    _logger.Error(exc, "Could not call Abandon() on message {0} from {1}. Possible lock expiry?", message, message.ReplyTo);
+                }
             }
             catch (Exception exc)
             {
