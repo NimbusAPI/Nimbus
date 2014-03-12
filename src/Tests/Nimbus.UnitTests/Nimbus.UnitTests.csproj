@@ -85,6 +85,7 @@
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="ConfigurationTests\WhenLookingForClosedTypesOfAnOpenGeneric.cs" />
     <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
+    <Compile Include="Conventions\AllAsyncUnitTests.cs" />
     <Compile Include="Conventions\AllBusBuilderConfigurationExtensionMethods.cs" />
     <Compile Include="Conventions\AllComponentsThatCreateOtherComponents.cs" />
     <Compile Include="Conventions\AllFactories.cs" />
@@ -97,8 +98,12 @@
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="DispatcherTests\Handlers\BrokerTestCommandHandler.cs" />
+    <Compile Include="DispatcherTests\Handlers\SlowCommandHandler.cs" />
     <Compile Include="DispatcherTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="DispatcherTests\MessageContracts\SlowCommand.cs" />
+    <Compile Include="DispatcherTests\WhenDispatchingACommandToALongRunningHandler.cs" />
     <Compile Include="DispatcherTests\WhenDispatchingTwoCommands.cs" />
+    <Compile Include="GlobalTestTimeout.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />

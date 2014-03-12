@@ -17,7 +17,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
     {
         private ICommandSender _commandSender;
 
-        public override Task<Bus> Given()
+        protected override Task<Bus> Given()
         {
             var logger = Substitute.For<ILogger>();
             _commandSender = Substitute.For<ICommandSender>();
@@ -31,7 +31,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             return Task.FromResult(bus);
         }
 
-        public override async Task When()
+        protected override async Task When()
         {
             var commands = new IBusCommand[] {new FooCommand(), new BarCommand(), new BazCommand()};
             await Subject.SendAll(commands);

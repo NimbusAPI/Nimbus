@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.HandlerFactories;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -24,7 +25,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             await base.Given(context);
 
-            _commandDispatcher = new CommandMessageDispatcher(Subject, typeof (FooCommand));
+            _commandDispatcher = new CommandMessageDispatcher(Subject, typeof (FooCommand), new SystemClock());
         }
 
         protected override async Task When()

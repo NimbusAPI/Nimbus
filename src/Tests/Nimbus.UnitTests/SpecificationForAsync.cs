@@ -7,10 +7,10 @@ namespace Nimbus.UnitTests
 {
     public abstract class SpecificationForAsync<T> where T : class
     {
-        public T Subject;
+        protected T Subject;
 
-        public abstract Task<T> Given();
-        public abstract Task When();
+        protected abstract Task<T> Given();
+        protected abstract Task When();
 
         private Stopwatch _sw;
 

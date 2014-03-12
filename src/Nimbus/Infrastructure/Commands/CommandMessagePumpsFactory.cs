@@ -49,7 +49,7 @@ namespace Nimbus.Infrastructure.Commands
                 var queuePath = PathFactory.QueuePathFor(commandType);
                 var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, commandType);
+                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, commandType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);

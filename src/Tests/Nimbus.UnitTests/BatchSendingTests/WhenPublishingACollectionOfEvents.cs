@@ -17,7 +17,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
     {
         private IEventSender _eventSender;
 
-        public override Task<Bus> Given()
+        protected override Task<Bus> Given()
         {
             var logger = Substitute.For<ILogger>();
             var commandSender = Substitute.For<ICommandSender>();
@@ -31,7 +31,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             return Task.FromResult(bus);
         }
 
-        public override async Task When()
+        protected override async Task When()
         {
             var events = new IBusEvent[] {new FooEvent(), new BarEvent(), new BazEvent()};
             await Subject.PublishAll(events);

@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\ILongRunningHandler.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="HandlerFactories\OwnedComponent.cs" />
     <Compile Include="HandlerFactories\ICommandHandlerFactory.cs" />

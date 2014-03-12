@@ -17,7 +17,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
     {
         private INimbusMessageSender _nimbusMessageSender;
 
-        public override Task<BusCommandSender> Given()
+        protected override Task<BusCommandSender> Given()
         {
             _nimbusMessageSender = Substitute.For<INimbusMessageSender>();
 
@@ -31,7 +31,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             return Task.FromResult(busCommandSender);
         }
 
-        public override async Task When()
+        protected override async Task When()
         {
             var commands = new IBusCommand[] {new FooCommand(), new BarCommand(), new BazCommand()};
 

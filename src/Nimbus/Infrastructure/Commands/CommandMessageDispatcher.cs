@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Commands
@@ -11,11 +12,13 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly Type _commandType;
+        private readonly IClock _clock;
 
-        public CommandMessageDispatcher(ICommandHandlerFactory commandHandlerFactory, Type commandType)
+        public CommandMessageDispatcher(ICommandHandlerFactory commandHandlerFactory, Type commandType, IClock clock)
         {
             _commandHandlerFactory = commandHandlerFactory;
             _commandType = commandType;
+            _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -28,7 +31,9 @@ namespace Nimbus.Infrastructure.Commands
         {
             using (var handler = _commandHandlerFactory.GetHandler<TBusCommand>())
             {
-                await handler.Component.Handle(busCommand);
+                var handlerTask = handler.Component.Handle(busCommand);
+                var wrapper = new LongLivedTaskWrapper(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
+                await wrapper.AwaitCompletion();
             }
         }
     }
