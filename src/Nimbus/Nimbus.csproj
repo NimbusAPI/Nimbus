@@ -57,7 +57,7 @@
     <Compile Include="BatchSendingExtensions.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
-    <Compile Include="Infrastructure\LongLivedTaskWrapper.cs" />
+    <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />

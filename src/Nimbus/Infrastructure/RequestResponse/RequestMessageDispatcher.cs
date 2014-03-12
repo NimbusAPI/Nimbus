@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -43,7 +44,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             {
                 using (var handler = _requestHandlerFactory.GetHandler<TBusRequest, TBusResponse>())
                 {
-                    var response = await handler.Component.Handle(busRequest);
+                    var handlerTask = handler.Component.Handle(busRequest);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
+                    var response = await wrapperTask.AwaitCompletion();
                     responseMessage = new BrokeredMessage(response);
                     responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
                     responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);

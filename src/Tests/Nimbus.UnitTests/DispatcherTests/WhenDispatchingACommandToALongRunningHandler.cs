@@ -31,13 +31,13 @@ namespace Nimbus.UnitTests.DispatcherTests
             _renewLockCalled = false;
             _handlerTask = _handler.Handle(_slowCommand);
 
-            LongLivedTaskWrapper.RenewLockStrategy = m =>
+            LongLivedTaskWrapperBase.RenewLockStrategy = m =>
                                                      {
                                                          _renewLockCalled = true;
                                                          _lockedUntil = _clock.UtcNow.AddSeconds(1);
                                                          _handler.PretendToBeWorkingSemaphore.Release();
                                                      };
-            LongLivedTaskWrapper.LockedUntilUtcStrategy = m => _lockedUntil;
+            LongLivedTaskWrapperBase.LockedUntilUtcStrategy = m => _lockedUntil;
 
             _lockedUntil = DateTimeOffset.UtcNow.AddSeconds(1);
             return new LongLivedTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock);

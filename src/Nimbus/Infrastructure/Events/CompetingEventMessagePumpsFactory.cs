@@ -53,7 +53,7 @@ namespace Nimbus.Infrastructure.Events
                 var subscriptionName = String.Format("{0}", _applicationName);
                 var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, eventType);
+                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, eventType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

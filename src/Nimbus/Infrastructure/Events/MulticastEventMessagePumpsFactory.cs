@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure.Events
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
                 _garbageMan.Add(receiver);
 
-                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, eventType);
+                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, eventType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

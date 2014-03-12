@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.HandlerFactories;
+using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -14,12 +15,17 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly Type _requestType;
+        private readonly IClock _clock;
 
-        public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory, IMulticastRequestHandlerFactory multicastRequestHandlerFactory, Type requestType)
+        public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory,
+                                                 IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
+                                                 Type requestType,
+                                                 IClock clock)
         {
             _messagingFactory = messagingFactory;
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _requestType = requestType;
+            _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -42,14 +48,15 @@ namespace Nimbus.Infrastructure.RequestResponse
             using (var handlers = _multicastRequestHandlerFactory.GetHandlers<TBusRequest, TBusResponse>())
             {
                 var tasks = handlers.Component
-                                    .Select(h => h.Handle(busRequest)
-                                                  .ContinueWith(async t =>
-                                                                      {
-                                                                          var responseMessage = new BrokeredMessage(t.Result);
-                                                                          responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                                                                          responseMessage.CorrelationId = message.CorrelationId;
-                                                                          await replyQueueClient.Send(responseMessage);
-                                                                      }))
+                                    .Select(h => new LongLivedTaskWrapper<TBusResponse>(h.Handle(busRequest), h as ILongRunningHandler, message, _clock)
+                                                .AwaitCompletion()
+                                                .ContinueWith(async t =>
+                                                                    {
+                                                                        var responseMessage = new BrokeredMessage(t.Result);
+                                                                        responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
+                                                                        responseMessage.CorrelationId = message.CorrelationId;
+                                                                        await replyQueueClient.Send(responseMessage);
+                                                                    }))
                                     .ToArray();
 
                 await Task.WhenAll(tasks);

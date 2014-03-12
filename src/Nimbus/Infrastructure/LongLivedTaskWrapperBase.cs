@@ -8,9 +8,37 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    internal class LongLivedTaskWrapper
+    internal class LongLivedTaskWrapper<T> : LongLivedTaskWrapperBase
     {
-        private readonly Task _handlerTask;
+        public LongLivedTaskWrapper(Task<T> handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+            : base(handlerTask, longRunningHandler, message, clock)
+        {
+        }
+
+        public async Task<T> AwaitCompletion()
+        {
+            var firstTaskToComplete = await AwaitCompletionInternal(HandlerTask);
+            return await ((Task<T>) firstTaskToComplete);
+        }
+    }
+
+    internal class LongLivedTaskWrapper : LongLivedTaskWrapperBase
+    {
+        public LongLivedTaskWrapper(Task handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+            : base(handlerTask, longRunningHandler, message, clock)
+        {
+        }
+
+        public async Task AwaitCompletion()
+        {
+            var firstTaskToComplete = await AwaitCompletionInternal(HandlerTask);
+            await firstTaskToComplete;
+        }
+    }
+
+    internal abstract class LongLivedTaskWrapperBase
+    {
+        protected readonly Task HandlerTask;
         private readonly ILongRunningHandler _longRunningHandler;
         private readonly BrokeredMessage _message;
         private readonly IClock _clock;
@@ -23,20 +51,17 @@ namespace Nimbus.Infrastructure
         internal static Func<BrokeredMessage, DateTimeOffset> LockedUntilUtcStrategy = m => m.LockedUntilUtc;
         internal static Action<BrokeredMessage> RenewLockStrategy = m => m.RenewLock();
 
-        public LongLivedTaskWrapper(Task handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+        protected LongLivedTaskWrapperBase(Task handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
         {
-            _handlerTask = handlerTask;
+            HandlerTask = handlerTask;
             _longRunningHandler = longRunningHandler;
             _message = message;
             _clock = clock;
         }
 
-        public async Task AwaitCompletion()
+        protected async Task<Task> AwaitCompletionInternal(Task handlerTask)
         {
-            var tasks = new List<Task>();
-
-            var handlerTask = WaitForCompletion(_handlerTask);
-            tasks.Add(handlerTask);
+            var tasks = new List<Task> {handlerTask};
 
             if (_longRunningHandler != null)
             {
@@ -45,10 +70,13 @@ namespace Nimbus.Infrastructure
             }
 
             var firstTaskToComplete = await Task.WhenAny(tasks);
+
             if (firstTaskToComplete.IsFaulted)
             {
                 ExceptionDispatchInfo.Capture(firstTaskToComplete.Exception.InnerException).Throw();
             }
+
+            return firstTaskToComplete;
         }
 
         private async Task WaitForCompletion(Task handlerTask)
