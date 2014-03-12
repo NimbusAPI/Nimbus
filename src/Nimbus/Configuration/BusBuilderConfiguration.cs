@@ -8,15 +8,17 @@ namespace Nimbus.Configuration
 {
     public class BusBuilderConfiguration
     {
-        internal ApplicationNameSetting ApplicationName { get; set; }
-        internal InstanceNameSetting InstanceName { get; set; }
-        internal ConnectionStringSetting ConnectionString { get; set; }
         internal ICommandHandlerFactory CommandHandlerFactory { get; set; }
         internal IRequestHandlerFactory RequestHandlerFactory { get; set; }
         internal IMulticastRequestHandlerFactory MulticastRequestHandlerFactory { get; set; }
         internal IMulticastEventHandlerFactory MulticastEventHandlerFactory { get; set; }
         internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
+        internal ILogger Logger { get; set; }
+        internal BusDebuggingConfiguration Debugging { get; set; }
 
+        internal ApplicationNameSetting ApplicationName { get; set; }
+        internal InstanceNameSetting InstanceName { get; set; }
+        internal ConnectionStringSetting ConnectionString { get; set; }
         internal CommandHandlerTypesSetting CommandHandlerTypes { get; set; }
         internal CommandTypesSetting CommandTypes { get; set; }
         internal RequestHandlerTypesSetting RequestHandlerTypes { get; set; }
@@ -27,15 +29,10 @@ namespace Nimbus.Configuration
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
-        internal ILogger Logger { get; set; }
-        internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal BusBuilderConfiguration()
         {
-            DefaultTimeout = new DefaultTimeoutSetting {Value = TimeSpan.FromSeconds(10)}; //FIXME refactor these to override the Default property on their setting class
-            MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = 5};
             Logger = new NullLogger();
-
             Debugging = new BusDebuggingConfiguration();
         }
 
