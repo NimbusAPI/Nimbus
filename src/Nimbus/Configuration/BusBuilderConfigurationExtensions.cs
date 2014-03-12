@@ -40,7 +40,8 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastEventHandlerFactory(this BusBuilderConfiguration configuration, IMulticastEventHandlerFactory multicastEventHandlerFactory)
+        public static BusBuilderConfiguration WithMulticastEventHandlerFactory(this BusBuilderConfiguration configuration,
+                                                                               IMulticastEventHandlerFactory multicastEventHandlerFactory)
         {
             configuration.MulticastEventHandlerFactory = multicastEventHandlerFactory;
             return configuration;
@@ -102,6 +103,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
             configuration.DefaultTimeout = new DefaultTimeoutSetting {Value = defaultTimeout};
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDefaultMessageLockDuration(this BusBuilderConfiguration configuration, TimeSpan defaultLockDuration)
+        {
+            configuration.DefaultMessageLockDuration = new DefaultMessageLockDurationSetting {Value = defaultLockDuration};
             return configuration;
         }
 

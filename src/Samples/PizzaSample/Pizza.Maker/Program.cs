@@ -23,23 +23,14 @@ namespace Pizza.Maker
 
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<PizzaMaker>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<PizzaMaker>()
+                .AsImplementedInterfaces()
+                .SingleInstance();
 
             SetUpBus(builder);
             var container = builder.Build();
-            var pizzaMaker = container.Resolve<IPizzaMaker>();
 
-            while (true)
-            {
-                Console.WriteLine();
-                Console.WriteLine("PIZZA CHEF");
-                Console.WriteLine("Enter a pizza ID when you're done cooking it.");
-                var customerName = (Console.ReadLine() ?? string.Empty).Trim();
-
-                if (string.IsNullOrWhiteSpace(customerName)) continue;
-
-                pizzaMaker.CompletePizza(customerName);
-            }
+            Console.ReadLine();
         }
 
         private static void SetUpBus(ContainerBuilder builder)

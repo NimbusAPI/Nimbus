@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nimbus;
 using Pizza.Maker.Messages;
 
@@ -9,28 +9,20 @@ namespace Pizza.Maker
     {
         private readonly IBus _bus;
 
-        private readonly List<string> _currentPizzaOrders = new List<string>();
-
         public PizzaMaker(IBus bus)
         {
             _bus = bus;
         }
 
-        public void TakePizzaOrder(string customerName)
+        public async Task MakePizzaForCustomer(string customerName)
         {
-            if (_currentPizzaOrders.Contains(customerName)) return;
-
-            _currentPizzaOrders.Add(customerName);
-
+            await _bus.Publish(new NewOrderRecieved {CustomerName = customerName});
             Console.WriteLine("Have got your order {0}", customerName);
-        }
 
-        public void CompletePizza(string customerName)
-        {
-            if (!_currentPizzaOrders.Contains(customerName)) return;
+            await Task.Delay(TimeSpan.FromSeconds(45));
 
-            _currentPizzaOrders.Remove(customerName);
-            _bus.Publish(new PizzaIsReady {CustomerName = customerName});
+            await _bus.Publish(new PizzaIsReady {CustomerName = customerName});
+            Console.WriteLine("Hey, {0}! Your pizza's ready!", customerName);
         }
     }
 }

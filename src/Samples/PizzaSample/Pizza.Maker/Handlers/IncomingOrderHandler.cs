@@ -1,26 +1,26 @@
 ﻿using System.Threading.Tasks;
-using Nimbus;
 using Nimbus.Handlers;
-using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
 namespace Pizza.Maker.Handlers
 {
-    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>
+    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>, ILongRunningHandler
     {
-        private readonly IBus _bus;
         private readonly IPizzaMaker _pizzaMaker;
 
-        public IncomingOrderHandler(IBus bus, IPizzaMaker pizzaMaker)
+        public IncomingOrderHandler(IPizzaMaker pizzaMaker)
         {
-            _bus = bus;
             _pizzaMaker = pizzaMaker;
         }
 
         public async Task Handle(OrderPizzaCommand busCommand)
         {
-            _pizzaMaker.TakePizzaOrder(busCommand.CustomerName);
-            await _bus.Publish(new NewOrderRecieved {CustomerName = busCommand.CustomerName});
+            await _pizzaMaker.MakePizzaForCustomer(busCommand.CustomerName);
+        }
+
+        public bool IsAlive
+        {
+            get { return true; }
         }
     }
 }

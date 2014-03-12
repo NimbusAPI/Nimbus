@@ -19,16 +19,19 @@ namespace Nimbus.Infrastructure
         private readonly Lazy<ConcurrentBag<string>> _knownTopics;
         private readonly Lazy<ConcurrentBag<string>> _knownSubscriptions;
         private readonly Lazy<ConcurrentBag<string>> _knownQueues;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
-                                 ILogger logger)
+                                 ILogger logger,
+                                 DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
 
             _knownTopics = new Lazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new Lazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -156,7 +159,7 @@ namespace Nimbus.Infrastructure
                                               DefaultMessageTimeToLive = TimeSpan.MaxValue,
                                               EnableDeadLetteringOnMessageExpiration = true,
                                               EnableBatchedOperations = true,
-                                              LockDuration = TimeSpan.FromSeconds(30),
+                                              LockDuration = _defaultMessageLockDuration,
                                               RequiresSession = false,
                                               AutoDeleteOnIdle = TimeSpan.FromDays(367),
                                           };
@@ -203,7 +206,7 @@ namespace Nimbus.Infrastructure
                                        DefaultMessageTimeToLive = TimeSpan.MaxValue,
                                        EnableDeadLetteringOnMessageExpiration = true,
                                        EnableBatchedOperations = true,
-                                       LockDuration = TimeSpan.FromSeconds(30),
+                                       LockDuration = _defaultMessageLockDuration,
                                        RequiresDuplicateDetection = false,
                                        RequiresSession = false,
                                        SupportOrdering = false,

@@ -1,8 +1,9 @@
-﻿namespace Pizza.Maker
+﻿using System.Threading.Tasks;
+
+namespace Pizza.Maker
 {
     public interface IPizzaMaker
     {
-        void TakePizzaOrder(string customerName);
-        void CompletePizza(string customerName);
+        Task MakePizzaForCustomer(string customerName);
     }
 }
