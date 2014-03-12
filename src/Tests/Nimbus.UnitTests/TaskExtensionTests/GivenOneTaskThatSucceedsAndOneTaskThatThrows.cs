@@ -13,6 +13,8 @@ namespace Nimbus.UnitTests.TaskExtensionTests
         [TestFixture]
         public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<Task<int>[]>
         {
+            private const int _timeoutMilliseconds = 1000;
+
             private int[] _result;
             private Stopwatch _sw;
 
@@ -35,7 +37,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
 
             public override void When()
             {
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(100)).ToArray();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(_timeoutMilliseconds)).ToArray();
                 _sw.Stop();
             }
 
@@ -54,7 +56,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             [Test]
             public void TheElapsedTimeShouldBeLessThanTheTimeoutBecauseBothTasksCompleteImmediately()
             {
-                _sw.ElapsedMilliseconds.ShouldBeLessThan(100);
+                _sw.ElapsedMilliseconds.ShouldBeLessThan(_timeoutMilliseconds);
             }
         }
     }
