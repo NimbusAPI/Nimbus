@@ -58,7 +58,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             public void WhenOneTaskReturnsInTime_WeGetOneResult()
             {
                 _semaphore1.Release();
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(500)).ToArray();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(1000)).ToArray();
                 
                 _result[0].ShouldBe(1);
             }
@@ -68,7 +68,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             {
                 _semaphore1.Release();
                 _semaphore2.Release();
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(500)).ToArray();
+                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(1000)).ToArray();
 
                 _result.Count().ShouldBe(2);
             }
