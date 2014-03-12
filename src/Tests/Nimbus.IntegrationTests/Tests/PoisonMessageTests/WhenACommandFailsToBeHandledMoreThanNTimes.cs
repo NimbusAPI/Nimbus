@@ -13,21 +13,22 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
     [TestFixture]
     public class WhenACommandFailsToBeHandledMoreThanNTimes : TestForAllBuses
     {
-        private TestCommand _testCommand;
+        private GoBangCommand _goBangCommand;
         private string _someContent;
-        private List<TestCommand> _deadLetterMessages = new List<TestCommand>();
+        private GoBangCommand[] _deadLetterMessages;
 
-        private const int _maxDeliveryAttempts = 7;
+        private const int _maxDeliveryAttempts = 3;
 
         public override async Task When()
         {
             _someContent = Guid.NewGuid().ToString();
-            _testCommand = new TestCommand(_someContent);
+            _goBangCommand = new GoBangCommand(_someContent);
 
-            await Bus.Send(_testCommand);
+            await Bus.Send(_goBangCommand);
+
             TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-            _deadLetterMessages = await FetchAllDeadLetterMessages(Bus);
+            _deadLetterMessages = (await FetchAllDeadLetterMessages(Bus)).ToArray();
         }
 
         [Test]
@@ -37,16 +38,16 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             await Given(busFactory);
             await When();
 
-            _deadLetterMessages.Count.ShouldBe(1);
+            _deadLetterMessages.Count().ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }
 
-        private static async Task<List<TestCommand>> FetchAllDeadLetterMessages(IBus bus)
+        private static async Task<List<GoBangCommand>> FetchAllDeadLetterMessages(IBus bus)
         {
-            var deadLetterMessages = new List<TestCommand>();
+            var deadLetterMessages = new List<GoBangCommand>();
             while (true)
             {
-                var message = await bus.DeadLetterQueues.CommandQueue.Pop<TestCommand>();
+                var message = await bus.DeadLetterQueues.CommandQueue.Pop<GoBangCommand>();
                 if (message == null) break;
                 deadLetterMessages.Add(message);
             }

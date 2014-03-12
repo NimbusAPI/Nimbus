@@ -111,8 +111,8 @@
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequest.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\RequestHandlers\SomeRequestHandler.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeResponse.cs" />
-    <Compile Include="Tests\PoisonMessageTests\MessageContracts\TestCommand.cs" />
-    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\TestCommandHandler.cs" />
+    <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
+    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />

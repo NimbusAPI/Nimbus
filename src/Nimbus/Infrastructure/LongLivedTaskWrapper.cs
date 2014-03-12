@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Handlers;
@@ -43,12 +44,16 @@ namespace Nimbus.Infrastructure
                 tasks.Add(watcherTask);
             }
 
-            await Task.WhenAny(tasks);
+            var firstTaskToComplete = await Task.WhenAny(tasks);
+            if (firstTaskToComplete.IsFaulted)
+            {
+                ExceptionDispatchInfo.Capture(firstTaskToComplete.Exception.InnerException).Throw();
+            }
         }
 
         private async Task WaitForCompletion(Task handlerTask)
         {
-            await Task.Run(async () => await handlerTask);
+            await Task.Run(async () => { await handlerTask; });
             lock (_mutex)
             {
                 _completed = true;

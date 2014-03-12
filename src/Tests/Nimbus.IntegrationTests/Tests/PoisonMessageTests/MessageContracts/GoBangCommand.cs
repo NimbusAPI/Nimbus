@@ -2,15 +2,15 @@
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts
 {
-    public class TestCommand : IBusCommand
+    public class GoBangCommand : IBusCommand
     {
         public string SomeContent { get; set; }
 
-        public TestCommand()
+        public GoBangCommand()
         {
         }
 
-        public TestCommand(string someContent)
+        public GoBangCommand(string someContent)
         {
             SomeContent = someContent;
         }
