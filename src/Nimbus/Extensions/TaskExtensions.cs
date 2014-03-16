@@ -19,39 +19,45 @@ namespace Nimbus.Extensions
         {
             var sw = Stopwatch.StartNew();
 
+            var completed = false;
+
             var tasksClone = tasks.ToArray();
-            var queue = new BlockingCollection<TResult>();
-            var totalTasks = tasksClone.Count();
-            var tasksCompleted = 0;
-
-            foreach (var task in tasksClone)
+            using (var resultsQueue = new BlockingCollection<TResult>())
             {
-                task.ContinueWith(t =>
-                                  {
-                                      if (t.IsFaulted || t.IsCanceled)
+                var totalTasks = tasksClone.Count();
+                var tasksCompleted = 0;
+
+                foreach (var task in tasksClone)
+                {
+                    task.ContinueWith(t =>
                                       {
-                                          // just pretend that we've already returned this result so that
-                                          // we can return immediately after all the non-broken tasks are
-                                          // complete.
-                                          Interlocked.Increment(ref tasksCompleted);
-                                          return;
-                                      }
+                                          if (completed) return; // just bail if our continuation is invoked after we've already given up.
 
-                                      queue.TryAdd(t.Result);
-                                  });
-            }
+                                          if (t.IsFaulted || t.IsCanceled)
+                                          {
+                                              Interlocked.Increment(ref tasksCompleted);
+                                              return;
+                                          }
 
-            while (true)
-            {
-                if (tasksCompleted >= totalTasks) break;
-                if (sw.Elapsed >= timeout) break;
+                                          resultsQueue.TryAdd(t.Result);
+                                      });
+                }
 
-                TResult result;
-                var remainingTime = timeout - sw.Elapsed;
-                if (!queue.TryTake(out result, remainingTime)) continue;
+                while (true)
+                {
+                    if (tasksCompleted >= totalTasks) break;
+                    if (sw.Elapsed >= timeout) break;
 
-                Interlocked.Increment(ref tasksCompleted);
-                yield return result;
+                    TResult result;
+                    var remainingTime = timeout - sw.Elapsed;
+                    var halfRemainingTime = TimeSpan.FromMilliseconds(remainingTime.TotalMilliseconds/2);
+                    if (!resultsQueue.TryTake(out result, halfRemainingTime)) continue;
+
+                    Interlocked.Increment(ref tasksCompleted);
+                    yield return result;
+                }
+
+                completed = true;
             }
         }
     }
