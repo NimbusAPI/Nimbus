@@ -11,7 +11,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
     internal class GivenThreeTasksOfVaryingDuration
     {
         [TestFixture]
-        [Timeout(1000)]
+        [Timeout(2000)]
         public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<OpportunisticTaskCompletionReturner<int>>
         {
             private readonly TimeSpan _timeout = TimeSpan.FromMilliseconds(100);
@@ -73,6 +73,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
 
                 _result.Length.ShouldBe(1);
                 _result[0].ShouldBe(1);
+                _cancellationToken.IsCancellationRequested.ShouldBe(true);
             }
 
             [Test]
@@ -85,6 +86,17 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 _result.Count().ShouldBe(2);
                 _result.ShouldContain(1);
                 _result.ShouldContain(2);
+                _cancellationToken.IsCancellationRequested.ShouldBe(true);
+            }
+
+            [Test]
+            public void WhenTwoTaskReturnsInTime_TheCancellationTokenShouldBeSet()
+            {
+                _semaphore1.Release();
+                _semaphore2.Release();
+                _result = Subject.GetResults().ToArray();
+
+                _cancellationToken.IsCancellationRequested.ShouldBe(true);
             }
 
             [Test]
