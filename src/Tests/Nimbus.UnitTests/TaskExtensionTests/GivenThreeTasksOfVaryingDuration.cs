@@ -11,26 +11,28 @@ namespace Nimbus.UnitTests.TaskExtensionTests
     internal class GivenThreeTasksOfVaryingDuration
     {
         [TestFixture]
-        [Timeout(2000)]
         public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<OpportunisticTaskCompletionReturner<int>>
         {
-            private readonly TimeSpan _timeout = TimeSpan.FromMilliseconds(100);
-
             private int[] _result;
+            private Semaphore _semaphore0;
             private Semaphore _semaphore1;
             private Semaphore _semaphore2;
-            private Semaphore _semaphore3;
             private Task<int>[] _tasks;
             private CancellationTokenSource _cancellationToken;
 
             public override OpportunisticTaskCompletionReturner<int> Given()
             {
+                _semaphore0 = new Semaphore(0, 1);
                 _semaphore1 = new Semaphore(0, 1);
                 _semaphore2 = new Semaphore(0, 1);
-                _semaphore3 = new Semaphore(0, 1);
 
                 _tasks = new[]
                          {
+                             Task.Run(() =>
+                                      {
+                                          _semaphore0.WaitOne();
+                                          return 0;
+                                      }),
                              Task.Run(() =>
                                       {
                                           _semaphore1.WaitOne();
@@ -40,15 +42,10 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                                       {
                                           _semaphore2.WaitOne();
                                           return 2;
-                                      }),
-                             Task.Run(() =>
-                                      {
-                                          _semaphore3.WaitOne();
-                                          return 3;
                                       })
                          };
 
-                _cancellationToken = new CancellationTokenSource(_timeout);
+                _cancellationToken = new CancellationTokenSource();
                 return new OpportunisticTaskCompletionReturner<int>(_tasks, _cancellationToken);
             }
 
@@ -59,52 +56,52 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             [Test]
             public void WhenTakingOnlyTheFirstResult_TheCallShouldExitWithoutNeedingTheCancellationTokenSet()
             {
-                _semaphore1.Release();
+                _semaphore0.Release();
                 _result = Subject.GetResults().Take(1).ToArray();
-
-                _cancellationToken.IsCancellationRequested.ShouldBe(false);
             }
 
             [Test]
-            public void WhenOnlyOneTaskReturnsInTime_WeGetASingleCorrectResult()
+            public async Task WhenOnlyOneTaskReturnsInTime_WeGetASingleCorrectResult()
             {
-                _semaphore1.Release();
+                _semaphore0.Release();
+                await _tasks[0];
+                _cancellationToken.Cancel();
+
                 _result = Subject.GetResults().ToArray();
 
                 _result.Length.ShouldBe(1);
-                _result[0].ShouldBe(1);
+                _result[0].ShouldBe(0);
                 _cancellationToken.IsCancellationRequested.ShouldBe(true);
             }
 
             [Test]
-            public void WhenTwoTaskReturnsInTime_WeGetTwoCorrectResults()
+            public async Task WhenTwoTaskReturnsInTime_WeGetTwoCorrectResults()
             {
+                _semaphore0.Release();
+                await _tasks[0];
+
                 _semaphore1.Release();
+                await _tasks[1];
+
+                _cancellationToken.Cancel();
+
                 _semaphore2.Release();
+                await _tasks[2];
+
                 _result = Subject.GetResults().ToArray();
 
                 _result.Count().ShouldBe(2);
+                _result.ShouldContain(0);
                 _result.ShouldContain(1);
-                _result.ShouldContain(2);
-                _cancellationToken.IsCancellationRequested.ShouldBe(true);
-            }
-
-            [Test]
-            public void WhenTwoTaskReturnsInTime_TheCancellationTokenShouldBeSet()
-            {
-                _semaphore1.Release();
-                _semaphore2.Release();
-                _result = Subject.GetResults().ToArray();
-
-                _cancellationToken.IsCancellationRequested.ShouldBe(true);
             }
 
             [Test]
             public void WhenAllTasksCompleteImmediately_WeShouldGetThreeResults()
             {
+                _semaphore0.Release();
                 _semaphore1.Release();
                 _semaphore2.Release();
-                _semaphore3.Release();
+
                 _result = Subject.GetResults().ToArray();
 
                 _result.Count().ShouldBe(3);
@@ -113,9 +110,10 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             [Test]
             public void WhenAllTasksCompleteImmediately_TheCallShouldExitWithoutTheCancellationTokenBeingSet()
             {
+                _semaphore0.Release();
                 _semaphore1.Release();
                 _semaphore2.Release();
-                _semaphore3.Release();
+
                 _result = Subject.GetResults().ToArray();
 
                 _cancellationToken.IsCancellationRequested.ShouldBe(false);

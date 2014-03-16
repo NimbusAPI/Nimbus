@@ -40,7 +40,7 @@ namespace Nimbus.Extensions
             _remainingTasks = tasks.ToList();
 
             foreach (var task in _remainingTasks.ToArray()) task.ContinueWith(OnTaskCompletion, TaskContinuationOptions.ExecuteSynchronously);
-            cancellationToken.Token.Register(() => _resultsQueue.CompleteAdding());
+            cancellationToken.Token.Register(Cancel);
         }
 
         public IEnumerable<TResult> GetResults()
@@ -57,9 +57,18 @@ namespace Nimbus.Extensions
                 _remainingTasks.Remove(task);
                 if (task.IsFaulted) return;
                 if (task.IsCanceled) return;
+
                 _resultsQueue.Add(task.Result);
 
                 if (_remainingTasks.None()) _resultsQueue.CompleteAdding();
+            }
+        }
+
+        private void Cancel()
+        {
+            lock (_remainingTasks)
+            {
+                _resultsQueue.CompleteAdding();
             }
         }
 
