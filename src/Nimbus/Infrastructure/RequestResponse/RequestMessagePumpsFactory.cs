@@ -20,13 +20,15 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
                                           IQueueManager queueManager,
                                           IRequestHandlerFactory requestHandlerFactory,
                                           INimbusMessagingFactory messagingFactory,
-                                          IClock clock)
+                                          IClock clock,
+                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -34,6 +36,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _requestHandlerFactory = requestHandlerFactory;
             _messagingFactory = messagingFactory;
             _clock = clock;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -51,7 +54,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 _logger.Debug("Creating message pump for request type {0}", requestType.Name);
 
                 var queuePath = PathFactory.QueuePathFor(requestType);
-                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
+                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new RequestMessageDispatcher(_messagingFactory, requestType, _requestHandlerFactory, _clock);

@@ -21,6 +21,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         internal MulticastEventMessagePumpsFactory(IQueueManager queueManager,
                                                    ApplicationNameSetting applicationName,
@@ -28,7 +29,8 @@ namespace Nimbus.Infrastructure.Events
                                                    MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
                                                    IMulticastEventHandlerFactory multicastEventHandlerFactory,
-                                                   IClock clock)
+                                                   IClock clock,
+                                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _queueManager = queueManager;
             _applicationName = applicationName;
@@ -37,6 +39,7 @@ namespace Nimbus.Infrastructure.Events
             _logger = logger;
             _multicastEventHandlerFactory = multicastEventHandlerFactory;
             _clock = clock;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -56,7 +59,7 @@ namespace Nimbus.Infrastructure.Events
 
                 var topicPath = PathFactory.TopicPathFor(eventType);
                 var subscriptionName = String.Format("{0}.{1}", _applicationName, _instanceName);
-                var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
+                var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit);
                 _garbageMan.Add(receiver);
 
                 var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, eventType, _clock);

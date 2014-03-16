@@ -21,6 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
                                                    RequestHandlerTypesSetting requestHandlerTypes,
@@ -28,7 +29,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    IQueueManager queueManager,
                                                    IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
                                                    INimbusMessagingFactory messagingFactory,
-                                                   IClock clock)
+                                                   IClock clock,
+                                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
@@ -37,6 +39,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _messagingFactory = messagingFactory;
             _clock = clock;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -56,7 +59,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
 
-                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName);
+                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _concurrentHandlerLimit);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestHandlerFactory, requestType, _clock);

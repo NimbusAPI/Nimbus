@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
@@ -15,10 +16,12 @@ namespace Nimbus.Infrastructure
         private readonly ConcurrentDictionary<string, INimbusMessageSender> _topicMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
         private readonly ConcurrentDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ConcurrentDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
-        public NimbusMessagingFactory(IQueueManager queueManager)
+        public NimbusMessagingFactory(IQueueManager queueManager, ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _queueManager = queueManager;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -51,7 +54,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath);
+            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit);
             _garbageMan.Add(receiver);
             return receiver;
         }
@@ -65,7 +68,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName);
+            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit);
             _garbageMan.Add(receiver);
             return receiver;
         }

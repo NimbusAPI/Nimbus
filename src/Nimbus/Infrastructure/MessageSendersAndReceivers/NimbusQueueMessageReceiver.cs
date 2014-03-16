@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -8,14 +9,16 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         private MessageReceiver _messageReceiver;
         private readonly object _mutex = new object();
 
-        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath)
+        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
         }
 
         public void Start(Func<BrokeredMessage, Task> callback)
@@ -29,7 +32,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                 new OnMessageOptions
                                                 {
                                                     AutoComplete = false,
-                                                    MaxConcurrentCalls = Environment.ProcessorCount,
+                                                    MaxConcurrentCalls = _concurrentHandlerLimit,
                                                 });
             }
         }

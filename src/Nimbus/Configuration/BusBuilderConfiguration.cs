@@ -1,5 +1,4 @@
-﻿using System;
-using Nimbus.Configuration.Settings;
+﻿using Nimbus.Configuration.Settings;
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
 using Nimbus.Logger;
@@ -26,8 +25,10 @@ namespace Nimbus.Configuration
         internal MulticastEventHandlerTypesSetting MulticastEventHandlerTypes { get; set; }
         internal CompetingEventHandlerTypesSetting CompetingEventHandlerTypes { get; set; }
         internal EventTypesSetting EventTypes { get; set; }
+
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
+        internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
 
         internal BusBuilderConfiguration()

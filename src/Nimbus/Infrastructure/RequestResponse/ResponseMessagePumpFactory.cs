@@ -14,23 +14,26 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IQueueManager _queueManager;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         internal ResponseMessagePumpFactory(IQueueManager queueManager,
                                             ResponseMessagePumpDispatcher dispatcher,
                                             ILogger logger,
                                             ReplyQueueNameSetting replyQueueName,
-                                            IClock clock)
+                                            IClock clock,
+                                            ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _logger = logger;
             _queueManager = queueManager;
             _replyQueueName = replyQueueName;
             _clock = clock;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
             _dispatcher = dispatcher;
         }
 
         public IMessagePump Create()
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName);
+            var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _concurrentHandlerLimit);
             _garbageMan.Add(receiver);
 
             var pump = new MessagePump(receiver, _dispatcher, _logger, _clock);
