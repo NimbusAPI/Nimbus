@@ -169,7 +169,7 @@ namespace Nimbus.Infrastructure
                     using (var mem = new MemoryStream())
                     {
                         var serializer = new DataContractSerializer(messageType);
-                        var instance = Activator.CreateInstance(messageType);
+                        var instance = Activator.CreateInstance(messageType, true);
                         serializer.WriteObject(mem, instance);
                     }
                 }
