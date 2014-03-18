@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csproj", "{1B793C01-E824-4449-B93D-277626B1791F}"
 EndProject
@@ -54,6 +54,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.InfrastructureContracts", "Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj", "{D59397D3-F595-45AB-9BF8-4615C298545B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pizza.RetailWeb", "Samples\PizzaSample\Pizza.RetailWeb\Pizza.RetailWeb.csproj", "{126FE030-4A2E-45C0-8FD8-C7C46A2F268E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization", "Tests\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj", "{8E57016E-6344-4245-82CA-A5B4D5BAA07E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,10 @@ Global
 		{126FE030-4A2E-45C0-8FD8-C7C46A2F268E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{126FE030-4A2E-45C0-8FD8-C7C46A2F268E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{126FE030-4A2E-45C0-8FD8-C7C46A2F268E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{AD2DAA55-CA83-4FA6-A0A8-2AAE1CB9EA41} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{5BAAC418-8993-48FB-994B-2F06A4B5A26B} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{661699AC-929D-4F77-96A5-DE73F5B8E214} = {0942FED4-86C1-468A-85DE-98B88DF22384}
+		{8E57016E-6344-4245-82CA-A5B4D5BAA07E} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{6B665505-3C52-49D3-914A-7C295AF3F877} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{7FCF3124-24EC-40CA-95FD-E30315D0DDE2} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
