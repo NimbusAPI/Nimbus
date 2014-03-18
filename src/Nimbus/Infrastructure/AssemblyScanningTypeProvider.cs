@@ -173,7 +173,7 @@ namespace Nimbus.Infrastructure
                         serializer.WriteObject(mem, instance);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     var message = "The message contract type {0} is not serializable."
                         .FormatWith(
