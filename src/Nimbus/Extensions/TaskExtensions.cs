@@ -32,15 +32,27 @@ namespace Nimbus.Extensions
     internal class OpportunisticTaskCompletionReturner<TResult> : IDisposable
     {
         private bool _disposed;
+        private bool _completedAdding;
         private readonly List<Task<TResult>> _remainingTasks;
         private readonly BlockingCollection<TResult> _resultsQueue = new BlockingCollection<TResult>();
+        private readonly Task[] _continuations;
+        private readonly object _mutex = new object();
 
         public OpportunisticTaskCompletionReturner(IEnumerable<Task<TResult>> tasks, CancellationTokenSource cancellationToken)
         {
             _remainingTasks = tasks.ToList();
 
-            foreach (var task in _remainingTasks.ToArray()) task.ContinueWith(OnTaskCompletion, TaskContinuationOptions.ExecuteSynchronously);
             cancellationToken.Token.Register(Cancel);
+
+            _continuations = _remainingTasks
+                .ToArray()
+                .Select(task => task.ContinueWith(OnTaskCompletion))
+                .ToArray();
+        }
+
+        internal Task[] Continuations
+        {
+            get { return _continuations; }
         }
 
         public IEnumerable<TResult> GetResults()
@@ -52,23 +64,31 @@ namespace Nimbus.Extensions
         {
             if (_disposed) return; // already given up before a task completes? just bail.
 
-            lock (_remainingTasks)
+            lock (_mutex)
             {
                 _remainingTasks.Remove(task);
                 if (task.IsFaulted) return;
                 if (task.IsCanceled) return;
+                if (_completedAdding) return;
 
                 _resultsQueue.Add(task.Result);
 
-                if (_remainingTasks.None()) _resultsQueue.CompleteAdding();
+                if (_remainingTasks.None())
+                {
+                    _resultsQueue.CompleteAdding();
+                    _completedAdding = true;
+                }
             }
         }
 
         private void Cancel()
         {
-            lock (_remainingTasks)
+            if (_completedAdding) return;
+            lock (_mutex)
             {
+                if (_completedAdding) return;
                 _resultsQueue.CompleteAdding();
+                _completedAdding = true;
             }
         }
 
@@ -80,9 +100,13 @@ namespace Nimbus.Extensions
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            _disposed = true;
+            if (_disposed) return;
+
+            _resultsQueue.CompleteAdding();
+            _completedAdding = true;
 
             _resultsQueue.Dispose();
+            _disposed = true;
         }
     }
 }

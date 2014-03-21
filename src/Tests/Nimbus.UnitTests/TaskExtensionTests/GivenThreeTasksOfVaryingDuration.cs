@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
@@ -58,6 +57,10 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             {
                 _semaphore0.Release();
                 _result = Subject.GetResults().Take(1).ToArray();
+
+                _result.Length.ShouldBe(1);
+
+                _cancellationToken.Cancel();
             }
 
             [Test]
@@ -75,18 +78,18 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             }
 
             [Test]
-            public async Task WhenTwoTaskReturnsInTime_WeGetTwoCorrectResults()
+            public async Task WhenTwoTasksReturnInTime_WeGetTwoCorrectResults()
             {
                 _semaphore0.Release();
-                await _tasks[0];
+                await Subject.Continuations[0];
 
                 _semaphore1.Release();
-                await _tasks[1];
+                await Subject.Continuations[1];
 
                 _cancellationToken.Cancel();
 
                 _semaphore2.Release();
-                await _tasks[2];
+                await Subject.Continuations[2];
 
                 _result = Subject.GetResults().ToArray();
 
