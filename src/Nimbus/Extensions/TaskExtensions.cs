@@ -32,7 +32,6 @@ namespace Nimbus.Extensions
     internal class OpportunisticTaskCompletionReturner<TResult> : IDisposable
     {
         private bool _disposed;
-        private bool _completedAdding;
         private readonly List<Task<TResult>> _remainingTasks;
         private readonly BlockingCollection<TResult> _resultsQueue = new BlockingCollection<TResult>();
         private readonly Task[] _continuations;
@@ -69,26 +68,25 @@ namespace Nimbus.Extensions
                 _remainingTasks.Remove(task);
                 if (task.IsFaulted) return;
                 if (task.IsCanceled) return;
-                if (_completedAdding) return;
+                if (_resultsQueue.IsAddingCompleted) return;
 
                 _resultsQueue.Add(task.Result);
 
                 if (_remainingTasks.None())
                 {
                     _resultsQueue.CompleteAdding();
-                    _completedAdding = true;
                 }
             }
         }
 
         private void Cancel()
         {
-            if (_completedAdding) return;
+            if (_resultsQueue.IsAddingCompleted) return;
             lock (_mutex)
             {
-                if (_completedAdding) return;
+                if (_resultsQueue.IsAddingCompleted) return;
+
                 _resultsQueue.CompleteAdding();
-                _completedAdding = true;
             }
         }
 
@@ -103,7 +101,6 @@ namespace Nimbus.Extensions
             if (_disposed) return;
 
             _resultsQueue.CompleteAdding();
-            _completedAdding = true;
 
             _resultsQueue.Dispose();
             _disposed = true;

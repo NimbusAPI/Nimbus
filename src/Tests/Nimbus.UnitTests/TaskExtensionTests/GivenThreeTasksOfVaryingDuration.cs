@@ -52,6 +52,16 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             {
             }
 
+            public override void TearDown()
+            {
+                _semaphore0.Dispose();
+                _semaphore1.Dispose();
+                _semaphore2.Dispose();
+                _cancellationToken.Dispose();
+
+                base.TearDown();
+            }
+
             [Test]
             public void WhenTakingOnlyTheFirstResult_TheCallShouldExitWithoutNeedingTheCancellationTokenSet()
             {
@@ -81,9 +91,9 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             public async Task WhenTwoTasksReturnInTime_WeGetTwoCorrectResults()
             {
                 _semaphore0.Release();
-                await Subject.Continuations[0];
-
                 _semaphore1.Release();
+
+                await Subject.Continuations[0];
                 await Subject.Continuations[1];
 
                 _cancellationToken.Cancel();
