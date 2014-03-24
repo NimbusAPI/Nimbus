@@ -25,7 +25,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 return new[]
                        {
                            Task.Run(() => GoBang()),
-                           Task.FromResult(20)
+                           Task.Run(() => 20)
                        };
             }
 
@@ -37,8 +37,11 @@ namespace Nimbus.UnitTests.TaskExtensionTests
 
             public override void When()
             {
-                _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(_timeoutMilliseconds)).ToArray();
-                _sw.Stop();
+                Task.Run(() =>
+                         {
+                             _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(_timeoutMilliseconds)).ToArray();
+                             _sw.Stop();
+                         }).Wait();
             }
 
             [Test]
