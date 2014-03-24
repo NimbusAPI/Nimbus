@@ -65,6 +65,8 @@ namespace Nimbus.Extensions
 
             lock (_mutex)
             {
+                if (_disposed) return; // already given up before a task completes? just bail.
+
                 _remainingTasks.Remove(task);
                 if (task.IsFaulted) return;
                 if (task.IsCanceled) return;

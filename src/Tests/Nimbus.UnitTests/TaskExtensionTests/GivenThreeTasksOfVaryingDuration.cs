@@ -76,36 +76,42 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             [Test]
             public async Task WhenOnlyOneTaskReturnsInTime_WeGetASingleCorrectResult()
             {
-                _semaphore0.Release();
-                await _tasks[0];
-                _cancellationToken.Cancel();
+                await Task.Run(async () =>
+                               {
+                                   _semaphore0.Release();
+                                   await _tasks[0];
+                                   _cancellationToken.Cancel();
 
-                _result = Subject.GetResults().ToArray();
+                                   _result = Subject.GetResults().ToArray();
 
-                _result.Length.ShouldBe(1);
-                _result[0].ShouldBe(0);
-                _cancellationToken.IsCancellationRequested.ShouldBe(true);
+                                   _result.Length.ShouldBe(1);
+                                   _result[0].ShouldBe(0);
+                                   _cancellationToken.IsCancellationRequested.ShouldBe(true);
+                               });
             }
 
             [Test]
             public async Task WhenTwoTasksReturnInTime_WeGetTwoCorrectResults()
             {
-                _semaphore0.Release();
-                _semaphore1.Release();
+                await Task.Run(async () =>
+                                     {
+                                         _semaphore0.Release();
+                                         _semaphore1.Release();
 
-                await Subject.Continuations[0];
-                await Subject.Continuations[1];
+                                         await Subject.Continuations[0];
+                                         await Subject.Continuations[1];
 
-                _cancellationToken.Cancel();
+                                         _cancellationToken.Cancel();
 
-                _semaphore2.Release();
-                await Subject.Continuations[2];
+                                         _semaphore2.Release();
+                                         await Subject.Continuations[2];
 
-                _result = Subject.GetResults().ToArray();
+                                         _result = Subject.GetResults().ToArray();
 
-                _result.Count().ShouldBe(2);
-                _result.ShouldContain(0);
-                _result.ShouldContain(1);
+                                         _result.Count().ShouldBe(2);
+                                         _result.ShouldContain(0);
+                                         _result.ShouldContain(1);
+                                     });
             }
 
             [Test]
