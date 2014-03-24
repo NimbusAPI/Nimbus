@@ -62,7 +62,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -73,6 +72,7 @@
   <ItemGroup>
     <Compile Include="AssemblyScanningTests\WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
     <Compile Include="AssemblyScanningTests\WhenAMessageTypeNameIsDuplicated.cs" />
+    <Compile Include="AssemblyScanningTests\WhenAUnserializableAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BarEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BazEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\FooEvent.cs" />
@@ -180,6 +180,10 @@
     <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.Handlers\Nimbus.UnitTests.TestAssemblies.Handlers.csproj">
       <Project>{0747e41e-8bc7-4ce9-82ae-9051f3f6e55b}</Project>
       <Name>Nimbus.UnitTests.TestAssemblies.Handlers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj">
+      <Project>{8E57016E-6344-4245-82CA-A5B4D5BAA07E}</Project>
+      <Name>Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.MessageContracts\Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj">
       <Project>{ad2daa55-ca83-4fa6-a0a8-2aae1cb9ea41}</Project>
