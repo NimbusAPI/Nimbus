@@ -152,10 +152,10 @@ namespace Nimbus.Infrastructure
         {
             AssertAllHandledMessageTypesAreIncludedDirectly();
             AssertThatWeWontDuplicateQueueNames();
-            AssertAllMessageTypesAreSerlizable();
+            AssertAllMessageTypesAreSerializable();
         }
 
-        private void AssertAllMessageTypesAreSerlizable()
+        private void AssertAllMessageTypesAreSerializable()
         {
             var messageTypes = CommandTypes
                 .Union(RequestTypes)
@@ -173,13 +173,13 @@ namespace Nimbus.Infrastructure
                         serializer.WriteObject(mem, instance);
                     }
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
                     var message = "The message contract type {0} is not serializable."
                         .FormatWith(
                             messageType.FullName);
 
-                    throw new BusException(message);
+                    throw new BusException(message, exception);
                 }    
             }
         }
