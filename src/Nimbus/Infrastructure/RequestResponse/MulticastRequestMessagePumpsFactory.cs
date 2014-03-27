@@ -54,7 +54,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             foreach (var requestType in requestTypes)
             {
-                _logger.Debug("Creating message pump for multicase request type {0}", requestType.Name);
+                _logger.Debug("Creating message pump for multicast request type {0}", requestType.Name);
 
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
