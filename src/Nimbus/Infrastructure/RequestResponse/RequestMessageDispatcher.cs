@@ -13,16 +13,26 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class RequestMessageDispatcher : IMessageDispatcher
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _messageType;
         private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly IClock _clock;
+        private readonly ILogger _logger;
 
-        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestHandlerFactory requestHandlerFactory, IClock clock)
+        public RequestMessageDispatcher(
+            INimbusMessagingFactory messagingFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            Type messageType,
+            IRequestHandlerFactory requestHandlerFactory,
+            IClock clock,
+            ILogger logger)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _messageType = messageType;
             _requestHandlerFactory = requestHandlerFactory;
             _clock = clock;
+            _logger = logger;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -47,20 +57,24 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var handlerTask = handler.Component.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
-                    responseMessage = new BrokeredMessage(response);
-                    responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                    responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                    responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                    LogActivity("Sending successful response message", responseMessage, replyQueueName);
                 }
             }
             catch (Exception exc)
             {
-                responseMessage = new BrokeredMessage();
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, false);
-                foreach (var prop in exc.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
+                responseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exc);
+                LogActivity("Sending failed response message", responseMessage, replyQueueName);
             }
 
-            responseMessage.CorrelationId = message.CorrelationId;
             await replyQueueClient.Send(responseMessage);
+            LogActivity("Sent response message", responseMessage, replyQueueName);
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)

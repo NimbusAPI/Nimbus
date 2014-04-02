@@ -58,6 +58,8 @@
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
+    <Compile Include="Infrastructure\BrokeredMessageFactory.cs" />
+    <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />

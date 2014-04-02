@@ -11,13 +11,19 @@ namespace Nimbus.Infrastructure.Commands
     internal class BusCommandSender : ICommandSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly IClock _clock;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ILogger _logger;
         private readonly HashSet<Type> _validCommandTypes;
 
-        public BusCommandSender(INimbusMessagingFactory messagingFactory, IClock clock, CommandTypesSetting validCommandTypes)
+        public BusCommandSender(
+            INimbusMessagingFactory messagingFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            CommandTypesSetting validCommandTypes,
+            ILogger logger)
         {
             _messagingFactory = messagingFactory;
-            _clock = clock;
+            _brokeredMessageFactory = brokeredMessageFactory;
+            _logger = logger;
             _validCommandTypes = new HashSet<Type>(validCommandTypes.Value);
         }
 
@@ -26,7 +32,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = ConstructBrokeredMessage(busCommand, commandType);
+            var message = _brokeredMessageFactory.Create(busCommand);
 
             await Deliver(commandType, message);
         }
@@ -36,8 +42,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = ConstructBrokeredMessage(busCommand, commandType);
-            message.ScheduledEnqueueTimeUtc = whenToSend.DateTime;
+            var message = _brokeredMessageFactory.Create(busCommand).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(commandType, message);
         }
@@ -50,18 +55,20 @@ namespace Nimbus.Infrastructure.Commands
                         commandType.FullName));
         }
 
-        private static BrokeredMessage ConstructBrokeredMessage<TBusCommand>(TBusCommand busCommand, Type commandType)
-        {
-            var message = new BrokeredMessage(busCommand);
-            message.Properties[MessagePropertyKeys.MessageType] = commandType.AssemblyQualifiedName;
-            return message;
-        }
-
         private async Task Deliver(Type commandType, BrokeredMessage message)
         {
             var queuePath = PathFactory.QueuePathFor(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
+
+            LogActivity("Sending command", message, queuePath);
             await sender.Send(message);
+            LogActivity("Sent command", message, queuePath);
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string queuePath)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
         }
     }
 }

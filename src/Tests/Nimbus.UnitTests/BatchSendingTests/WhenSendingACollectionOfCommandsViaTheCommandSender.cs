@@ -25,9 +25,14 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var validCommandTypes = new CommandTypesSetting {Value = new[] {typeof (FooCommand), typeof (BarCommand), typeof (BazCommand)}};
+            var replyQueueNameSetting = new ReplyQueueNameSetting(
+                new ApplicationNameSetting {Value = "TestApplication"},
+                new InstanceNameSetting {Value = "TestInstance"});
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, clock);
+            var validCommandTypes = new CommandTypesSetting { Value = new[] { typeof(FooCommand), typeof(BarCommand), typeof(BazCommand) } };
+            var logger = Substitute.For<ILogger>();
 
-            var busCommandSender = new BusCommandSender(messagingFactory, clock, validCommandTypes);
+            var busCommandSender = new BusCommandSender(messagingFactory, brokeredMessageFactory, validCommandTypes, logger);
             return Task.FromResult(busCommandSender);
         }
 

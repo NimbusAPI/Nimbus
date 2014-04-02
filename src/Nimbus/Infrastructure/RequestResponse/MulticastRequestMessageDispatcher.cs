@@ -13,19 +13,25 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly Type _requestType;
         private readonly IClock _clock;
+        private readonly ILogger _logger;
 
         public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory,
+                                                 IBrokeredMessageFactory brokeredMessageFactory,
                                                  IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
                                                  Type requestType,
-                                                 IClock clock)
+                                                 IClock clock,
+                                                 ILogger logger)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _requestType = requestType;
             _clock = clock;
+            _logger = logger;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -42,8 +48,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
-            var requestTimeoutInMilliseconds = (int) message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
-            var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
+            // NOTE: This doesn't appear to be used anywhere (yet?)
+            var timeout = message.GetRequestTimeout();
 
             using (var handlers = _multicastRequestHandlerFactory.GetHandlers<TBusRequest, TBusResponse>())
             {
@@ -52,15 +58,21 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .AwaitCompletion()
                                                 .ContinueWith(async t =>
                                                                     {
-                                                                        var responseMessage = new BrokeredMessage(t.Result);
-                                                                        responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                                                                        responseMessage.CorrelationId = message.CorrelationId;
+                                                                        var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
+                                                                        LogActivity("Sending successful response message", responseMessage, replyQueueName);
                                                                         await replyQueueClient.Send(responseMessage);
+                                                                        LogActivity("Sent response message", responseMessage, replyQueueName);
                                                                     }))
                                     .ToArray();
 
                 await Task.WhenAll(tasks);
             }
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)

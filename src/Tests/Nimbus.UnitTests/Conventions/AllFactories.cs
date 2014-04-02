@@ -28,12 +28,18 @@ namespace Nimbus.UnitTests.Conventions
                 return typeof (Bus).Assembly
                                    .GetTypes()
                                    .Where(t => t.Name.EndsWith("Factory"))
+                                   .Where(t => GetExcludedTypes().Contains(t) == false)
                                    .Where(t => t.IsInstantiable())
                                    .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null)
                                    .Where(t => !t.IsAssignableFrom(typeof (DefaultMessageHandlerFactory)))
                                    .Select(t => new TestCaseData(t)
                                                .SetName(t.FullName))
                                    .GetEnumerator();
+            }
+
+            private IEnumerable<Type> GetExcludedTypes()
+            {
+                yield return typeof (BrokeredMessageFactory);
             }
 
             IEnumerator IEnumerable.GetEnumerator()

@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     public class BusRequestSender : IRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly ReplyQueueNameSetting _replyQueueName;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly Lazy<HashSet<Type>> _validRequestTypes;
 
         internal BusRequestSender(INimbusMessagingFactory messagingFactory,
-                                  ReplyQueueNameSetting replyQueueName,
+                                  IBrokeredMessageFactory brokeredMessageFactory,
                                   RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
                                   DefaultTimeoutSetting responseTimeout,
@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   ILogger logger)
         {
             _messagingFactory = messagingFactory;
-            _replyQueueName = replyQueueName;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _logger = logger;
             _clock = clock;
@@ -52,30 +52,31 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             AssertValidRequestType<TRequest, TResponse>();
 
-            var correlationId = Guid.NewGuid();
-            var requestTypeName = typeof (TRequest).FullName;
-            var message = new BrokeredMessage(busRequest)
-                          {
-                              CorrelationId = correlationId.ToString(),
-                              ReplyTo = _replyQueueName,
-                              TimeToLive = timeout,
-                          };
-            message.Properties.Add(MessagePropertyKeys.MessageType, requestTypeName);
+            var message = _brokeredMessageFactory.Create(busRequest).WithRequestTimeout(timeout);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var sender = _messagingFactory.GetQueueSender(PathFactory.QueuePathFor(busRequest.GetType()));
+            var queuePath = PathFactory.QueuePathFor(busRequest.GetType());
+            var sender = _messagingFactory.GetQueueSender(queuePath);
 
-            _logger.Debug("Sending request message {0} of type {1}", correlationId, requestTypeName);
+            LogActivity("Sending request", message, queuePath);
             await sender.Send(message);
-            _logger.Debug("Sent request message {0} of type {1}", correlationId, requestTypeName);
+            LogActivity("Sent request", message, queuePath);
 
-            _logger.Debug("Waiting for response to request {0} of type {1}", correlationId, requestTypeName);
+            _logger.Debug("Waiting for response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
             var response = responseCorrelationWrapper.WaitForResponse(timeout);
-            _logger.Debug("Received response to request {0} of type {1}", correlationId, requestTypeName);
+            _logger.Debug("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId, response.GetType().FullName);
 
             return response;
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         private void AssertValidRequestType<TRequest, TResponse>() where TRequest : IBusRequest<TRequest, TResponse> where TResponse : IBusResponse

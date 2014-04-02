@@ -11,12 +11,18 @@ namespace Nimbus.Infrastructure.Events
     internal class BusEventSender : IEventSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
         private readonly HashSet<Type> _validEventTypes;
 
-        public BusEventSender(INimbusMessagingFactory messagingFactory, EventTypesSetting validEventTypes, ILogger logger)
+        public BusEventSender(
+            INimbusMessagingFactory messagingFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            EventTypesSetting validEventTypes,
+            ILogger logger)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
             _validEventTypes = new HashSet<Type>(validEventTypes.Value);
         }
@@ -26,12 +32,19 @@ namespace Nimbus.Infrastructure.Events
             var eventType = busEvent.GetType();
             AssertValidEventType(eventType);
 
-            var brokeredMessage = new BrokeredMessage(busEvent);
+            var message = _brokeredMessageFactory.Create(busEvent);
+            var topicPath = PathFactory.TopicPathFor(eventType);
+            var topicSender = _messagingFactory.GetTopicSender(topicPath);
 
-            var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(eventType));
-            await client.Send(brokeredMessage);
+            LogActivity("Publishing event", message, topicPath);
+            await topicSender.Send(message);
+            LogActivity("Published event", message, topicPath);
+        }
 
-            _logger.Debug("Published event: {0}", busEvent);
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         private void AssertValidEventType(Type eventType)
