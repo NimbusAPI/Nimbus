@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts;
@@ -12,7 +11,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     public class BusRequestSender : IRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly ReplyQueueNameSetting _replyQueueName;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -21,7 +20,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly Lazy<HashSet<Type>> _validRequestTypes;
 
         internal BusRequestSender(INimbusMessagingFactory messagingFactory,
-                                  ReplyQueueNameSetting replyQueueName,
+                                  IBrokeredMessageFactory brokeredMessageFactory,
                                   RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
                                   DefaultTimeoutSetting responseTimeout,
@@ -29,7 +28,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   ILogger logger)
         {
             _messagingFactory = messagingFactory;
-            _replyQueueName = replyQueueName;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _logger = logger;
             _clock = clock;
@@ -54,13 +53,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var correlationId = Guid.NewGuid();
             var requestTypeName = typeof (TRequest).FullName;
-            var message = new BrokeredMessage(busRequest)
-                          {
-                              CorrelationId = correlationId.ToString(),
-                              ReplyTo = _replyQueueName,
-                              TimeToLive = timeout,
-                          };
-            message.Properties.Add(MessagePropertyKeys.MessageType, requestTypeName);
+            var message = _brokeredMessageFactory.Create(busRequest)
+                .WithCorrelationId(correlationId)
+                .WithTimeToLive(timeout);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(correlationId, expiresAfter);

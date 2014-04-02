@@ -13,13 +13,20 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class RequestMessageDispatcher : IMessageDispatcher
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _messageType;
         private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly IClock _clock;
 
-        public RequestMessageDispatcher(INimbusMessagingFactory messagingFactory, Type messageType, IRequestHandlerFactory requestHandlerFactory, IClock clock)
+        public RequestMessageDispatcher(
+            INimbusMessagingFactory messagingFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            Type messageType,
+            IRequestHandlerFactory requestHandlerFactory,
+            IClock clock)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _messageType = messageType;
             _requestHandlerFactory = requestHandlerFactory;
             _clock = clock;
@@ -47,19 +54,14 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var handlerTask = handler.Component.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
-                    responseMessage = new BrokeredMessage(response);
-                    responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                    responseMessage.Properties.Add(MessagePropertyKeys.MessageType, _messageType.FullName);
+                    responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
                 }
             }
             catch (Exception exc)
             {
-                responseMessage = new BrokeredMessage();
-                responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, false);
-                foreach (var prop in exc.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
+                responseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exc);
             }
 
-            responseMessage.CorrelationId = message.CorrelationId;
             await replyQueueClient.Send(responseMessage);
         }
 

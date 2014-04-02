@@ -18,6 +18,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IQueueManager _queueManager;
         private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -29,6 +30,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    IQueueManager queueManager,
                                                    IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
                                                    INimbusMessagingFactory messagingFactory,
+                                                   IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
                                                    ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
@@ -38,6 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _queueManager = queueManager;
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _concurrentHandlerLimit = concurrentHandlerLimit;
         }
@@ -62,7 +65,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _concurrentHandlerLimit);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _multicastRequestHandlerFactory, requestType, _clock);
+                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, _multicastRequestHandlerFactory, requestType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);

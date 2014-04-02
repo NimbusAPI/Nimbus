@@ -12,19 +12,20 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class BusMulticastRequestSender : IMulticastRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly string _replyQueueName;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
         private readonly HashSet<Type> _validRequestTypes;
 
         public BusMulticastRequestSender(INimbusMessagingFactory messagingFactory,
-                                         ReplyQueueNameSetting replyQueueName,
+                                         IBrokeredMessageFactory brokeredMessageFactory,
                                          RequestResponseCorrelator requestResponseCorrelator,
                                          IClock clock,
                                          RequestTypesSetting validRequestTypes)
         {
             _messagingFactory = messagingFactory;
-            _replyQueueName = replyQueueName;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _clock = clock;
             _validRequestTypes = new HashSet<Type>(validRequestTypes.Value);
@@ -37,13 +38,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             AssertValidRequestType<TRequest, TResponse>();
 
             var correlationId = Guid.NewGuid();
-            var message = new BrokeredMessage(busRequest)
-                          {
-                              CorrelationId = correlationId.ToString(),
-                              ReplyTo = _replyQueueName,
-                          };
-            message.Properties.Add(MessagePropertyKeys.MessageType, typeof (TRequest).FullName);
-            message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMilliseconds, (int) timeout.TotalMilliseconds);
+            var message = _brokeredMessageFactory.Create(busRequest)
+                .WithCorrelationId(correlationId)
+                .WithRequestTimeout(timeout);
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(correlationId, expiresAfter);
 

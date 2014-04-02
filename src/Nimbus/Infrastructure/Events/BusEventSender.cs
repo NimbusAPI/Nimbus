@@ -11,12 +11,18 @@ namespace Nimbus.Infrastructure.Events
     internal class BusEventSender : IEventSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
         private readonly HashSet<Type> _validEventTypes;
 
-        public BusEventSender(INimbusMessagingFactory messagingFactory, EventTypesSetting validEventTypes, ILogger logger)
+        public BusEventSender(
+            INimbusMessagingFactory messagingFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            EventTypesSetting validEventTypes,
+            ILogger logger)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
             _validEventTypes = new HashSet<Type>(validEventTypes.Value);
         }
@@ -26,7 +32,7 @@ namespace Nimbus.Infrastructure.Events
             var eventType = busEvent.GetType();
             AssertValidEventType(eventType);
 
-            var brokeredMessage = new BrokeredMessage(busEvent);
+            var brokeredMessage = _brokeredMessageFactory.Create(busEvent);
 
             var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(eventType));
             await client.Send(brokeredMessage);

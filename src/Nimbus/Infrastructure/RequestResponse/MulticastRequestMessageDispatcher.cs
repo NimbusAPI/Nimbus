@@ -13,16 +13,19 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly Type _requestType;
         private readonly IClock _clock;
 
         public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory,
+                                                 IBrokeredMessageFactory brokeredMessageFactory,
                                                  IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
                                                  Type requestType,
                                                  IClock clock)
         {
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _requestType = requestType;
             _clock = clock;
@@ -42,8 +45,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
-            var requestTimeoutInMilliseconds = (int) message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
-            var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
+            // NOTE: This doesn't appear to be used anywhere (yet?)
+            var timeout = message.GetRequestTimeout();
 
             using (var handlers = _multicastRequestHandlerFactory.GetHandlers<TBusRequest, TBusResponse>())
             {
@@ -52,9 +55,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .AwaitCompletion()
                                                 .ContinueWith(async t =>
                                                                     {
-                                                                        var responseMessage = new BrokeredMessage(t.Result);
-                                                                        responseMessage.Properties.Add(MessagePropertyKeys.RequestSuccessful, true);
-                                                                        responseMessage.CorrelationId = message.CorrelationId;
+                                                                        var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
                                                                         await replyQueueClient.Send(responseMessage);
                                                                     }))
                                     .ToArray();
