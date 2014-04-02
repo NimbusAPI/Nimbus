@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    internal interface IBrokeredMessageFactory
+    public interface IBrokeredMessageFactory
     {
         /// <summary>
         /// Ensures consistent construction of <see cref="BrokeredMessage"/>s
