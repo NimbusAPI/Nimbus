@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
@@ -64,13 +65,13 @@ namespace Nimbus.Infrastructure
 
                 try
                 {
-                    _logger.Debug("Dispatching message: {0} from {1}", message, message.ReplyTo);
+                    LogActivity("Dispatching", message);
                     await _dispatcher.Dispatch(message);
-                    _logger.Debug("Dispatched message: {0} from {1}", message, message.ReplyTo);
+                    LogActivity("Dispatched", message);
 
-                    _logger.Debug("Completing message {0}", message);
+                    LogActivity("Completing", message);
                     await message.CompleteAsync();
-                    _logger.Debug("Completed message {0}", message);
+                    LogActivity("Completed", message);
 
                     return;
                 }
@@ -83,19 +84,26 @@ namespace Nimbus.Infrastructure
 
                 try
                 {
-                    _logger.Debug("Abandoning message {0} from {1}", message, message.ReplyTo);
+                    LogActivity("Abandoning", message);
                     await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
-                    _logger.Debug("Abandoned message {0} from {1}", message, message.ReplyTo);
+                    LogActivity("Abandoned", message);
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Could not call Abandon() on message {0} from {1}. Possible lock expiry?", message, message.ReplyTo);
+                    _logger.Error(exc, "Could not call Abandon() on message {0} from {1} [MessageId:{2}, CorrelationId:{3}]. Possible lock expiry?",
+                        message.SafelyGetBodyTypeNameOrDefault(), message.MessageId, message.CorrelationId, message.ReplyTo);
                 }
             }
             catch (Exception exc)
             {
                 _logger.Error(exc, "Unhandled exception in message pump");
             }
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message)
+        {
+            _logger.Debug("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
         }
 
         public void Dispose()

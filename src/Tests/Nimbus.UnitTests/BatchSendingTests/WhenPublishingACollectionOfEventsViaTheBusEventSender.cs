@@ -24,10 +24,15 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var messagingFactory = Substitute.For<INimbusMessagingFactory>();
             messagingFactory.GetTopicSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
-            var validEventTypes = new EventTypesSetting {Value = new[] {typeof (FooEvent), typeof (BarEvent), typeof (BazEvent)}};
+            var clock = new SystemClock();
+            var replyQueueNameSetting = new ReplyQueueNameSetting(
+                new ApplicationNameSetting { Value = "TestApplication" },
+                new InstanceNameSetting { Value = "TestInstance" });
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, clock);
+            var validEventTypes = new EventTypesSetting { Value = new[] { typeof(FooEvent), typeof(BarEvent), typeof(BazEvent) } };
             var logger = Substitute.For<ILogger>();
 
-            var busCommandSender = new BusEventSender(messagingFactory, validEventTypes, logger);
+            var busCommandSender = new BusEventSender(messagingFactory, brokeredMessageFactory, validEventTypes, logger);
             return Task.FromResult(busCommandSender);
         }
 

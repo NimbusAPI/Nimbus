@@ -12,15 +12,18 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ILogger _logger;
         private readonly HashSet<Type> _validCommandTypes;
 
         public BusCommandSender(
             INimbusMessagingFactory messagingFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
-            CommandTypesSetting validCommandTypes)
+            CommandTypesSetting validCommandTypes,
+            ILogger logger)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
+            _logger = logger;
             _validCommandTypes = new HashSet<Type>(validCommandTypes.Value);
         }
 
@@ -56,7 +59,16 @@ namespace Nimbus.Infrastructure.Commands
         {
             var queuePath = PathFactory.QueuePathFor(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
+
+            LogActivity("Sending command", message, queuePath);
             await sender.Send(message);
+            LogActivity("Sent command", message, queuePath);
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string queuePath)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
         }
     }
 }

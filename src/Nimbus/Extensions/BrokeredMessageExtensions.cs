@@ -6,9 +6,15 @@ namespace Nimbus.Extensions
 {
     public static class BrokeredMessageExtensions
     {
+        public static string SafelyGetBodyTypeNameOrDefault(this BrokeredMessage message)
+        {
+            object name;
+            return (message.Properties.TryGetValue(MessagePropertyKeys.MessageType, out name) ? (string) name : default(string));
+        }
+
         public static Type GetBodyType(this BrokeredMessage message)
         {
-            var bodyTypeName = (string) message.Properties[MessagePropertyKeys.MessageType];
+            var bodyTypeName = message.SafelyGetBodyTypeNameOrDefault();
             var bodyType = Type.GetType(bodyTypeName);
             return bodyType;
         }
@@ -23,7 +29,7 @@ namespace Nimbus.Extensions
 
         public static BrokeredMessage WithCorrelationId(this BrokeredMessage message, Guid correlationId)
         {
-            message.CorrelationId = correlationId.ToString();
+            message.CorrelationId = correlationId.ToString("N");
             return message;
         }
 
@@ -53,6 +59,7 @@ namespace Nimbus.Extensions
 
         public static BrokeredMessage WithRequestTimeout(this BrokeredMessage message, TimeSpan timeout)
         {
+            message.TimeToLive = timeout;
             message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMilliseconds, (int)timeout.TotalMilliseconds);
             return message;
         }

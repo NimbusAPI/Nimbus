@@ -65,7 +65,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _concurrentHandlerLimit);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, _multicastRequestHandlerFactory, requestType, _clock);
+                var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, _multicastRequestHandlerFactory, requestType, _clock, _logger);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);

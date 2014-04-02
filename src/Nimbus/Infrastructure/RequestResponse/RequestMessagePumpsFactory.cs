@@ -60,7 +60,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit);
                 _garbageMan.Add(messageReceiver);
 
-                var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _requestHandlerFactory, _clock);
+                var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _requestHandlerFactory, _clock, _logger);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);

@@ -32,12 +32,19 @@ namespace Nimbus.Infrastructure.Events
             var eventType = busEvent.GetType();
             AssertValidEventType(eventType);
 
-            var brokeredMessage = _brokeredMessageFactory.Create(busEvent);
+            var message = _brokeredMessageFactory.Create(busEvent);
+            var topicPath = PathFactory.TopicPathFor(eventType);
+            var topicSender = _messagingFactory.GetTopicSender(topicPath);
 
-            var client = _messagingFactory.GetTopicSender(PathFactory.TopicPathFor(eventType));
-            await client.Send(brokeredMessage);
+            LogActivity("Publishing event", message, topicPath);
+            await topicSender.Send(message);
+            LogActivity("Published event", message, topicPath);
+        }
 
-            _logger.Debug("Published event: {0}", busEvent);
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         private void AssertValidEventType(Type eventType)

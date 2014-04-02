@@ -5,19 +5,6 @@ using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure
 {
-    internal interface IBrokeredMessageFactory
-    {
-        /// <summary>
-        /// Ensures consistent construction of <see cref="BrokeredMessage"/>s
-        /// </summary>
-        /// <param name="serializableObject"></param>
-        /// <returns>The newly minted <see cref="BrokeredMessage"/></returns>
-        BrokeredMessage Create(object serializableObject);
-
-        BrokeredMessage CreateSuccessfulResponse(object responseContent, BrokeredMessage originalRequest);
-        BrokeredMessage CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
-    }
-
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
@@ -29,16 +16,11 @@ namespace Nimbus.Infrastructure
             _clock = clock;
         }
 
-        /// <summary>
-        /// Ensures consistent construction of <see cref="BrokeredMessage"/>s
-        /// </summary>
-        /// <param name="serializableObject"></param>
-        /// <returns>The newly minted <see cref="BrokeredMessage"/></returns>
         public BrokeredMessage Create(object serializableObject = null)
         {
             var message = serializableObject != null ? new BrokeredMessage(serializableObject) : new BrokeredMessage();
             message.ReplyTo = _replyQueueName;
-            message.CorrelationId = Guid.NewGuid().ToString(); // Provide a default CorrelationId
+            message.CorrelationId = message.MessageId; // Use the MessageId as a default CorrelationId
 
             if (serializableObject != null)
             {

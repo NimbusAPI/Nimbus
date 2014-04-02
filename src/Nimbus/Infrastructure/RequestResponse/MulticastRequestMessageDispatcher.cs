@@ -17,18 +17,21 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IMulticastRequestHandlerFactory _multicastRequestHandlerFactory;
         private readonly Type _requestType;
         private readonly IClock _clock;
+        private readonly ILogger _logger;
 
         public MulticastRequestMessageDispatcher(INimbusMessagingFactory messagingFactory,
                                                  IBrokeredMessageFactory brokeredMessageFactory,
                                                  IMulticastRequestHandlerFactory multicastRequestHandlerFactory,
                                                  Type requestType,
-                                                 IClock clock)
+                                                 IClock clock,
+                                                 ILogger logger)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _multicastRequestHandlerFactory = multicastRequestHandlerFactory;
             _requestType = requestType;
             _clock = clock;
+            _logger = logger;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -56,12 +59,20 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .ContinueWith(async t =>
                                                                     {
                                                                         var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
+                                                                        LogActivity("Sending successful response message", responseMessage, replyQueueName);
                                                                         await replyQueueClient.Send(responseMessage);
+                                                                        LogActivity("Sent response message", responseMessage, replyQueueName);
                                                                     }))
                                     .ToArray();
 
                 await Task.WhenAll(tasks);
             }
+        }
+
+        private void LogActivity(string activity, BrokeredMessage message, string path)
+        {
+            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
