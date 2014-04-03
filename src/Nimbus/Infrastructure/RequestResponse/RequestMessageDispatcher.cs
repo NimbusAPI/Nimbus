@@ -58,23 +58,20 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
                     responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
-                    LogInfo("Sending successful response message", responseMessage, replyQueueName);
+                    _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                        responseMessage.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
                 }
             }
             catch (Exception exc)
             {
                 responseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exc);
-                LogInfo("Sending failed response message", responseMessage, replyQueueName);
+                _logger.Warn("Sending failed response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                    replyQueueName, exc.Message, message.MessageId, message.CorrelationId);
             }
 
             await replyQueueClient.Send(responseMessage);
-            LogInfo("Sent response message", responseMessage, replyQueueName);
-        }
-
-        private void LogInfo(string activity, BrokeredMessage message, string path)
-        {
-            _logger.Info("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
+            _logger.Info("Sent response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
