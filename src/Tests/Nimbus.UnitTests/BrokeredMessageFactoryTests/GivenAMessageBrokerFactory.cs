@@ -16,6 +16,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
         public class WhenCreatingANewMessageWithContent : SpecificationFor<BrokeredMessageFactory>
         {
             private IClock _clock;
+            private ISerializer _serializer;
             private BrokeredMessage _message;
             private ReplyQueueNameSetting _replyQueueNameSetting;
             private GzipMessageCompressionSetting _gzipMessageCompressionSetting;
@@ -23,11 +24,12 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             public override BrokeredMessageFactory Given()
             {
                 _clock = Substitute.For<IClock>();
+                _serializer = Substitute.For<ISerializer>();
                 _replyQueueNameSetting = new ReplyQueueNameSetting(
                     new ApplicationNameSetting {Value = "TestApplication"},
                     new InstanceNameSetting {Value = "TestInstance"});
                 _gzipMessageCompressionSetting = new GzipMessageCompressionSetting {Value = false};
-                return new BrokeredMessageFactory(_replyQueueNameSetting, _gzipMessageCompressionSetting, _clock);
+                return new BrokeredMessageFactory(_replyQueueNameSetting, _serializer, _gzipMessageCompressionSetting, _clock);
             }
 
             public override void When()

@@ -12,19 +12,25 @@ namespace Nimbus.Infrastructure.Events
     internal class MulticastEventMessageDispatcher : IMessageDispatcher
     {
         private readonly IMulticastEventHandlerFactory _multicastEventHandlerFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _eventType;
         private readonly IClock _clock;
 
-        public MulticastEventMessageDispatcher(IMulticastEventHandlerFactory multicastEventHandlerFactory, Type eventType, IClock clock)
+        public MulticastEventMessageDispatcher(
+            IMulticastEventHandlerFactory multicastEventHandlerFactory, 
+            IBrokeredMessageFactory brokeredMessageFactory,
+            Type eventType, 
+            IClock clock)
         {
             _multicastEventHandlerFactory = multicastEventHandlerFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _eventType = eventType;
             _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busEvent = message.GetBody(_eventType);
+            var busEvent = _brokeredMessageFactory.GetBody(message, _eventType);
             await Dispatch((dynamic) busEvent, message);
         }
 

@@ -61,6 +61,7 @@
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
+    <Compile Include="Infrastructure\ISerializer.cs" />
     <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
@@ -144,6 +145,8 @@
     <Compile Include="Infrastructure\AzureQueueManager.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
+    <Compile Include="Serliazers\DefaultSerializer.cs" />
+    <Compile Include="Serliazers\SerializerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

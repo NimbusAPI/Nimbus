@@ -138,6 +138,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithSerializer(this BusBuilderConfiguration configuration, ISerializer serializer)
+        {
+            configuration.Serializer = serializer;
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
                                                                Func<BusDebuggingConfiguration, BusDebuggingConfiguration> debugConfiguration)
         {

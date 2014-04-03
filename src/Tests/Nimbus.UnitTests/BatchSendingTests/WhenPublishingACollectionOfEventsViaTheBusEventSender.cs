@@ -5,6 +5,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.MessageContracts;
+using Nimbus.Serliazers;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
@@ -25,11 +26,12 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetTopicSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
+            var serializer = new DefaultSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting { Value = "TestApplication" },
                 new InstanceNameSetting { Value = "TestInstance" });
             var gzipMessageCompressionSetting = new GzipMessageCompressionSetting { Value = false };
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, gzipMessageCompressionSetting, clock);
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, gzipMessageCompressionSetting, clock);
             var validEventTypes = new EventTypesSetting { Value = new[] { typeof(FooEvent), typeof(BarEvent), typeof(BazEvent) } };
             var logger = Substitute.For<ILogger>();
 

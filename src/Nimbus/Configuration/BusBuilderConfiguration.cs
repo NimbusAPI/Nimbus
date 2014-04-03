@@ -2,6 +2,7 @@
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
 using Nimbus.Logger;
+using Nimbus.Serliazers;
 
 namespace Nimbus.Configuration
 {
@@ -13,6 +14,7 @@ namespace Nimbus.Configuration
         internal IMulticastEventHandlerFactory MulticastEventHandlerFactory { get; set; }
         internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
         internal ILogger Logger { get; set; }
+        internal ISerializer Serializer { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
@@ -36,6 +38,7 @@ namespace Nimbus.Configuration
         {
             Logger = new NullLogger();
             Debugging = new BusDebuggingConfiguration();
+            Serializer = new DefaultSerializer();
         }
 
         public Bus Build()
