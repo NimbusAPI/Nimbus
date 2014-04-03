@@ -59,9 +59,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .ContinueWith(async t =>
                                                                     {
                                                                         var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
-                                                                        LogActivity("Sending successful response message", responseMessage, replyQueueName);
+                                                                        LogInfo("Sending successful response message", responseMessage, replyQueueName);
                                                                         await replyQueueClient.Send(responseMessage);
-                                                                        LogActivity("Sent response message", responseMessage, replyQueueName);
+                                                                        LogInfo("Sent response message", responseMessage, replyQueueName);
                                                                     }))
                                     .ToArray();
 
@@ -69,9 +69,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             }
         }
 
-        private void LogActivity(string activity, BrokeredMessage message, string path)
+        private void LogInfo(string activity, BrokeredMessage message, string path)
         {
-            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+            _logger.Info("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
                 activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 

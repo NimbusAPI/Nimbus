@@ -58,22 +58,22 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
                     responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
-                    LogActivity("Sending successful response message", responseMessage, replyQueueName);
+                    LogInfo("Sending successful response message", responseMessage, replyQueueName);
                 }
             }
             catch (Exception exc)
             {
                 responseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exc);
-                LogActivity("Sending failed response message", responseMessage, replyQueueName);
+                LogInfo("Sending failed response message", responseMessage, replyQueueName);
             }
 
             await replyQueueClient.Send(responseMessage);
-            LogActivity("Sent response message", responseMessage, replyQueueName);
+            LogInfo("Sent response message", responseMessage, replyQueueName);
         }
 
-        private void LogActivity(string activity, BrokeredMessage message, string path)
+        private void LogInfo(string activity, BrokeredMessage message, string path)
         {
-            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
+            _logger.Info("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
                 activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 

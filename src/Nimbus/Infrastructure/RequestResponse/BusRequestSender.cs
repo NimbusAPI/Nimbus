@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts;
@@ -60,23 +59,19 @@ namespace Nimbus.Infrastructure.RequestResponse
             var queuePath = PathFactory.QueuePathFor(busRequest.GetType());
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
-            LogActivity("Sending request", message, queuePath);
+            _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
             await sender.Send(message);
-            LogActivity("Sent request", message, queuePath);
+            _logger.Info("Sent request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
 
             _logger.Debug("Waiting for response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
                 message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
             var response = responseCorrelationWrapper.WaitForResponse(timeout);
-            _logger.Debug("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
+            _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
                 message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId, response.GetType().FullName);
 
             return response;
-        }
-
-        private void LogActivity(string activity, BrokeredMessage message, string path)
-        {
-            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         private void AssertValidRequestType<TRequest, TResponse>() where TRequest : IBusRequest<TRequest, TResponse> where TResponse : IBusResponse

@@ -60,15 +60,11 @@ namespace Nimbus.Infrastructure.Commands
             var queuePath = PathFactory.QueuePathFor(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
-            LogActivity("Sending command", message, queuePath);
+            _logger.Debug("Sending command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
             await sender.Send(message);
-            LogActivity("Sent command", message, queuePath);
-        }
-
-        private void LogActivity(string activity, BrokeredMessage message, string queuePath)
-        {
-            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
+            _logger.Debug("Sent command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
         }
     }
 }
