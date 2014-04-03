@@ -65,13 +65,13 @@ namespace Nimbus.Infrastructure
 
                 try
                 {
-                    LogActivity("Dispatching", message);
+                    LogInfo("Dispatching", message);
                     await _dispatcher.Dispatch(message);
-                    LogActivity("Dispatched", message);
+                    LogDebug("Dispatched", message);
 
-                    LogActivity("Completing", message);
+                    LogDebug("Completing", message);
                     await message.CompleteAsync();
-                    LogActivity("Completed", message);
+                    LogInfo("Completed", message);
 
                     return;
                 }
@@ -80,13 +80,14 @@ namespace Nimbus.Infrastructure
                     exception = exc;
                 }
 
-                _logger.Error(exception, "Message dispatch failed");
+                _logger.Error(exception, "Message dispatch failed for {0} from {2} [MessageId:{3}, CorrelationId:{4}]",
+                    message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
 
                 try
                 {
-                    LogActivity("Abandoning", message);
+                    LogDebug("Abandoning", message);
                     await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
-                    LogActivity("Abandoned", message);
+                    LogDebug("Abandoned", message);
                 }
                 catch (Exception exc)
                 {
@@ -100,9 +101,15 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private void LogActivity(string activity, BrokeredMessage message)
+        private void LogDebug(string activity, BrokeredMessage message)
         {
             _logger.Debug("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
+                activity, message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
+        }
+
+        private void LogInfo(string activity, BrokeredMessage message)
+        {
+            _logger.Info("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
                 activity, message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
         }
 

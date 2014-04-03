@@ -59,20 +59,16 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .ContinueWith(async t =>
                                                                     {
                                                                         var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
-                                                                        LogActivity("Sending successful response message", responseMessage, replyQueueName);
+                                                                        _logger.Debug("Sending successful multicast response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                                                                            message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
                                                                         await replyQueueClient.Send(responseMessage);
-                                                                        LogActivity("Sent response message", responseMessage, replyQueueName);
+                                                                        _logger.Info("Sent successful multicast response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                                                                            message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
                                                                     }))
                                     .ToArray();
 
                 await Task.WhenAll(tasks);
             }
-        }
-
-        private void LogActivity(string activity, BrokeredMessage message, string path)
-        {
-            _logger.Debug("{0} {1} to {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), path, message.MessageId, message.CorrelationId);
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
