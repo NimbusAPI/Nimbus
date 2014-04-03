@@ -8,17 +8,20 @@ namespace Nimbus.Infrastructure
     public class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
+        private readonly GzipMessageCompressionSetting _gzipCompression;
         private readonly IClock _clock;
 
-        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, IClock clock)
+        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, GzipMessageCompressionSetting gzipCompression, IClock clock)
         {
             _replyQueueName = replyQueueName;
+            _gzipCompression = gzipCompression;
             _clock = clock;
         }
 
         public BrokeredMessage Create(object serializableObject = null)
         {
-            var message = serializableObject != null ? new BrokeredMessage(serializableObject) : new BrokeredMessage();
+            // We need to serialize the message ourselves if we want to be in control of the BrokeredMessage.BodyStream
+            var message = new BrokeredMessage(serializableObject); // It's safe to pass the ctor a null
             message.ReplyTo = _replyQueueName;
             message.CorrelationId = message.MessageId; // Use the MessageId as a default CorrelationId
 

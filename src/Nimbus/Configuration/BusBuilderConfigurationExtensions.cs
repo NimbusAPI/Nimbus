@@ -126,6 +126,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithGzipMessageCompression(this BusBuilderConfiguration configuration)
+        {
+            configuration.GzipMessageCompression = new GzipMessageCompressionSetting {Value = true};
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithLogger(this BusBuilderConfiguration configuration, ILogger logger)
         {
             configuration.Logger = logger;

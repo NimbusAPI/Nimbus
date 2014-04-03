@@ -28,7 +28,8 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting { Value = "TestApplication" },
                 new InstanceNameSetting { Value = "TestInstance" });
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, clock);
+            var gzipMessageCompressionSetting = new GzipMessageCompressionSetting { Value = false };
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, gzipMessageCompressionSetting, clock);
             var validEventTypes = new EventTypesSetting { Value = new[] { typeof(FooEvent), typeof(BarEvent), typeof(BazEvent) } };
             var logger = Substitute.For<ILogger>();
 

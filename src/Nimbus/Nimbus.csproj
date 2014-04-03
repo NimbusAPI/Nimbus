@@ -57,6 +57,7 @@
     <Compile Include="BatchSendingExtensions.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
+    <Compile Include="Configuration\Settings\GzipMessageCompressionSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />

@@ -17,6 +17,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             private IClock _clock;
             private BrokeredMessage _message;
             private ReplyQueueNameSetting _replyQueueNameSetting;
+            private GzipMessageCompressionSetting _gzipMessageCompressionSetting;
 
             public override BrokeredMessageFactory Given()
             {
@@ -24,7 +25,8 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                 _replyQueueNameSetting = new ReplyQueueNameSetting(
                     new ApplicationNameSetting {Value = "TestApplication"},
                     new InstanceNameSetting {Value = "TestInstance"});
-                return new BrokeredMessageFactory(_replyQueueNameSetting, _clock);
+                _gzipMessageCompressionSetting = new GzipMessageCompressionSetting {Value = false};
+                return new BrokeredMessageFactory(_replyQueueNameSetting, _gzipMessageCompressionSetting, _clock);
             }
 
             public override void When()
