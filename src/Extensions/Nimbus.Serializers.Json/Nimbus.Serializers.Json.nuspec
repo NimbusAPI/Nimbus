@@ -7,7 +7,7 @@
     <authors>Gert Jansen van Rensburg</authors>
     <owners>Damian Maclennan</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Nimbus serliazer implemented with Newtonsoft.Json</description>
+    <description>Nimbus serializer implemented with Newtonsoft.Json</description>
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>azure servicebus json.net</tags>

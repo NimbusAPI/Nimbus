@@ -7,8 +7,8 @@
     <ProjectGuid>{109FB118-FA9A-4EB2-88AF-F66C973CE50F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Serliazers.Json</RootNamespace>
-    <AssemblyName>Nimbus.Serliazers.Json</AssemblyName>
+    <RootNamespace>Nimbus.Serializers.Json</RootNamespace>
+    <AssemblyName>Nimbus.Serializers.Json</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\BusBuilderConfigurationJsonSerliazerExtensions.cs" />
+    <Compile Include="Configuration\BusBuilderConfigurationJsonSerializerExtensions.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,7 +62,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Nimbus.Seriliazers.Json.nuspec">
+    <None Include="Nimbus.Serializers.Json.nuspec">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />

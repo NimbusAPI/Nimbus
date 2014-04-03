@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Nimbus.Serliazers.Json
+namespace Nimbus.Serializers.Json
 {
     public class JsonSerializer : ISerializer
     {

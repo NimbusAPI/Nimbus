@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pizza.RetailWeb", "Samples\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization", "Tests\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj", "{8E57016E-6344-4245-82CA-A5B4D5BAA07E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serliazers.Json", "Extensions\Nimbus.Serliazers.Json\Nimbus.Serliazers.Json.csproj", "{109FB118-FA9A-4EB2-88AF-F66C973CE50F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj", "{109FB118-FA9A-4EB2-88AF-F66C973CE50F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

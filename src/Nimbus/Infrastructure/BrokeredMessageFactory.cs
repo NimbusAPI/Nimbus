@@ -9,22 +9,22 @@ namespace Nimbus.Infrastructure
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
-        private readonly GzipMessageCompressionSetting _gzipCompression;
+        private readonly GzipMessageCompressionSetting _gzipMessageCompression;
         private readonly IClock _clock;
         private readonly ISerializer _serializer;
 
-        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, ISerializer serializer, GzipMessageCompressionSetting gzipCompression, IClock clock)
+        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, ISerializer serializer, GzipMessageCompressionSetting gzipMessageCompression, IClock clock)
         {
             _replyQueueName = replyQueueName;
             _serializer = serializer;
-            _gzipCompression = gzipCompression;
+            _gzipMessageCompression = gzipMessageCompression;
             _clock = clock;
         }
 
         public BrokeredMessage Create(object serializableObject = null)
         {   
             BrokeredMessage message;
-            if (serializableObject == null) 
+            if (serializableObject == null)
             {
                 message = new BrokeredMessage();
             }
