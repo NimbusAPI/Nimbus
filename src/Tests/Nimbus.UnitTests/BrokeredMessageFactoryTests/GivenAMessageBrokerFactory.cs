@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
@@ -9,7 +10,7 @@ using Shouldly;
 
 namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
 {
-    public class GivenAMessageBrokerFactory
+    internal class GivenAMessageBrokerFactory
     {
         [TestFixture]
         public class WhenCreatingANewMessageWithContent : SpecificationFor<BrokeredMessageFactory>
@@ -64,6 +65,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                 _message.ReplyTo.ShouldBe(_replyQueueNameSetting.Value);
             }
 
+            [DataContract]
             public class TestMessage
             {
                 
