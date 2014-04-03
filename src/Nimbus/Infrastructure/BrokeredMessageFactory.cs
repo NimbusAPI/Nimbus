@@ -5,7 +5,7 @@ using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure
 {
-    public class BrokeredMessageFactory : IBrokeredMessageFactory
+    internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
