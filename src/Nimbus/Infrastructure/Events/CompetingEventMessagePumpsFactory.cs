@@ -16,6 +16,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ICompetingEventHandlerFactory _competingEventHandlerFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -25,6 +26,7 @@ namespace Nimbus.Infrastructure.Events
                                                  ICompetingEventHandlerFactory competingEventHandlerFactory,
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
+                                                 IBrokeredMessageFactory brokeredMessageFactory,
                                                  IClock clock)
         {
             _applicationName = applicationName;
@@ -32,6 +34,7 @@ namespace Nimbus.Infrastructure.Events
             _competingEventHandlerFactory = competingEventHandlerFactory;
             _logger = logger;
             _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
         }
 
@@ -53,7 +56,7 @@ namespace Nimbus.Infrastructure.Events
                 var subscriptionName = String.Format("{0}", _applicationName);
                 var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, eventType, _clock);
+                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, _brokeredMessageFactory, eventType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

@@ -5,6 +5,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.MessageContracts;
+using Nimbus.Serliazers;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
@@ -25,10 +26,11 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
+            var serialzer = new DefaultSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, clock);
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serialzer, clock);
             var validCommandTypes = new CommandTypesSetting { Value = new[] { typeof(FooCommand), typeof(BarCommand), typeof(BazCommand) } };
             var logger = Substitute.For<ILogger>();
 

@@ -12,21 +12,6 @@ namespace Nimbus.Extensions
             return (message.Properties.TryGetValue(MessagePropertyKeys.MessageType, out name) ? (string) name : default(string));
         }
 
-        public static Type GetBodyType(this BrokeredMessage message)
-        {
-            var bodyTypeName = message.SafelyGetBodyTypeNameOrDefault();
-            var bodyType = Type.GetType(bodyTypeName);
-            return bodyType;
-        }
-
-        public static object GetBody(this BrokeredMessage message, Type messageType)
-        {
-            var getBodyOpenGenericMethod = typeof (BrokeredMessage).GetMethod("GetBody", new Type[0]);
-            var getBodyMethod = getBodyOpenGenericMethod.MakeGenericMethod(messageType);
-            var body = getBodyMethod.Invoke(message, null);
-            return body;
-        }
-
         public static BrokeredMessage WithCorrelationId(this BrokeredMessage message, Guid correlationId)
         {
             message.CorrelationId = correlationId.ToString("N");
