@@ -80,7 +80,8 @@ namespace Nimbus.Infrastructure
                     exception = exc;
                 }
 
-                _logger.Error(exception, "Message dispatch failed");
+                _logger.Error(exception, "Message dispatch failed for {0} from {2} [MessageId:{3}, CorrelationId:{4}]",
+                    message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
 
                 try
                 {
