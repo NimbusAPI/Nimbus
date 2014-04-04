@@ -42,6 +42,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=1.2.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Serilog.1.2.4\lib\net45\Serilog.dll</HintPath>
@@ -76,6 +80,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
       <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj">
+      <Project>{109FB118-FA9A-4EB2-88AF-F66C973CE50F}</Project>
+      <Name>Nimbus.Serializers.Json</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Windsor\Nimbus.Windsor.csproj">
       <Project>{7fcf3124-24ec-40ca-95fd-e30315d0dde2}</Project>

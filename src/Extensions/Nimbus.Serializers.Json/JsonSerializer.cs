@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Newtonsoft.Json;
 
 namespace Nimbus.Serializers.Json
@@ -20,28 +19,14 @@ namespace Nimbus.Serializers.Json
             _formatting = formatting;
         }
 
-
-        public Stream Serialize(object serializableObject)
+        public string Serialize(object serializableObject)
         {
-            Newtonsoft.Json.JsonSerializer jsonSerializer = Newtonsoft.Json.JsonSerializer.Create(_settings);
-            jsonSerializer.Formatting = _formatting;
-
-            var memoryStream = new MemoryStream();
-            var sw = new StreamWriter(memoryStream);
-            using (var jsonWriter = new JsonTextWriter(sw))
-            {
-                jsonWriter.Formatting = jsonSerializer.Formatting;
-                jsonSerializer.Serialize(jsonWriter, serializableObject);
-            }
-
-            return memoryStream;
+            return JsonConvert.SerializeObject(serializableObject, _formatting, _settings);
         }
 
-        public object Deserialize(Stream stream, Type type)
+        public object Deserialize(string serializedObject, Type type)
         {
-            var serializer = new Newtonsoft.Json.JsonSerializer();
-            var jsonTextReader = new JsonTextReader(new StreamReader(stream));
-            return serializer.Deserialize(jsonTextReader, type);
+            return JsonConvert.DeserializeObject(serializedObject, type, _settings);
         }
     }
 }

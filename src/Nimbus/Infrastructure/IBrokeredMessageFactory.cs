@@ -28,8 +28,6 @@ namespace Nimbus.Infrastructure
         /// <returns>The newly minted <see cref="BrokeredMessage"/></returns>
         BrokeredMessage CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
 
-        object GetBody(BrokeredMessage message, Type messageType);
-
-        object GetBody<T>(BrokeredMessage message);
+        object GetBody(BrokeredMessage message, Type type);
     }
 }

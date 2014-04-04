@@ -67,15 +67,18 @@ namespace PingPong.Windsor
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             container.RegisterNimbus(typeProvider);
-            container.Register(Component.For<IBus>().ImplementedBy<Bus>().UsingFactoryMethod<IBus>(() => new BusBuilder()
-                                                                                                       .Configure()
-                                                                                                       .WithConnectionString(connectionString)
-                                                                                                       .WithNames("PingPong.Windsor", Environment.MachineName)
-                                                                                                       .WithTypesFrom(typeProvider)
-                                                                                                       .WithWindsorDefaults(container)
-                                                                                                       .Build())
-                                        .LifestyleSingleton()
-                                        .StartUsingMethod("Start")
+            container.Register(Component.For<IBus>().ImplementedBy<Bus>()
+                .UsingFactoryMethod<IBus>(() => new BusBuilder()
+                    .Configure()
+                    .WithConnectionString(connectionString)
+                    .WithNames("PingPong.Windsor", Environment.MachineName)
+                    .WithTypesFrom(typeProvider)
+                    .WithWindsorDefaults(container)
+                    .WithJsonSerializer()
+                    .WithGzipMessageCompression()
+                    .Build())
+                .LifestyleSingleton()
+                .StartUsingMethod("Start")
                 );
         }
     }

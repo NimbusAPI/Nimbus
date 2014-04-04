@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
@@ -30,8 +32,8 @@ namespace Nimbus.Infrastructure
             }
             else
             {
-                var stream = _serializer.Serialize(serializableObject);
-                message = new BrokeredMessage(stream, true);
+                var messageBodyBytes = BuildBodyBytes(serializableObject);
+                message = new BrokeredMessage(new MemoryStream(messageBodyBytes), ownsStream: true);
             }
 
             message.ReplyTo = _replyQueueName;
@@ -64,17 +66,60 @@ namespace Nimbus.Infrastructure
             return responseMessage;
         }
 
-        public object GetBody(BrokeredMessage message, Type messageType)
+        private byte[] BuildBodyBytes(object serializableObject)
         {
-            using (var stream = message.GetBody<Stream>())
+            if (serializableObject == null) throw new ArgumentNullException("serializableObject");
+
+            var serialized = _serializer.Serialize(serializableObject);
+            var serializedBytes = Encoding.UTF8.GetBytes(serialized);
+            var compressedBytes = Compress(serializedBytes);
+            return compressedBytes;
+        }
+
+        public object GetBody(BrokeredMessage message, Type type)
+        {
+            // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
+            byte[] bodyBytes;
+            using (var dataStream = message.GetBody<Stream>())
+            using (var memoryStream = new MemoryStream())
             {
-                return _serializer.Deserialize(stream, messageType);
+                dataStream.CopyTo(memoryStream);
+                bodyBytes = memoryStream.ToArray();
+            }
+
+            var decompressedBytes = Decompress(bodyBytes);
+            var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), type);
+            return deserialized;
+        }
+
+        private byte[] Compress(byte[] input)
+        {
+            if (_gzipMessageCompression == false) return input;
+
+            using (var outputStream = new MemoryStream())
+            {
+                // We need to close the compression stream before we can get the fully realized output
+                using (var inputStream = new MemoryStream(input))
+                using (var compressionStream = new GZipStream(outputStream, CompressionMode.Compress))
+                {
+                    inputStream.CopyTo(compressionStream);
+                }
+
+                return outputStream.ToArray();
             }
         }
 
-        public object GetBody<T>(BrokeredMessage message)
+        private byte[] Decompress(byte[] input)
         {
-            return (T)GetBody(message, typeof (T));
+            if (_gzipMessageCompression == false) return input;
+
+            using (var inputStream = new MemoryStream(input))
+            using (var decompressionStream = new GZipStream(inputStream, CompressionMode.Decompress))
+            using (var outputStream = new MemoryStream())
+            {
+                decompressionStream.CopyTo(outputStream);
+                return outputStream.ToArray();
+            }
         }
     }
 }

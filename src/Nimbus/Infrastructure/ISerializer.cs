@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
 
 namespace Nimbus
 {
     public interface ISerializer
     {
-        Stream Serialize(object serializableObject);
+        string Serialize(object serializableObject);
 
-        object Deserialize(Stream stream, Type type);
+        object Deserialize(string serializedObject, Type type);
     }
 }
