@@ -48,9 +48,9 @@ namespace Nimbus.Configuration
             messagePumps.Add(container.Resolve<ResponseMessagePumpFactory>().Create());
             messagePumps.AddRange(container.Resolve<CommandMessagePumpsFactory>().CreateAll());
             messagePumps.AddRange(container.Resolve<RequestMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll());
+            //messagePumps.AddRange(container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll());
             messagePumps.AddRange(container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
+            //messagePumps.AddRange(container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
             logger.Debug("Message pumps and subscriptions are all created.");
 
             var bus = new Bus(container.Resolve<ILogger>(),
