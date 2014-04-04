@@ -27,85 +27,85 @@ namespace Nimbus.Extensions
                 }
             }
         }
-    }
 
-    internal class OpportunisticTaskCompletionReturner<TResult> : IDisposable
-    {
-        private bool _disposed;
-        private readonly List<Task<TResult>> _remainingTasks;
-        private readonly BlockingCollection<TResult> _resultsQueue = new BlockingCollection<TResult>();
-        private readonly Task[] _continuations;
-        private readonly object _mutex = new object();
-
-        public OpportunisticTaskCompletionReturner(IEnumerable<Task<TResult>> tasks, CancellationTokenSource cancellationToken)
+        internal class OpportunisticTaskCompletionReturner<TResult> : IDisposable
         {
-            _remainingTasks = tasks.ToList();
+            private bool _disposed;
+            private readonly List<Task<TResult>> _remainingTasks;
+            private readonly BlockingCollection<TResult> _resultsQueue = new BlockingCollection<TResult>();
+            private readonly Task[] _continuations;
+            private readonly object _mutex = new object();
 
-            cancellationToken.Token.Register(Cancel);
+            public OpportunisticTaskCompletionReturner(IEnumerable<Task<TResult>> tasks, CancellationTokenSource cancellationToken)
+            {
+                _remainingTasks = tasks.ToList();
 
-            _continuations = _remainingTasks
-                .ToArray()
-                .Select(task => task.ContinueWith(OnTaskCompletion))
-                .ToArray();
-        }
+                cancellationToken.Token.Register(Cancel);
 
-        internal Task[] Continuations
-        {
-            get { return _continuations; }
-        }
+                _continuations = _remainingTasks
+                    .ToArray()
+                    .Select(task => task.ContinueWith(OnTaskCompletion))
+                    .ToArray();
+            }
 
-        public IEnumerable<TResult> GetResults()
-        {
-            return _resultsQueue.GetConsumingEnumerable();
-        }
+            internal Task[] Continuations
+            {
+                get { return _continuations; }
+            }
 
-        private void OnTaskCompletion(Task<TResult> task)
-        {
-            if (_disposed) return; // already given up before a task completes? just bail.
+            public IEnumerable<TResult> GetResults()
+            {
+                return _resultsQueue.GetConsumingEnumerable();
+            }
 
-            lock (_mutex)
+            private void OnTaskCompletion(Task<TResult> task)
             {
                 if (_disposed) return; // already given up before a task completes? just bail.
 
-                _remainingTasks.Remove(task);
-                if (task.IsFaulted) return;
-                if (task.IsCanceled) return;
-                if (_resultsQueue.IsAddingCompleted) return;
-
-                _resultsQueue.Add(task.Result);
-
-                if (_remainingTasks.None())
+                lock (_mutex)
                 {
+                    if (_disposed) return; // already given up before a task completes? just bail.
+
+                    _remainingTasks.Remove(task);
+                    if (task.IsFaulted) return;
+                    if (task.IsCanceled) return;
+                    if (_resultsQueue.IsAddingCompleted) return;
+
+                    _resultsQueue.Add(task.Result);
+
+                    if (_remainingTasks.None())
+                    {
+                        _resultsQueue.CompleteAdding();
+                    }
+                }
+            }
+
+            private void Cancel()
+            {
+                if (_resultsQueue.IsAddingCompleted) return;
+                lock (_mutex)
+                {
+                    if (_resultsQueue.IsAddingCompleted) return;
+
                     _resultsQueue.CompleteAdding();
                 }
             }
-        }
 
-        private void Cancel()
-        {
-            if (_resultsQueue.IsAddingCompleted) return;
-            lock (_mutex)
+            public void Dispose()
             {
-                if (_resultsQueue.IsAddingCompleted) return;
+                Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposing) return;
+                if (_disposed) return;
 
                 _resultsQueue.CompleteAdding();
+
+                _resultsQueue.Dispose();
+                _disposed = true;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-            if (_disposed) return;
-
-            _resultsQueue.CompleteAdding();
-
-            _resultsQueue.Dispose();
-            _disposed = true;
         }
     }
 }

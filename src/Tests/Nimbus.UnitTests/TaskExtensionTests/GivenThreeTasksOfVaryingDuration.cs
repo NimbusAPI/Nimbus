@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Nimbus.Extensions;
 using NUnit.Framework;
 using Shouldly;
+using TaskExtensions = Nimbus.Extensions.TaskExtensions;
 
 namespace Nimbus.UnitTests.TaskExtensionTests
 {
     internal class GivenThreeTasksOfVaryingDuration
     {
         [TestFixture]
-        public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<OpportunisticTaskCompletionReturner<int>>
+        public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<TaskExtensions.OpportunisticTaskCompletionReturner<int>>
         {
             private int[] _result;
             private Semaphore _semaphore0;
@@ -19,7 +19,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             private Task<int>[] _tasks;
             private CancellationTokenSource _cancellationToken;
 
-            public override OpportunisticTaskCompletionReturner<int> Given()
+            public override TaskExtensions.OpportunisticTaskCompletionReturner<int> Given()
             {
                 _semaphore0 = new Semaphore(0, 1);
                 _semaphore1 = new Semaphore(0, 1);
@@ -45,7 +45,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                          };
 
                 _cancellationToken = new CancellationTokenSource();
-                return new OpportunisticTaskCompletionReturner<int>(_tasks, _cancellationToken);
+                return new TaskExtensions.OpportunisticTaskCompletionReturner<int>(_tasks, _cancellationToken);
             }
 
             public override void When()
@@ -77,17 +77,17 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             public async Task WhenOnlyOneTaskReturnsInTime_WeGetASingleCorrectResult()
             {
                 await Task.Run(async () =>
-                               {
-                                   _semaphore0.Release();
-                                   await _tasks[0];
-                                   _cancellationToken.Cancel();
+                                     {
+                                         _semaphore0.Release();
+                                         await _tasks[0];
+                                         _cancellationToken.Cancel();
 
-                                   _result = Subject.GetResults().ToArray();
+                                         _result = Subject.GetResults().ToArray();
 
-                                   _result.Length.ShouldBe(1);
-                                   _result[0].ShouldBe(0);
-                                   _cancellationToken.IsCancellationRequested.ShouldBe(true);
-                               });
+                                         _result.Length.ShouldBe(1);
+                                         _result[0].ShouldBe(0);
+                                         _cancellationToken.IsCancellationRequested.ShouldBe(true);
+                                     });
             }
 
             [Test]
