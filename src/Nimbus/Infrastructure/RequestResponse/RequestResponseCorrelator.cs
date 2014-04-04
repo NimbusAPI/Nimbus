@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -27,7 +28,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var wrapper = new RequestResponseCorrelationWrapper<TResponse>(expiresAfter);
             if (_requestWrappers.TryAdd(correlationId, wrapper)) return wrapper;
 
-            throw new InvalidOperationException("A request with this correlation ID already exists.");
+            throw new InvalidOperationException("A request with CorrelationId '{0}' already exists.".FormatWith(correlationId));
         }
 
         internal MulticastRequestResponseCorrelationWrapper<TResponse> RecordMulticastRequest<TResponse>(Guid correlationId, DateTimeOffset expiresAfter)
@@ -36,7 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var wrapper = new MulticastRequestResponseCorrelationWrapper<TResponse>(expiresAfter);
             if (_requestWrappers.TryAdd(correlationId, wrapper)) return wrapper;
 
-            throw new InvalidOperationException("A request with this correlation ID already exists.");
+            throw new InvalidOperationException("A request with CorrelationId '{0}' already exists.".FormatWith(correlationId));
         }
 
         internal IRequestResponseCorrelationWrapper TryGetWrapper(Guid correlationId)
