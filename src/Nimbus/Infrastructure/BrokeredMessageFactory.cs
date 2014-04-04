@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
@@ -9,16 +10,28 @@ namespace Nimbus.Infrastructure
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
+        private readonly ISerializer _serializer;
 
-        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, IClock clock)
+        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, ISerializer serializer, IClock clock)
         {
             _replyQueueName = replyQueueName;
+            _serializer = serializer;
             _clock = clock;
         }
 
         public BrokeredMessage Create(object serializableObject = null)
-        {
-            var message = serializableObject != null ? new BrokeredMessage(serializableObject) : new BrokeredMessage();
+        {   
+            BrokeredMessage message;
+            if (serializableObject == null) 
+            {
+                message = new BrokeredMessage();
+            }
+            else
+            {
+                var stream = _serializer.Serialize(serializableObject);
+                message = new BrokeredMessage(stream, true);
+            }
+
             message.ReplyTo = _replyQueueName;
             message.CorrelationId = message.MessageId; // Use the MessageId as a default CorrelationId
 
@@ -47,6 +60,19 @@ namespace Nimbus.Infrastructure
             foreach (var prop in exception.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
             
             return responseMessage;
+        }
+
+        public object GetBody(BrokeredMessage message, Type messageType)
+        {
+            using (var stream = message.GetBody<Stream>())
+            {
+                return _serializer.Deserialize(stream, messageType);
+            }
+        }
+
+        public object GetBody<T>(BrokeredMessage message)
+        {
+            return (T)GetBody(message, typeof (T));
         }
     }
 }

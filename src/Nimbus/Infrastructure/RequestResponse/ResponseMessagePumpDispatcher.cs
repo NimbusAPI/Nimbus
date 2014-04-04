@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class ResponseMessagePumpDispatcher : IMessageDispatcher
     {
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        public ResponseMessagePumpDispatcher(RequestResponseCorrelator requestResponseCorrelator)
+        public ResponseMessagePumpDispatcher(
+            RequestResponseCorrelator requestResponseCorrelator, 
+            IBrokeredMessageFactory brokeredMessageFactory)
         {
             _requestResponseCorrelator = requestResponseCorrelator;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -24,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             if (success)
             {
                 var responseType = responseCorrelationWrapper.ResponseType;
-                var response = message.GetBody(responseType);
+                var response = _brokeredMessageFactory.GetBody(message, responseType);
                 responseCorrelationWrapper.Reply(response);
             }
             else

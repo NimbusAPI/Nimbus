@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
+using Nimbus.Serliazers;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
@@ -17,6 +18,7 @@ namespace Nimbus.UnitTests.DispatcherTests
     public class WhenDispatchingTwoCommands : TestForAll<ICommandHandlerFactory>
     {
         private CommandMessageDispatcher _commandDispatcher;
+        private BrokeredMessageFactory _brokeredMessageFactory;
 
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
@@ -27,7 +29,13 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             await base.Given(context);
 
-            _commandDispatcher = new CommandMessageDispatcher(Subject, typeof (FooCommand), new SystemClock());
+            var clock = new SystemClock();
+            var serialzer = new DefaultSerializer();
+            var replyQueueNameSetting = new ReplyQueueNameSetting(
+                new ApplicationNameSetting { Value = "TestApplication" },
+                new InstanceNameSetting { Value = "TestInstance" });
+            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serialzer, clock);
+            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof(FooCommand), new SystemClock());
         }
 
         protected override async Task When()
@@ -35,8 +43,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
-            await _commandDispatcher.Dispatch(new BrokeredMessage(command1));
-            await _commandDispatcher.Dispatch(new BrokeredMessage(command2));
+            await _commandDispatcher.Dispatch(_brokeredMessageFactory.Create(command1));
+            await _commandDispatcher.Dispatch(_brokeredMessageFactory.Create(command2));
         }
 
 #pragma warning disable 4014
