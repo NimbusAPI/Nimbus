@@ -10,7 +10,6 @@ namespace Nimbus.Infrastructure
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
-        public const int MaxMessageSize = 65536;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly GzipMessageCompressionSetting _gzipMessageCompression;
         private readonly IClock _clock;
@@ -39,10 +38,6 @@ namespace Nimbus.Infrastructure
             {
                 var messageBodyBytes = BuildBodyBytes(serializableObject);
                 message = new BrokeredMessage(new MemoryStream(messageBodyBytes), ownsStream: true);
-
-                if (message.Size > MaxMessageSize)
-                    throw new Exception("This message is larger than the maximum allowable message size for Microsoft Azure. Consider breaking it into multiple messages. [MessageType:'{0}',Size:'{1}bytes']"
-                        .FormatWith(serializableObject.GetType().FullName, message.Size.ToString("N")));
             }
 
             message.ReplyTo = _replyQueueName;
