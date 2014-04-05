@@ -11,7 +11,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(60*1000)]
+    [Timeout(120*1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
         private Bus[] _buses;
@@ -19,7 +19,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         [Test]
         public async Task NoneOfThemShouldGoBang()
         {
-            var tasks = Enumerable.Range(0, 10)
+            var tasks = Enumerable.Range(0, 5)
                                   .Select(i => BuildMeABus())
                                   .ToArray();
 
