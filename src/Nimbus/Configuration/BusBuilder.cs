@@ -35,8 +35,13 @@ namespace Nimbus.Configuration
                 container.Register(value);
             }
 
-            container.Register<Func<NamespaceManager>>(c => () => NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
-            container.Register<Func<MessagingFactory>>(c => () => MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>()));
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+            namespaceManager.Settings.OperationTimeout = TimeSpan.FromMinutes(2);
+
+            var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+
+            container.Register<Func<NamespaceManager>>(c => (() => namespaceManager));
+            container.Register<Func<MessagingFactory>>(c => () => messagingFactory);
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {
