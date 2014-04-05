@@ -85,7 +85,11 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing topics...");
 
             var topics = _namespaceManager().GetTopics();
-            return new ConcurrentBag<string>(topics.Select(t => t.Path));
+            var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
+
+            _logger.Debug("Topic paths: {0}", string.Join(Environment.NewLine, topicPaths));
+
+            return topicPaths;
         }
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
@@ -95,6 +99,9 @@ namespace Nimbus.Infrastructure
             var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel().WithDegreeOfParallelism(64)
                                    from subscriptionName in _namespaceManager().GetSubscriptions(topicPath).Select(s => s.Name)
                                    select BuildSubscriptionKey(topicPath, subscriptionName);
+
+
+            _logger.Debug("Subscription keys: {0}", string.Join(Environment.NewLine, subscriptionKeys.OrderBy(k => k)));
 
             return new ConcurrentBag<string>(subscriptionKeys);
         }
@@ -107,7 +114,11 @@ namespace Nimbus.Infrastructure
             if (!queuesAsync.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
             var queues = queuesAsync.Result;
-            return new ConcurrentBag<string>(queues.Select(q => q.Path));
+            var queuePaths = new ConcurrentBag<string>(queues.Select(q => q.Path));
+
+            _logger.Debug("Queue paths: {0}", string.Join(Environment.NewLine, queuePaths));
+
+            return queuePaths;
         }
 
         private void EnsureTopicExists(string topicPath)
@@ -152,6 +163,8 @@ namespace Nimbus.Infrastructure
             if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
 
             EnsureTopicExists(topicPath);
+
+            _logger.Debug("Creating subscription '{0}'", subscriptionKey);
 
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
                                           {

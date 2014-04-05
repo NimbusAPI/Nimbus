@@ -100,6 +100,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithServerConnectionCount(this BusBuilderConfiguration configuration, int serverConnectionCount)
+        {
+            configuration.ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
             configuration.DefaultTimeout = new DefaultTimeoutSetting {Value = defaultTimeout};

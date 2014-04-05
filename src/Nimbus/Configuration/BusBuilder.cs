@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
@@ -35,13 +36,25 @@ namespace Nimbus.Configuration
                 container.Register(value);
             }
 
-            var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-            namespaceManager.Settings.OperationTimeout = TimeSpan.FromMinutes(2);
 
-            var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+            var namespaceManagers = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
+                                               .AsParallel()
+                                               .Select(i =>
+                                                       {
+                                                           var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                                                           namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                                                           return namespaceManager;
+                                                       })
+                                               .ToArray();
+            var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(namespaceManagers);
+            container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
 
-            container.Register<Func<NamespaceManager>>(c => (() => namespaceManager));
-            container.Register<Func<MessagingFactory>>(c => () => messagingFactory);
+            var messagingFactories = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
+                                               .AsParallel()
+                                               .Select(i => MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>()))
+                                               .ToArray();
+            var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(messagingFactories);
+            container.Register<Func<MessagingFactory>>(c => messagingFactoryRoundRobin.GetNext);
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {

@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
             var messageHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
-            using (new AssertingStopwatch("First bus creation", TimeSpan.FromSeconds(180)))
+            using (new AssertingStopwatch("First bus creation", TimeSpan.FromSeconds(240)))
             {
                 using (var bus = new BusBuilder().Configure()
                                                  .WithNames("MyTestSuite", Environment.MachineName)
@@ -48,7 +48,14 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                                  .Build())
                 {
-                    bus.Start();
+                    try
+                    {
+                        bus.Start();
+                    }
+                    catch (AggregateException exc)
+                    {
+                        throw exc.Flatten();
+                    }
                 }
             }
 
@@ -57,7 +64,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                 Console.WriteLine();
             }
 
-            using (new AssertingStopwatch("Subsequent bus creation", TimeSpan.FromSeconds(10)))
+            using (new AssertingStopwatch("Subsequent bus creation", TimeSpan.FromSeconds(15)))
             {
                 using (var bus = new BusBuilder().Configure()
                                                  .WithNames("MyTestSuite", Environment.MachineName)
@@ -68,7 +75,14 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                                                  .WithLogger(logger)
                                                  .Build())
                 {
-                    bus.Start();
+                    try
+                    {
+                        bus.Start();
+                    }
+                    catch (AggregateException exc)
+                    {
+                        throw exc.Flatten();
+                    }
                 }
             }
         }
