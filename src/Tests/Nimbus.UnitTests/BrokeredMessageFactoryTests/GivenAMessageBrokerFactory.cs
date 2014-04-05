@@ -4,6 +4,8 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
@@ -19,7 +21,6 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             private ISerializer _serializer;
             private BrokeredMessage _message;
             private ReplyQueueNameSetting _replyQueueNameSetting;
-            private GzipMessageCompressionSetting _gzipMessageCompressionSetting;
 
             public override BrokeredMessageFactory Given()
             {
@@ -28,8 +29,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                 _replyQueueNameSetting = new ReplyQueueNameSetting(
                     new ApplicationNameSetting {Value = "TestApplication"},
                     new InstanceNameSetting {Value = "TestInstance"});
-                _gzipMessageCompressionSetting = new GzipMessageCompressionSetting {Value = false};
-                return new BrokeredMessageFactory(_replyQueueNameSetting, _serializer, _gzipMessageCompressionSetting, _clock);
+                return new BrokeredMessageFactory(_replyQueueNameSetting, _serializer, new NullCompressor(), _clock);
             }
 
             public override void When()

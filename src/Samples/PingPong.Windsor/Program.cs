@@ -75,7 +75,7 @@ namespace PingPong.Windsor
                     .WithTypesFrom(typeProvider)
                     .WithWindsorDefaults(container)
                     .WithJsonSerializer()
-                    .WithGzipMessageCompression()
+                    .WithDeflateCompressor()
                     .Build())
                 .LifestyleSingleton()
                 .StartUsingMethod("Start")

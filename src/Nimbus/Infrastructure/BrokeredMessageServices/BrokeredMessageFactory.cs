@@ -1,29 +1,28 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.BrokeredMessageServices
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly ReplyQueueNameSetting _replyQueueName;
-        private readonly GzipMessageCompressionSetting _gzipMessageCompression;
         private readonly IClock _clock;
         private readonly ISerializer _serializer;
+        private readonly ICompressor _compressor;
 
         public BrokeredMessageFactory(
             ReplyQueueNameSetting replyQueueName,
             ISerializer serializer,
-            GzipMessageCompressionSetting gzipMessageCompression,
+            ICompressor compressor,
             IClock clock)
         {
             _replyQueueName = replyQueueName;
             _serializer = serializer;
-            _gzipMessageCompression = gzipMessageCompression;
+            _compressor = compressor;
             _clock = clock;
         }
 
@@ -76,7 +75,7 @@ namespace Nimbus.Infrastructure
 
             var serialized = _serializer.Serialize(serializableObject);
             var serializedBytes = Encoding.UTF8.GetBytes(serialized);
-            var compressedBytes = Compress(serializedBytes);
+            var compressedBytes = _compressor.Compress(serializedBytes);
             return compressedBytes;
         }
 
@@ -91,39 +90,9 @@ namespace Nimbus.Infrastructure
                 bodyBytes = memoryStream.ToArray();
             }
 
-            var decompressedBytes = Decompress(bodyBytes);
+            var decompressedBytes = _compressor.Decompress(bodyBytes);
             var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), type);
             return deserialized;
-        }
-
-        private byte[] Compress(byte[] input)
-        {
-            if (_gzipMessageCompression == false) return input;
-
-            using (var outputStream = new MemoryStream())
-            {
-                // We need to close the compression stream before we can get the fully realized output
-                using (var inputStream = new MemoryStream(input))
-                using (var compressionStream = new GZipStream(outputStream, CompressionMode.Compress))
-                {
-                    inputStream.CopyTo(compressionStream);
-                }
-
-                return outputStream.ToArray();
-            }
-        }
-
-        private byte[] Decompress(byte[] input)
-        {
-            if (_gzipMessageCompression == false) return input;
-
-            using (var inputStream = new MemoryStream(input))
-            using (var decompressionStream = new GZipStream(inputStream, CompressionMode.Decompress))
-            using (var outputStream = new MemoryStream())
-            {
-                decompressionStream.CopyTo(outputStream);
-                return outputStream.ToArray();
-            }
         }
     }
 }

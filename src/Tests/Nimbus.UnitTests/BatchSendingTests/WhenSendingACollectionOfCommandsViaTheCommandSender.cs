@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.MessageContracts;
-using Nimbus.Serliazers;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
@@ -26,12 +28,11 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var serializer = new DefaultSerializer();
+            var serializer = new DataContractSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var gzipMessageCompressionSetting = new GzipMessageCompressionSetting {Value = false};
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, gzipMessageCompressionSetting, clock);
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock);
             var validCommandTypes = new CommandTypesSetting { Value = new[] { typeof(FooCommand), typeof(BarCommand), typeof(BazCommand) } };
             var logger = Substitute.For<ILogger>();
 

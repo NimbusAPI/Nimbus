@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
-using Nimbus.Serliazers;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
@@ -30,12 +32,11 @@ namespace Nimbus.UnitTests.DispatcherTests
             await base.Given(context);
 
             var clock = new SystemClock();
-            var serializer = new DefaultSerializer();
+            var serializer = new DataContractSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting { Value = "TestApplication" },
                 new InstanceNameSetting { Value = "TestInstance" });
-            var gzipMessageCompressionSetting = new GzipMessageCompressionSetting();
-            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, gzipMessageCompressionSetting, clock);
+            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock);
             _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof(FooCommand), new SystemClock());
         }
 

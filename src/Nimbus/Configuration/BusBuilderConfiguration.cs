@@ -1,8 +1,9 @@
 ﻿using Nimbus.Configuration.Settings;
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
-using Nimbus.Serliazers;
 
 namespace Nimbus.Configuration
 {
@@ -15,6 +16,7 @@ namespace Nimbus.Configuration
         internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
         internal ILogger Logger { get; set; }
         internal ISerializer Serializer { get; set; }
+        internal ICompressor Compressor { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
@@ -32,13 +34,13 @@ namespace Nimbus.Configuration
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
-        internal GzipMessageCompressionSetting GzipMessageCompression { get; set; }
 
         internal BusBuilderConfiguration()
         {
             Logger = new NullLogger();
             Debugging = new BusDebuggingConfiguration();
-            Serializer = new DefaultSerializer();
+            Serializer = new DataContractSerializer();
+            Compressor = new NullCompressor();
         }
 
         public Bus Build()

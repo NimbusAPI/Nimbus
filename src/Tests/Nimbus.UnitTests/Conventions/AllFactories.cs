@@ -6,6 +6,7 @@ using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices;
 using NUnit.Framework;
 using Shouldly;
 
