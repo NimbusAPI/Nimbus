@@ -92,7 +92,7 @@ namespace Nimbus.Infrastructure
         {
             _logger.Debug("Fetching existing subscriptions...");
 
-            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel()
+            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel().WithDegreeOfParallelism(64)
                                    from subscriptionName in _namespaceManager().GetSubscriptions(topicPath).Select(s => s.Name)
                                    select BuildSubscriptionKey(topicPath, subscriptionName);
 
@@ -114,7 +114,7 @@ namespace Nimbus.Infrastructure
         {
             if (_knownTopics.Value.Contains(topicPath)) return;
 
-            _logger.Debug("Ensuring topic '{0}' exists", topicPath);
+            _logger.Debug("Creating topic '{0}'", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
                                    {
@@ -198,7 +198,7 @@ namespace Nimbus.Infrastructure
         {
             if (_knownQueues.Value.Contains(queuePath)) return;
 
-            _logger.Debug("Ensuring queue '{0}' exists", queuePath);
+            _logger.Debug("Creating queue '{0}'", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
                                    {

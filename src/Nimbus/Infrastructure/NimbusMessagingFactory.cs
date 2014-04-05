@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
@@ -11,10 +11,10 @@ namespace Nimbus.Infrastructure
     {
         private readonly IQueueManager _queueManager;
 
-        private readonly ConcurrentDictionary<string, INimbusMessageSender> _queueMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
-        private readonly ConcurrentDictionary<string, INimbusMessageReceiver> _queueMessageReceivers = new ConcurrentDictionary<string, INimbusMessageReceiver>();
-        private readonly ConcurrentDictionary<string, INimbusMessageSender> _topicMessageSenders = new ConcurrentDictionary<string, INimbusMessageSender>();
-        private readonly ConcurrentDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ConcurrentDictionary<string, INimbusMessageReceiver>();
+        private readonly ThreadSafeDictionary<string, INimbusMessageSender> _queueMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
+        private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _queueMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
+        private readonly ThreadSafeDictionary<string, INimbusMessageSender> _topicMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
+        private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
