@@ -80,7 +80,7 @@ namespace Nimbus.Infrastructure
         protected virtual Type[] ScanAssembliesForInterestingTypes()
         {
             return _assemblies
-                .SelectMany(a => a.GetExportedTypes())
+                .SelectMany(a => a.GetTypes())
                 .Where(t => t.IsInstantiable())
                 .ToArray();
         }

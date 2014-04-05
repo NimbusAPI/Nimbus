@@ -104,8 +104,6 @@
     <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
-    <Compile Include="Tests\StartupPerformanceTests\Handlers\LotsOfHandlers.cs" />
-    <Compile Include="Tests\StartupPerformanceTests\MessageContracts\LotsOfMessageContracts.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABunchOfQueueReceivers.cs" />
     <Compile Include="Tests\ThroughputTests\Infrastructure\FakeHandlerFactory.cs" />
