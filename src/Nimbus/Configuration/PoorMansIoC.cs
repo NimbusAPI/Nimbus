@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
 namespace Nimbus.Configuration
 {
     public class PoorMansIoC : ICreateComponents
     {
-        private readonly ConcurrentDictionary<Type, object> _components = new ConcurrentDictionary<Type, object>();
-        private readonly ConcurrentDictionary<Type, Func<PoorMansIoC, object>> _factoryDelegates = new ConcurrentDictionary<Type, Func<PoorMansIoC, object>>();
+        private readonly ThreadSafeDictionary<Type, object> _components = new ThreadSafeDictionary<Type, object>();
+        private readonly ThreadSafeDictionary<Type, Func<PoorMansIoC, object>> _factoryDelegates = new ThreadSafeDictionary<Type, Func<PoorMansIoC, object>>();
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 

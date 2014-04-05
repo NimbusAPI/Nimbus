@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
+using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -12,7 +13,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private const int _numMessagesBetweenScanningForExpiredWrappers = 1000;
         private readonly IClock _clock;
         private readonly ILogger _logger;
-        private readonly ConcurrentDictionary<Guid, IRequestResponseCorrelationWrapper> _requestWrappers = new ConcurrentDictionary<Guid, IRequestResponseCorrelationWrapper>();
+        private readonly ThreadSafeDictionary<Guid, IRequestResponseCorrelationWrapper> _requestWrappers = new ThreadSafeDictionary<Guid, IRequestResponseCorrelationWrapper>();
         private int _messagesProcessed;
         private readonly object _mutex = new object();
 

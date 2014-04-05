@@ -26,6 +26,7 @@ namespace Nimbus.Configuration
         internal CompetingEventHandlerTypesSetting CompetingEventHandlerTypes { get; set; }
         internal EventTypesSetting EventTypes { get; set; }
 
+        internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }

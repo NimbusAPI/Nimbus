@@ -97,6 +97,7 @@
     <Compile Include="Conventions\AllSettingsClasses.cs" />
     <Compile Include="Conventions\CoreHandlerInterfaces.cs" />
     <Compile Include="Conventions\CoreInfrastructureInterfaces.cs" />
+    <Compile Include="Conventions\NimbusCode.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="DispatcherTests\Handlers\BrokerTestCommandHandler.cs" />

@@ -85,16 +85,23 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing topics...");
 
             var topics = _namespaceManager().GetTopics();
-            return new ConcurrentBag<string>(topics.Select(t => t.Path));
+            var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
+
+            _logger.Debug("Topic paths: {0}", string.Join(Environment.NewLine, topicPaths));
+
+            return topicPaths;
         }
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
         {
             _logger.Debug("Fetching existing subscriptions...");
 
-            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel()
+            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel().WithDegreeOfParallelism(64)
                                    from subscriptionName in _namespaceManager().GetSubscriptions(topicPath).Select(s => s.Name)
                                    select BuildSubscriptionKey(topicPath, subscriptionName);
+
+
+            _logger.Debug("Subscription keys: {0}", string.Join(Environment.NewLine, subscriptionKeys.OrderBy(k => k)));
 
             return new ConcurrentBag<string>(subscriptionKeys);
         }
@@ -107,14 +114,18 @@ namespace Nimbus.Infrastructure
             if (!queuesAsync.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
             var queues = queuesAsync.Result;
-            return new ConcurrentBag<string>(queues.Select(q => q.Path));
+            var queuePaths = new ConcurrentBag<string>(queues.Select(q => q.Path));
+
+            _logger.Debug("Queue paths: {0}", string.Join(Environment.NewLine, queuePaths));
+
+            return queuePaths;
         }
 
         private void EnsureTopicExists(string topicPath)
         {
             if (_knownTopics.Value.Contains(topicPath)) return;
 
-            _logger.Debug("Ensuring topic '{0}' exists", topicPath);
+            _logger.Debug("Creating topic '{0}'", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
                                    {
@@ -152,6 +163,8 @@ namespace Nimbus.Infrastructure
             if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
 
             EnsureTopicExists(topicPath);
+
+            _logger.Debug("Creating subscription '{0}'", subscriptionKey);
 
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
                                           {
@@ -194,11 +207,11 @@ namespace Nimbus.Infrastructure
             EnsureQueueExists(queuePath);
         }
 
-        private void EnsureQueueExists(string queuePath)
+        internal void EnsureQueueExists(string queuePath)
         {
             if (_knownQueues.Value.Contains(queuePath)) return;
 
-            _logger.Debug("Ensuring queue '{0}' exists", queuePath);
+            _logger.Debug("Creating queue '{0}'", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
                                    {

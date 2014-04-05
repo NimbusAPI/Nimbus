@@ -55,8 +55,11 @@
   <ItemGroup>
     <Compile Include="BackwardCompatibilityAdaptorExtensions.cs" />
     <Compile Include="BatchSendingExtensions.cs" />
+    <Compile Include="ConcurrentCollections\RoundRobin.cs" />
+    <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
+    <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
