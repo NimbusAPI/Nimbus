@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
@@ -16,7 +17,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
         [Test]
         [Timeout(10*60*1000)]
-        public void TheStartupTimeShouldBeAcceptable()
+        public async Task TheStartupTimeShouldBeAcceptable()
         {
             var logger = new ConsoleLogger();
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
