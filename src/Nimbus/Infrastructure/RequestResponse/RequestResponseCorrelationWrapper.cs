@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Nimbus.Exceptions;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -53,8 +54,12 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var responseReceivedInTime = _semaphore.WaitOne(timeout);
 
-            if (!responseReceivedInTime) throw new TimeoutException("No response was received from the bus within the configured timeout.");
-            if (!_requestWasSuccessful) throw new RequestFailedException(_exceptionMessage, _exceptionStackTrace);
+            if (!responseReceivedInTime)
+                throw new TimeoutException("No response was received from the bus within the configured timeout. Expected a '{0}'."
+                    .FormatWith(typeof(TResponse)));
+            
+            if (!_requestWasSuccessful)
+                throw new RequestFailedException(_exceptionMessage, _exceptionStackTrace);
 
             return _response;
         }

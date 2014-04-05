@@ -50,6 +50,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
             BrokeredMessage responseMessage;
+            Exception exception = null;
             try
             {
                 using (var handler = _requestHandlerFactory.GetHandler<TBusRequest, TBusResponse>())
@@ -57,21 +58,32 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var handlerTask = handler.Component.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
+
                     responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                    
                     _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                         responseMessage.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
+                    await replyQueueClient.Send(responseMessage);
+                    _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                        message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
                 }
             }
             catch (Exception exc)
             {
-                responseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exc);
-                _logger.Warn("Sending failed response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                    replyQueueName, exc.Message, message.MessageId, message.CorrelationId);
+                // Capture any exception so we can send a failed response outside the catch block
+                exception = exc;
             }
 
-            await replyQueueClient.Send(responseMessage);
-            _logger.Info("Sent response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
+            if (exception != null)
+            {
+                var failedResponseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exception);
+
+                _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
+                    replyQueueName, exception.Message, message.MessageId, message.CorrelationId);
+                await replyQueueClient.Send(failedResponseMessage);
+                _logger.Info("Sent failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
+                    replyQueueName, message.MessageId, message.CorrelationId);
+            }
         }
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
