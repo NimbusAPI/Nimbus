@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
         [Timeout(10*60*1000)]
         public async Task TheStartupTimeShouldBeAcceptable()
         {
-            const int numMessageTypes = 50;
+            const int numMessageTypes = 25;
 
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
             var messageHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
-            using (new AssertingStopwatch("First bus creation", TimeSpan.FromSeconds(240)))
+            using (new AssertingStopwatch("First bus creation", TimeSpan.FromMinutes(5)))
             {
                 using (var bus = new BusBuilder().Configure()
                                                  .WithNames("MyTestSuite", Environment.MachineName)
