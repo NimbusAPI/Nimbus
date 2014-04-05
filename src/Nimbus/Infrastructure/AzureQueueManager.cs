@@ -194,7 +194,7 @@ namespace Nimbus.Infrastructure
             EnsureQueueExists(queuePath);
         }
 
-        private void EnsureQueueExists(string queuePath)
+        internal void EnsureQueueExists(string queuePath)
         {
             if (_knownQueues.Value.Contains(queuePath)) return;
 
