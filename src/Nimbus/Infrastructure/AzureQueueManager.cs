@@ -23,6 +23,8 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
+        private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>(); 
+
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
@@ -160,76 +162,85 @@ namespace Nimbus.Infrastructure
         private void EnsureTopicExists(string topicPath)
         {
             if (_knownTopics.Value.Contains(topicPath)) return;
-
-            _logger.Debug("Creating topic '{0}'", topicPath);
-
-            var topicDescription = new TopicDescription(topicPath)
-                                   {
-                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                       EnableBatchedOperations = true,
-                                       RequiresDuplicateDetection = false,
-                                       SupportOrdering = false,
-                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                   };
-
-            // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
-            // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-            // update its configuration in a minute anyway.  -andrewh 8/12/2013
-            try
+            lock (LockFor(topicPath))
             {
-                _namespaceManager().CreateTopic(topicDescription);
-            }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-            }
-            catch (MessagingException exc)
-            {
-                if (!exc.Message.Contains("SubCode=40901")) throw;
+                if (_knownTopics.Value.Contains(topicPath)) return;
 
-                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
-                if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
-            }
+                _logger.Debug("Creating topic '{0}'", topicPath);
 
-            _knownTopics.Value.Add(topicPath);
+                var topicDescription = new TopicDescription(topicPath)
+                                       {
+                                           DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                           EnableBatchedOperations = true,
+                                           RequiresDuplicateDetection = false,
+                                           SupportOrdering = false,
+                                           AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                       };
+
+                // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
+                // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                try
+                {
+                    _namespaceManager().CreateTopic(topicDescription);
+                }
+                catch (MessagingEntityAlreadyExistsException)
+                {
+                }
+                catch (MessagingException exc)
+                {
+                    if (!exc.Message.Contains("SubCode=40901")) throw;
+
+                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
+                    if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+                }
+
+                _knownTopics.Value.Add(topicPath);
+            }
         }
 
         private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
         {
             var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
+
             if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
-
-            EnsureTopicExists(topicPath);
-
-            _logger.Debug("Creating subscription '{0}'", subscriptionKey);
-
-            var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                          {
-                                              MaxDeliveryCount = _maxDeliveryAttempts,
-                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                              EnableDeadLetteringOnMessageExpiration = true,
-                                              EnableBatchedOperations = true,
-                                              LockDuration = _defaultMessageLockDuration,
-                                              RequiresSession = false,
-                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                          };
-
-            try
+            lock (LockFor(subscriptionKey))
             {
-                _namespaceManager().CreateSubscription(subscriptionDescription);
-            }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-            }
-            catch (MessagingException exc)
-            {
-                if (!exc.Message.Contains("SubCode=40901")) throw;
+                if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
 
-                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
-                if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
-                    throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
-            }
+                EnsureTopicExists(topicPath);
 
-            _knownSubscriptions.Value.Add(subscriptionKey);
+                _logger.Debug("Creating subscription '{0}'", subscriptionKey);
+
+                var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
+                                              {
+                                                  MaxDeliveryCount = _maxDeliveryAttempts,
+                                                  DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                                  EnableDeadLetteringOnMessageExpiration = true,
+                                                  EnableBatchedOperations = true,
+                                                  LockDuration = _defaultMessageLockDuration,
+                                                  RequiresSession = false,
+                                                  AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                              };
+
+                try
+                {
+                    _namespaceManager().CreateSubscription(subscriptionDescription);
+                }
+                catch (MessagingEntityAlreadyExistsException)
+                {
+                }
+                catch (MessagingException exc)
+                {
+                    if (!exc.Message.Contains("SubCode=40901")) throw;
+
+                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
+                    if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
+                        throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+                }
+
+                _knownSubscriptions.Value.Add(subscriptionKey);
+            }
         }
 
         private static string BuildSubscriptionKey(string topicPath, string subscriptionName)
@@ -247,40 +258,45 @@ namespace Nimbus.Infrastructure
         {
             if (_knownQueues.Value.Contains(queuePath)) return;
 
-            _logger.Debug("Creating queue '{0}'", queuePath);
-
-            var queueDescription = new QueueDescription(queuePath)
-                                   {
-                                       MaxDeliveryCount = _maxDeliveryAttempts,
-                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                       EnableDeadLetteringOnMessageExpiration = true,
-                                       EnableBatchedOperations = true,
-                                       LockDuration = _defaultMessageLockDuration,
-                                       RequiresDuplicateDetection = false,
-                                       RequiresSession = false,
-                                       SupportOrdering = false,
-                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                   };
-
-            // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
-            // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-            // update its configuration in a minute anyway.  -andrewh 8/12/2013
-            try
+            lock (LockFor(queuePath))
             {
-                _namespaceManager().CreateQueue(queueDescription);
-            }
-            catch (MessagingEntityAlreadyExistsException)
-            {
-            }
-            catch (MessagingException exc)
-            {
-                if (!exc.Message.Contains("SubCode=40901")) throw;
+                if (_knownQueues.Value.Contains(queuePath)) return;
 
-                // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
-                if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
-            }
+                _logger.Debug("Creating queue '{0}'", queuePath);
 
-            _knownQueues.Value.Add(queuePath);
+                var queueDescription = new QueueDescription(queuePath)
+                                       {
+                                           MaxDeliveryCount = _maxDeliveryAttempts,
+                                           DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                           EnableDeadLetteringOnMessageExpiration = true,
+                                           EnableBatchedOperations = true,
+                                           LockDuration = _defaultMessageLockDuration,
+                                           RequiresDuplicateDetection = false,
+                                           RequiresSession = false,
+                                           SupportOrdering = false,
+                                           AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                       };
+
+                // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
+                // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                try
+                {
+                    _namespaceManager().CreateQueue(queueDescription);
+                }
+                catch (MessagingEntityAlreadyExistsException)
+                {
+                }
+                catch (MessagingException exc)
+                {
+                    if (!exc.Message.Contains("SubCode=40901")) throw;
+
+                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
+                    if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+                }
+
+                _knownQueues.Value.Add(queuePath);
+            }
         }
 
         private string GetDeadLetterQueueName(Type messageContractType)
@@ -288,6 +304,11 @@ namespace Nimbus.Infrastructure
             var queuePath = PathFactory.QueuePathFor(messageContractType);
             var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
+        }
+
+        private object LockFor(string path)
+        {
+            return _locks.GetOrAdd(path, p => new object());
         }
     }
 }
