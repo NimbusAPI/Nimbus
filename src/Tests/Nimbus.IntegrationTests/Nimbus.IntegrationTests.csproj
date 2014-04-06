@@ -113,6 +113,8 @@
     <Compile Include="Tests\ThroughputTests\MessageContracts\BazCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\FooCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\FooEvent.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\FooRequest.cs" />
+    <Compile Include="Tests\ThroughputTests\MessageContracts\FooResponse.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\QuxCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\QuxEvent.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />

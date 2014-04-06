@@ -8,21 +8,23 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 {
     [TestFixture]
     [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
-    public class WhenPublishingManyEventsOfDifferentTypes : ThroughputSpecificationForBus
+    public class WhenSendingManyRequestsOfTheSameType : ThroughputSpecificationForBus
     {
         protected override int ExpectedMessagesPerSecond
+        {
+            get { return 200; }
+        }
+
+        protected override int NumMessagesToSend
         {
             get { return 1000; }
         }
 
         public override IEnumerable<Task> SendMessages(IBus bus)
         {
-            for (var i = 0; i < NumMessagesToSend/8; i++) // /8 because we'll see each event once via multicast and once via competition
+            for (var i = 0; i < NumMessagesToSend; i++)
             {
-                yield return bus.Publish(new FooEvent());
-                yield return bus.Publish(new BarEvent());
-                yield return bus.Publish(new BazEvent());
-                yield return bus.Publish(new QuxEvent());
+                yield return bus.Request(new FooRequest());
                 Console.Write(".");
             }
             Console.WriteLine();

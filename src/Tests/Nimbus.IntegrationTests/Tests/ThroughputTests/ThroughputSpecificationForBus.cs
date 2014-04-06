@@ -24,14 +24,18 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
 
-        protected const int NumMessagesToSend = 4*1000;
+        protected virtual int NumMessagesToSend
+        {
+            get { return 4000; }
+        }
+
         protected abstract int ExpectedMessagesPerSecond { get; }
 
         public override async Task<Bus> Given()
         {
             _fakeHandler = new FakeHandler(NumMessagesToSend);
             _handlerFactory = new FakeHandlerFactory(_fakeHandler);
-            _timeout = TimeSpan.FromSeconds(30);
+            _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
@@ -65,7 +69,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
-            _messagesPerSecond = _fakeHandler.ActualNumMessagesReceived / _stopwatch.Elapsed.TotalSeconds;
+            _messagesPerSecond = _fakeHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 

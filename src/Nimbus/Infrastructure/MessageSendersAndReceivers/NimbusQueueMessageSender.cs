@@ -1,7 +1,9 @@
 using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -11,7 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly string _queuePath;
 
         private readonly Lazy<MessageSender> _queueClient;
-        readonly SemaphoreSlim _throttle = new SemaphoreSlim(10);
+        private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath)
         {
@@ -23,16 +25,47 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Send(BrokeredMessage message)
         {
-            _throttle.Wait();
-            try
+            lock (_outboundQueue)
             {
-                await _queueClient.Value.SendAsync(message);
+                Console.WriteLine("{0} pending messages in outbound queue for {1}", _outboundQueue.Count, _queuePath);
+                _outboundQueue.Add(message);
+                TriggerMessageFlush();
             }
-            finally
+        }
+
+        private void TriggerMessageFlush()
+        {
+            Task.Run(() => FlushMessages());
+        }
+
+        private void FlushMessages()
+        {
+            BrokeredMessage[] toSend;
+
+            lock (_outboundQueue)
             {
-                _throttle.Release();
+                toSend = _outboundQueue.Take(100).ToArray();
+                _outboundQueue.RemoveRange(0, 100);
+                if (_outboundQueue.Any()) TriggerMessageFlush();
             }
-            
+
+            if (toSend.None()) return;
+
+            lock (_queueClient.Value)
+            {
+                Console.WriteLine("Flushing outbound message queue {1} ({0} messages)", toSend.Length, _queuePath);
+                try
+                {
+                    _queueClient.Value.SendBatch(toSend);
+                }
+                catch (Exception)
+                {
+                    lock (_outboundQueue)
+                    {
+                        _outboundQueue.AddRange(toSend);
+                    }
+                }
+            }
         }
 
         public void Dispose()

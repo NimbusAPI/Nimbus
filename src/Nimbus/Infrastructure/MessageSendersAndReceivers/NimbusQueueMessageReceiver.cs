@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -10,30 +12,63 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private bool _running;
 
-        private MessageReceiver _messageReceiver;
+        private readonly SemaphoreSlim _throttle;
         private readonly object _mutex = new object();
+        private readonly List<Task> _workerTasks = new List<Task>();
 
         public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
             _concurrentHandlerLimit = concurrentHandlerLimit;
+
+            _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
         public void Start(Func<BrokeredMessage, Task> callback)
         {
             lock (_mutex)
             {
-                if (_messageReceiver != null) throw new InvalidOperationException("Already started!");
+                if (_running) throw new InvalidOperationException("Already started!");
+                _running = true;
 
-                _messageReceiver = _queueManager.CreateMessageReceiver(_queuePath);
-                _messageReceiver.OnMessageAsync(callback,
-                                                new OnMessageOptions
+                Task.Run(() => Worker(callback));
+            }
+        }
+
+        private async Task Worker(Func<BrokeredMessage, Task> callback)
+        {
+            for (var i = 0; i < _concurrentHandlerLimit; i++)
+            {
+                var workerTask = Task.Run(async () =>
                                                 {
-                                                    AutoComplete = false,
-                                                    MaxConcurrentCalls = _concurrentHandlerLimit,
+                                                    var messageReceiver = _queueManager.CreateMessageReceiver(_queuePath);
+                                                    messageReceiver.PrefetchCount = _concurrentHandlerLimit;
+
+                                                    while (_running)
+                                                    {
+                                                        try
+                                                        {
+                                                            await _throttle.WaitAsync();
+                                                            var message = messageReceiver.Receive(TimeSpan.FromSeconds(10));
+                                                            if (message == null) continue;
+
+                                                            await callback(message);
+                                                        }
+                                                        catch (Exception)
+                                                        {
+                                                        }
+                                                        finally
+                                                        {
+                                                            _throttle.Release();
+                                                        }
+                                                    }
+
+                                                    messageReceiver.Close();
                                                 });
+                _workerTasks.Add(workerTask);
             }
         }
 
@@ -41,11 +76,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             lock (_mutex)
             {
-                var messageReceiver = _messageReceiver;
-                if (messageReceiver == null) return;
-
-                messageReceiver.Close();
-                _messageReceiver = null;
+                _running = false;
+                Task.WaitAll(_workerTasks.ToArray());
             }
         }
 

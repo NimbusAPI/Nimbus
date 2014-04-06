@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
 
@@ -8,7 +9,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class RequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper, IDisposable
     {
         private readonly DateTimeOffset _expiresAfter;
-        private readonly Semaphore _semaphore;
+        private readonly SemaphoreSlim _semaphore;
         private bool _requestWasSuccessful;
         private TResponse _response;
         private string _exceptionMessage;
@@ -17,7 +18,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestResponseCorrelationWrapper(DateTimeOffset expiresAfter)
         {
             _expiresAfter = expiresAfter;
-            _semaphore = new Semaphore(0, int.MaxValue);
+            _semaphore = new SemaphoreSlim(0, int.MaxValue);
         }
 
         public Type ResponseType
@@ -45,14 +46,14 @@ namespace Nimbus.Infrastructure.RequestResponse
             get { return _expiresAfter; }
         }
 
-        public TResponse WaitForResponse()
+        public Task<TResponse> WaitForResponse()
         {
             return WaitForResponse(TimeSpan.MaxValue);
         }
 
-        public TResponse WaitForResponse(TimeSpan timeout)
+        public async Task<TResponse> WaitForResponse(TimeSpan timeout)
         {
-            var responseReceivedInTime = _semaphore.WaitOne(timeout);
+            var responseReceivedInTime = await _semaphore.WaitAsync(timeout);
 
             if (!responseReceivedInTime)
                 throw new TimeoutException("No response was received from the bus within the configured timeout. Expected a '{0}'."

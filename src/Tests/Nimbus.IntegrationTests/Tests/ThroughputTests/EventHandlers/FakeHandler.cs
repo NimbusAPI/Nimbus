@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
-using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
 {
@@ -24,7 +22,8 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
                                IHandleCommand<FooCommand>,
                                IHandleCommand<BarCommand>,
                                IHandleCommand<BazCommand>,
-                               IHandleCommand<QuxCommand>
+                               IHandleCommand<QuxCommand>,
+                               IHandleRequest<FooRequest, FooResponse>
     {
         private readonly int _expectedNumMessagesReceived;
         private int _actualNumMessagesReceived;
@@ -95,20 +94,10 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
             RecordMessageReceipt();
         }
 
-        public TBusResponse Handle<TBusRequest, TBusResponse>(TBusRequest request)
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
+        public async Task<FooResponse> Handle(FooRequest busRequest)
         {
             RecordMessageReceipt();
-            return Activator.CreateInstance<TBusResponse>();
-        }
-
-        public IEnumerable<TBusResponse> HandleMulticast<TBusRequest, TBusResponse>(TBusRequest request, TimeSpan timeout)
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
-        {
-            RecordMessageReceipt();
-            return new[] {Activator.CreateInstance<TBusResponse>()};
+            return new FooResponse();
         }
 
         private void RecordMessageReceipt()
