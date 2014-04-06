@@ -23,14 +23,17 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _queueClient = new Lazy<MessageSender>(() => _queueManager.CreateMessageSender(_queuePath));
         }
 
-        public async Task Send(BrokeredMessage message)
+        public Task Send(BrokeredMessage message)
         {
-            lock (_outboundQueue)
-            {
-                Console.WriteLine("{0} pending messages in outbound queue for {1}", _outboundQueue.Count, _queuePath);
-                _outboundQueue.Add(message);
-                TriggerMessageFlush();
-            }
+            return Task.Run(() =>
+                            {
+                                lock (_outboundQueue)
+                                {
+                                    _outboundQueue.Add(message);
+                                    Console.WriteLine("{0} pending messages in outbound queue for {1}", _outboundQueue.Count, _queuePath);
+                                    TriggerMessageFlush();
+                                }
+                            });
         }
 
         private void TriggerMessageFlush()
@@ -45,7 +48,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             lock (_outboundQueue)
             {
                 toSend = _outboundQueue.Take(100).ToArray();
-                _outboundQueue.RemoveRange(0, 100);
+                _outboundQueue.RemoveRange(0, toSend.Length);
                 if (_outboundQueue.Any()) TriggerMessageFlush();
             }
 

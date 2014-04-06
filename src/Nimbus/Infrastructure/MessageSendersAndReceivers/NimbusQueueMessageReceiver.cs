@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -14,7 +13,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
         private bool _running;
 
-        private readonly SemaphoreSlim _throttle;
         private readonly object _mutex = new object();
         private readonly List<Task> _workerTasks = new List<Task>();
 
@@ -23,8 +21,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _queueManager = queueManager;
             _queuePath = queuePath;
             _concurrentHandlerLimit = concurrentHandlerLimit;
-
-            _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
         public void Start(Func<BrokeredMessage, Task> callback)
@@ -51,7 +47,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                     {
                                                         try
                                                         {
-                                                            await _throttle.WaitAsync();
                                                             var message = messageReceiver.Receive(TimeSpan.FromSeconds(10));
                                                             if (message == null) continue;
 
@@ -59,10 +54,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                         }
                                                         catch (Exception)
                                                         {
-                                                        }
-                                                        finally
-                                                        {
-                                                            _throttle.Release();
                                                         }
                                                     }
 
