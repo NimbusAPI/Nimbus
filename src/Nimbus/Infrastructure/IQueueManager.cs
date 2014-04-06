@@ -1,15 +1,16 @@
-﻿using Microsoft.ServiceBus.Messaging;
+﻿using System.Threading.Tasks;
+using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
     internal interface IQueueManager
     {
-        MessageSender CreateMessageSender(string queuePath);
-        MessageReceiver CreateMessageReceiver(string queuePath);
+        Task<MessageSender> CreateMessageSender(string queuePath);
+        Task<MessageReceiver> CreateMessageReceiver(string queuePath);
 
-        TopicClient CreateTopicSender(string topicPath);
-        SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName);
+        Task<TopicClient> CreateTopicSender(string topicPath);
+        Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName);
 
-        QueueClient CreateDeadLetterQueueClient<T>();
+        Task<QueueClient> CreateDeadLetterQueueClient<T>();
     }
 }

@@ -1,40 +1,31 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusTopicMessageSender : INimbusMessageSender
+    internal class NimbusTopicMessageSender : BatchingMessageSender
     {
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
 
-        private readonly Lazy<TopicClient> _topicClient;
-        readonly SemaphoreSlim _throttle = new SemaphoreSlim(10);
+        private readonly ThreadSafeLazy<TopicClient> _topicClient;
 
         public NimbusTopicMessageSender(IQueueManager queueManager, string topicPath)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
 
-            _topicClient = new Lazy<TopicClient>(() => _queueManager.CreateTopicSender(_topicPath));
+            _topicClient = new ThreadSafeLazy<TopicClient>(() => _queueManager.CreateTopicSender(_topicPath).Result);
         }
 
-        public async Task Send(BrokeredMessage message)
+        protected override void SendBatch(BrokeredMessage[] toSend)
         {
-            _throttle.Wait();
-            try
-            {
-                await _topicClient.Value.SendAsync(message);
-            }
-            finally
-            {
-                _throttle.Release();
-            }
+            Console.WriteLine("Flushing outbound message queue {0} ({1} messages)", _topicPath, toSend.Length);
+            _topicClient.Value.SendBatch(toSend);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (!_topicClient.IsValueCreated) return;
             _topicClient.Value.Close();

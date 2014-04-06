@@ -62,7 +62,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var topicPath = PathFactory.TopicPathFor(requestType);
                 var applicationSharedSubscriptionName = String.Format("{0}", _applicationName);
 
-                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _concurrentHandlerLimit);
+                var messageReceiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, applicationSharedSubscriptionName, _concurrentHandlerLimit, _logger);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new MulticastRequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, _multicastRequestHandlerFactory, requestType, _clock, _logger);

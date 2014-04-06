@@ -15,7 +15,7 @@ namespace Nimbus.PoisonMessages
 
         public async Task<TBusMessageContract> Pop<TBusMessageContract>() where TBusMessageContract : class
         {
-            var queueClient = _queueManager.CreateDeadLetterQueueClient<TBusMessageContract>();
+            var queueClient = await _queueManager.CreateDeadLetterQueueClient<TBusMessageContract>();
 
             var result = await queueClient.ReceiveAsync(TimeSpan.Zero);
             if (result == null) return null;

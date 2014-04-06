@@ -70,7 +70,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit);
+            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

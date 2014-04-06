@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -15,7 +16,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private bool _running;
 
         private readonly object _mutex = new object();
-        private readonly List<Task> _workerTasks = new List<Task>();
+        private Task _workerTask;
+        private readonly SemaphoreSlim _throttle;
 
         public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
         {
@@ -23,6 +25,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _queuePath = queuePath;
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
+            _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
         public void Start(Func<BrokeredMessage, Task> callback)
@@ -32,43 +35,49 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 if (_running) throw new InvalidOperationException("Already started!");
                 _running = true;
 
-                Task.Run(() => Worker(callback));
+                _workerTask = Task.Run(() => Worker(callback));
             }
         }
 
         private async Task Worker(Func<BrokeredMessage, Task> callback)
         {
-            for (var i = 0; i < _concurrentHandlerLimit; i++)
+            var messageReceiver = await _queueManager.CreateMessageReceiver(_queuePath);
+            messageReceiver.PrefetchCount = _concurrentHandlerLimit;
+
+            while (_running)
             {
-                var workerTask = Task.Run(async () =>
-                                                {
-                                                    var messageReceiver = _queueManager.CreateMessageReceiver(_queuePath);
-                                                    messageReceiver.PrefetchCount = _concurrentHandlerLimit;
+                try
+                {
+                    var messages = await messageReceiver.ReceiveBatchAsync(_throttle.CurrentCount, TimeSpan.FromSeconds(300));
 
-                                                    while (_running)
-                                                    {
-                                                        try
-                                                        {
-                                                            var message = messageReceiver.Receive(TimeSpan.FromSeconds(5));
+                    var tasks = messages
+                        .Select(async m =>
+                        {
+                            try
+                            {
+                                await _throttle.WaitAsync();
+                                await callback(m);
+                            }
+                            finally
+                            {
+                                _throttle.Release();
+                            }
+                        })
+                        .ToArray();
 
-                                                            if (message == null) continue;
-
-                                                            await callback(message);
-                                                        }
-                                                        catch (OperationCanceledException)
-                                                        {
-                                                            // will be thrown when someone calls .Stop() on us
-                                                        }
-                                                        catch (Exception exc)
-                                                        {
-                                                            _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, _queuePath);
-                                                        }
-                                                    }
-
-                                                    await messageReceiver.CloseAsync();
-                                                });
-                _workerTasks.Add(workerTask);
+                    await Task.WhenAll(tasks);
+                }
+                catch (OperationCanceledException)
+                {
+                    // will be thrown when someone calls .Stop() on us
+                }
+                catch (Exception exc)
+                {
+                    _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, _queuePath);
+                }
             }
+
+            await messageReceiver.CloseAsync();
         }
 
         public void Stop()
@@ -77,7 +86,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             _running = false;
 
-            Task.WaitAll(_workerTasks.ToArray());
+            Task.WaitAll(_workerTask);
         }
 
         public override string ToString()
@@ -96,6 +105,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             if (!disposing) return;
 
             Stop();
+            _throttle.Dispose();
         }
     }
 }

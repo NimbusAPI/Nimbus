@@ -59,28 +59,34 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        public MessageSender CreateMessageSender(string queuePath)
+        public  Task<MessageSender> CreateMessageSender(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return _messagingFactory().CreateMessageSender(queuePath);
+            return  _messagingFactory().CreateMessageSenderAsync(queuePath);
         }
 
-        public MessageReceiver CreateMessageReceiver(string queuePath)
+        public  Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return _messagingFactory().CreateMessageReceiver(queuePath);
+            return _messagingFactory().CreateMessageReceiverAsync(queuePath);
         }
 
-        public TopicClient CreateTopicSender(string topicPath)
+        public Task<TopicClient> CreateTopicSender(string topicPath)
         {
-            EnsureTopicExists(topicPath);
-            return _messagingFactory().CreateTopicClient(topicPath);
+            return Task.Run(() =>
+            {
+                EnsureTopicExists(topicPath);
+                return _messagingFactory().CreateTopicClient(topicPath);
+            });
         }
 
-        public SubscriptionClient CreateSubscriptionReceiver(string topicPath, string subscriptionName)
+        public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
-            EnsureSubscriptionExists(topicPath, subscriptionName);
-            return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName);
+            return Task.Run(() =>
+            {
+                EnsureSubscriptionExists(topicPath, subscriptionName);
+                return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName);
+            });
         }
 
         public QueueClient CreateQueueClient<T>()
@@ -92,13 +98,16 @@ namespace Nimbus.Infrastructure
             return _messagingFactory().CreateQueueClient(queueName);
         }
 
-        public QueueClient CreateDeadLetterQueueClient<T>()
+        public Task<QueueClient> CreateDeadLetterQueueClient<T>()
         {
-            var messageContractType = typeof(T);
-            var queueName = GetDeadLetterQueueName(messageContractType);
+            return Task.Run(() =>
+            {
+                var messageContractType = typeof(T);
+                var queueName = GetDeadLetterQueueName(messageContractType);
 
-            EnsureQueueExists(messageContractType);
-            return _messagingFactory().CreateQueueClient(queueName);
+                EnsureQueueExists(messageContractType);
+                return _messagingFactory().CreateQueueClient(queueName);
+            });
         }
 
         private ConcurrentBag<string> FetchExistingTopics()
