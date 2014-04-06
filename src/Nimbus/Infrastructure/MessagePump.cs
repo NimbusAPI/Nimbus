@@ -26,35 +26,29 @@ namespace Nimbus.Infrastructure
 
         public Task Start()
         {
-            return Task.Run(() =>
-                            {
-                                lock (_mutex)
-                                {
-                                    if (_started)
-                                        throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
+            return Task.Run(async () =>
+                                  {
+                                      if (_started)
+                                          throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
 
-                                    _logger.Debug("Message pump for {0} starting...", _receiver);
-                                    _receiver.Start(Dispatch);
-                                    _started = true;
-                                    _logger.Debug("Message pump for {0} started", _receiver);
-                                }
-                            });
+                                      _logger.Debug("Message pump for {0} starting...", _receiver);
+                                      await _receiver.Start(Dispatch);
+                                      _started = true;
+                                      _logger.Debug("Message pump for {0} started", _receiver);
+                                  });
         }
 
         public Task Stop()
         {
-            return Task.Run(() =>
-                            {
-                                lock (_mutex)
-                                {
-                                    if (!_started) return;
-                                    _started = false;
+            return Task.Run(async () =>
+                                  {
+                                      if (!_started) return;
+                                      _started = false;
 
-                                    _logger.Debug("Message pump for {0} stopping...", _receiver);
-                                    _receiver.Stop();
-                                    _logger.Debug("Message pump for {0} stopped.", _receiver);
-                                }
-                            });
+                                      _logger.Debug("Message pump for {0} stopping...", _receiver);
+                                      await _receiver.Stop();
+                                      _logger.Debug("Message pump for {0} stopped.", _receiver);
+                                  });
         }
 
         private async Task Dispatch(BrokeredMessage message)
@@ -80,8 +74,12 @@ namespace Nimbus.Infrastructure
                     exception = exc;
                 }
 
-                _logger.Error(exception, "Message dispatch failed for {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                    message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
+                _logger.Error(exception,
+                              "Message dispatch failed for {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
+                              message.SafelyGetBodyTypeNameOrDefault(),
+                              message.ReplyTo,
+                              message.MessageId,
+                              message.CorrelationId);
 
                 try
                 {
@@ -91,8 +89,12 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Could not call Abandon() on message {0} from {1} [MessageId:{2}, CorrelationId:{3}]. Possible lock expiry?",
-                        message.SafelyGetBodyTypeNameOrDefault(), message.MessageId, message.CorrelationId, message.ReplyTo);
+                    _logger.Error(exc,
+                                  "Could not call Abandon() on message {0} from {1} [MessageId:{2}, CorrelationId:{3}]. Possible lock expiry?",
+                                  message.SafelyGetBodyTypeNameOrDefault(),
+                                  message.MessageId,
+                                  message.CorrelationId,
+                                  message.ReplyTo);
                 }
             }
             catch (Exception exc)
@@ -104,13 +106,21 @@ namespace Nimbus.Infrastructure
         private void LogDebug(string activity, BrokeredMessage message)
         {
             _logger.Debug("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
+                          activity,
+                          message.SafelyGetBodyTypeNameOrDefault(),
+                          message.ReplyTo,
+                          message.MessageId,
+                          message.CorrelationId);
         }
 
         private void LogInfo(string activity, BrokeredMessage message)
         {
             _logger.Info("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
-                activity, message.SafelyGetBodyTypeNameOrDefault(), message.ReplyTo, message.MessageId, message.CorrelationId);
+                         activity,
+                         message.SafelyGetBodyTypeNameOrDefault(),
+                         message.ReplyTo,
+                         message.MessageId,
+                         message.CorrelationId);
         }
 
         public void Dispose()

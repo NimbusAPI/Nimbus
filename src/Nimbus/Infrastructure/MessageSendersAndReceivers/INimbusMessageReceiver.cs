@@ -6,7 +6,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal interface INimbusMessageReceiver : IDisposable
     {
-        void Start(Func<BrokeredMessage, Task> callback);
-        void Stop();
+        Task Start(Func<BrokeredMessage, Task> callback);
+        Task Stop();
     }
 }

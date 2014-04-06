@@ -97,7 +97,7 @@ namespace Nimbus.Configuration
                 messagingFactories.Do(mf => mf.Close()).Done();
             };
 
-            logger.Debug("Bus built. Job done!");
+            logger.Info("Bus built. Job done!");
 
             return bus;
         }

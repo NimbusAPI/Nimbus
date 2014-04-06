@@ -10,7 +10,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
     {
         public async Task<BlackBallResponse> Handle(BlackBallRequest request)
         {
-            Thread.Sleep(TimeSpan.FromSeconds(5));
+            Thread.Sleep(TimeSpan.FromSeconds(4));
 
             return new BlackBallResponse
                    {
