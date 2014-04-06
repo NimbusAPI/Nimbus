@@ -75,7 +75,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateQueueClient<T>()
         {
-            var messageContractType = typeof(T);
+            var messageContractType = typeof (T);
             var queueName = PathFactory.QueuePathFor(messageContractType);
 
             EnsureQueueExists(messageContractType);
@@ -84,7 +84,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateDeadLetterQueueClient<T>()
         {
-            var messageContractType = typeof(T);
+            var messageContractType = typeof (T);
             var queueName = GetDeadLetterQueueName(messageContractType);
 
             EnsureQueueExists(messageContractType);
@@ -95,7 +95,10 @@ namespace Nimbus.Infrastructure
         {
             _logger.Debug("Fetching existing topics...");
 
-            var topics = _namespaceManager().GetTopics();
+            var topicsAsync = _namespaceManager().GetTopicsAsync();
+            if (!topicsAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+
+            var topics = topicsAsync.Result;
             var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
 
             return topicPaths;
@@ -122,21 +125,24 @@ namespace Nimbus.Infrastructure
         private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
         {
             return Task.Run(async () =>
-            {
-                var subscriptions = await _namespaceManager().GetSubscriptionsAsync(topicPath);
+                                  {
+                                      var subscriptions = await _namespaceManager().GetSubscriptionsAsync(topicPath);
 
-                return subscriptions
-                    .Select(s => s.Name)
-                    .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
-                    .ToArray();
-            });
+                                      return subscriptions
+                                          .Select(s => s.Name)
+                                          .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
+                                          .ToArray();
+                                  });
         }
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
             _logger.Debug("Fetching existing queues...");
 
-            var queues = _namespaceManager().GetQueues();
+            var queuesAsync = _namespaceManager().GetQueuesAsync();
+            if (!queuesAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+
+            var queues = queuesAsync.Result;
             var queuePaths = queues.Select(q => q.Path)
                                    .OrderBy(p => p)
                                    .ToArray();
@@ -150,13 +156,13 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating topic '{0}'", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
-            {
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableBatchedOperations = true,
-                RequiresDuplicateDetection = false,
-                SupportOrdering = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                   {
+                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                       EnableBatchedOperations = true,
+                                       RequiresDuplicateDetection = false,
+                                       SupportOrdering = false,
+                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                   };
 
             // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
             // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
@@ -189,15 +195,15 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating subscription '{0}'", subscriptionKey);
 
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-            {
-                MaxDeliveryCount = _maxDeliveryAttempts,
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableDeadLetteringOnMessageExpiration = true,
-                EnableBatchedOperations = true,
-                LockDuration = _defaultMessageLockDuration,
-                RequiresSession = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                          {
+                                              MaxDeliveryCount = _maxDeliveryAttempts,
+                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                              EnableDeadLetteringOnMessageExpiration = true,
+                                              EnableBatchedOperations = true,
+                                              LockDuration = _defaultMessageLockDuration,
+                                              RequiresSession = false,
+                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                          };
 
             try
             {
@@ -236,17 +242,17 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating queue '{0}'", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
-            {
-                MaxDeliveryCount = _maxDeliveryAttempts,
-                DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                EnableDeadLetteringOnMessageExpiration = true,
-                EnableBatchedOperations = true,
-                LockDuration = _defaultMessageLockDuration,
-                RequiresDuplicateDetection = false,
-                RequiresSession = false,
-                SupportOrdering = false,
-                AutoDeleteOnIdle = TimeSpan.FromDays(367),
-            };
+                                   {
+                                       MaxDeliveryCount = _maxDeliveryAttempts,
+                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                       EnableDeadLetteringOnMessageExpiration = true,
+                                       EnableBatchedOperations = true,
+                                       LockDuration = _defaultMessageLockDuration,
+                                       RequiresDuplicateDetection = false,
+                                       RequiresSession = false,
+                                       SupportOrdering = false,
+                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                   };
 
             // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
             // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
