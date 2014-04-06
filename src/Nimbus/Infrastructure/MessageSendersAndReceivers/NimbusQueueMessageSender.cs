@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
@@ -10,6 +11,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly string _queuePath;
 
         private readonly Lazy<MessageSender> _queueClient;
+        readonly SemaphoreSlim _throttle = new SemaphoreSlim(10);
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath)
         {
@@ -21,7 +23,16 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Send(BrokeredMessage message)
         {
-            await _queueClient.Value.SendAsync(message);
+            _throttle.Wait();
+            try
+            {
+                await _queueClient.Value.SendAsync(message);
+            }
+            finally
+            {
+                _throttle.Release();
+            }
+            
         }
 
         public void Dispose()
