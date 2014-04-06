@@ -1,6 +1,8 @@
 ﻿using Nimbus.Configuration.Settings;
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
 
 namespace Nimbus.Configuration
@@ -13,6 +15,8 @@ namespace Nimbus.Configuration
         internal IMulticastEventHandlerFactory MulticastEventHandlerFactory { get; set; }
         internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
         internal ILogger Logger { get; set; }
+        internal ISerializer Serializer { get; set; }
+        internal ICompressor Compressor { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
@@ -36,6 +40,8 @@ namespace Nimbus.Configuration
         {
             Logger = new NullLogger();
             Debugging = new BusDebuggingConfiguration();
+            Serializer = new DataContractSerializer();
+            Compressor = new NullCompressor();
         }
 
         public Bus Build()

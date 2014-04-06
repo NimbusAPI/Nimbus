@@ -16,6 +16,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IClock _clock;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -23,6 +24,7 @@ namespace Nimbus.Infrastructure.Commands
                                           CommandHandlerTypesSetting commandHandlerTypes,
                                           ICommandHandlerFactory commandHandlerFactory,
                                           INimbusMessagingFactory messagingFactory,
+                                          IBrokeredMessageFactory brokeredMessageFactory,
                                           IClock clock)
         {
             _logger = logger;
@@ -30,6 +32,7 @@ namespace Nimbus.Infrastructure.Commands
             _commandHandlerFactory = commandHandlerFactory;
             _messagingFactory = messagingFactory;
             _clock = clock;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -49,7 +52,7 @@ namespace Nimbus.Infrastructure.Commands
                 var queuePath = PathFactory.QueuePathFor(commandType);
                 var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, commandType, _clock);
+                var dispatcher = new CommandMessageDispatcher(_commandHandlerFactory, _brokeredMessageFactory, commandType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);

@@ -18,6 +18,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly MulticastEventHandlerTypesSetting _multicastEventHandlerTypes;
         private readonly ILogger _logger;
         private readonly IMulticastEventHandlerFactory _multicastEventHandlerFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -29,6 +30,7 @@ namespace Nimbus.Infrastructure.Events
                                                    MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
                                                    IMulticastEventHandlerFactory multicastEventHandlerFactory,
+                                                   IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
                                                    ConcurrentHandlerLimitSetting concurrentHandlerLimit)
         {
@@ -38,6 +40,7 @@ namespace Nimbus.Infrastructure.Events
             _multicastEventHandlerTypes = multicastEventHandlerTypes;
             _logger = logger;
             _multicastEventHandlerFactory = multicastEventHandlerFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _concurrentHandlerLimit = concurrentHandlerLimit;
         }
@@ -62,7 +65,7 @@ namespace Nimbus.Infrastructure.Events
                 var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _logger);
                 _garbageMan.Add(receiver);
 
-                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, eventType, _clock);
+                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, _brokeredMessageFactory, eventType, _clock);
                 _garbageMan.Add(dispatcher);
 
                 var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

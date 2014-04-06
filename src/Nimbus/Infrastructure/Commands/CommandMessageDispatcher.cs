@@ -11,19 +11,25 @@ namespace Nimbus.Infrastructure.Commands
     internal class CommandMessageDispatcher : IMessageDispatcher
     {
         private readonly ICommandHandlerFactory _commandHandlerFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _commandType;
         private readonly IClock _clock;
 
-        public CommandMessageDispatcher(ICommandHandlerFactory commandHandlerFactory, Type commandType, IClock clock)
+        public CommandMessageDispatcher(
+            ICommandHandlerFactory commandHandlerFactory, 
+            IBrokeredMessageFactory brokeredMessageFactory, 
+            Type commandType, 
+            IClock clock)
         {
             _commandHandlerFactory = commandHandlerFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _commandType = commandType;
             _clock = clock;
         }
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busCommand = message.GetBody(_commandType);
+            var busCommand = _brokeredMessageFactory.GetBody(message, _commandType);
             await Dispatch((dynamic) busCommand, message);
         }
 

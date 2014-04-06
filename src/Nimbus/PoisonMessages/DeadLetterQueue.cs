@@ -7,10 +7,12 @@ namespace Nimbus.PoisonMessages
     public class DeadLetterQueue : IDeadLetterQueue
     {
         private readonly IQueueManager _queueManager;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        internal DeadLetterQueue(IQueueManager queueManager)
+        internal DeadLetterQueue(IQueueManager queueManager, IBrokeredMessageFactory brokeredMessageFactory)
         {
             _queueManager = queueManager;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public async Task<TBusMessageContract> Pop<TBusMessageContract>() where TBusMessageContract : class
@@ -21,7 +23,7 @@ namespace Nimbus.PoisonMessages
             if (result == null) return null;
 
             await result.CompleteAsync();
-            return result.GetBody<TBusMessageContract>();
+            return (TBusMessageContract)_brokeredMessageFactory.GetBody(result, typeof(TBusMessageContract));
         }
     }
 }
