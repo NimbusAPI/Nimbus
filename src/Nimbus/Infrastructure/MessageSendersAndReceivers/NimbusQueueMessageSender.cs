@@ -8,20 +8,22 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
+        private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<MessageSender> _queueClient;
 
-        public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath)
+        public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _logger = logger;
 
             _queueClient = new ThreadSafeLazy<MessageSender>(() => _queueManager.CreateMessageSender(_queuePath).Result);
         }
 
         protected override void SendBatch(BrokeredMessage[] toSend)
         {
-            Console.WriteLine("Flushing outbound message queue {1} ({0} messages)", toSend.Length, _queuePath);
+            _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _queuePath, toSend.Length);
             _queueClient.Value.SendBatch(toSend);
         }
 

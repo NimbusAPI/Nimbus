@@ -49,7 +49,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
         {
-            var sender = new NimbusQueueMessageSender(_queueManager, queuePath);
+            var sender = new NimbusQueueMessageSender(_queueManager, queuePath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
@@ -63,7 +63,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            var sender = new NimbusTopicMessageSender(_queueManager, topicPath);
+            var sender = new NimbusTopicMessageSender(_queueManager, topicPath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
