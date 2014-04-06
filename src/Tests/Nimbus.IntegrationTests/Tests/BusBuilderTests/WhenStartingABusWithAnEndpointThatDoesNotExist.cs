@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
     public class WhenStartingABusWithAnEndpointThatDoesNotExist
     {
         [Test]
-        [Timeout(10*1000)]
+        [Timeout(15*1000)]
         public async Task ItShouldGoBangQuickly()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});

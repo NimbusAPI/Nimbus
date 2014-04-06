@@ -42,11 +42,19 @@ namespace Nimbus.Infrastructure
 
         public void WarmUp()
         {
-            // ReSharper disable UnusedVariable
-            var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
-            var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
-            // ReSharper restore UnusedVariable
-            Task.WaitAll(task0, task1);
+            try
+            {
+                // ReSharper disable UnusedVariable
+                var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
+                var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
+                // ReSharper restore UnusedVariable
+
+                Task.WaitAll(task0, task1);
+            }
+            catch (Exception exc)
+            {
+                throw new BusException("Azure queue manager failed to start", exc);
+            }
         }
 
         public MessageSender CreateMessageSender(string queuePath)
@@ -75,7 +83,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateQueueClient<T>()
         {
-            var messageContractType = typeof (T);
+            var messageContractType = typeof(T);
             var queueName = PathFactory.QueuePathFor(messageContractType);
 
             EnsureQueueExists(messageContractType);
@@ -84,7 +92,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateDeadLetterQueueClient<T>()
         {
-            var messageContractType = typeof (T);
+            var messageContractType = typeof(T);
             var queueName = GetDeadLetterQueueName(messageContractType);
 
             EnsureQueueExists(messageContractType);
