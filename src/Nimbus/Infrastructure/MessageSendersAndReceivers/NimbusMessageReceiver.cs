@@ -113,7 +113,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             if (!disposing) return;
 
-            Stop();
+            Stop().Wait();
             _throttle.Dispose();
         }
     }
