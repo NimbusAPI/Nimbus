@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
+using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
 using NUnit.Framework;
 using Shouldly;
@@ -19,6 +20,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         private AssemblyScanningTypeProvider _typeProvider;
 
         private FakeHandlerFactory _handlerFactory;
+        private FakeHandler _fakeHandler;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
 
@@ -27,7 +29,8 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         public override async Task<Bus> Given()
         {
-            _handlerFactory = new FakeHandlerFactory(NumMessagesToSend);
+            _fakeHandler = new FakeHandler(NumMessagesToSend);
+            _handlerFactory = new FakeHandlerFactory(_fakeHandler);
             _timeout = TimeSpan.FromSeconds(30);
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
@@ -58,11 +61,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            _handlerFactory.WaitUntilDone(_timeout);
+            _fakeHandler.WaitUntilDone(_timeout);
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
-            _messagesPerSecond = _handlerFactory.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
+            _messagesPerSecond = _fakeHandler.ActualNumMessagesReceived / _stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 
@@ -74,7 +77,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             Subject = await Given();
             await When();
 
-            _handlerFactory.ActualNumMessagesReceived.ShouldBe(_handlerFactory.ExpectedNumMessagesReceived);
+            _fakeHandler.ActualNumMessagesReceived.ShouldBe(_fakeHandler.ExpectedNumMessagesReceived);
         }
 
         [Test]

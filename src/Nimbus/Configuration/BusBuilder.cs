@@ -52,7 +52,12 @@ namespace Nimbus.Configuration
 
             var messagingFactories = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
                                                .AsParallel()
-                                               .Select(i => MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>()))
+                                               .Select(i =>
+                                                       {
+                                                           var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                                                           messagingFactory.PrefetchCount = 20;
+                                                           return messagingFactory;
+                                                       })
                                                .ToArray();
             var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(messagingFactories);
             container.Register<Func<MessagingFactory>>(c => messagingFactoryRoundRobin.GetNext);

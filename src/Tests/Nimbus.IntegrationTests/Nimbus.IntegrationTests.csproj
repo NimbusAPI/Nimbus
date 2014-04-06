@@ -106,7 +106,7 @@
     <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
     <Compile Include="Tests\ThroughputTests\Infrastructure\FakeHandlerFactory.cs" />
-    <Compile Include="Tests\ThroughputTests\EventHandlers\GreedyHandler.cs" />
+    <Compile Include="Tests\ThroughputTests\EventHandlers\FakeHandler.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarEvent.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BazEvent.cs" />

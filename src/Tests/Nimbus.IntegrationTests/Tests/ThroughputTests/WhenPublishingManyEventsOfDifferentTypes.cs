@@ -17,7 +17,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         public override IEnumerable<Task> SendMessages(IBus bus)
         {
-            for (var i = 0; i < NumMessagesToSend/8; i++)
+            for (var i = 0; i < NumMessagesToSend/8; i++)   // /8 because we'll see each event once via multicast and once via competition
             {
                 yield return bus.Publish(new FooEvent());
                 yield return bus.Publish(new BarEvent());
