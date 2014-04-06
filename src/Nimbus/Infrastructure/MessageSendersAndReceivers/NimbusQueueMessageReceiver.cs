@@ -11,16 +11,18 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly ILogger _logger;
         private bool _running;
 
         private readonly object _mutex = new object();
         private readonly List<Task> _workerTasks = new List<Task>();
 
-        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit)
+        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
             _concurrentHandlerLimit = concurrentHandlerLimit;
+            _logger = logger;
         }
 
         public void Start(Func<BrokeredMessage, Task> callback)
@@ -47,17 +49,23 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                     {
                                                         try
                                                         {
-                                                            var message = messageReceiver.Receive(TimeSpan.FromSeconds(10));
+                                                            var message = messageReceiver.Receive(TimeSpan.FromSeconds(5));
+
                                                             if (message == null) continue;
 
                                                             await callback(message);
                                                         }
-                                                        catch (Exception)
+                                                        catch (OperationCanceledException)
                                                         {
+                                                            // will be thrown when someone calls .Stop() on us
+                                                        }
+                                                        catch (Exception exc)
+                                                        {
+                                                            _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, _queuePath);
                                                         }
                                                     }
 
-                                                    messageReceiver.Close();
+                                                    await messageReceiver.CloseAsync();
                                                 });
                 _workerTasks.Add(workerTask);
             }
@@ -65,11 +73,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public void Stop()
         {
-            lock (_mutex)
-            {
-                _running = false;
-                Task.WaitAll(_workerTasks.ToArray());
-            }
+            if (!_running) return;
+
+            _running = false;
+
+            Task.WaitAll(_workerTasks.ToArray());
         }
 
         public override string ToString()

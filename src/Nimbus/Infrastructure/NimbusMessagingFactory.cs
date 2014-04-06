@@ -17,11 +17,13 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly ILogger _logger;
 
-        public NimbusMessagingFactory(IQueueManager queueManager, ConcurrentHandlerLimitSetting concurrentHandlerLimit)
+        public NimbusMessagingFactory(IQueueManager queueManager, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
         {
             _queueManager = queueManager;
             _concurrentHandlerLimit = concurrentHandlerLimit;
+            _logger = logger;
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -54,7 +56,7 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit);
+            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

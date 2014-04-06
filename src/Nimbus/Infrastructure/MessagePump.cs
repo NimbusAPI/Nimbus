@@ -48,10 +48,10 @@ namespace Nimbus.Infrastructure
                                 lock (_mutex)
                                 {
                                     if (!_started) return;
+                                    _started = false;
 
                                     _logger.Debug("Message pump for {0} stopping...", _receiver);
                                     _receiver.Stop();
-                                    _started = false;
                                     _logger.Debug("Message pump for {0} stopped.", _receiver);
                                 }
                             });

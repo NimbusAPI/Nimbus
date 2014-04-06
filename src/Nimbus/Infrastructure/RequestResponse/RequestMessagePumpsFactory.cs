@@ -57,7 +57,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 _logger.Debug("Creating message pump for request type {0}", requestType.Name);
 
                 var queuePath = PathFactory.QueuePathFor(requestType);
-                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit);
+                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit, _logger);
                 _garbageMan.Add(messageReceiver);
 
                 var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _requestHandlerFactory, _clock, _logger);
