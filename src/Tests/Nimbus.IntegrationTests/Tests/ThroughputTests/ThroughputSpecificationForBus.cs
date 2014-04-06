@@ -6,6 +6,7 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
+using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
 
@@ -23,6 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         private FakeHandler _fakeHandler;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
+        private ILogger _logger;
 
         protected virtual int NumMessagesToSend
         {
@@ -37,9 +39,12 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             _handlerFactory = new FakeHandlerFactory(_fakeHandler);
             _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output
+            _logger = new NullLogger();
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
+                                      .WithLogger(_logger)
                                       .WithConnectionString(CommonResources.ConnectionString)
                                       .WithTypesFrom(_typeProvider)
                                       .WithCommandHandlerFactory(_handlerFactory)

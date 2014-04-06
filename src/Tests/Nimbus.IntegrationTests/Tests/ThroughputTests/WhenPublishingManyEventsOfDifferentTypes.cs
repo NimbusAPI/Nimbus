@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
+using Nimbus.MessageContracts;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.ThroughputTests
@@ -17,15 +17,16 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         public override IEnumerable<Task> SendMessages(IBus bus)
         {
+            var messages = new List<IBusEvent>();
             for (var i = 0; i < NumMessagesToSend/8; i++) // /8 because we'll see each event once via multicast and once via competition
             {
-                yield return bus.Publish(new FooEvent());
-                yield return bus.Publish(new BarEvent());
-                yield return bus.Publish(new BazEvent());
-                yield return bus.Publish(new QuxEvent());
-                Console.Write(".");
+                messages.Add(new FooEvent());
+                messages.Add(new BarEvent());
+                messages.Add(new BazEvent());
+                messages.Add(new QuxEvent());
             }
-            Console.WriteLine();
+
+            yield return bus.PublishAll(messages);
         }
     }
 }

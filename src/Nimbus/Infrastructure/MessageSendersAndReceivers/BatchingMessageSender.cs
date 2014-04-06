@@ -11,6 +11,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
         private readonly object _sendingMutex = new object();
+        private bool _flushing;
 
         protected abstract void SendBatch(BrokeredMessage[] messages);
 
@@ -21,42 +22,53 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                 lock (_outboundQueue)
                                 {
                                     _outboundQueue.Add(message);
-                                    TriggerMessageFlush();
                                 }
+                                TriggerMessageFlush();
                             });
         }
 
         private void TriggerMessageFlush()
         {
-            Task.Run((Action) (FlushMessages));
+            Task.Run(() => FlushMessages());
         }
 
         private void FlushMessages()
         {
-            BrokeredMessage[] toSend;
-
-            lock (_outboundQueue)
-            {
-                toSend = _outboundQueue.Take(100).ToArray();
-                _outboundQueue.RemoveRange(0, toSend.Length);
-                if (_outboundQueue.Any()) TriggerMessageFlush();
-            }
-
-            if (toSend.None()) return;
+            if (_flushing) return;
 
             lock (_sendingMutex)
             {
                 try
                 {
-                    SendBatch(toSend);
-                }
-                catch (Exception)
-                {
+                    _flushing = true;
+                    BrokeredMessage[] toSend;
+
                     lock (_outboundQueue)
                     {
-                        _outboundQueue.AddRange(toSend);
+                        toSend = _outboundQueue.Take(100).ToArray();
+                        _outboundQueue.RemoveRange(0, toSend.Length);
+                    }
+
+                    if (toSend.None()) return;
+
+                    try
+                    {
+                        SendBatch(toSend);
+                    }
+                    catch (Exception)
+                    {
+                        lock (_outboundQueue)
+                        {
+                            _outboundQueue.AddRange(toSend);
+                        }
                     }
                 }
+                finally
+                {
+                    _flushing = false;
+                }
+
+                if (_outboundQueue.Any()) TriggerMessageFlush();
             }
         }
 
