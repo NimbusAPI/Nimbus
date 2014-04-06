@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,14 +66,14 @@ namespace Nimbus.Extensions
                 lock (_mutex)
                 {
                     if (_disposed) return; // already given up before a task completes? just bail.
-
-                    _remainingTasks.Remove(task);
-                    if (task.IsFaulted) return;
-                    if (task.IsCanceled) return;
                     if (_resultsQueue.IsAddingCompleted) return;
 
-                    _resultsQueue.Add(task.Result);
+                    if (!task.IsFaulted && !task.IsCanceled)
+                    {
+                        _resultsQueue.Add(task.Result);
+                    }
 
+                    _remainingTasks.Remove(task);
                     if (_remainingTasks.None())
                     {
                         _resultsQueue.CompleteAdding();

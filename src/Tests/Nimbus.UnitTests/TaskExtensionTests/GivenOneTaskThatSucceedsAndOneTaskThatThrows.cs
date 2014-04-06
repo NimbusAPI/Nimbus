@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using NUnit.Framework;
@@ -11,16 +12,12 @@ namespace Nimbus.UnitTests.TaskExtensionTests
     public class GivenOneTaskThatSucceedsAndOneTaskThatThrows
     {
         [TestFixture]
-        public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete : SpecificationFor<Task<int>[]>
+        public class WhenOpportunisticallyReturningTheirResultsAsTheyComplete
         {
-            private const int _timeoutMilliseconds = 10000;
+            private const int _timeoutMilliseconds = 1000;
 
-            private int[] _result;
-
-            public override Task<int>[] Given()
+            public async Task<Task<int>[]> Given()
             {
-                _result = null;
-
                 return new[]
                        {
                            Task.Run(() => GoBang()),
@@ -34,27 +31,37 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 throw new Exception("This task is supposed to go bang.");
             }
 
-            public override void When()
+            public async Task<int[]> When(Task<int>[] tasks)
             {
-                Task.Run(() => { _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(_timeoutMilliseconds)).ToArray(); }).Wait();
+                var timeout = TimeSpan.FromMilliseconds(_timeoutMilliseconds);
+                return tasks.ReturnOpportunistically(timeout).ToArray();
             }
 
             [Test]
-            public void ThereShouldBeOneResult()
+            public async Task ThereShouldBeOneResult()
             {
-                _result.Count().ShouldBe(1);
+                var subject = await Given();
+                var result = await When(subject);
+                result.Count().ShouldBe(1);
             }
 
             [Test]
-            public void TheFirstResultShouldBe20()
+            public async Task TheFirstResultShouldBe20()
             {
-                _result[0].ShouldBe(20);
+                var subject = await Given();
+                var result = await When(subject);
+                result[0].ShouldBe(20);
             }
 
             [Test]
-            public void TheElapsedTimeShouldBeLessThanTheTimeoutBecauseBothTasksCompleteImmediately()
+            public async Task TheElapsedTimeShouldBeLessThanTheTimeoutBecauseBothTasksCompleteImmediately()
             {
-                ElapsedTime.TotalMilliseconds.ShouldBeLessThan(_timeoutMilliseconds);
+                var sw = Stopwatch.StartNew();
+                var subject = await Given();
+                var result = await When(subject);
+                sw.Stop();
+
+                sw.Elapsed.TotalMilliseconds.ShouldBeLessThan(_timeoutMilliseconds);
             }
         }
     }
