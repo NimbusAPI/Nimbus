@@ -52,7 +52,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                       {
                                           try
                                           {
-                                              await _throttle.WaitAsync();
+                                              await _throttle.WaitAsync(_cancellationToken.Token);
                                               await callback(m);
                                           }
                                           finally
