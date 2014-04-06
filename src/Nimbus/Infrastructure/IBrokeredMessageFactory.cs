@@ -27,5 +27,7 @@ namespace Nimbus.Infrastructure
         /// <param name="exception">The exception that caused the request to fail.</param>
         /// <returns>The newly minted <see cref="BrokeredMessage"/></returns>
         BrokeredMessage CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
+
+        object GetBody(BrokeredMessage message, Type type);
     }
 }

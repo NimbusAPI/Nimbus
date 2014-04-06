@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pizza.RetailWeb", "Samples\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization", "Tests\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj", "{8E57016E-6344-4245-82CA-A5B4D5BAA07E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj", "{109FB118-FA9A-4EB2-88AF-F66C973CE50F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,10 @@ Global
 		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E57016E-6344-4245-82CA-A5B4D5BAA07E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{109FB118-FA9A-4EB2-88AF-F66C973CE50F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{109FB118-FA9A-4EB2-88AF-F66C973CE50F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{109FB118-FA9A-4EB2-88AF-F66C973CE50F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{109FB118-FA9A-4EB2-88AF-F66C973CE50F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -160,6 +166,7 @@ Global
 		{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{6B665505-3C52-49D3-914A-7C295AF3F877} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{7FCF3124-24EC-40CA-95FD-E30315D0DDE2} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{109FB118-FA9A-4EB2-88AF-F66C973CE50F} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{86300BEC-7B51-41D5-8E0D-B2C85945329D} = {4431DEBC-ACDA-49A8-B8B2-2E6CD6D959C0}
 		{79D2D912-4B73-456B-B1E0-C6114BC2CB4F} = {4431DEBC-ACDA-49A8-B8B2-2E6CD6D959C0}
 		{D98B95C3-F4BE-4F6A-BF62-3E3EC0BD384F} = {4431DEBC-ACDA-49A8-B8B2-2E6CD6D959C0}
