@@ -64,7 +64,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                 Console.WriteLine();
             }
 
-            using (new AssertingStopwatch("Subsequent bus creation", TimeSpan.FromSeconds(15)))
+            using (new AssertingStopwatch("Subsequent bus creation", TimeSpan.FromSeconds(20)))
             {
                 using (var bus = new BusBuilder().Configure()
                                                  .WithNames("MyTestSuite", Environment.MachineName)
