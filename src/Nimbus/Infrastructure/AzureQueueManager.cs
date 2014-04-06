@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts.Exceptions;
@@ -16,9 +18,9 @@ namespace Nimbus.Infrastructure
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
-        private readonly Lazy<ConcurrentBag<string>> _knownTopics;
-        private readonly Lazy<ConcurrentBag<string>> _knownSubscriptions;
-        private readonly Lazy<ConcurrentBag<string>> _knownQueues;
+        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
+        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
+        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
@@ -33,9 +35,18 @@ namespace Nimbus.Infrastructure
             _logger = logger;
             _defaultMessageLockDuration = defaultMessageLockDuration;
 
-            _knownTopics = new Lazy<ConcurrentBag<string>>(FetchExistingTopics);
-            _knownSubscriptions = new Lazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
-            _knownQueues = new Lazy<ConcurrentBag<string>>(FetchExistingQueues);
+            _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
+            _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
+            _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
+        }
+
+        public void WarmUp()
+        {
+            // ReSharper disable UnusedVariable
+            var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
+            var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
+            // ReSharper restore UnusedVariable
+            Task.WaitAll(task0, task1);
         }
 
         public MessageSender CreateMessageSender(string queuePath)
@@ -64,7 +75,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateQueueClient<T>()
         {
-            var messageContractType = typeof (T);
+            var messageContractType = typeof(T);
             var queueName = PathFactory.QueuePathFor(messageContractType);
 
             EnsureQueueExists(messageContractType);
@@ -73,7 +84,7 @@ namespace Nimbus.Infrastructure
 
         public QueueClient CreateDeadLetterQueueClient<T>()
         {
-            var messageContractType = typeof (T);
+            var messageContractType = typeof(T);
             var queueName = GetDeadLetterQueueName(messageContractType);
 
             EnsureQueueExists(messageContractType);
@@ -87,8 +98,6 @@ namespace Nimbus.Infrastructure
             var topics = _namespaceManager().GetTopics();
             var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
 
-            _logger.Debug("Topic paths: {0}", string.Join(Environment.NewLine, topicPaths));
-
             return topicPaths;
         }
 
@@ -96,29 +105,42 @@ namespace Nimbus.Infrastructure
         {
             _logger.Debug("Fetching existing subscriptions...");
 
-            var subscriptionKeys = from topicPath in _knownTopics.Value.AsParallel().WithDegreeOfParallelism(64)
-                                   from subscriptionName in _namespaceManager().GetSubscriptions(topicPath).Select(s => s.Name)
-                                   select BuildSubscriptionKey(topicPath, subscriptionName);
+            var subscriptionTasks = _knownTopics.Value
+                                                .Select(FetchExistingTopicSubscriptions)
+                                                .ToArray();
 
+            Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
 
-            _logger.Debug("Subscription keys: {0}", string.Join(Environment.NewLine, subscriptionKeys.OrderBy(k => k)));
+            var subscriptionKeys = subscriptionTasks
+                .SelectMany(t => t.Result)
+                .OrderBy(k => k)
+                .ToArray();
 
             return new ConcurrentBag<string>(subscriptionKeys);
+        }
+
+        private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
+        {
+            return Task.Run(async () =>
+            {
+                var subscriptions = await _namespaceManager().GetSubscriptionsAsync(topicPath);
+
+                return subscriptions
+                    .Select(s => s.Name)
+                    .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
+                    .ToArray();
+            });
         }
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
             _logger.Debug("Fetching existing queues...");
 
-            var queuesAsync = _namespaceManager().GetQueuesAsync();
-            if (!queuesAsync.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
-
-            var queues = queuesAsync.Result;
-            var queuePaths = new ConcurrentBag<string>(queues.Select(q => q.Path));
-
-            _logger.Debug("Queue paths: {0}", string.Join(Environment.NewLine, queuePaths));
-
-            return queuePaths;
+            var queues = _namespaceManager().GetQueues();
+            var queuePaths = queues.Select(q => q.Path)
+                                   .OrderBy(p => p)
+                                   .ToArray();
+            return new ConcurrentBag<string>(queuePaths);
         }
 
         private void EnsureTopicExists(string topicPath)
@@ -128,13 +150,13 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating topic '{0}'", topicPath);
 
             var topicDescription = new TopicDescription(topicPath)
-                                   {
-                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                       EnableBatchedOperations = true,
-                                       RequiresDuplicateDetection = false,
-                                       SupportOrdering = false,
-                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                   };
+            {
+                DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                EnableBatchedOperations = true,
+                RequiresDuplicateDetection = false,
+                SupportOrdering = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
+            };
 
             // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
             // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
@@ -167,15 +189,15 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating subscription '{0}'", subscriptionKey);
 
             var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                          {
-                                              MaxDeliveryCount = _maxDeliveryAttempts,
-                                              DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                              EnableDeadLetteringOnMessageExpiration = true,
-                                              EnableBatchedOperations = true,
-                                              LockDuration = _defaultMessageLockDuration,
-                                              RequiresSession = false,
-                                              AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                          };
+            {
+                MaxDeliveryCount = _maxDeliveryAttempts,
+                DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                EnableDeadLetteringOnMessageExpiration = true,
+                EnableBatchedOperations = true,
+                LockDuration = _defaultMessageLockDuration,
+                RequiresSession = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
+            };
 
             try
             {
@@ -214,17 +236,17 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Creating queue '{0}'", queuePath);
 
             var queueDescription = new QueueDescription(queuePath)
-                                   {
-                                       MaxDeliveryCount = _maxDeliveryAttempts,
-                                       DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                       EnableDeadLetteringOnMessageExpiration = true,
-                                       EnableBatchedOperations = true,
-                                       LockDuration = _defaultMessageLockDuration,
-                                       RequiresDuplicateDetection = false,
-                                       RequiresSession = false,
-                                       SupportOrdering = false,
-                                       AutoDeleteOnIdle = TimeSpan.FromDays(367),
-                                   };
+            {
+                MaxDeliveryCount = _maxDeliveryAttempts,
+                DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                EnableDeadLetteringOnMessageExpiration = true,
+                EnableBatchedOperations = true,
+                LockDuration = _defaultMessageLockDuration,
+                RequiresDuplicateDetection = false,
+                RequiresSession = false,
+                SupportOrdering = false,
+                AutoDeleteOnIdle = TimeSpan.FromDays(367),
+            };
 
             // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
             // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and

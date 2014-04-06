@@ -7,6 +7,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
@@ -79,7 +80,17 @@ namespace Nimbus.Configuration
                               messagePumps,
                               container.Resolve<DeadLetterQueues>());
 
-            bus.Disposing += (sender, args) => container.Dispose();
+            bus.Starting += delegate
+            {
+                container.Resolve<AzureQueueManager>().WarmUp();
+            };
+
+
+            bus.Disposing += delegate
+            {
+                container.Dispose();
+                messagingFactories.Do(mf => mf.Close()).Done();
+            };
 
             logger.Debug("Bus built. Job done!");
 

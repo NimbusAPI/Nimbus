@@ -81,11 +81,16 @@ namespace Nimbus
             get { return _deadLetterQueues; }
         }
 
+        public EventHandler<EventArgs> Starting;
+
         public void Start()
         {
             _logger.Debug("Bus starting...");
 
-            var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(async () => await p.Start())).ToArray();
+            var handler = Starting;
+            if (handler != null) handler(this, EventArgs.Empty);
+
+            var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(() => p.Start())).ToArray();
 
             try
             {
@@ -100,11 +105,16 @@ namespace Nimbus
             _logger.Info("Bus started.");
         }
 
+        public EventHandler<EventArgs> Stopping;
+
         public void Stop()
         {
             _logger.Debug("Bus stopping...");
 
-            var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(async () => await p.Stop())).ToArray();
+            var handler = Stopping;
+            if (handler != null) handler(this, EventArgs.Empty);
+
+            var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(() => p.Stop())).ToArray();
 
             try
             {

@@ -57,6 +57,7 @@
     <Compile Include="BatchSendingExtensions.cs" />
     <Compile Include="ConcurrentCollections\RoundRobin.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
+    <Compile Include="ConcurrentCollections\ThreadSafeLazy.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
