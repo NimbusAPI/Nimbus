@@ -4,6 +4,7 @@ using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 
 namespace Nimbus.Configuration
 {
@@ -136,6 +137,28 @@ namespace Nimbus.Configuration
         {
             configuration.Logger = logger;
             return configuration;
+        }
+
+        public static BusBuilderConfiguration WithSerializer(this BusBuilderConfiguration configuration, ISerializer serializer)
+        {
+            configuration.Serializer = serializer;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithCompressor(this BusBuilderConfiguration configuration, ICompressor compressor)
+        {
+            configuration.Compressor = compressor;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDeflateCompressor(this BusBuilderConfiguration configuration)
+        {
+            return configuration.WithCompressor(new DeflateCompressor());
+        }
+
+        public static BusBuilderConfiguration WithGzipCompressor(this BusBuilderConfiguration configuration)
+        {
+            return configuration.WithCompressor(new GzipCompressor());
         }
 
         public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
