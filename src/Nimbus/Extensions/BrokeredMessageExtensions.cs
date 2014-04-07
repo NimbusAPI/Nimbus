@@ -49,6 +49,12 @@ namespace Nimbus.Extensions
             return message;
         }
 
+        public static BrokeredMessage WithProperty(this BrokeredMessage message, string key, object value)
+        {
+            message.Properties.Add(key, value);
+            return message;
+        }
+
         public static TimeSpan GetRequestTimeout(this BrokeredMessage message)
         {
             var requestTimeoutInMilliseconds = (int)message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];

@@ -1,40 +1,41 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
 {
-    internal class GivenAMessageBrokerFactory
+    internal abstract class GivenAMessageBrokerFactory : SpecificationForAsync<BrokeredMessageFactory>
     {
-        [TestFixture]
-        public class WhenCreatingANewMessageWithContent : SpecificationFor<BrokeredMessageFactory>
+        private IClock _clock;
+        private ISerializer _serializer;
+        private BrokeredMessage _message;
+        private ReplyQueueNameSetting _replyQueueNameSetting;
+
+        protected override async Task<BrokeredMessageFactory> Given()
         {
-            private IClock _clock;
-            private ISerializer _serializer;
-            private BrokeredMessage _message;
-            private ReplyQueueNameSetting _replyQueueNameSetting;
+            _clock = Substitute.For<IClock>();
+            _serializer = Substitute.For<ISerializer>();
+            _replyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"});
 
-            public override BrokeredMessageFactory Given()
-            {
-                _clock = Substitute.For<IClock>();
-                _serializer = Substitute.For<ISerializer>();
-                _replyQueueNameSetting = new ReplyQueueNameSetting(
-                    new ApplicationNameSetting {Value = "TestApplication"},
-                    new InstanceNameSetting {Value = "TestInstance"});
-                return new BrokeredMessageFactory(_replyQueueNameSetting, _serializer, new NullCompressor(), _clock);
-            }
+            return new BrokeredMessageFactory(_replyQueueNameSetting, _serializer, new NullCompressor(), _clock, new UnsupportedMessageBodyStore());
+        }
 
-            public override void When()
+        [TestFixture]
+        public class WhenCreatingANewMessageWithContent : GivenAMessageBrokerFactory
+        {
+            protected override async Task When()
             {
-                _message = Subject.Create(new TestMessage());
+                _message = await Subject.Create(new TestMessage());
             }
 
             [Test]
@@ -58,7 +59,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             [Test]
             public void ThenTheMessageTypeShouldBeSetToTheFullNameOfTheSerializedContent()
             {
-                _message.SafelyGetBodyTypeNameOrDefault().ShouldBe(typeof(TestMessage).FullName);
+                _message.SafelyGetBodyTypeNameOrDefault().ShouldBe(typeof (TestMessage).FullName);
             }
 
             [Test]
@@ -70,7 +71,6 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             [DataContract]
             public class TestMessage
             {
-                
             }
         }
     }

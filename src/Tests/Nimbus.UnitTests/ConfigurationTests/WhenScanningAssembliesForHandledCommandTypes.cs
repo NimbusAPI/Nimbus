@@ -12,12 +12,12 @@ namespace Nimbus.UnitTests.ConfigurationTests
     {
         private Type[] _commandHandlerTypes;
 
-        public override AssemblyScanningTypeProvider Given()
+        protected override AssemblyScanningTypeProvider Given()
         {
             return new AssemblyScanningTypeProvider(typeof (WhenScanningAssembliesForHandledCommandTypes).Assembly);
         }
 
-        public override void When()
+        protected override void When()
         {
             _commandHandlerTypes = Subject.CommandHandlerTypes.ToArray();
         }

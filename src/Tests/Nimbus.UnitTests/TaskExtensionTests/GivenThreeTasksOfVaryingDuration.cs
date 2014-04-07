@@ -19,7 +19,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
             private Task<int>[] _tasks;
             private CancellationTokenSource _cancellationToken;
 
-            public override TaskExtensions.OpportunisticTaskCompletionReturner<int> Given()
+            protected override TaskExtensions.OpportunisticTaskCompletionReturner<int> Given()
             {
                 _semaphore0 = new Semaphore(0, 1);
                 _semaphore1 = new Semaphore(0, 1);
@@ -48,7 +48,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                 return new TaskExtensions.OpportunisticTaskCompletionReturner<int>(_tasks, _cancellationToken);
             }
 
-            public override void When()
+            protected override void When()
             {
             }
 

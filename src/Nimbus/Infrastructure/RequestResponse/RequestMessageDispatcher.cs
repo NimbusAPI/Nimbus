@@ -37,7 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var request = _brokeredMessageFactory.GetBody(message, _messageType);
+            var request = await _brokeredMessageFactory.GetBody(message, _messageType);
             var dispatchMethod = GetGenericDispatchMethodFor(request);
             await (Task) dispatchMethod.Invoke(this, new[] {request, message});
         }
@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
 
-                    responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                    responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
                     
                     _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                         responseMessage.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
@@ -76,7 +76,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             if (exception != null)
             {
-                var failedResponseMessage = _brokeredMessageFactory.CreateFailedResponse(message, exception);
+                var failedResponseMessage = await _brokeredMessageFactory.CreateFailedResponse(message, exception);
 
                 _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                     replyQueueName, exception.Message, message.MessageId, message.CorrelationId);

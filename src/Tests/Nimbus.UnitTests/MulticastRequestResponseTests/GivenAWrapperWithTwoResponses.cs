@@ -7,7 +7,7 @@ namespace Nimbus.UnitTests.MulticastRequestResponseTests
     [TestFixture]
     internal abstract class GivenAWrapperWithTwoResponses : SpecificationFor<MulticastRequestResponseCorrelationWrapper<string>>
     {
-        public override MulticastRequestResponseCorrelationWrapper<string> Given()
+        protected override MulticastRequestResponseCorrelationWrapper<string> Given()
         {
             var wrapper = new MulticastRequestResponseCorrelationWrapper<string>(DateTimeOffset.MaxValue);
             wrapper.Reply("Hello!");

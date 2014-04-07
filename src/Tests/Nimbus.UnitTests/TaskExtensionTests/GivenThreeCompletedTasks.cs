@@ -14,7 +14,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
         {
             private int[] _result;
 
-            public override Task<int>[] Given()
+            protected override Task<int>[] Given()
             {
                 return new[]
                        {
@@ -24,7 +24,7 @@ namespace Nimbus.UnitTests.TaskExtensionTests
                        };
             }
 
-            public override void When()
+            protected override void When()
             {
                 _result = Subject.ReturnOpportunistically(TimeSpan.FromMilliseconds(100)).ToArray();
             }

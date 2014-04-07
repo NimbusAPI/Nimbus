@@ -7,10 +7,10 @@ namespace Nimbus.UnitTests
     [TestFixture]
     public abstract class SpecificationFor<T> where T : class
     {
-        public T Subject;
+        protected T Subject;
 
-        public abstract T Given();
-        public abstract void When();
+        protected abstract T Given();
+        protected abstract void When();
 
         private Stopwatch _sw;
 

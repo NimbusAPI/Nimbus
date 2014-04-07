@@ -13,7 +13,7 @@ namespace Nimbus.UnitTests.MulticastRequestResponseTests
 
         private string[] _result;
 
-        public override void When()
+        protected override void When()
         {
             _result = Subject.ReturnResponsesOpportunistically(_timeout).Take(3).ToArray();
         }

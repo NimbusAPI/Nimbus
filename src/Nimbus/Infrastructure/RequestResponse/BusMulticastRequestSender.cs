@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             AssertValidRequestType<TRequest, TResponse>();
 
-            var message = _brokeredMessageFactory.Create(busRequest).WithRequestTimeout(timeout);
+            var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 

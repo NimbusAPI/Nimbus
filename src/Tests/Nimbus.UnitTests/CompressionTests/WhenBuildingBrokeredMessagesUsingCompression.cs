@@ -1,9 +1,11 @@
 ﻿using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
@@ -12,13 +14,13 @@ using DataContractSerializer = Nimbus.Infrastructure.BrokeredMessageServices.Ser
 
 namespace Nimbus.UnitTests.CompressionTests
 {
-    internal class WhenBuildingBrokeredMessagesUsingCompression : SpecificationFor<BrokeredMessageFactory>
+    internal class WhenBuildingBrokeredMessagesUsingCompression : SpecificationForAsync<BrokeredMessageFactory>
     {
         private BrokeredMessage _compressedMessage;
         private BrokeredMessage _uncompressedMessage;
         private BrokeredMessageFactory _defaultBrokeredMessageFactory;
 
-        public override BrokeredMessageFactory Given()
+        protected override async Task<BrokeredMessageFactory> Given()
         {
             _defaultBrokeredMessageFactory = BuildBrokeredMessageFactory(new NullCompressor());
             return BuildBrokeredMessageFactory(new DeflateCompressor());
@@ -27,17 +29,18 @@ namespace Nimbus.UnitTests.CompressionTests
         private static BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
             return new BrokeredMessageFactory(
-                new ReplyQueueNameSetting(new ApplicationNameSetting { Value = "App" }, new InstanceNameSetting { Value = "Instance" }),
+                new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
                 new DataContractSerializer(),
-                compressor, 
-                Substitute.For<IClock>()
+                compressor,
+                Substitute.For<IClock>(),
+                new UnsupportedMessageBodyStore()
                 );
         }
 
-        public override void When()
+        protected override async Task When()
         {
-            _uncompressedMessage = _defaultBrokeredMessageFactory.Create(new CommandToCompress());
-            _compressedMessage = Subject.Create(new CommandToCompress());
+            _uncompressedMessage = await _defaultBrokeredMessageFactory.Create(new CommandToCompress());
+            _compressedMessage = await Subject.Create(new CommandToCompress());
         }
 
         [Test]
@@ -51,7 +54,8 @@ namespace Nimbus.UnitTests.CompressionTests
         {
             public CommandToCompress()
             {
-                Message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum convallis laoreet ligula, ut congue tellus condimentum eu. Duis mollis, nisi et adipiscing dapibus, leo lectus venenatis nibh, sed placerat enim mauris eget urna. Mauris et auctor augue. Morbi nec magna dapibus, molestie arcu id, venenatis eros. Ut a accumsan massa, quis suscipit neque. Quisque suscipit, lorem at malesuada luctus, odio urna commodo leo, vitae commodo lorem odio non nisi. Vivamus eros dui, aliquam eget nisi vitae, suscipit adipiscing lacus. Donec vel adipiscing dui. In et turpis vel metus ornare aliquam. Mauris placerat venenatis auctor. Suspendisse pretium lacus id dui congue, sed varius neque aliquet. Quisque cursus a velit id aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In pulvinar dignissim est a ultrices. Aliquam non ullamcorper risus.";
+                Message =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum convallis laoreet ligula, ut congue tellus condimentum eu. Duis mollis, nisi et adipiscing dapibus, leo lectus venenatis nibh, sed placerat enim mauris eget urna. Mauris et auctor augue. Morbi nec magna dapibus, molestie arcu id, venenatis eros. Ut a accumsan massa, quis suscipit neque. Quisque suscipit, lorem at malesuada luctus, odio urna commodo leo, vitae commodo lorem odio non nisi. Vivamus eros dui, aliquam eget nisi vitae, suscipit adipiscing lacus. Donec vel adipiscing dui. In et turpis vel metus ornare aliquam. Mauris placerat venenatis auctor. Suspendisse pretium lacus id dui congue, sed varius neque aliquet. Quisque cursus a velit id aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In pulvinar dignissim est a ultrices. Aliquam non ullamcorper risus.";
             }
 
             [DataMember]

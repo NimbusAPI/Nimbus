@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure.Events
             var eventType = busEvent.GetType();
             AssertValidEventType(eventType);
 
-            var message = _brokeredMessageFactory.Create(busEvent);
+            var message = await _brokeredMessageFactory.Create(busEvent);
             var topicPath = PathFactory.TopicPathFor(eventType);
             var topicSender = _messagingFactory.GetTopicSender(topicPath);
 

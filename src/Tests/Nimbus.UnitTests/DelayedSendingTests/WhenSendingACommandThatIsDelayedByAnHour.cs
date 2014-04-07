@@ -12,12 +12,12 @@ namespace Nimbus.UnitTests.DelayedSendingTests
         private FooCommand _fooCommand;
         private DateTimeOffset _expectedDeliveryTime;
 
-        public override IBus Given()
+        protected override IBus Given()
         {
             return Substitute.For<IBus>();
         }
 
-        public override void When()
+        protected override void When()
         {
             var lyingClock = Substitute.For<IClock>();
             var now = new DateTimeOffset(2014, 02, 09, 18, 04, 58, TimeSpan.FromHours(10));

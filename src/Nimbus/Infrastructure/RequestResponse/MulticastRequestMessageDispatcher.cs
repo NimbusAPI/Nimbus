@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var request =_brokeredMessageFactory.GetBody(message, _requestType);
+            var request = await _brokeredMessageFactory.GetBody(message, _requestType);
             var dispatchMethod = GetGenericDispatchMethodFor(request);
             await (Task) dispatchMethod.Invoke(this, new[] {request, message});
         }
@@ -58,12 +58,18 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                 .AwaitCompletion()
                                                 .ContinueWith(async t =>
                                                                     {
-                                                                        var responseMessage = _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
+                                                                        var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(t.Result, message);
                                                                         _logger.Debug("Sending successful multicast response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                                                            message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
+                                                                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                                                                      replyQueueName,
+                                                                                      message.MessageId,
+                                                                                      message.CorrelationId);
                                                                         await replyQueueClient.Send(responseMessage);
                                                                         _logger.Info("Sent successful multicast response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                                                            message.SafelyGetBodyTypeNameOrDefault(), replyQueueName, message.MessageId, message.CorrelationId);
+                                                                                     message.SafelyGetBodyTypeNameOrDefault(),
+                                                                                     replyQueueName,
+                                                                                     message.MessageId,
+                                                                                     message.CorrelationId);
                                                                     }))
                                     .ToArray();
 

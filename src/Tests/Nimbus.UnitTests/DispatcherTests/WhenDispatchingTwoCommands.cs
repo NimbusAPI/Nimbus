@@ -6,6 +6,7 @@ using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
@@ -36,7 +37,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting { Value = "TestApplication" },
                 new InstanceNameSetting { Value = "TestInstance" });
-            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock);
+            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock, new UnsupportedMessageBodyStore());
             _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof(FooCommand), new SystemClock());
         }
 
@@ -45,8 +46,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
-            await _commandDispatcher.Dispatch(_brokeredMessageFactory.Create(command1));
-            await _commandDispatcher.Dispatch(_brokeredMessageFactory.Create(command2));
+            await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command1));
+            await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command2));
         }
 
 #pragma warning disable 4014

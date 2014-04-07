@@ -4,6 +4,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -32,8 +33,8 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock);
-            var validCommandTypes = new CommandTypesSetting { Value = new[] { typeof(FooCommand), typeof(BarCommand), typeof(BazCommand) } };
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock, new UnsupportedMessageBodyStore());
+            var validCommandTypes = new CommandTypesSetting {Value = new[] {typeof (FooCommand), typeof (BarCommand), typeof (BazCommand)}};
             var logger = Substitute.For<ILogger>();
 
             var busCommandSender = new BusCommandSender(messagingFactory, brokeredMessageFactory, validCommandTypes, logger);

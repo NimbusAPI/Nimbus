@@ -10,6 +10,7 @@
         public const string ExceptionTimestamp = "ExceptionTimestamp";
         public const string ExceptionMachineName = "ExceptionMachineName";
         public const string ExceptionIdentityName = "ExceptionIdentityName";
+        public const string LargeBodyBlobIdentifier = "LargeBodyBlobIdentifier";
         public const string MessageType = "MessageType";
     }
 }

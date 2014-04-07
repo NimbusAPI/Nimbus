@@ -2,6 +2,7 @@
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
 
@@ -17,6 +18,7 @@ namespace Nimbus.Configuration
         internal ILogger Logger { get; set; }
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
+        internal IMessageBodyStore LargeMessageBodyStore { get; set; }
         internal BusDebuggingConfiguration Debugging { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
@@ -42,6 +44,7 @@ namespace Nimbus.Configuration
             Debugging = new BusDebuggingConfiguration();
             Serializer = new DataContractSerializer();
             Compressor = new NullCompressor();
+            LargeMessageBodyStore = new UnsupportedMessageBodyStore();
         }
 
         public Bus Build()

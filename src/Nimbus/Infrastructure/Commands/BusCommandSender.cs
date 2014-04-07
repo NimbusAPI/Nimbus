@@ -32,7 +32,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = _brokeredMessageFactory.Create(busCommand);
+            var message = await _brokeredMessageFactory.Create(busCommand);
 
             await Deliver(commandType, message);
         }
@@ -42,7 +42,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             AssertValidCommandType(commandType);
 
-            var message = _brokeredMessageFactory.Create(busCommand).WithScheduledEnqueueTime(whenToSend);
+            var message = (await _brokeredMessageFactory.Create(busCommand)).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(commandType, message);
         }
