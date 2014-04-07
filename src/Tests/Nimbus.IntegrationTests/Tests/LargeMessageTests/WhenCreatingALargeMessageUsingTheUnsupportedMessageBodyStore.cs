@@ -21,7 +21,9 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               new DataContractSerializer(),
                                               new NullCompressor(),
                                               new SystemClock(),
-                                              new UnsupportedMessageBodyStore());
+                                              new UnsupportedLargeMessageBodyStore(),
+                                              new MaxSmallMessageSizeSetting {Value = 64*1024},
+                                              new MaxLargeMessageSizeSetting());
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)
@@ -31,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         }
 
         [Test]
-        [ExpectedException(typeof (NotSupportedException), ExpectedMessage = UnsupportedMessageBodyStore.FailureMessage)]
+        [ExpectedException(typeof (NotSupportedException), ExpectedMessage = UnsupportedLargeMessageBodyStore.FailureMessage)]
         public async Task MessageCreationShouldFail()
         {
             var brokeredMessageFactory = await Given();

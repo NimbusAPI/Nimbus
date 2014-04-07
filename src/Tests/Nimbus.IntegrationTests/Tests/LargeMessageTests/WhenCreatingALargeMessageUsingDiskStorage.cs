@@ -14,6 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
+    [Timeout(15 * 1000)]
     public class WhenCreatingALargeMessageUsingDiskStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
@@ -29,9 +30,9 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var logger = new ConsoleLogger();
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ConnectionString)
+                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithLargeBodyMessageStore(new FileSystemMessageBodyStore(_largeMessageBodyTempPath, logger))
+                                      .WithLargeMessageBodyStore(new FileSystemLargeMessageBodyStore(_largeMessageBodyTempPath, logger))
                                       .WithDefaultHandlerFactory(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
@@ -65,7 +66,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             base.TearDown();
 
-            Directory.Delete(_largeMessageBodyTempPath, true);
+            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
         }
     }
 }

@@ -40,4 +40,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("Nimbus.UnitTests", AllInternalsVisible = true)]
 [assembly: InternalsVisibleTo("Nimbus.IntegrationTests", AllInternalsVisible = true)]
+[assembly: InternalsVisibleTo("Nimbus.LargeMessages.Azure")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2", AllInternalsVisible = true)]

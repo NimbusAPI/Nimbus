@@ -45,7 +45,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             var bus = new BusBuilder().Configure()
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithLogger(_logger)
-                                      .WithConnectionString(CommonResources.ConnectionString)
+                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(_typeProvider)
                                       .WithCommandHandlerFactory(_handlerFactory)
                                       .WithRequestHandlerFactory(_handlerFactory)

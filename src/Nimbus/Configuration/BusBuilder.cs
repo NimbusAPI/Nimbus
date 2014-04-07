@@ -37,16 +37,15 @@ namespace Nimbus.Configuration
                 container.Register(value);
             }
 
-
             var namespaceManagers = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                                               .AsParallel()
-                                               .Select(i =>
-                                                       {
-                                                           var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                                                           namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
-                                                           return namespaceManager;
-                                                       })
-                                               .ToArray();
+                                              .AsParallel()
+                                              .Select(i =>
+                                                      {
+                                                          var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                                                          namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                                                          return namespaceManager;
+                                                      })
+                                              .ToArray();
             var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(namespaceManagers);
             container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
 
@@ -85,17 +84,13 @@ namespace Nimbus.Configuration
                               messagePumps,
                               container.Resolve<DeadLetterQueues>());
 
-            bus.Starting += delegate
-            {
-                container.Resolve<AzureQueueManager>().WarmUp();
-            };
-
+            bus.Starting += delegate { container.Resolve<AzureQueueManager>().WarmUp(); };
 
             bus.Disposing += delegate
-            {
-                container.Dispose();
-                messagingFactories.Do(mf => mf.Close()).Done();
-            };
+                             {
+                                 container.Dispose();
+                                 messagingFactories.Do(mf => mf.Close()).Done();
+                             };
 
             logger.Info("Bus built. Job done!");
 

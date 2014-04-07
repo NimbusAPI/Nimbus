@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices
 {
@@ -15,15 +16,25 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly IClock _clock;
         private readonly ISerializer _serializer;
         private readonly ICompressor _compressor;
-        private readonly IMessageBodyStore _messageBodyStore;
+        private readonly ILargeMessageBodyStore _largeMessageBodyStore;
+        private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
+        private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
 
-        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName, ISerializer serializer, ICompressor compressor, IClock clock, IMessageBodyStore messageBodyStore)
+        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName,
+                                      ISerializer serializer,
+                                      ICompressor compressor,
+                                      IClock clock,
+                                      ILargeMessageBodyStore largeMessageBodyStore,
+                                      MaxSmallMessageSizeSetting maxSmallMessageSize,
+                                      MaxLargeMessageSizeSetting maxLargeMessageSize)
         {
             _replyQueueName = replyQueueName;
             _serializer = serializer;
             _compressor = compressor;
             _clock = clock;
-            _messageBodyStore = messageBodyStore;
+            _largeMessageBodyStore = largeMessageBodyStore;
+            _maxSmallMessageSize = maxSmallMessageSize;
+            _maxLargeMessageSize = maxLargeMessageSize;
         }
 
         public Task<BrokeredMessage> Create(object serializableObject = null)
@@ -37,29 +48,34 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       }
                                       else
                                       {
-                                          const int sizeLimit = 64*1024; //FIXME we should grab this from the queue settings or somewhere.  -andrewh 7/4/2014
                                           var messageBodyBytes = BuildBodyBytes(serializableObject);
 
-                                          if (messageBodyBytes.Length < sizeLimit)
+                                          if (messageBodyBytes.Length > _maxLargeMessageSize)
                                           {
-                                              message = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                              var errorMessage =
+                                                  "Message body size of {0} is larger than the permitted maximum of {1}. You need to change this in your bus configuration settings if you want to send messages this large."
+                                                      .FormatWith(messageBodyBytes.Length, _maxLargeMessageSize.Value);
+                                              throw new BusException(errorMessage);
                                           }
-                                          else
+
+                                          if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               message = new BrokeredMessage();
                                               var blobIdentifier = message.MessageId;
                                               message.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
-                                              await _messageBodyStore.Store(blobIdentifier, messageBodyBytes, _clock.UtcNow.AddDays(367));   //FIXME if someone changes this afterwards then it'll hurt.
+                                              await _largeMessageBodyStore.Store(blobIdentifier, messageBodyBytes, _clock.UtcNow.AddDays(367));
+                                              //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
+                                          else
+                                          {
+                                              message = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                          }
+
+                                          message.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
                                       message.ReplyTo = _replyQueueName;
                                       message.CorrelationId = message.MessageId; // Use the MessageId as a default CorrelationId
-
-                                      if (serializableObject != null)
-                                      {
-                                          message.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
-                                      }
 
                                       return message;
                                   });
@@ -111,7 +127,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       object blobId;
                                       if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
                                       {
-                                          bodyBytes = await _messageBodyStore.Retrieve((string) blobId);
+                                          bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
                                       }
                                       else
                                       {

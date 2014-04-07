@@ -62,7 +62,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                       })
                         .ToArray();
 
-                    await Task.WhenAll(tasks);
+                    await Task.WhenAny(tasks);
                 }
                 catch (OperationCanceledException)
                 {

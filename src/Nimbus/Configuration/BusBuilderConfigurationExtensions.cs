@@ -4,8 +4,6 @@ using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 
 namespace Nimbus.Configuration
 {
@@ -102,12 +100,6 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithLargeBodyMessageStore(this BusBuilderConfiguration configuration, IMessageBodyStore messageBodyStore)
-        {
-            configuration.LargeMessageBodyStore = messageBodyStore;
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithServerConnectionCount(this BusBuilderConfiguration configuration, int serverConnectionCount)
         {
             configuration.ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
@@ -146,30 +138,8 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithSerializer(this BusBuilderConfiguration configuration, ISerializer serializer)
-        {
-            configuration.Serializer = serializer;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithCompressor(this BusBuilderConfiguration configuration, ICompressor compressor)
-        {
-            configuration.Compressor = compressor;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithDeflateCompressor(this BusBuilderConfiguration configuration)
-        {
-            return configuration.WithCompressor(new DeflateCompressor());
-        }
-
-        public static BusBuilderConfiguration WithGzipCompressor(this BusBuilderConfiguration configuration)
-        {
-            return configuration.WithCompressor(new GzipCompressor());
-        }
-
         public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
-                                                               Func<BusDebuggingConfiguration, BusDebuggingConfiguration> debugConfiguration)
+                                                               Func<BusBuilderDebuggingConfiguration, BusBuilderDebuggingConfiguration> debugConfiguration)
         {
             debugConfiguration(configuration.Debugging);
             return configuration;

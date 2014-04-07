@@ -33,8 +33,9 @@ namespace Nimbus.UnitTests.CompressionTests
                 new DataContractSerializer(),
                 compressor,
                 Substitute.For<IClock>(),
-                new UnsupportedMessageBodyStore()
-                );
+                new UnsupportedLargeMessageBodyStore(),
+                new MaxSmallMessageSizeSetting(),
+                new MaxLargeMessageSizeSetting());
         }
 
         protected override async Task When()

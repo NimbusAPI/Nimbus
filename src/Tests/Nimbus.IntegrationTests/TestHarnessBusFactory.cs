@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ConnectionString)
+                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultHandlerFactory(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))

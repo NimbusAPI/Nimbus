@@ -54,7 +54,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
             var busBuilder = new BusBuilder().Configure()
                                              .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                             .WithConnectionString(CommonResources.ConnectionString)
+                                             .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                              .WithTypesFrom(typeProvider)
                                              .WithCommandHandlerFactory(messageBroker)
                                              .WithRequestHandlerFactory(messageBroker)
@@ -88,7 +88,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
                                 var bus = new BusBuilder().Configure()
                                                           .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                          .WithConnectionString(CommonResources.ConnectionString)
+                                                          .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                                           .WithTypesFrom(typeProvider)
                                                           .WithCommandHandlerFactory(messageBroker)
                                                           .WithRequestHandlerFactory(messageBroker)

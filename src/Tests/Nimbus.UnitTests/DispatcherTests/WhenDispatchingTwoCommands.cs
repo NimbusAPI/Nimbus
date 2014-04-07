@@ -35,10 +35,16 @@ namespace Nimbus.UnitTests.DispatcherTests
             var clock = new SystemClock();
             var serializer = new DataContractSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
-                new ApplicationNameSetting { Value = "TestApplication" },
-                new InstanceNameSetting { Value = "TestInstance" });
-            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock, new UnsupportedMessageBodyStore());
-            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof(FooCommand), new SystemClock());
+                new ApplicationNameSetting {Value = "TestApplication"},
+                new InstanceNameSetting {Value = "TestInstance"});
+            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting,
+                                                                 serializer,
+                                                                 new NullCompressor(),
+                                                                 clock,
+                                                                 new UnsupportedLargeMessageBodyStore(),
+                                                                 new MaxSmallMessageSizeSetting(),
+                                                                 new MaxLargeMessageSizeSetting());
+            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof (FooCommand), new SystemClock());
         }
 
         protected override async Task When()

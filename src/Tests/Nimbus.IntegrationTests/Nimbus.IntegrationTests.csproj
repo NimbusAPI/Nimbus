@@ -80,8 +80,10 @@
     <Compile Include="Tests\LargeMessageTests\Handlers\BigFatRequestHandler.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatRequest.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatResponse.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingAzureBlobStorage.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingDiskStorage.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
@@ -152,6 +154,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.Azure\Nimbus.LargeMessages.Azure.csproj">
+      <Project>{3D86BFFC-7718-4A33-8CF9-E286B455B993}</Project>
+      <Name>Nimbus.LargeMessages.Azure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>

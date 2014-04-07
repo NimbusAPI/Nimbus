@@ -33,7 +33,13 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting, serializer, new NullCompressor(), clock, new UnsupportedMessageBodyStore());
+            var brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting,
+                                                                    serializer,
+                                                                    new NullCompressor(),
+                                                                    clock,
+                                                                    new UnsupportedLargeMessageBodyStore(),
+                                                                    new MaxSmallMessageSizeSetting(),
+                                                                    new MaxLargeMessageSizeSetting());
             var validCommandTypes = new CommandTypesSetting {Value = new[] {typeof (FooCommand), typeof (BarCommand), typeof (BazCommand)}};
             var logger = Substitute.For<ILogger>();
 
