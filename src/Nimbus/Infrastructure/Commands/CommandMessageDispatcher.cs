@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Extensions;
 using Nimbus.HandlerFactories;
 using Nimbus.Handlers;
 using Nimbus.MessageContracts;
@@ -16,9 +15,9 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IClock _clock;
 
         public CommandMessageDispatcher(
-            ICommandHandlerFactory commandHandlerFactory, 
-            IBrokeredMessageFactory brokeredMessageFactory, 
-            Type commandType, 
+            ICommandHandlerFactory commandHandlerFactory,
+            IBrokeredMessageFactory brokeredMessageFactory,
+            Type commandType,
             IClock clock)
         {
             _commandHandlerFactory = commandHandlerFactory;
@@ -29,7 +28,7 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busCommand = _brokeredMessageFactory.GetBody(message, _commandType);
+            var busCommand = await _brokeredMessageFactory.GetBody(message, _commandType);
             await Dispatch((dynamic) busCommand, message);
         }
 

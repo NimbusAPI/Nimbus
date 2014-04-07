@@ -102,7 +102,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return compressedBytes;
         }
 
-        public async Task<object> GetBody(BrokeredMessage message, Type type)
+        public Task<object> GetBody(BrokeredMessage message, Type type)
         {
             return Task.Run(async () =>
                                   {
