@@ -1,10 +1,11 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
 {
-    internal interface IMessageBodyStore
+    public interface IMessageBodyStore
     {
-        Task Store(string id, byte[] bytes);
+        Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter);
         Task<byte[]> Retrieve(string id);
         Task Delete(string id);
     }

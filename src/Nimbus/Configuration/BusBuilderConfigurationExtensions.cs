@@ -5,6 +5,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 
 namespace Nimbus.Configuration
 {
@@ -98,6 +99,12 @@ namespace Nimbus.Configuration
             configuration.CompetingEventHandlerTypes = new CompetingEventHandlerTypesSetting {Value = typeProvider.CompetingEventHandlerTypes.ToArray()};
             configuration.EventTypes = new EventTypesSetting {Value = typeProvider.EventTypes.ToArray()};
 
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithLargeBodyMessageStore(this BusBuilderConfiguration configuration, IMessageBodyStore messageBodyStore)
+        {
+            configuration.LargeMessageBodyStore = messageBodyStore;
             return configuration;
         }
 

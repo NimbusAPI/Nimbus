@@ -1,26 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
+using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
 {
-    class FileSystemMessageBodyStore: IMessageBodyStore
+    internal class FileSystemMessageBodyStore : IMessageBodyStore
     {
-        public Task Store(string id, byte[] bytes)
+        private readonly ILogger _logger;
+        private readonly ThreadSafeLazy<DirectoryInfo> _storageDirectory;
+
+        public FileSystemMessageBodyStore(string storageDirectoryPath, ILogger logger)
         {
-            throw new NotImplementedException();
+            _logger = logger;
+            _storageDirectory = new ThreadSafeLazy<DirectoryInfo>(() => OpenStorageDirectory(storageDirectoryPath));
+        }
+
+        private DirectoryInfo OpenStorageDirectory(string storageDirectoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(storageDirectoryPath);
+            if (!directoryInfo.Exists) directoryInfo.Create();
+            return directoryInfo;
+        }
+
+        public Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        {
+            return Task.Run(() =>
+                            {
+                                var filename = ConstructFilename(id);
+                                _logger.Debug("Writing blob {0} to {1}", id, filename);
+                                File.WriteAllBytes(filename, bytes);
+                            });
         }
 
         public Task<byte[]> Retrieve(string id)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+                            {
+                                var filename = ConstructFilename(id);
+                                _logger.Debug("Reading blob {0} from {1}", id, filename);
+                                return File.ReadAllBytes(filename);
+                            });
         }
 
         public Task Delete(string id)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+                            {
+                                var filename = ConstructFilename(id);
+                                _logger.Debug("Deleting blob {0} from {1}", id, filename);
+                                File.Delete(filename);
+                            });
+        }
+
+        private string ConstructFilename(string id)
+        {
+            return Path.Combine(_storageDirectory.Value.FullName, id);
         }
     }
 }

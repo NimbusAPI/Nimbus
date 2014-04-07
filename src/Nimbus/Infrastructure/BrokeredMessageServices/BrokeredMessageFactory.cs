@@ -49,7 +49,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                               message = new BrokeredMessage();
                                               var blobIdentifier = message.MessageId;
                                               message.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
-                                              await _messageBodyStore.Store(blobIdentifier, messageBodyBytes);
+                                              await _messageBodyStore.Store(blobIdentifier, messageBodyBytes, _clock.UtcNow.AddDays(367));   //FIXME if someone changes this afterwards then it'll hurt.
                                           }
                                       }
 

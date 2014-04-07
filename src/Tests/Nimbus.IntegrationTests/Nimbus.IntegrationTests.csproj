@@ -63,6 +63,7 @@
     <Compile Include="CommonResources.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
+    <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
@@ -76,6 +77,11 @@
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\RequestThatWillThrowHandler.cs" />
+    <Compile Include="Tests\LargeMessageTests\Handlers\BigFatRequestHandler.cs" />
+    <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatRequest.cs" />
+    <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatResponse.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingDiskStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\SomeRequestThatIsNotReturedByTheTypeProvider.cs" />
