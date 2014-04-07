@@ -13,7 +13,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15 * 1000)]
+    [Timeout(30 * 1000)]
     public class WhenCreatingALargeMessageUsingAzureBlobStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
