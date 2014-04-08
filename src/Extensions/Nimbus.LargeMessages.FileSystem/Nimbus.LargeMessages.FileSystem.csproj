@@ -45,7 +45,9 @@
     <Compile Include="Infrastructure\FileSystemLargeMessageBodyStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Nimbus.LargeMessages.FileSystem.nuspec" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
