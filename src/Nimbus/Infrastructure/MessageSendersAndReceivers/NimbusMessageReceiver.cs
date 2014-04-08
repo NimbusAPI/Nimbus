@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -46,6 +47,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 {
                     var messages = await FetchBatchInternal(_throttle.CurrentCount);
                     if (!_running) return;
+                    if (messages.None()) continue;
 
                     var tasks = messages
                         .Select(async m =>
