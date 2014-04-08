@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
     [Timeout(30*1000)]
-    public class WhenCreatingALargeMessageUsingAzureBlobStorage : SpecificationForAsync<Bus>
+    public class WhenSendingALargeRequestUsingAzureBlobStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
         private BigFatRequest _busRequest;
@@ -43,7 +43,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         protected override async Task When()
         {
-            var bigQuestion = new string(Enumerable.Range(0, 524288).Select(i => '.').ToArray());
+            var bigQuestion = new string(Enumerable.Range(0, BigFatRequestHandler.MessageSize).Select(i => '.').ToArray());
 
             _busRequest = new BigFatRequest
                           {
@@ -55,7 +55,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         [Test]
         public async Task TheResponseShouldReturnUnscathed()
         {
-            _response.SomeBigAnswer.Length.ShouldBe(BigFatRequestHandler.ResponseLength);
+            _response.SomeBigAnswer.Length.ShouldBe(BigFatRequestHandler.MessageSize);
         }
     }
 }

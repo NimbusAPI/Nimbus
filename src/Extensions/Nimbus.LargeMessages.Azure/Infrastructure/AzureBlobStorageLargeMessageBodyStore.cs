@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Nimbus.ConcurrentCollections;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.Azure.Infrastructure
@@ -29,12 +29,14 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
             _container = new ThreadSafeLazy<CloudBlobContainer>(GetContainerReference);
         }
 
-        public async Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public async Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
         {
-            var blobReference = _container.Value.GetBlockBlobReference(id);
+            var storageKey = DefaultStorageKeyGenerator.GenerateStorageKey(id, expiresAfter);
+            var blobReference = _container.Value.GetBlockBlobReference(storageKey);
             _logger.Debug("Writing blob {0} to {1}", id, blobReference.Uri);
 
             await blobReference.UploadFromByteArrayAsync(bytes, 0, bytes.Length);
+            return storageKey;
         }
 
         public async Task<byte[]> Retrieve(string id)

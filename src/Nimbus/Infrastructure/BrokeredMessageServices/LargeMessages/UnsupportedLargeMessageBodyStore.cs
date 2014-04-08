@@ -8,7 +8,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
         public const string FailureMessage =
             "Your message was too large. Large message support must be configured via Nimbus.LargeMessages.[Azure|FileSystem|<yourCustomStorageProvider>] before use.";
 
-        public Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
         {
             throw new NotSupportedException(FailureMessage);
         }

@@ -16,7 +16,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
     [Timeout(15*1000)]
-    public class WhenCreatingALargeMessageUsingDiskStorage : SpecificationForAsync<Bus>
+    public class WhenSendingALargeRequestUsingDiskStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
         private BigFatRequest _busRequest;
@@ -60,7 +60,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         [Test]
         public async Task TheResponseShouldReturnUnscathed()
         {
-            _response.SomeBigAnswer.Length.ShouldBe(BigFatRequestHandler.ResponseLength);
+            _response.SomeBigAnswer.Length.ShouldBe(BigFatRequestHandler.MessageSize);
         }
 
         public override void TearDown()

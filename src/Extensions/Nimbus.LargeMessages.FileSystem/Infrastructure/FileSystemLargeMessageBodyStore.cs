@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.FileSystem.Infrastructure
@@ -28,14 +28,24 @@ namespace Nimbus.LargeMessages.FileSystem.Infrastructure
             return directoryInfo;
         }
 
-        public Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
         {
             return Task.Run(() =>
                             {
-                                var filename = ConstructFilename(id);
+                                var storageKey = DefaultStorageKeyGenerator.GenerateStorageKey(id, expiresAfter);
+                                var filename = ConstructFilename(storageKey);
+                                EnsureDirectoryExistsFor(filename);
                                 _logger.Debug("Writing blob {0} to {1}", id, filename);
                                 File.WriteAllBytes(filename, bytes);
+                                return storageKey;
                             });
+        }
+
+        private void EnsureDirectoryExistsFor(string filename)
+        {
+            var fileInfo = new FileInfo(filename);
+            var directoryInfo = fileInfo.Directory;
+            if (!directoryInfo.Exists) directoryInfo.Create();
         }
 
         public Task<byte[]> Retrieve(string id)

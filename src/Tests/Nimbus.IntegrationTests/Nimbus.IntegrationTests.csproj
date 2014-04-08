@@ -80,8 +80,8 @@
     <Compile Include="Tests\LargeMessageTests\Handlers\BigFatRequestHandler.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatRequest.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatResponse.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingAzureBlobStorage.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingDiskStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingAzureBlobStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingDiskStorage.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />

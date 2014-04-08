@@ -6,7 +6,6 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices
@@ -62,9 +61,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               message = new BrokeredMessage();
-                                              var blobIdentifier = message.MessageId;
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(message.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
                                               message.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
-                                              await _largeMessageBodyStore.Store(blobIdentifier, messageBodyBytes, _clock.UtcNow.AddDays(367));
                                               //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
                                           else

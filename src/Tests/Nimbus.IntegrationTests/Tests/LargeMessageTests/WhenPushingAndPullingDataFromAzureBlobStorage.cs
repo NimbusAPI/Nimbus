@@ -18,6 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         private string _id;
         private DateTimeOffset _expiresAfter;
         private byte[] _bytes;
+        private string _storageKey;
 
         protected override async Task<AzureBlobStorageLargeMessageBodyStore> Given()
         {
@@ -33,7 +34,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             using (new AssertingStopwatch("Store", TimeSpan.FromSeconds(10)))
             {
-                await Subject.Store(_id, _bytes, _expiresAfter);
+                _storageKey = await Subject.Store(_id, _bytes, _expiresAfter);
             }
             Console.WriteLine();
             Console.WriteLine();
@@ -44,7 +45,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             using (new AssertingStopwatch("Retrieve", TimeSpan.FromSeconds(10)))
             {
-                var retrieved = await Subject.Retrieve(_id);
+                var retrieved = await Subject.Retrieve(_storageKey);
                 retrieved.ShouldBe(_bytes);
             }
         }
@@ -54,7 +55,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             Console.WriteLine();
             Console.WriteLine();
 
-            Subject.Delete(_id).Wait();
+            Subject.Delete(_storageKey).Wait();
 
             base.TearDown();
         }
