@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus
 {
     public interface ISerializer
     {
         string Serialize(object serializableObject);
-
         object Deserialize(string serializedObject, Type type);
     }
 }

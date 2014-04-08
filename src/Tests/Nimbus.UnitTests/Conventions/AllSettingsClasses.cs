@@ -16,9 +16,10 @@ namespace Nimbus.UnitTests.Conventions
 
         [Test]
         [TestCaseSource(typeof (TestCases))]
-        public void ShouldBeInTheSettingsNamespace(Type settingType)
+        public void ShouldBeInASettingsNamespaceUnderConfiguration(Type settingType)
         {
-            settingType.Namespace.ShouldBe(_referenceNamespace);
+            settingType.Namespace.ShouldContain(".Configuration.");
+            settingType.Namespace.ShouldEndWith(".Settings");
         }
 
         [Test]

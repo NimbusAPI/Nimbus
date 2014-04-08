@@ -78,8 +78,6 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\IMessageCompressor.cs" />
-    <Compile Include="Infrastructure\ISerializer.cs" />
     <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
