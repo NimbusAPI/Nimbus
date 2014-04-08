@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
@@ -30,12 +29,9 @@ namespace Nimbus.Configuration
 
             var container = new PoorMansIoC();
 
-            foreach (var prop in configuration.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                var value = prop.GetValue(configuration);
-                if (value == null) continue;
-                container.Register(value);
-            }
+            RegisterPropertiesFromConfigurationObject(container, configuration);
+            RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageBodyConfiguration);
+            RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
             var namespaceManagers = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
                                               .AsParallel()
@@ -63,7 +59,8 @@ namespace Nimbus.Configuration
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
             {
-                RemoveAllExistingNamespaceElements(container.Resolve<Func<NamespaceManager>>(), logger);
+                var namespaceCleanser = container.Resolve<NamespaceCleanser>();
+                namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
             }
 
             logger.Debug("Creating message pumps and subscriptions.");
@@ -97,36 +94,14 @@ namespace Nimbus.Configuration
             return bus;
         }
 
-        /// <summary>
-        ///     Danger! Danger, Will Robinson!
-        /// </summary>
-        private static void RemoveAllExistingNamespaceElements(Func<NamespaceManager> namespaceManager, ILogger logger)
+        private static void RegisterPropertiesFromConfigurationObject(PoorMansIoC container, object configuration)
         {
-            logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
-
-            var queueDeletionTasks = namespaceManager().GetQueues()
-                                                       .Select(q => q.Path)
-                                                       .Select(queuePath => Task.Run(async delegate
-                                                                                           {
-                                                                                               logger.Debug("Deleting queue {0}", queuePath);
-                                                                                               await namespaceManager().DeleteQueueAsync(queuePath);
-                                                                                           }))
-                                                       .ToArray();
-
-            var topicDeletionTasks = namespaceManager().GetTopics()
-                                                       .Select(t => t.Path)
-                                                       .Select(topicPath => Task.Run(async delegate
-                                                                                           {
-                                                                                               logger.Debug("Deleting topic {0}", topicPath);
-                                                                                               await namespaceManager().DeleteTopicAsync(topicPath);
-                                                                                           }))
-                                                       .ToArray();
-
-            var allDeletionTasks = new Task[0]
-                .Union(queueDeletionTasks)
-                .Union(topicDeletionTasks)
-                .ToArray();
-            Task.WaitAll(allDeletionTasks);
+            foreach (var prop in configuration.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+            {
+                var value = prop.GetValue(configuration);
+                if (value == null) continue;
+                container.Register(value);
+            }
         }
     }
 }

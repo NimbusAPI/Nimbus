@@ -1,4 +1,5 @@
-﻿using Nimbus.Exceptions;
+﻿using Nimbus.Configuration.Debug;
+using Nimbus.Exceptions;
 
 namespace Nimbus.Configuration
 {

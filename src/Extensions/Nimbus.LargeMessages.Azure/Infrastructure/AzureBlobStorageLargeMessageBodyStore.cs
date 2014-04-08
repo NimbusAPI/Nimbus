@@ -6,19 +6,20 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.LargeMessages.Azure.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.Azure.Infrastructure
 {
     public class AzureBlobStorageLargeMessageBodyStore : ILargeMessageBodyStore
     {
-        private readonly string _connectionString;
+        private readonly BlobStorageConnectionStringSetting _connectionString;
         private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<CloudStorageAccount> _storageAccount;
         private readonly ThreadSafeLazy<CloudBlobClient> _blobClient;
         private readonly ThreadSafeLazy<CloudBlobContainer> _container;
 
-        public AzureBlobStorageLargeMessageBodyStore(string connectionString, ILogger logger)
+        internal AzureBlobStorageLargeMessageBodyStore(BlobStorageConnectionStringSetting connectionString, ILogger logger)
         {
             _connectionString = connectionString;
             _logger = logger;

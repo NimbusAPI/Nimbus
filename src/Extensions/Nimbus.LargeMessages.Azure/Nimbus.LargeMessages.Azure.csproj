@@ -62,7 +62,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\BlobStorageConfiguration.cs" />
+    <Compile Include="Configuration\Settings\BlobStorageConnectionStringSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,4 @@
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 
 namespace Nimbus.Configuration

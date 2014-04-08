@@ -5,7 +5,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
 {
     internal class UnsupportedLargeMessageBodyStore : ILargeMessageBodyStore
     {
-        public const string FailureMessage = "Your message was too large. Large message support must be configured via BusBuilder.WithLargeMessageBodyStore(...) before use.";
+        public const string FailureMessage =
+            "Your message was too large. Large message support must be configured via Nimbus.LargeMessages.[Azure|FileSystem|<yourCustomStorageProvider>] before use.";
 
         public Task Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
         {

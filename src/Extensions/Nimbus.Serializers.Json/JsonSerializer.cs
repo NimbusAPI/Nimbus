@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Nimbus.Infrastructure;
 
 namespace Nimbus.Serializers.Json
 {

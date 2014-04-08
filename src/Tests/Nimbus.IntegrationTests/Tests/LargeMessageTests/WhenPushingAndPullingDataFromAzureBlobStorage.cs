@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
+using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.LargeMessages.Azure.Infrastructure;
 using Nimbus.Logger;
 using NUnit.Framework;
@@ -11,7 +12,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15 * 1000)]
+    [Timeout(15*1000)]
     public class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
     {
         private string _id;
@@ -21,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected override async Task<AzureBlobStorageLargeMessageBodyStore> Given()
         {
             var logger = new ConsoleLogger();
-            return new AzureBlobStorageLargeMessageBodyStore(CommonResources.BlobStorageConnectionString, logger);
+            return new AzureBlobStorageLargeMessageBodyStore(new BlobStorageConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString}, logger);
         }
 
         protected override async Task When()
@@ -52,7 +53,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             Console.WriteLine();
             Console.WriteLine();
-            
+
             Subject.Delete(_id).Wait();
 
             base.TearDown();

@@ -1,4 +1,4 @@
-﻿namespace Nimbus
+﻿namespace Nimbus.Infrastructure
 {
     public interface ICompressor
     {

@@ -2,18 +2,23 @@
 using System.IO;
 using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
+using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
 
-namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
+namespace Nimbus.LargeMessages.FileSystem.Infrastructure
 {
-    internal class FileSystemLargeMessageBodyStore : ILargeMessageBodyStore
+    public class FileSystemLargeMessageBodyStore : ILargeMessageBodyStore
     {
+        private readonly StorageDirectorySetting _storageDirectory;
         private readonly ILogger _logger;
-        private readonly ThreadSafeLazy<DirectoryInfo> _storageDirectory;
+        private readonly ThreadSafeLazy<DirectoryInfo> _directoryOnDisk;
 
-        public FileSystemLargeMessageBodyStore(string storageDirectoryPath, ILogger logger)
+        internal FileSystemLargeMessageBodyStore(StorageDirectorySetting storageDirectory, ILogger logger)
         {
+            _storageDirectory = storageDirectory;
             _logger = logger;
-            _storageDirectory = new ThreadSafeLazy<DirectoryInfo>(() => OpenStorageDirectory(storageDirectoryPath));
+
+            _directoryOnDisk = new ThreadSafeLazy<DirectoryInfo>(() => OpenStorageDirectory(_storageDirectory));
         }
 
         private DirectoryInfo OpenStorageDirectory(string storageDirectoryPath)
@@ -55,7 +60,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages
 
         private string ConstructFilename(string id)
         {
-            return Path.Combine(_storageDirectory.Value.FullName, id);
+            return Path.Combine(_directoryOnDisk.Value.FullName, id);
         }
     }
 }

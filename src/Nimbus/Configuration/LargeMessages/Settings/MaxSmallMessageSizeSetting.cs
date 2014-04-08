@@ -1,4 +1,6 @@
-﻿namespace Nimbus.Configuration.Settings
+﻿using Nimbus.Configuration.Settings;
+
+namespace Nimbus.Configuration.LargeMessages.Settings
 {
     public class MaxSmallMessageSizeSetting : Setting<int>
     {

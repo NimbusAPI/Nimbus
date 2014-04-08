@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;

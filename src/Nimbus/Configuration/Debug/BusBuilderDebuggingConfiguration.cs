@@ -1,4 +1,4 @@
-﻿namespace Nimbus.Configuration
+﻿namespace Nimbus.Configuration.Debug
 {
     public class BusBuilderDebuggingConfiguration
     {

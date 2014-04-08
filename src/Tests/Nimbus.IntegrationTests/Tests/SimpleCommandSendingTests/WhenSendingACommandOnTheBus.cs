@@ -10,6 +10,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
+    [Timeout(15*1000)]
     public class WhenSendingACommandOnTheBus : TestForAllBuses
     {
         public override async Task When()

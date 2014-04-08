@@ -158,6 +158,10 @@
       <Project>{3D86BFFC-7718-4A33-8CF9-E286B455B993}</Project>
       <Name>Nimbus.LargeMessages.Azure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.FileSystem\Nimbus.LargeMessages.FileSystem.csproj">
+      <Project>{7FEB8D9E-1451-4132-8E3B-30D8E7F84126}</Project>
+      <Name>Nimbus.LargeMessages.FileSystem</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>

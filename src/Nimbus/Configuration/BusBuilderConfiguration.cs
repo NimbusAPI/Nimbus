@@ -1,8 +1,10 @@
-﻿using Nimbus.Configuration.Settings;
+﻿using Nimbus.Configuration.Debug;
+using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.Settings;
 using Nimbus.Exceptions;
 using Nimbus.HandlerFactories;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
 
@@ -18,11 +20,9 @@ namespace Nimbus.Configuration
         internal ILogger Logger { get; set; }
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
-        internal BusBuilderDebuggingConfiguration Debugging { get; set; }
 
-        internal ILargeMessageBodyStore LargeMessageBodyStore { get; set; }
-        internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; }
-        internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; }
+        internal BusBuilderDebuggingConfiguration Debugging { get; set; }
+        internal ILargeMessageBodyConfiguration LargeMessageBodyConfiguration { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
@@ -48,7 +48,7 @@ namespace Nimbus.Configuration
             Logger = new NullLogger();
             Serializer = new DataContractSerializer();
             Compressor = new NullCompressor();
-            LargeMessageBodyStore = new UnsupportedLargeMessageBodyStore();
+            LargeMessageBodyConfiguration = new UnsupportedLargeMessageBodyConfiguration();
         }
 
         public Bus Build()

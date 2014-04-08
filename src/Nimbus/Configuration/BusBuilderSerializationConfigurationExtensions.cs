@@ -1,3 +1,5 @@
+using Nimbus.Infrastructure;
+
 namespace Nimbus.Configuration
 {
     public static class BusBuilderSerializationConfigurationExtensions

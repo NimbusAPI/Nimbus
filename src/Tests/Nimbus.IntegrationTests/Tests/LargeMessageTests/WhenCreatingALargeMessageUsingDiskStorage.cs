@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.IntegrationTests.Tests.LargeMessageTests;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
+using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
@@ -14,7 +15,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15 * 1000)]
+    [Timeout(15*1000)]
     public class WhenCreatingALargeMessageUsingDiskStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
@@ -32,14 +33,14 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithLargeMessageBodyStore(new FileSystemLargeMessageBodyStore(_largeMessageBodyTempPath, logger))
                                       .WithDefaultHandlerFactory(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
-                                      .WithDebugOptions(
-                                          dc =>
-                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                      .WithFileSystemMessageBodyStorage(fs => fs.WithStorageDirectory(_largeMessageBodyTempPath)
+                                                                                .WithMaxSmallMessageSize(64*1024)
+                                                                                .WithMaxLargeMessageSize(10*1048576))
+                                      .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                          "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;
@@ -47,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         protected override async Task When()
         {
-            var bigQuestion = new string(Enumerable.Range(0, 256*1024).Select(i => '.').ToArray());
+            var bigQuestion = new string(Enumerable.Range(0, 524288).Select(i => '.').ToArray());
 
             _busRequest = new BigFatRequest
                           {
@@ -70,3 +71,5 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         }
     }
 }
+
+
