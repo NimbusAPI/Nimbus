@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
+using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
@@ -25,6 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
         private ILogger _logger;
+        private string _largeMessageBodyTempPath;
 
         protected virtual int NumMessagesToSend
         {
@@ -35,11 +38,13 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         public override async Task<Bus> Given()
         {
+            _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
+
             _fakeHandler = new FakeHandler(NumMessagesToSend);
             _handlerFactory = new FakeHandlerFactory(_fakeHandler);
             _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output
+            //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output and crashes it
             _logger = new NullLogger();
 
             var bus = new BusBuilder().Configure()
@@ -52,10 +57,10 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithMulticastRequestHandlerFactory(_handlerFactory)
                                       .WithMulticastEventHandlerFactory(_handlerFactory)
                                       .WithCompetingEventHandlerFactory(_handlerFactory)
-                                      .WithDebugOptions(
-                                          dc =>
-                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                      .WithFileSystemMessageBodyStorage(fs => fs.WithStorageDirectory(_largeMessageBodyTempPath)
+                                                                                .WithMaxSmallMessageSize(4096))
+                                      .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                          "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             bus.Start();
             return bus;
@@ -103,6 +108,8 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         {
             Subject.Stop();
             _handlerFactory = null;
+
+            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
         }
     }
 }

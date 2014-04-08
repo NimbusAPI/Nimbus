@@ -135,6 +135,7 @@
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Tests\ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
     <Compile Include="Tests\ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
