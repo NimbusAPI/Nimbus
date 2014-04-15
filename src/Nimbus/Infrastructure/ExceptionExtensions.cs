@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Nimbus.Infrastructure
 {
-    public static class ExceptionExtensions
+    internal static class ExceptionExtensions
     {
         public static Dictionary<string, object> ExceptionDetailsAsProperties(this Exception exception, DateTimeOffset timestamp)
         {

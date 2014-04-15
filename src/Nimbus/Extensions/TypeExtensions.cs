@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Nimbus.Extensions
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         public static bool IsClosedTypeOf(this Type type, Type openGenericType)
         {

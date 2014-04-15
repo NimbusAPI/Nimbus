@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Nimbus.Extensions
 {
-    public static class EnumerableExtensions
+    internal static class EnumerableExtensions
     {
         public static IEnumerable<T> Do<T>(this IEnumerable<T> items, Action<T> action)
         {
