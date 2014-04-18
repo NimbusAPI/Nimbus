@@ -28,11 +28,28 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Start(Func<BrokeredMessage, Task> callback)
         {
-            if (_running) throw new InvalidOperationException("Already started!");
-            _running = true;
+            lock (_mutex)
+            {
+                if (_running) return;
+                _running = true;
+            }
 
             await CreateBatchReceiver();
             _workerTask = Task.Run(() => Worker(callback));
+        }
+
+        public async Task Stop()
+        {
+            lock (_mutex)
+            {
+                if (!_running) return;
+                _running = false;
+            }
+
+            _cancellationToken.Cancel();
+
+            StopBatchReceiver();
+            await _workerTask;
         }
 
         protected abstract Task CreateBatchReceiver();
@@ -93,16 +110,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return fetchTask.IsCompleted
                 ? fetchTask.Result
                 : new BrokeredMessage[0];
-        }
-
-        public async Task Stop()
-        {
-            if (!_running) return;
-            _running = false;
-            _cancellationToken.Cancel();
-
-            StopBatchReceiver();
-            await _workerTask;
         }
 
         public void Dispose()

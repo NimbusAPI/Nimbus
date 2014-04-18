@@ -1,6 +1,5 @@
 using System;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Logger;
 
