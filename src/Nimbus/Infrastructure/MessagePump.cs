@@ -28,12 +28,16 @@ namespace Nimbus.Infrastructure
         {
             return Task.Run(async () =>
                                   {
-                                      if (_started)
-                                          throw new InvalidOperationException("Message pump either is already running or was previously running and has not completed shutting down.");
+                                      lock (_mutex)
+                                      {
+                                          if (_started)
+                                              throw new InvalidOperationException(
+                                                  "Message pump either is already running or was previously running and has not completed shutting down.");
+                                          _started = true;
+                                      }
 
                                       _logger.Debug("Message pump for {0} starting...", _receiver);
                                       await _receiver.Start(Dispatch);
-                                      _started = true;
                                       _logger.Debug("Message pump for {0} started", _receiver);
                                   });
         }
@@ -42,8 +46,11 @@ namespace Nimbus.Infrastructure
         {
             return Task.Run(async () =>
                                   {
-                                      if (!_started) return;
-                                      _started = false;
+                                      lock (_mutex)
+                                      {
+                                          if (!_started) return;
+                                          _started = false;
+                                      }
 
                                       _logger.Debug("Message pump for {0} stopping...", _receiver);
                                       await _receiver.Stop();
