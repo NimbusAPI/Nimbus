@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -12,14 +13,14 @@ namespace Nimbus.Infrastructure
     public class AssemblyScanningTypeProvider : ITypeProvider, IValidatableConfigurationSetting
     {
         private readonly Assembly[] _assemblies;
-        private readonly Lazy<Type[]> _allInstantiableTypesInScannedAssemblies;
-        private readonly Lazy<Type[]> _commandHandlerTypes;
-        private readonly Lazy<Type[]> _commandTypes;
-        private readonly Lazy<Type[]> _multicastEventHandlerTypes;
-        private readonly Lazy<Type[]> _competingEventHandlerTypes;
-        private readonly Lazy<Type[]> _eventTypes;
-        private readonly Lazy<Type[]> _requestHandlerTypes;
-        private readonly Lazy<Type[]> _requestTypes;
+        private readonly ThreadSafeLazy<Type[]> _allInstantiableTypesInScannedAssemblies;
+        private readonly ThreadSafeLazy<Type[]> _commandHandlerTypes;
+        private readonly ThreadSafeLazy<Type[]> _commandTypes;
+        private readonly ThreadSafeLazy<Type[]> _multicastEventHandlerTypes;
+        private readonly ThreadSafeLazy<Type[]> _competingEventHandlerTypes;
+        private readonly ThreadSafeLazy<Type[]> _eventTypes;
+        private readonly ThreadSafeLazy<Type[]> _requestHandlerTypes;
+        private readonly ThreadSafeLazy<Type[]> _requestTypes;
 
         private IEnumerable<Type> AllInstantiableTypesInScannedAssemblies
         {
@@ -30,14 +31,14 @@ namespace Nimbus.Infrastructure
         {
             _assemblies = assemblies;
 
-            _allInstantiableTypesInScannedAssemblies = new Lazy<Type[]>(ScanAssembliesForInterestingTypes);
-            _commandHandlerTypes = new Lazy<Type[]>(ScanForCommandHandlerTypes);
-            _commandTypes = new Lazy<Type[]>(ScanForCommandTypes);
-            _multicastEventHandlerTypes = new Lazy<Type[]>(ScanForMulticastEventHandlerTypes);
-            _competingEventHandlerTypes = new Lazy<Type[]>(ScanForCompetingEventHandlerTypes);
-            _eventTypes = new Lazy<Type[]>(ScanForEventTypes);
-            _requestHandlerTypes = new Lazy<Type[]>(ScanForRequestHandlerTypes);
-            _requestTypes = new Lazy<Type[]>(ScanForRequestTypes);
+            _allInstantiableTypesInScannedAssemblies = new ThreadSafeLazy<Type[]>(ScanAssembliesForInterestingTypes);
+            _commandHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForCommandHandlerTypes);
+            _commandTypes = new ThreadSafeLazy<Type[]>(ScanForCommandTypes);
+            _multicastEventHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastEventHandlerTypes);
+            _competingEventHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForCompetingEventHandlerTypes);
+            _eventTypes = new ThreadSafeLazy<Type[]>(ScanForEventTypes);
+            _requestHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForRequestHandlerTypes);
+            _requestTypes = new ThreadSafeLazy<Type[]>(ScanForRequestTypes);
         }
 
         public IEnumerable<Type> CommandHandlerTypes
