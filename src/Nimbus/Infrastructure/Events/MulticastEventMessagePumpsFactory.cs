@@ -3,75 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.HandlerFactories;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure.Events
 {
     internal class MulticastEventMessagePumpsFactory : ICreateComponents
     {
-        private readonly IQueueManager _queueManager;
+        private readonly IDependencyResolver _dependencyResolver;
         private readonly ApplicationNameSetting _applicationName;
         private readonly InstanceNameSetting _instanceName;
         private readonly MulticastEventHandlerTypesSetting _multicastEventHandlerTypes;
         private readonly ILogger _logger;
-        private readonly IMulticastEventHandlerFactory _multicastEventHandlerFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly INimbusMessagingFactory _messagingFactory;
 
-        internal MulticastEventMessagePumpsFactory(IQueueManager queueManager,
+        internal MulticastEventMessagePumpsFactory(IDependencyResolver dependencyResolver,
                                                    ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
                                                    MulticastEventHandlerTypesSetting multicastEventHandlerTypes,
                                                    ILogger logger,
-                                                   IMulticastEventHandlerFactory multicastEventHandlerFactory,
                                                    IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
-                                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit)
+                                                   INimbusMessagingFactory messagingFactory)
         {
-            _queueManager = queueManager;
             _applicationName = applicationName;
             _instanceName = instanceName;
             _multicastEventHandlerTypes = multicastEventHandlerTypes;
             _logger = logger;
-            _multicastEventHandlerFactory = multicastEventHandlerFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
-            _concurrentHandlerLimit = concurrentHandlerLimit;
+            _messagingFactory = messagingFactory;
+            _dependencyResolver = dependencyResolver;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            _logger.Debug("Creating multicast event message pumps");
-
-            var eventTypes = _multicastEventHandlerTypes.Value
-                                                        .SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>)))
-                                                        .Select(gi => gi.GetGenericArguments().Single())
-                                                        .OrderBy(t => t.FullName)
-                                                        .Distinct()
-                                                        .ToArray();
-
-            foreach (var eventType in eventTypes)
+            foreach (var handlerType in _multicastEventHandlerTypes.Value)
             {
-                _logger.Debug("Creating message pump for multicast event type {0}", eventType.Name);
+                var eventTypes = handlerType
+                    .GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>))
+                    .Select(gi => gi.GetGenericArguments().Single())
+                    .ToArray();
 
-                var topicPath = PathFactory.TopicPathFor(eventType);
-                var subscriptionName = String.Format("{0}.{1}", _applicationName, _instanceName);
-                var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _logger);
-                _garbageMan.Add(receiver);
+                foreach (var eventType in eventTypes)
+                {
+                    var topicPath = PathFactory.TopicPathFor(eventType);
+                    var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, _instanceName, handlerType);
 
-                var dispatcher = new MulticastEventMessageDispatcher(_multicastEventHandlerFactory, _brokeredMessageFactory, eventType, _clock);
-                _garbageMan.Add(dispatcher);
+                    _logger.Debug("Creating message pump for multicast event {0}/{1}", topicPath, subscriptionName);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
-                _garbageMan.Add(pump);
+                    var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                yield return pump;
+                    var dispatcher = new MulticastEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, eventType, _clock);
+                    _garbageMan.Add(dispatcher);
+
+                    var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
+                    _garbageMan.Add(pump);
+
+                    yield return pump;
+                }
             }
         }
 

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.HandlerFactories;
 using Nimbus.Handlers;
 
 namespace Nimbus.Infrastructure.Events
@@ -13,56 +13,57 @@ namespace Nimbus.Infrastructure.Events
     {
         private readonly ApplicationNameSetting _applicationName;
         private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
-        private readonly ICompetingEventHandlerFactory _competingEventHandlerFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
+        private readonly IDependencyResolver _dependencyResolver;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public CompetingEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                  CompetingEventHandlerTypesSetting competingEventHandlerTypes,
-                                                 ICompetingEventHandlerFactory competingEventHandlerFactory,
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
                                                  IBrokeredMessageFactory brokeredMessageFactory,
-                                                 IClock clock)
+                                                 IClock clock,
+                                                 IDependencyResolver dependencyResolver)
         {
             _applicationName = applicationName;
             _competingEventHandlerTypes = competingEventHandlerTypes;
-            _competingEventHandlerFactory = competingEventHandlerFactory;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
+            _dependencyResolver = dependencyResolver;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            _logger.Debug("Creating competing event message pumps");
-
-            var eventTypes = _competingEventHandlerTypes.Value.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>)))
-                                                        .Select(gi => gi.GetGenericArguments().Single())
-                                                        .OrderBy(t => t.FullName)
-                                                        .Distinct()
-                                                        .ToArray();
-
-            foreach (var eventType in eventTypes)
+            foreach (var handlerType in _competingEventHandlerTypes.Value)
             {
-                _logger.Debug("Registering Message Pump for Competing Event type {0}", eventType.Name);
+                var eventTypes = handlerType
+                    .GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>))
+                    .Select(gi => gi.GetGenericArguments().Single())
+                    .ToArray();
 
-                var topicPath = PathFactory.TopicPathFor(eventType);
-                var subscriptionName = String.Format("{0}", _applicationName);
-                var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
+                foreach (var eventType in eventTypes)
+                {
+                    var topicPath = PathFactory.TopicPathFor(eventType);
+                    var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, handlerType);
 
-                var dispatcher = new CompetingEventMessageDispatcher(_competingEventHandlerFactory, _brokeredMessageFactory, eventType, _clock);
-                _garbageMan.Add(dispatcher);
+                    _logger.Debug("Creating message pump for competing event {0}/{1}", topicPath, subscriptionName);
 
-                var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
-                _garbageMan.Add(pump);
+                    var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                yield return pump;
+                    var dispatcher = new CompetingEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, handlerType, _clock);
+                    _garbageMan.Add(dispatcher);
+
+                    var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
+                    _garbageMan.Add(pump);
+
+                    yield return pump;
+                }
             }
         }
 

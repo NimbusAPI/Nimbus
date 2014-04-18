@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.HandlerFactories;
+using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.MessageContracts;
 
@@ -9,21 +9,24 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class CommandMessageDispatcher : IMessageDispatcher
     {
-        private readonly ICommandHandlerFactory _commandHandlerFactory;
+        private readonly IDependencyResolver _dependencyResolver;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _commandType;
         private readonly IClock _clock;
+        private readonly Type _handlerType;
 
         public CommandMessageDispatcher(
-            ICommandHandlerFactory commandHandlerFactory,
+            IDependencyResolver dependencyResolver,
             IBrokeredMessageFactory brokeredMessageFactory,
             Type commandType,
-            IClock clock)
+            IClock clock,
+            Type handlerType)
         {
-            _commandHandlerFactory = commandHandlerFactory;
+            _dependencyResolver = dependencyResolver;
             _brokeredMessageFactory = brokeredMessageFactory;
             _commandType = commandType;
             _clock = clock;
+            _handlerType = handlerType;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -34,10 +37,11 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
         {
-            using (var handler = _commandHandlerFactory.GetHandler<TBusCommand>())
+            using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handlerTask = handler.Component.Handle(busCommand);
-                var wrapper = new LongLivedTaskWrapper(handlerTask, handler.Component as ILongRunningHandler, message, _clock);
+                var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
+                var handlerTask = handler.Handle(busCommand);
+                var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningHandler, message, _clock);
                 await wrapper.AwaitCompletion();
             }
         }

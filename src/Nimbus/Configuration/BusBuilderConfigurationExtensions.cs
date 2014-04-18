@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.Settings;
-using Nimbus.HandlerFactories;
-using Nimbus.Infrastructure;
+using Nimbus.DependencyResolution;
 
 namespace Nimbus.Configuration
 {
@@ -41,49 +40,6 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMulticastEventHandlerFactory(this BusBuilderConfiguration configuration,
-                                                                               IMulticastEventHandlerFactory multicastEventHandlerFactory)
-        {
-            configuration.MulticastEventHandlerFactory = multicastEventHandlerFactory;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithCompetingEventHandlerFactory(this BusBuilderConfiguration configuration,
-                                                                               ICompetingEventHandlerFactory competingEventHandlerFactory)
-        {
-            configuration.CompetingEventHandlerFactory = competingEventHandlerFactory;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithCommandHandlerFactory(this BusBuilderConfiguration configuration, ICommandHandlerFactory commandHandlerFactory)
-        {
-            configuration.CommandHandlerFactory = commandHandlerFactory;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithRequestHandlerFactory(this BusBuilderConfiguration configuration, IRequestHandlerFactory requestHandlerFactory)
-        {
-            configuration.RequestHandlerFactory = requestHandlerFactory;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithMulticastRequestHandlerFactory(this BusBuilderConfiguration configuration, IMulticastRequestHandlerFactory requestHandlerFactory)
-        {
-            configuration.MulticastRequestHandlerFactory = requestHandlerFactory;
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithDefaultHandlerFactory(this BusBuilderConfiguration configuration, DefaultMessageHandlerFactory messageHandlerFactory)
-        {
-            configuration
-                .WithCommandHandlerFactory(messageHandlerFactory)
-                .WithRequestHandlerFactory(messageHandlerFactory)
-                .WithMulticastRequestHandlerFactory(messageHandlerFactory)
-                .WithCompetingEventHandlerFactory(messageHandlerFactory)
-                .WithMulticastEventHandlerFactory(messageHandlerFactory);
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
             typeProvider.Verify();
@@ -98,6 +54,14 @@ namespace Nimbus.Configuration
             configuration.CompetingEventHandlerTypes = new CompetingEventHandlerTypesSetting {Value = typeProvider.CompetingEventHandlerTypes.ToArray()};
             configuration.EventTypes = new EventTypesSetting {Value = typeProvider.EventTypes.ToArray()};
 
+            configuration.TypeProvider = typeProvider;
+
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDependencyResolver(this BusBuilderConfiguration configuration, IDependencyResolver dependencyResolver)
+        {
+            configuration.DependencyResolver = dependencyResolver;
             return configuration;
         }
 

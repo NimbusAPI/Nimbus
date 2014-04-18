@@ -11,7 +11,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         public void WeShouldGetTheRightMethod()
         {
             var request = new SomeInternalRequest();
-            var handlerMethod = MulticastRequestMessageDispatcher.GetGenericDispatchMethodFor(request);
+            var handlerMethod = RequestMessageDispatcher.GetGenericDispatchMethodFor(request);
 
             handlerMethod.ShouldNotBe(null);
         }

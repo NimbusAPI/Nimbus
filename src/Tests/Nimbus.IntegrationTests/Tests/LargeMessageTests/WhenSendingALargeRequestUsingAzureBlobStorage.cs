@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.Azure.Configuration;
@@ -22,13 +21,11 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected override async Task<Bus> Given()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var messageHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
             var logger = new ConsoleLogger();
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithDefaultHandlerFactory(messageHandlerFactory)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithAzureMessageBodyStorage(c => c.WithBlobStorageConnectionString(CommonResources.BlobStorageConnectionString)

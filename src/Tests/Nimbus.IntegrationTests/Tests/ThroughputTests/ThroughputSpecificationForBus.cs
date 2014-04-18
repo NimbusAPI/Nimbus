@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         private TimeSpan _timeout;
         private AssemblyScanningTypeProvider _typeProvider;
 
-        private FakeHandlerFactory _handlerFactory;
+        private FakeDependencyResolver _dependencyResolver;
         private FakeHandler _fakeHandler;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
@@ -41,7 +41,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
             _fakeHandler = new FakeHandler(NumMessagesToSend);
-            _handlerFactory = new FakeHandlerFactory(_fakeHandler);
+            _dependencyResolver = new FakeDependencyResolver(_fakeHandler);
             _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output and crashes it
@@ -52,11 +52,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithLogger(_logger)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(_typeProvider)
-                                      .WithCommandHandlerFactory(_handlerFactory)
-                                      .WithRequestHandlerFactory(_handlerFactory)
-                                      .WithMulticastRequestHandlerFactory(_handlerFactory)
-                                      .WithMulticastEventHandlerFactory(_handlerFactory)
-                                      .WithCompetingEventHandlerFactory(_handlerFactory)
+                                      .WithDependencyResolver(_dependencyResolver)
                                       .WithFileSystemMessageBodyStorage(fs => fs.WithStorageDirectory(_largeMessageBodyTempPath)
                                                                                 .WithMaxSmallMessageSize(4096))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
@@ -107,7 +103,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
         public override void TearDown()
         {
             Subject.Stop();
-            _handlerFactory = null;
+            _dependencyResolver = null;
 
             if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
         }

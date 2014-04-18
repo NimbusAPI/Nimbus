@@ -10,6 +10,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
+using Nimbus.Windsor.Configuration;
 using Serilog;
 using ILogger = Nimbus.ILogger;
 

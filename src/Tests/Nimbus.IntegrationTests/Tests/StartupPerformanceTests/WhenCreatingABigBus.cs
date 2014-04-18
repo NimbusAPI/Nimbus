@@ -31,7 +31,6 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
             var logger = new ConsoleLogger();
             var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
-            var messageHandlerFactory = new DefaultMessageHandlerFactory(typeProvider);
 
             using (new AssertingStopwatch("First bus creation", TimeSpan.FromMinutes(5)))
             {
@@ -39,7 +38,6 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                                                  .WithNames("MyTestSuite", Environment.MachineName)
                                                  .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                                  .WithTypesFrom(typeProvider)
-                                                 .WithDefaultHandlerFactory(messageHandlerFactory)
                                                  .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                  .WithLogger(logger)
                                                  .WithDebugOptions(
@@ -70,7 +68,6 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                                                  .WithNames("MyTestSuite", Environment.MachineName)
                                                  .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                                  .WithTypesFrom(typeProvider)
-                                                 .WithDefaultHandlerFactory(messageHandlerFactory)
                                                  .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                  .WithLogger(logger)
                                                  .Build())
@@ -142,8 +139,8 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
         private static Type EmitBusEventType(int i, ModuleBuilder moduleBuilder)
         {
-            var EventTypeName = "LotsOfEvents{0:00}".FormatWith(i);
-            var busEventTypeBuilder = moduleBuilder.DefineType(EventTypeName,
+            var eventTypeName = "LotsOfEvents{0:00}".FormatWith(i);
+            var busEventTypeBuilder = moduleBuilder.DefineType(eventTypeName,
                                                                TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                TypeAttributes.BeforeFieldInit,
                                                                typeof (Object));
@@ -154,8 +151,8 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
         private static Type EmitBusMulticastEventHandlerType(int i, ModuleBuilder moduleBuilder, Type busEventType)
         {
-            var MulticastEventHandlerTypeName = "LotsOfMulticastEventsHandler{0:00}".FormatWith(i);
-            var busMulticastEventHandlerTypeBuilder = moduleBuilder.DefineType(MulticastEventHandlerTypeName,
+            var multicastEventHandlerTypeName = "LotsOfMulticastEventsHandler{0:00}".FormatWith(i);
+            var busMulticastEventHandlerTypeBuilder = moduleBuilder.DefineType(multicastEventHandlerTypeName,
                                                                                TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                                TypeAttributes.BeforeFieldInit,
                                                                                typeof (Object));

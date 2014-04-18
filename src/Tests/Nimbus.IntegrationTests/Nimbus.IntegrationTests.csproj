@@ -113,7 +113,8 @@
     <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestThatIsNotReturedByTheTypeProvider.cs" />
     <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
-    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeHandlerFactory.cs" />
+    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeChildScope.cs" />
+    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
     <Compile Include="Tests\ThroughputTests\EventHandlers\FakeHandler.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarCommand.cs" />
     <Compile Include="Tests\ThroughputTests\MessageContracts\BarEvent.cs" />

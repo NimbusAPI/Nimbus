@@ -36,10 +36,16 @@ namespace Nimbus.Infrastructure.Events
             var topicSender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Publishing event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), topicPath, message.MessageId, message.CorrelationId);
+                          message.SafelyGetBodyTypeNameOrDefault(),
+                          topicPath,
+                          message.MessageId,
+                          message.CorrelationId);
             await topicSender.Send(message);
             _logger.Info("Published event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), topicPath, message.MessageId, message.CorrelationId);
+                         message.SafelyGetBodyTypeNameOrDefault(),
+                         topicPath,
+                         message.MessageId,
+                         message.CorrelationId);
         }
 
         private void AssertValidEventType(Type eventType)

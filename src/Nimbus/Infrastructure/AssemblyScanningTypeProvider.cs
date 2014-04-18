@@ -180,7 +180,7 @@ namespace Nimbus.Infrastructure
                             messageType.FullName);
 
                     throw new BusException(message, exception);
-                }    
+                }
             }
         }
 

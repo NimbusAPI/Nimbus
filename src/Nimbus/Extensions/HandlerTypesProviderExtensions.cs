@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Nimbus.Handlers;
 
 namespace Nimbus.Extensions
 {
@@ -22,6 +23,15 @@ namespace Nimbus.Extensions
                 .Union(typeProvider.EventTypes)
                 .Union(typeProvider.RequestTypes)
                 .ToArray();
+        }
+
+        public static bool IsHandlerType(this ITypeProvider typeProvider, Type potentialHandlerType)
+        {
+            if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleCommand<>))) return true;
+            if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleMulticastEvent<>))) return true;
+            if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleCompetingEvent<>))) return true;
+            if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleRequest<,>))) return true;
+            return false;
         }
     }
 }

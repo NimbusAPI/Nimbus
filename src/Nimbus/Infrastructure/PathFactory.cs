@@ -32,6 +32,16 @@ namespace Nimbus.Infrastructure
             return Sanitize(_topicPrefix + "." + StripGenericQualification(type));
         }
 
+        public static string SubscriptionNameFor(string applicationName, Type handlerType)
+        {
+            return Sanitize(string.Join(".", new[] {applicationName, handlerType.Name}));
+        }
+
+        public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
+        {
+            return Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name}));
+        }
+
         private static string StripGenericQualification(Type type)
         {
             if (! type.IsGenericType) return type.FullName;

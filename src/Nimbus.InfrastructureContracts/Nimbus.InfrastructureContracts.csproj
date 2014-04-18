@@ -41,11 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DependencyResolution\ICreateChildScopes.cs" />
+    <Compile Include="DependencyResolution\IDependencyResolver.cs" />
     <Compile Include="Handlers\ILongRunningHandler.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="HandlerFactories\OwnedComponent.cs" />
-    <Compile Include="HandlerFactories\ICommandHandlerFactory.cs" />
-    <Compile Include="HandlerFactories\ICompetingEventHandlerFactory.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />
@@ -53,10 +52,8 @@
     <Compile Include="Handlers\IHandleCompetingEvent.cs" />
     <Compile Include="Handlers\IHandleMulticastEvent.cs" />
     <Compile Include="Handlers\IHandleRequest.cs" />
+    <Compile Include="DependencyResolution\IDependencyResolverScope.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="HandlerFactories\IMulticastEventHandlerFactory.cs" />
-    <Compile Include="HandlerFactories\IMulticastRequestHandlerFactory.cs" />
-    <Compile Include="HandlerFactories\IRequestHandlerFactory.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

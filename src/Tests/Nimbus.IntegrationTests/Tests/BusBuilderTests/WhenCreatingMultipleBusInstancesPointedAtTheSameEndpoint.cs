@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
@@ -48,7 +47,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
             // deleting queues and topics is slow.
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
-            var messageBroker = new DefaultMessageHandlerFactory(typeProvider);
 
             var logger = new ConsoleLogger();
 
@@ -56,11 +54,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                              .WithNames("IntegrationTestHarness", Environment.MachineName)
                                              .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                              .WithTypesFrom(typeProvider)
-                                             .WithCommandHandlerFactory(messageBroker)
-                                             .WithRequestHandlerFactory(messageBroker)
-                                             .WithMulticastEventHandlerFactory(messageBroker)
-                                             .WithCompetingEventHandlerFactory(messageBroker)
-                                             .WithMulticastRequestHandlerFactory(messageBroker)
                                              .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                              .WithLogger(logger)
                                              .WithDebugOptions(
@@ -82,7 +75,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                 // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
                                 // deleting queues and topics is slow.
                                 var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-                                var messageBroker = new DefaultMessageHandlerFactory(typeProvider);
 
                                 var logger = new ConsoleLogger();
 
@@ -90,11 +82,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                                           .WithNames("IntegrationTestHarness", Environment.MachineName)
                                                           .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                                           .WithTypesFrom(typeProvider)
-                                                          .WithCommandHandlerFactory(messageBroker)
-                                                          .WithRequestHandlerFactory(messageBroker)
-                                                          .WithMulticastEventHandlerFactory(messageBroker)
-                                                          .WithCompetingEventHandlerFactory(messageBroker)
-                                                          .WithMulticastRequestHandlerFactory(messageBroker)
                                                           .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                           .WithLogger(logger)
                                                           .Build();

@@ -1,9 +1,7 @@
 ﻿using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
-using Nimbus.Exceptions;
-using Nimbus.HandlerFactories;
-using Nimbus.Infrastructure;
+using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
@@ -12,11 +10,8 @@ namespace Nimbus.Configuration
 {
     public class BusBuilderConfiguration
     {
-        internal ICommandHandlerFactory CommandHandlerFactory { get; set; }
-        internal IRequestHandlerFactory RequestHandlerFactory { get; set; }
-        internal IMulticastRequestHandlerFactory MulticastRequestHandlerFactory { get; set; }
-        internal IMulticastEventHandlerFactory MulticastEventHandlerFactory { get; set; }
-        internal ICompetingEventHandlerFactory CompetingEventHandlerFactory { get; set; }
+        internal ITypeProvider TypeProvider { get; set; }
+        internal IDependencyResolver DependencyResolver { get; set; }
         internal ILogger Logger { get; set; }
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
@@ -60,9 +55,6 @@ namespace Nimbus.Configuration
         private void AssertConfigurationIsValid()
         {
             //FIXME nowhere near done yet.  -andrewh 6/11/2013
-            if (MulticastEventHandlerFactory == null) throw new BusConfigurationException("MulticastEventBroker", "You must supply a multicast event broker.");
-            if (CompetingEventHandlerFactory == null) throw new BusConfigurationException("CompetingEventBroker", "You must supply a competing event broker.");
-            if (MulticastRequestHandlerFactory == null) throw new BusConfigurationException("MulticastRequestBroker", "You must supply a multicast request broker.");
         }
     }
 }

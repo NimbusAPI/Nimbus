@@ -3,23 +3,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
-using Nimbus.HandlerFactories;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
+using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
-using Nimbus.UnitTests.MessageBrokerTests.TestInfrastructure;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests.DispatcherTests
 {
     [TestFixture]
-    public class WhenDispatchingTwoCommands : TestForAll<ICommandHandlerFactory>
+    public class WhenDispatchingTwoCommands : TestForAllDependencyResolvers
     {
         private CommandMessageDispatcher _commandDispatcher;
         private BrokeredMessageFactory _brokeredMessageFactory;
@@ -27,7 +26,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
 
-        protected override async Task Given(AllSubjectsTestContext context)
+        protected override async Task Given(AllDependencyResolversTestContext context)
         {
             MethodCallCounter.Clear();
 
@@ -38,6 +37,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
+
             _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting,
                                                                  serializer,
                                                                  new NullCompressor(),
@@ -45,7 +45,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                  new UnsupportedLargeMessageBodyStore(),
                                                                  new MaxSmallMessageSizeSetting(),
                                                                  new MaxLargeMessageSizeSetting());
-            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof (FooCommand), new SystemClock());
+
+            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof (FooCommand), new SystemClock(), typeof (BrokerTestCommandHandler));
         }
 
         protected override async Task When()
@@ -61,7 +62,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         [Test]
         [TestCaseSource("TestCases")]
-        public async Task Command1ShouldBeDispatchedToTheCorrectHandler(AllSubjectsTestContext context)
+        public async Task Command1ShouldBeDispatchedToTheCorrectHandler(AllDependencyResolversTestContext context)
         {
             await Given(context);
             await When();
@@ -75,7 +76,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         [Test]
         [TestCaseSource("TestCases")]
-        public async Task Command2ShouldBeDispatchedToTheCorrectHandler(AllSubjectsTestContext context)
+        public async Task Command2ShouldBeDispatchedToTheCorrectHandler(AllDependencyResolversTestContext context)
         {
             await Given(context);
             await When();
@@ -89,7 +90,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         [Test]
         [TestCaseSource("TestCases")]
-        public async Task ATotalOfTwoCallsToHandleShouldBeReceived(AllSubjectsTestContext context)
+        public async Task ATotalOfTwoCallsToHandleShouldBeReceived(AllDependencyResolversTestContext context)
         {
             await Given(context);
             await When();
@@ -99,7 +100,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         [Test]
         [TestCaseSource("TestCases")]
-        public async Task BothInstancesOfTheCommandHandlerShouldHaveBeenDisposed(AllSubjectsTestContext context)
+        public async Task BothInstancesOfTheCommandHandlerShouldHaveBeenDisposed(AllDependencyResolversTestContext context)
         {
             await Given(context);
             await When();

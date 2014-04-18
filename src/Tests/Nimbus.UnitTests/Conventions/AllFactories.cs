@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using NUnit.Framework;
 using Shouldly;
@@ -32,7 +32,7 @@ namespace Nimbus.UnitTests.Conventions
                                    .Where(t => GetExcludedTypes().Contains(t) == false)
                                    .Where(t => t.IsInstantiable())
                                    .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null)
-                                   .Where(t => !t.IsAssignableFrom(typeof (DefaultMessageHandlerFactory)))
+                                   .Where(t => !t.IsAssignableFrom(typeof (IDependencyResolver)))
                                    .Select(t => new TestCaseData(t)
                                                .SetName(t.FullName))
                                    .GetEnumerator();

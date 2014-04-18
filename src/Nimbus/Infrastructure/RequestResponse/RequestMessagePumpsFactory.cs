@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.HandlerFactories;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -14,59 +13,54 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly ILogger _logger;
         private readonly RequestHandlerTypesSetting _requestHandlerTypes;
-        private readonly IQueueManager _queueManager;
-        private readonly IRequestHandlerFactory _requestHandlerFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
+        private readonly IDependencyResolver _dependencyResolver;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         public RequestMessagePumpsFactory(ILogger logger,
                                           RequestHandlerTypesSetting requestHandlerTypes,
-                                          IQueueManager queueManager,
-                                          IRequestHandlerFactory requestHandlerFactory,
                                           INimbusMessagingFactory messagingFactory,
                                           IBrokeredMessageFactory brokeredMessageFactory,
                                           IClock clock,
-                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit)
+                                          IDependencyResolver dependencyResolver)
         {
             _logger = logger;
             _requestHandlerTypes = requestHandlerTypes;
-            _queueManager = queueManager;
-            _requestHandlerFactory = requestHandlerFactory;
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
-            _concurrentHandlerLimit = concurrentHandlerLimit;
+            _dependencyResolver = dependencyResolver;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            _logger.Debug("Creating request message pumps");
-
-            var requestTypes = _requestHandlerTypes.Value.SelectMany(ht => ht.GetGenericInterfacesClosing(typeof (IHandleRequest<,>)))
-                                                   .Select(gi => gi.GetGenericArguments().First())
-                                                   .OrderBy(t => t.FullName)
-                                                   .Distinct()
-                                                   .ToArray();
-
-            foreach (var requestType in requestTypes)
+            foreach (var handlerType in _requestHandlerTypes.Value)
             {
-                _logger.Debug("Creating message pump for request type {0}", requestType.Name);
+                var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleRequest<,>))
+                                              .Select(gi => gi.GetGenericArguments().First())
+                                              .OrderBy(t => t.FullName)
+                                              .Distinct()
+                                              .ToArray();
 
-                var queuePath = PathFactory.QueuePathFor(requestType);
-                var messageReceiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit, _logger);
-                _garbageMan.Add(messageReceiver);
+                foreach (var requestType in requestTypes)
+                {
+                    var queuePath = PathFactory.QueuePathFor(requestType);
 
-                var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _requestHandlerFactory, _clock, _logger);
-                _garbageMan.Add(dispatcher);
+                    _logger.Debug("Creating message pump for request queue {0}", queuePath);
 
-                var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
-                _garbageMan.Add(pump);
+                    var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                yield return pump;
+                    var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _clock, _logger, _dependencyResolver, handlerType);
+                    _garbageMan.Add(dispatcher);
+
+                    var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
+                    _garbageMan.Add(pump);
+
+                    yield return pump;
+                }
             }
         }
 

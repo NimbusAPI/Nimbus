@@ -1,52 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
-using Nimbus.HandlerFactories;
+using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
-using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Events
 {
-    internal class CompetingEventMessageDispatcher : IMessageDispatcher
+    internal class CompetingEventMessageDispatcher : EventMessageDispather
     {
-        private readonly ICompetingEventHandlerFactory _competingEventHandlerFactory;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly Type _eventType;
-        private readonly IClock _clock;
-
-        public CompetingEventMessageDispatcher(
-            ICompetingEventHandlerFactory competingEventHandlerFactory, 
-            IBrokeredMessageFactory brokeredMessageFactory, 
-            Type eventType, IClock clock)
+        public CompetingEventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock)
+            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock)
         {
-            _competingEventHandlerFactory = competingEventHandlerFactory;
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _eventType = eventType;
-            _clock = clock;
         }
 
-        public async Task Dispatch(BrokeredMessage message)
+        protected override void CreateHandlerTaskFromScope<TBusEvent>(TBusEvent busEvent,
+                                                                      IDependencyResolverScope scope,
+                                                                      out Task handlerTask,
+                                                                      out ILongRunningHandler longRunningHandler)
         {
-            var busEvent = await _brokeredMessageFactory.GetBody(message, _eventType);
-            await Dispatch((dynamic) busEvent, message);
-        }
-
-        private async Task Dispatch<TBusEvent>(TBusEvent busEvent, BrokeredMessage message) where TBusEvent : IBusEvent
-        {
-            using (var handlers = _competingEventHandlerFactory.GetHandlers<TBusEvent>())
-            {
-                var wrapperTasks = new List<Task>();
-
-                foreach (var handler in handlers.Component)
-                {
-                    var handlerTask = handler.Handle(busEvent);
-                    var wrapperTask = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningHandler, message, _clock);
-                    wrapperTasks.Add(wrapperTask.AwaitCompletion());
-                }
-
-                await Task.WhenAll(wrapperTasks);
-            }
+            var handler = scope.Resolve<IHandleCompetingEvent<TBusEvent>>(HandlerType.FullName);
+            handlerTask = handler.Handle(busEvent);
+            longRunningHandler = handler as ILongRunningHandler;
         }
     }
 }

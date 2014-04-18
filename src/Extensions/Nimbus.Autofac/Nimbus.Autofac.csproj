@@ -44,12 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AutofacBusBuilderConfigurationExtensions.cs" />
-    <Compile Include="Infrastructure\AutofacCommandHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacCompetingEventHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacMulticastEventHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacMulticastRequestHandlerFactory.cs" />
-    <Compile Include="Infrastructure\AutofacRequestHandlerFactory.cs" />
+    <Compile Include="Infrastructure\AutofacDependencyResolver.cs" />
     <Compile Include="Configuration\NimbusContainerBuilderExtensions.cs" />
+    <Compile Include="Infrastructure\AutofacDependencyResolverScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.InfrastructureContracts;
 
 namespace Nimbus.IntegrationTests
@@ -39,9 +38,7 @@ namespace Nimbus.IntegrationTests
 
             public IBus Create()
             {
-                var messageBroker = new DefaultMessageHandlerFactory(_typeProvider);
-
-                var bus = TestHarnessBusFactory.CreateAndStart(_typeProvider, messageBroker);
+                var bus = TestHarnessBusFactory.CreateAndStart(_typeProvider);
                 return bus;
             }
         }

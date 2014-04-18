@@ -77,6 +77,11 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\DependencyResolution\DependencyResolver.cs" />
+    <Compile Include="Infrastructure\DependencyResolution\DependencyResolverScope.cs" />
+    <Compile Include="Infrastructure\DependencyResolution\TrackingScope.cs" />
+    <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\Events\EventMessageDispather.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
@@ -92,13 +97,11 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
     <Compile Include="Infrastructure\NimbusMessagingFactory.cs" />
-    <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\ExceptionExtensions.cs" />
     <Compile Include="Infrastructure\IMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
@@ -147,7 +150,6 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Infrastructure\Commands\BusCommandSender.cs" />
     <Compile Include="Infrastructure\Events\BusEventSender.cs" />
-    <Compile Include="Infrastructure\DefaultMessageHandlerFactory.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Infrastructure\Commands\ICommandSender.cs" />
     <Compile Include="Infrastructure\Events\IEventSender.cs" />
