@@ -19,6 +19,7 @@ namespace Nimbus.Extensions
         public static Type[] AllClosedGenericHandlerInterfaces(this ITypeProvider typeProvider)
         {
             return typeProvider.AllHandlerTypes()
+                               .SelectMany(t => t.GetInterfaces())
                                .Where(typeProvider.IsClosedGenericHandlerInterface)
                                .ToArray();
         }
