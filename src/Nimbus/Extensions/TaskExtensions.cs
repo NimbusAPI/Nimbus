@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Nimbus.Extensions
 {
-    public static class TaskExtensions
+    internal static class TaskExtensions
     {
-        public static void WaitAll(this IEnumerable<Task> tasks)
+        internal static void WaitAll(this IEnumerable<Task> tasks)
         {
             Task.WaitAll(tasks.ToArray());
         }
 
-        public static IEnumerable<TResult> ReturnOpportunistically<TResult>(this IEnumerable<Task<TResult>> tasks, TimeSpan timeout)
+        internal static IEnumerable<TResult> ReturnOpportunistically<TResult>(this IEnumerable<Task<TResult>> tasks, TimeSpan timeout)
         {
             using (var cancellationTokenSource = new CancellationTokenSource(timeout))
             {
@@ -37,7 +36,7 @@ namespace Nimbus.Extensions
             private readonly Task[] _continuations;
             private readonly object _mutex = new object();
 
-            public OpportunisticTaskCompletionReturner(IEnumerable<Task<TResult>> tasks, CancellationTokenSource cancellationToken)
+            internal OpportunisticTaskCompletionReturner(IEnumerable<Task<TResult>> tasks, CancellationTokenSource cancellationToken)
             {
                 _remainingTasks = tasks.ToList();
 
@@ -49,12 +48,12 @@ namespace Nimbus.Extensions
                     .ToArray();
             }
 
-            internal Task[] Continuations
+            public Task[] Continuations
             {
                 get { return _continuations; }
             }
 
-            public IEnumerable<TResult> GetResults()
+            internal IEnumerable<TResult> GetResults()
             {
                 return _resultsQueue.GetConsumingEnumerable();
             }

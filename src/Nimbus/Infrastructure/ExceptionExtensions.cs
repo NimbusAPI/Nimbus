@@ -5,9 +5,9 @@ using System.Threading;
 
 namespace Nimbus.Infrastructure
 {
-    public static class ExceptionExtensions
+    internal static class ExceptionExtensions
     {
-        public static Dictionary<string, object> ExceptionDetailsAsProperties(this Exception exception, DateTimeOffset timestamp)
+        internal static Dictionary<string, object> ExceptionDetailsAsProperties(this Exception exception, DateTimeOffset timestamp)
         {
             if (exception is TargetInvocationException || exception is AggregateException) return ExceptionDetailsAsProperties(exception.InnerException, timestamp);
 

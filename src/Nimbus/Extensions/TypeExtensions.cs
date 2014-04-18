@@ -7,7 +7,7 @@ namespace Nimbus.Extensions
 {
     internal static class TypeExtensions
     {
-        public static bool IsClosedTypeOf(this Type type, Type openGenericType)
+        internal static bool IsClosedTypeOf(this Type type, Type openGenericType)
         {
             if (!openGenericType.IsGenericType) throw new ArgumentException("It's a bit difficult to have a closed type of a non-open-generic type", "openGenericType");
 
@@ -21,12 +21,12 @@ namespace Nimbus.Extensions
             return assignableGenericTypes.Any();
         }
 
-        public static bool IsClosedTypeOf(this Type type, params Type[] openGenericTypes)
+        internal static bool IsClosedTypeOf(this Type type, params Type[] openGenericTypes)
         {
             return openGenericTypes.Any(type.IsClosedTypeOf);
         }
 
-        public static bool IsInstantiable(this Type type)
+        internal static bool IsInstantiable(this Type type)
         {
             if (type.IsInterface) return false;
             if (type.IsAbstract) return false;
@@ -35,7 +35,7 @@ namespace Nimbus.Extensions
             return true;
         }
 
-        public static Type[] GetGenericInterfacesClosing(this Type type, Type genericInterface)
+        internal static Type[] GetGenericInterfacesClosing(this Type type, Type genericInterface)
         {
             var genericInterfaces = type.GetInterfaces()
                                         .Where(i => i.IsClosedTypeOf(genericInterface))
@@ -43,7 +43,7 @@ namespace Nimbus.Extensions
             return genericInterfaces;
         }
 
-        public static bool IsSerializable(this Type messageType)
+        internal static bool IsSerializable(this Type messageType)
         {
             try
             {

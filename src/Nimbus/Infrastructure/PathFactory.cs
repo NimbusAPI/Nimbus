@@ -17,11 +17,6 @@ namespace Nimbus.Infrastructure
             return Sanitize(string.Format("{0}.{1}.{2}", _instanceInputQueuePrefix, applicationName, instanceName));
         }
 
-        public static bool IsInputQueuePath(this string queuePath)
-        {
-            return Sanitize(queuePath).StartsWith(_instanceInputQueuePrefix + ".");
-        }
-
         public static string QueuePathFor(Type type)
         {
             return Sanitize(_queuePrefix + "." + StripGenericQualification(type));

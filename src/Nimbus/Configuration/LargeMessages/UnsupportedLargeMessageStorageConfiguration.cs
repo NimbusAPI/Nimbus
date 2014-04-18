@@ -3,13 +3,13 @@ using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 
 namespace Nimbus.Configuration.LargeMessages
 {
-    internal class UnsupportedLargeMessageBodyConfiguration : ILargeMessageBodyConfiguration
+    internal class UnsupportedLargeMessageStorageConfiguration : ILargeMessageStorageConfiguration
     {
         public ILargeMessageBodyStore LargeMessageBodyStore { get; internal set; }
         public MaxSmallMessageSizeSetting MaxSmallMessageSize { get { return new MaxSmallMessageSizeSetting(); } }
         public MaxLargeMessageSizeSetting MaxLargeMessageSize { get { return new MaxLargeMessageSizeSetting(); } }
 
-        public UnsupportedLargeMessageBodyConfiguration()
+        public UnsupportedLargeMessageStorageConfiguration()
         {
             LargeMessageBodyStore = new UnsupportedLargeMessageBodyStore();
         }

@@ -61,9 +61,10 @@
     <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\INimbusConfiguration.cs" />
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
-    <Compile Include="Configuration\LargeMessages\ILargeMessageBodyConfiguration.cs" />
+    <Compile Include="Configuration\LargeMessages\ILargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\NamespaceCleanser.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
-    <Compile Include="Configuration\LargeMessages\UnsupportedLargeMessageBodyConfiguration.cs" />
+    <Compile Include="Configuration\LargeMessages\UnsupportedLargeMessageStorageConfiguration.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\DeflateCompressor.cs" />

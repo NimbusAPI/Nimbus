@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.Extensions;
-using Nimbus.Windsor.Configuration;
 using NUnit.Framework;
 using Shouldly;
 
@@ -24,10 +23,10 @@ namespace Nimbus.UnitTests.Conventions
         }
 
         [Test]
-        [TestCaseSource(typeof(TestCases))]
+        [TestCaseSource(typeof (TestCases))]
         public void ShouldBePublic(MethodInfo method)
         {
-            throw new NotImplementedException();
+            method.IsPublic.ShouldBe(true);
         }
 
         private class TestCases : IEnumerable<TestCaseData>
@@ -42,9 +41,9 @@ namespace Nimbus.UnitTests.Conventions
                                  };
 
                 var testCases = assemblies
-                    .SelectMany(a => a.GetExportedTypes())
-                    .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Static))
-                    .Where(m => m.IsExtensionMethodFor<BusBuilderConfiguration>())
+                    .SelectMany(a => a.DefinedTypes)
+                    .SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
+                    .Where(m => m.IsExtensionMethodFor<INimbusConfiguration>())
                     .Select(m => new TestCaseData(m)
                                 .SetName("{0}.{1}".FormatWith(m.DeclaringType.FullName, m.Name))
                     );

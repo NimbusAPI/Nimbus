@@ -30,7 +30,7 @@ namespace Nimbus.Configuration
             var container = new PoorMansIoC();
 
             RegisterPropertiesFromConfigurationObject(container, configuration);
-            RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageBodyConfiguration);
+            RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
             var namespaceManagers = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())

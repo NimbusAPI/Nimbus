@@ -1,9 +1,8 @@
 ﻿using Nimbus.Configuration.LargeMessages.Settings;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 
 namespace Nimbus.Configuration.LargeMessages
 {
-    public interface ILargeMessageBodyConfiguration
+    public interface ILargeMessageStorageConfiguration : INimbusConfiguration
     {
         ILargeMessageBodyStore LargeMessageBodyStore { get; }
         MaxSmallMessageSizeSetting MaxSmallMessageSize { get; }

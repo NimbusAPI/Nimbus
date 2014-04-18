@@ -10,7 +10,7 @@ namespace Nimbus.LargeMessages.FileSystem.Configuration
         {
             var fileSystemStorageConfiguration = new FileSystemStorageConfiguration(configuration);
             configurationAction(fileSystemStorageConfiguration);
-            configuration.LargeMessageBodyConfiguration = fileSystemStorageConfiguration;
+            configuration.LargeMessageStorageConfiguration = fileSystemStorageConfiguration;
             return configuration;
         }
     }

@@ -9,11 +9,14 @@ namespace Nimbus.UnitTests
 {
     public static class MethodInfoExtensions
     {
+        public static bool IsExtensionMethod(this MethodInfo methodInfo)
+        {
+            return methodInfo.IsDefined(typeof (ExtensionAttribute), true);
+        }
+
         public static bool IsExtensionMethodFor<T>(this MethodInfo methodInfo)
         {
-            if (!methodInfo.IsStatic) return false;
-            if (!methodInfo.IsPublic) return false;
-            if (!methodInfo.IsDefined(typeof (ExtensionAttribute), true)) return false;
+            if (!methodInfo.IsExtensionMethod()) return false;
 
             var args = methodInfo.GetParameters();
             if (args.None()) return false;
@@ -24,22 +27,22 @@ namespace Nimbus.UnitTests
 
         public static string MethodName<TType, TResult>(this TType obj, Expression<Func<TType, TResult>> methodExpr)
         {
-            return ((MethodCallExpression)methodExpr.Body).Method.Name;
+            return ((MethodCallExpression) methodExpr.Body).Method.Name;
         }
 
         public static string MethodName<TType, TResult>(Expression<Func<TType, TResult>> methodExpr)
         {
-            return ((MethodCallExpression)methodExpr.Body).Method.Name;
+            return ((MethodCallExpression) methodExpr.Body).Method.Name;
         }
 
         public static string MethodName<T>(this T obj, Expression<Action<T>> methodExpr)
         {
-            return ((MethodCallExpression)methodExpr.Body).Method.Name;
+            return ((MethodCallExpression) methodExpr.Body).Method.Name;
         }
 
         public static string MethodName<T>(Expression<Action<T>> methodExpr)
         {
-            return ((MethodCallExpression)methodExpr.Body).Method.Name;
+            return ((MethodCallExpression) methodExpr.Body).Method.Name;
         }
     }
 }

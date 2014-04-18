@@ -12,7 +12,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Configuration
 {
-    public class BusBuilderConfiguration
+    public class BusBuilderConfiguration: INimbusConfiguration
     {
         internal ITypeProvider TypeProvider { get; set; }
         internal IDependencyResolver DependencyResolver { get; set; }
@@ -21,7 +21,7 @@ namespace Nimbus.Configuration
         internal ICompressor Compressor { get; set; }
 
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
-        internal ILargeMessageBodyConfiguration LargeMessageBodyConfiguration { get; set; }
+        internal ILargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
@@ -39,7 +39,7 @@ namespace Nimbus.Configuration
             Logger = new NullLogger();
             Serializer = new DataContractSerializer();
             Compressor = new NullCompressor();
-            LargeMessageBodyConfiguration = new UnsupportedLargeMessageBodyConfiguration();
+            LargeMessageStorageConfiguration = new UnsupportedLargeMessageStorageConfiguration();
         }
 
         public Bus Build()

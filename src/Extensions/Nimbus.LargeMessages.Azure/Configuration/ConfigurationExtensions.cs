@@ -9,7 +9,7 @@ namespace Nimbus.LargeMessages.Azure.Configuration
         public static BusBuilderConfiguration WithAzureMessageBodyStorage(this BusBuilderConfiguration configuration, Action<BlobStorageConfiguration> configurationAction)
         {
             var blobStorageConfiguration = new BlobStorageConfiguration(configuration);
-            configuration.LargeMessageBodyConfiguration = blobStorageConfiguration;
+            configuration.LargeMessageStorageConfiguration = blobStorageConfiguration;
             configurationAction(blobStorageConfiguration);
             return configuration;
         }
