@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -16,15 +14,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly IClock _clock;
         private readonly DefaultTimeoutSetting _responseTimeout;
-        private readonly RequestTypesSetting _requestTypes;
-        private readonly Lazy<HashSet<Type>> _validRequestTypes;
+        private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
 
         internal BusRequestSender(INimbusMessagingFactory messagingFactory,
                                   IBrokeredMessageFactory brokeredMessageFactory,
                                   RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
                                   DefaultTimeoutSetting responseTimeout,
-                                  RequestTypesSetting requestTypes,
+                                  IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger)
         {
             _messagingFactory = messagingFactory;
@@ -33,9 +30,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _clock = clock;
             _responseTimeout = responseTimeout;
-            _requestTypes = requestTypes;
-
-            _validRequestTypes = new Lazy<HashSet<Type>>(() => new HashSet<Type>(_requestTypes.Value));
+            _knownMessageTypeVerifier = knownMessageTypeVerifier;
         }
 
         public async Task<TResponse> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
@@ -49,7 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            AssertValidRequestType<TRequest, TResponse>();
+            _knownMessageTypeVerifier.AssertValidMessageType(busRequest.GetType());
 
             var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
 
@@ -60,26 +55,31 @@ namespace Nimbus.Infrastructure.RequestResponse
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
+                          message.SafelyGetBodyTypeNameOrDefault(),
+                          queuePath,
+                          message.MessageId,
+                          message.CorrelationId);
             await sender.Send(message);
             _logger.Info("Sent request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
+                         message.SafelyGetBodyTypeNameOrDefault(),
+                         queuePath,
+                         message.MessageId,
+                         message.CorrelationId);
 
             _logger.Debug("Waiting for response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId);
+                          message.SafelyGetBodyTypeNameOrDefault(),
+                          queuePath,
+                          message.MessageId,
+                          message.CorrelationId);
             var response = responseCorrelationWrapper.WaitForResponse(timeout);
             _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
-                message.SafelyGetBodyTypeNameOrDefault(), queuePath, message.MessageId, message.CorrelationId, response.GetType().FullName);
+                         message.SafelyGetBodyTypeNameOrDefault(),
+                         queuePath,
+                         message.MessageId,
+                         message.CorrelationId,
+                         response.GetType().FullName);
 
             return await response;
-        }
-
-        private void AssertValidRequestType<TRequest, TResponse>() where TRequest : IBusRequest<TRequest, TResponse> where TResponse : IBusResponse
-        {
-            if (!_validRequestTypes.Value.Contains(typeof (TRequest)))
-                throw new BusException(
-                    "The type {0} is not a recognised request type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
-                        typeof (TRequest).FullName));
         }
     }
 }

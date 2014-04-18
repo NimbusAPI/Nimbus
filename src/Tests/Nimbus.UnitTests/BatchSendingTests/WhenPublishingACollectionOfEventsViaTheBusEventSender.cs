@@ -41,10 +41,10 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     new MaxSmallMessageSizeSetting(),
                                                                     new MaxLargeMessageSizeSetting());
-            var validEventTypes = new EventTypesSetting {Value = new[] {typeof (FooEvent), typeof (BarEvent), typeof (BazEvent)}};
             var logger = Substitute.For<ILogger>();
+            var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
 
-            var busCommandSender = new BusEventSender(messagingFactory, brokeredMessageFactory, validEventTypes, logger);
+            var busCommandSender = new BusEventSender(messagingFactory, brokeredMessageFactory, logger, knownMessageTypeVerifier);
             return Task.FromResult(busCommandSender);
         }
 

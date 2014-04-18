@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nimbus.Configuration.Settings;
+﻿using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -12,24 +8,25 @@ namespace Nimbus.Infrastructure.Events
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
-        private readonly HashSet<Type> _validEventTypes;
+        private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
 
         public BusEventSender(
             INimbusMessagingFactory messagingFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
-            EventTypesSetting validEventTypes,
-            ILogger logger)
+            ILogger logger,
+            IKnownMessageTypeVerifier knownMessageTypeVerifier)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
-            _validEventTypes = new HashSet<Type>(validEventTypes.Value);
+            _knownMessageTypeVerifier = knownMessageTypeVerifier;
         }
 
         public async Task Publish<TBusEvent>(TBusEvent busEvent)
         {
             var eventType = busEvent.GetType();
-            AssertValidEventType(eventType);
+
+            _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
             var message = await _brokeredMessageFactory.Create(busEvent);
             var topicPath = PathFactory.TopicPathFor(eventType);
@@ -46,14 +43,6 @@ namespace Nimbus.Infrastructure.Events
                          topicPath,
                          message.MessageId,
                          message.CorrelationId);
-        }
-
-        private void AssertValidEventType(Type eventType)
-        {
-            if (!_validEventTypes.Contains(eventType))
-                throw new BusException(
-                    "The type {0} is not a recognised event type. Ensure it has been registered with the builder with the WithTypesFrom method.".FormatWith(
-                        eventType.FullName));
         }
     }
 }

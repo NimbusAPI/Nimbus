@@ -23,12 +23,9 @@ namespace Nimbus.Configuration
         internal InstanceNameSetting InstanceName { get; set; }
         internal ConnectionStringSetting ConnectionString { get; set; }
         internal CommandHandlerTypesSetting CommandHandlerTypes { get; set; }
-        internal CommandTypesSetting CommandTypes { get; set; }
         internal RequestHandlerTypesSetting RequestHandlerTypes { get; set; }
-        internal RequestTypesSetting RequestTypes { get; set; }
         internal MulticastEventHandlerTypesSetting MulticastEventHandlerTypes { get; set; }
         internal CompetingEventHandlerTypesSetting CompetingEventHandlerTypes { get; set; }
-        internal EventTypesSetting EventTypes { get; set; }
 
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }

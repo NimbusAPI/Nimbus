@@ -45,14 +45,11 @@ namespace Nimbus.Configuration
             typeProvider.Verify();
 
             configuration.CommandHandlerTypes = new CommandHandlerTypesSetting {Value = typeProvider.CommandHandlerTypes.ToArray()};
-            configuration.CommandTypes = new CommandTypesSetting {Value = typeProvider.CommandTypes.ToArray()};
 
             configuration.RequestHandlerTypes = new RequestHandlerTypesSetting {Value = typeProvider.RequestHandlerTypes.ToArray()};
-            configuration.RequestTypes = new RequestTypesSetting {Value = typeProvider.RequestTypes.ToArray()};
 
             configuration.MulticastEventHandlerTypes = new MulticastEventHandlerTypesSetting {Value = typeProvider.MulticastEventHandlerTypes.ToArray()};
             configuration.CompetingEventHandlerTypes = new CompetingEventHandlerTypesSetting {Value = typeProvider.CompetingEventHandlerTypes.ToArray()};
-            configuration.EventTypes = new EventTypesSetting {Value = typeProvider.EventTypes.ToArray()};
 
             configuration.TypeProvider = typeProvider;
 

@@ -98,7 +98,9 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
     <Compile Include="Infrastructure\NimbusMessagingFactory.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
+    <Compile Include="Infrastructure\IKnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />
+    <Compile Include="Infrastructure\KnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\ExceptionExtensions.cs" />
     <Compile Include="Infrastructure\IMessageDispatcher.cs" />
@@ -107,18 +109,15 @@
     <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
     <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
     <Compile Include="Configuration\Settings\CommandHandlerTypesSetting.cs" />
-    <Compile Include="Configuration\Settings\CommandTypesSetting.cs" />
     <Compile Include="Configuration\Settings\CompetingEventHandlerTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ConnectionStringSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
-    <Compile Include="Configuration\Settings\EventTypesSetting.cs" />
     <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
     <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />
     <Compile Include="Configuration\Settings\MulticastEventHandlerTypesSetting.cs" />
     <Compile Include="Configuration\PoorMansIoC.cs" />
     <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
     <Compile Include="Configuration\Settings\RequestHandlerTypesSetting.cs" />
-    <Compile Include="Configuration\Settings\RequestTypesSetting.cs" />
     <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />
@@ -132,7 +131,7 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusMulticastRequestSender.cs" />
-    <Compile Include="Extensions\HandlerTypesProviderExtensions.cs" />
+    <Compile Include="Extensions\TypeProviderExtensions.cs" />
     <Compile Include="Exceptions\BusConfigurationException.cs" />
     <Compile Include="Exceptions\RequestFailedException.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
