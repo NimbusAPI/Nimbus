@@ -12,35 +12,35 @@ namespace Nimbus.Infrastructure.Events
     internal class CompetingEventMessagePumpsFactory : ICreateComponents
     {
         private readonly ApplicationNameSetting _applicationName;
-        private readonly CompetingEventHandlerTypesSetting _competingEventHandlerTypes;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public CompetingEventMessagePumpsFactory(ApplicationNameSetting applicationName,
-                                                 CompetingEventHandlerTypesSetting competingEventHandlerTypes,
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
                                                  IBrokeredMessageFactory brokeredMessageFactory,
                                                  IClock clock,
-                                                 IDependencyResolver dependencyResolver)
+                                                 IDependencyResolver dependencyResolver,
+                                                 ITypeProvider typeProvider)
         {
             _applicationName = applicationName;
-            _competingEventHandlerTypes = competingEventHandlerTypes;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _typeProvider = typeProvider;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _competingEventHandlerTypes.Value)
+            foreach (var handlerType in _typeProvider.CompetingEventHandlerTypes)
             {
                 var eventTypes = handlerType
                     .GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>))

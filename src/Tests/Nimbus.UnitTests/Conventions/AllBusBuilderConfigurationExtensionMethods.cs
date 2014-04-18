@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,6 +21,13 @@ namespace Nimbus.UnitTests.Conventions
         public void ShouldBeInTheSameNamespace(MethodInfo method)
         {
             method.DeclaringType.Namespace.ShouldBe(_configurationExtensionsNamespace);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(TestCases))]
+        public void ShouldBePublic(MethodInfo method)
+        {
+            throw new NotImplementedException();
         }
 
         private class TestCases : IEnumerable<TestCaseData>

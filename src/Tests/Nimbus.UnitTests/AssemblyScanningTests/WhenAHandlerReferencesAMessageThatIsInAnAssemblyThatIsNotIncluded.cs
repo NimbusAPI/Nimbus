@@ -1,7 +1,7 @@
 ﻿using Nimbus.Infrastructure;
-using Nimbus.MessageContracts.Exceptions;
 using Nimbus.UnitTests.TestAssemblies.Handlers;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.UnitTests.AssemblyScanningTests
 {
@@ -9,12 +9,10 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
     public class WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded
     {
         [Test]
-        [ExpectedException(typeof (BusException))]
-        public void TheAssemblyScannerShouldGoBang()
+        public void ValidationShouldFail()
         {
             var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (CommandWhoseAssemblyShouldNotBeIncludedHandler).Assembly);
-
-            assemblyScanningTypeProvider.Verify();
+            assemblyScanningTypeProvider.Validate().ShouldNotBeEmpty();
         }
     }
 }

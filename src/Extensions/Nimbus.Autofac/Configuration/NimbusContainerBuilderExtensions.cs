@@ -15,7 +15,7 @@ namespace Nimbus.Configuration
         {
             foreach (var handlerType in typeProvider.AllHandlerTypes())
             {
-                var handlerInterfaceTypes = handlerType.GetInterfaces().Where(typeProvider.IsHandlerType);
+                var handlerInterfaceTypes = handlerType.GetInterfaces().Where(typeProvider.IsClosedGenericHandlerInterface);
                 foreach (var interfaceType in handlerInterfaceTypes)
                 {
                     builder.RegisterType(handlerType)

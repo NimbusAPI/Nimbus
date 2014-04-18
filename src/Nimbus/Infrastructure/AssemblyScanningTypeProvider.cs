@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
+using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.MessageContracts;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure
 {
-    public class AssemblyScanningTypeProvider : ITypeProvider
+    public class AssemblyScanningTypeProvider : ITypeProvider, IValidatableConfigurationSetting
     {
         private readonly Assembly[] _assemblies;
         private readonly Lazy<Type[]> _allInstantiableTypesInScannedAssemblies;
@@ -148,86 +146,58 @@ namespace Nimbus.Infrastructure
             return types;
         }
 
-        public void Verify()
+        public IEnumerable<string> Validate()
         {
-            AssertAllHandledMessageTypesAreIncludedDirectly();
-            AssertThatWeWontDuplicateQueueNames();
-            AssertAllMessageTypesAreSerializable();
-        }
-
-        private void AssertAllMessageTypesAreSerializable()
-        {
-            var messageTypes = CommandTypes
-                .Union(RequestTypes)
-                .Union(EventTypes)
+            var validationErrors = new string[0]
+                .Union(CheckForIndirectlyReferencedAssemblies())
+                .Union(CheckForDuplicateQueueNames())
+                .Union(CheckForNonSerializableMessageTypes())
                 .ToArray();
 
-            foreach (var messageType in messageTypes)
-            {
-                try
-                {
-                    using (var mem = new MemoryStream())
-                    {
-                        var serializer = new DataContractSerializer(messageType);
-                        var instance = Activator.CreateInstance(messageType, true);
-                        serializer.WriteObject(mem, instance);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    var message = "The message contract type {0} is not serializable."
-                        .FormatWith(
-                            messageType.FullName);
-
-                    throw new BusException(message, exception);
-                }
-            }
+            return validationErrors;
         }
 
-        private void AssertThatWeWontDuplicateQueueNames()
+        private IEnumerable<string> CheckForNonSerializableMessageTypes()
         {
-            var queueCounts = new Tuple<string, Type>[0]
-                .Union(CommandTypes.Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t)))
-                .Union(RequestTypes.Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t)))
-                .Union(EventTypes.Select(t => new Tuple<string, Type>(PathFactory.TopicPathFor(t), t)))
-                .GroupBy(queue => queue.Item1)
-                .Where(dupe => dupe.Count() > 1).ToArray();
+            var validationErrors = this.AllMessageContractTypes()
+                                       .Where(mt => !mt.IsSerializable())
+                                       .Select(mt => "The message contract type {0} is not serializable.".FormatWith(mt.FullName))
+                                       .ToArray();
 
-            if (queueCounts.None())
-                return;
-
-            var badTypes = queueCounts.SelectMany(dupe => dupe.Select(d => d.Item2.Name));
-            var message = "Your message types {0} will result in a duplicate queue name.".FormatWith(string.Join(", ", badTypes));
-
-            throw new BusException(message);
+            return validationErrors;
         }
 
-        private void AssertAllHandledMessageTypesAreIncludedDirectly()
+        private IEnumerable<string> CheckForDuplicateQueueNames()
         {
-            var handlerTypes = this.AllHandlerTypes()
-                                   .SelectMany(ht => ht.GetInterfaces())
-                                   .Where(t => t.IsClosedTypeOf(typeof (IHandleCommand<>),
-                                                                typeof (IHandleCompetingEvent<>),
-                                                                typeof (IHandleMulticastEvent<>),
-                                                                typeof (IHandleRequest<,>)))
-                                   .ToArray();
-            var genericParameterTypes = handlerTypes
-                .SelectMany(ht => ht.GetGenericArguments())
+            var duplicateQueues = this.AllMessageContractTypes()
+                                      .Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t))
+                                      .GroupBy(tuple => tuple.Item1)
+                                      .Where(tuple => tuple.Count() > 1)
+                                      .ToArray();
+
+            var validationErrors = duplicateQueues
+                .Select(tuple => "Some message types ({0}) would result in a duplicate queue name of {1}".FormatWith(string.Join(", ", tuple), tuple.Key))
                 .ToArray();
 
-            foreach (var parameterType in genericParameterTypes)
-            {
-                var assemblyIsInProvidedList = _assemblies.Contains(parameterType.Assembly);
+            return validationErrors;
+        }
 
-                if (!assemblyIsInProvidedList)
-                {
-                    var message = "The message contract type {0} is referenced by one of your handlers but its assembly is not included in the list of assemblies to scan."
-                        .FormatWith(
-                            parameterType.FullName);
+        private IEnumerable<string> CheckForIndirectlyReferencedAssemblies()
+        {
+            var genericParameterTypes = this.AllClosedGenericHandlerInterfaces()
+                                            .SelectMany(ht => ht.GetGenericArguments())
+                                            .ToArray();
 
-                    throw new BusException(message);
-                }
-            }
+            var typesFromMissingAssemblies = genericParameterTypes
+                .Where(t => !_assemblies.Contains(t.Assembly))
+                .ToArray();
+
+            var validationErrors = typesFromMissingAssemblies
+                .Select(t => "The message contract type {0} is referenced by one of your handlers but its assembly ({1}) is not included in the list of assemblies to scan."
+                            .FormatWith(t.FullName, t.Assembly.FullName))
+                .ToArray();
+
+            return validationErrors;
         }
     }
 }

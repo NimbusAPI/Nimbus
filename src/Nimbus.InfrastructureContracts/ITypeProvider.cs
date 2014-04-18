@@ -14,7 +14,5 @@ namespace Nimbus
 
         IEnumerable<Type> RequestHandlerTypes { get; }
         IEnumerable<Type> RequestTypes { get; }
-
-        void Verify();
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace Nimbus.Configuration.Settings
+﻿using System.Collections.Generic;
+
+namespace Nimbus.Configuration.Settings
 {
-    public abstract class Setting<T>
+    public abstract class Setting<T>: IValidatableConfigurationSetting
     {
         public T Value { get; set; }
 
@@ -17,6 +19,11 @@
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public IEnumerable<string> Validate()
+        {
+            yield break;
         }
 
         public virtual T Default

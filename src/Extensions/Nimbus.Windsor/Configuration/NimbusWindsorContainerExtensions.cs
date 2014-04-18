@@ -21,7 +21,7 @@ namespace Nimbus.Windsor.Configuration
 
             foreach (var handlerType in typeProvider.AllHandlerTypes())
             {
-                var handlerInterfaceTypes = handlerType.GetInterfaces().Where(typeProvider.IsHandlerType);
+                var handlerInterfaceTypes = handlerType.GetInterfaces().Where(typeProvider.IsClosedGenericHandlerInterface);
                 foreach (var interfaceType in handlerInterfaceTypes)
                 {
                     container.Register(Component.For(interfaceType).ImplementedBy(handlerType).Named(handlerType.FullName).LifestyleScoped());

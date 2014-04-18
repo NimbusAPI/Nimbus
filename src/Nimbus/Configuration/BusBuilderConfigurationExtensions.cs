@@ -42,17 +42,7 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
-            typeProvider.Verify();
-
-            configuration.CommandHandlerTypes = new CommandHandlerTypesSetting {Value = typeProvider.CommandHandlerTypes.ToArray()};
-
-            configuration.RequestHandlerTypes = new RequestHandlerTypesSetting {Value = typeProvider.RequestHandlerTypes.ToArray()};
-
-            configuration.MulticastEventHandlerTypes = new MulticastEventHandlerTypesSetting {Value = typeProvider.MulticastEventHandlerTypes.ToArray()};
-            configuration.CompetingEventHandlerTypes = new CompetingEventHandlerTypesSetting {Value = typeProvider.CompetingEventHandlerTypes.ToArray()};
-
             configuration.TypeProvider = typeProvider;
-
             return configuration;
         }
 

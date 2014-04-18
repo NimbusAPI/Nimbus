@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -12,32 +11,32 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class RequestMessagePumpsFactory : ICreateComponents
     {
         private readonly ILogger _logger;
-        private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public RequestMessagePumpsFactory(ILogger logger,
-                                          RequestHandlerTypesSetting requestHandlerTypes,
                                           INimbusMessagingFactory messagingFactory,
                                           IBrokeredMessageFactory brokeredMessageFactory,
                                           IClock clock,
-                                          IDependencyResolver dependencyResolver)
+                                          IDependencyResolver dependencyResolver,
+                                          ITypeProvider typeProvider)
         {
             _logger = logger;
-            _requestHandlerTypes = requestHandlerTypes;
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _typeProvider = typeProvider;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _requestHandlerTypes.Value)
+            foreach (var handlerType in _typeProvider.RequestHandlerTypes)
             {
                 var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleRequest<,>))
                                               .Select(gi => gi.GetGenericArguments().First())
@@ -48,7 +47,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                 foreach (var requestType in requestTypes)
                 {
                     var queuePath = PathFactory.QueuePathFor(requestType);
-
                     _logger.Debug("Creating message pump for request queue {0}", queuePath);
 
                     var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);

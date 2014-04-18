@@ -1,5 +1,5 @@
-﻿using Nimbus.Infrastructure;
-using Nimbus.MessageContracts.Exceptions;
+﻿using System.Linq;
+using Nimbus.Infrastructure;
 using Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization;
 using NUnit.Framework;
 using Shouldly;
@@ -10,22 +10,20 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
     public class WhenAUnserializableAMessageThatIsInAnAssemblyThatIsNotIncluded
     {
         [Test]
-        [ExpectedException(typeof(BusException))]
-        public void TheAssemblyScannerShouldGoBang()
+        public void ValidationShouldFail()
         {
-            var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof(UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
-
-            assemblyScanningTypeProvider.Verify();
+            var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
+            assemblyScanningTypeProvider.Validate().ShouldNotBeEmpty();
         }
 
         [Test]
-        public void TheExceptionShouldIncludeAnInnerException()
+        public void TheMessageShouldMentionTheOffendingTypeByName()
         {
-            var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof(UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
+            var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
 
-            var exception = Assert.Throws<BusException>(() => assemblyScanningTypeProvider.Verify());
+            var validationErrors = assemblyScanningTypeProvider.Validate().ToArray();
 
-            exception.InnerException.ShouldNotBe(null);
+            validationErrors.ShouldContain(e => e.Contains(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).FullName));
         }
     }
 }

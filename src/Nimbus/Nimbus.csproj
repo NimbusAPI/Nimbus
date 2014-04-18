@@ -61,6 +61,7 @@
     <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="Configuration\LargeMessages\ILargeMessageBodyConfiguration.cs" />
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
@@ -108,16 +109,12 @@
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
     <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
-    <Compile Include="Configuration\Settings\CommandHandlerTypesSetting.cs" />
-    <Compile Include="Configuration\Settings\CompetingEventHandlerTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ConnectionStringSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
     <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />
-    <Compile Include="Configuration\Settings\MulticastEventHandlerTypesSetting.cs" />
     <Compile Include="Configuration\PoorMansIoC.cs" />
     <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
-    <Compile Include="Configuration\Settings\RequestHandlerTypesSetting.cs" />
     <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />

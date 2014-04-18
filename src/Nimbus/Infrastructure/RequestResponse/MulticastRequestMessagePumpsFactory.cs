@@ -12,35 +12,35 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class MulticastRequestMessagePumpsFactory : ICreateComponents
     {
         private readonly ILogger _logger;
-        private readonly RequestHandlerTypesSetting _requestHandlerTypes;
         private readonly ApplicationNameSetting _applicationName;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
+        private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly IDependencyResolver _dependencyResolver;
 
         public MulticastRequestMessagePumpsFactory(ILogger logger,
-                                                   RequestHandlerTypesSetting requestHandlerTypes,
                                                    ApplicationNameSetting applicationName,
                                                    INimbusMessagingFactory messagingFactory,
                                                    IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
-                                                   IDependencyResolver dependencyResolver)
+                                                   IDependencyResolver dependencyResolver,
+                                                   ITypeProvider typeProvider)
         {
             _logger = logger;
-            _requestHandlerTypes = requestHandlerTypes;
             _applicationName = applicationName;
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _typeProvider = typeProvider;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _requestHandlerTypes.Value)
+            foreach (var handlerType in _typeProvider.RequestHandlerTypes)
             {
                 var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleRequest<,>))
                                               .Select(gi => gi.GetGenericArguments().First())
@@ -52,7 +52,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     var topicPath = PathFactory.TopicPathFor(requestType);
                     var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, handlerType);
-
                     _logger.Debug("Creating message pump for multicast request {0}/{1}", topicPath, subscriptionName);
 
                     var messageReceiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);

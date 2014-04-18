@@ -1,10 +1,14 @@
-﻿using Nimbus.Configuration.Debug;
+﻿using System;
+using System.Linq;
+using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Configuration
 {
@@ -22,11 +26,6 @@ namespace Nimbus.Configuration
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
         internal ConnectionStringSetting ConnectionString { get; set; }
-        internal CommandHandlerTypesSetting CommandHandlerTypes { get; set; }
-        internal RequestHandlerTypesSetting RequestHandlerTypes { get; set; }
-        internal MulticastEventHandlerTypesSetting MulticastEventHandlerTypes { get; set; }
-        internal CompetingEventHandlerTypesSetting CompetingEventHandlerTypes { get; set; }
-
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
@@ -51,7 +50,19 @@ namespace Nimbus.Configuration
 
         private void AssertConfigurationIsValid()
         {
-            //FIXME nowhere near done yet.  -andrewh 6/11/2013
+            var validatableComponents = GetType().GetProperties()
+                                                 .Select(p => p.GetValue(this))
+                                                 .OfType<IValidatableConfigurationSetting>()
+                                                 .ToArray();
+
+            var validationErrors = validatableComponents
+                .SelectMany(c => c.Validate())
+                .ToArray();
+
+            if (validationErrors.None()) return;
+
+            var message = string.Join(Environment.NewLine, new[] {"Bus configuration is invalid:"}.Concat(validationErrors));
+            throw new BusException(message);
         }
     }
 }

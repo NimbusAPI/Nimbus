@@ -16,6 +16,13 @@ namespace Nimbus.Extensions
                 .ToArray();
         }
 
+        public static Type[] AllClosedGenericHandlerInterfaces(this ITypeProvider typeProvider)
+        {
+            return typeProvider.AllHandlerTypes()
+                               .Where(typeProvider.IsClosedGenericHandlerInterface)
+                               .ToArray();
+        }
+
         public static Type[] AllMessageContractTypes(this ITypeProvider typeProvider)
         {
             return new Type[0]
@@ -25,8 +32,9 @@ namespace Nimbus.Extensions
                 .ToArray();
         }
 
-        public static bool IsHandlerType(this ITypeProvider typeProvider, Type potentialHandlerType)
+        public static bool IsClosedGenericHandlerInterface(this ITypeProvider typeProvider, Type potentialHandlerType)
         {
+            if (!potentialHandlerType.IsInterface) return false;
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleCommand<>))) return true;
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleMulticastEvent<>))) return true;
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleCompetingEvent<>))) return true;

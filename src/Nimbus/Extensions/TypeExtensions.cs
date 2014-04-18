@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Nimbus.Extensions
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         public static bool IsClosedTypeOf(this Type type, Type openGenericType)
         {
@@ -39,6 +41,24 @@ namespace Nimbus.Extensions
                                         .Where(i => i.IsClosedTypeOf(genericInterface))
                                         .ToArray();
             return genericInterfaces;
+        }
+
+        public static bool IsSerializable(this Type messageType)
+        {
+            try
+            {
+                using (var mem = new MemoryStream())
+                {
+                    var serializer = new DataContractSerializer(messageType);
+                    var instance = Activator.CreateInstance(messageType, true);
+                    serializer.WriteObject(mem, instance);
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                return false;
+            }
         }
     }
 }
