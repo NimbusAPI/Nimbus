@@ -99,11 +99,12 @@
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
-    <Compile Include="Conventions\AllParameterTypes.cs" />
+    <Compile Include="Conventions\AllParametersOnInfrastructureTypes.cs" />
     <Compile Include="Conventions\AllSettingsClasses.cs" />
     <Compile Include="Conventions\CoreHandlerInterfaces.cs" />
     <Compile Include="Conventions\CoreInfrastructureInterfaces.cs" />
     <Compile Include="Conventions\NimbusCode.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="DependencyResolverTests\DisposableComponents\Handlers\DisposableHandler.cs" />

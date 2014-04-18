@@ -9,9 +9,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        public ResponseMessagePumpDispatcher(
-            RequestResponseCorrelator requestResponseCorrelator, 
-            IBrokeredMessageFactory brokeredMessageFactory)
+        public ResponseMessagePumpDispatcher(IBrokeredMessageFactory brokeredMessageFactory, RequestResponseCorrelator requestResponseCorrelator)
         {
             _requestResponseCorrelator = requestResponseCorrelator;
             _brokeredMessageFactory = brokeredMessageFactory;

@@ -7,21 +7,20 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class BusCommandSender : ICommandSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
+        private readonly ILogger _logger;
+        private readonly INimbusMessagingFactory _messagingFactory;
 
-        public BusCommandSender(
-            INimbusMessagingFactory messagingFactory,
-            IBrokeredMessageFactory brokeredMessageFactory,
-            ILogger logger,
-            IKnownMessageTypeVerifier knownMessageTypeVerifier)
+        public BusCommandSender(IBrokeredMessageFactory brokeredMessageFactory,
+                                IKnownMessageTypeVerifier knownMessageTypeVerifier,
+                                ILogger logger,
+                                INimbusMessagingFactory messagingFactory)
         {
-            _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
-            _logger = logger;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
+            _logger = logger;
+            _messagingFactory = messagingFactory;
         }
 
         public async Task Send<TBusCommand>(TBusCommand busCommand)

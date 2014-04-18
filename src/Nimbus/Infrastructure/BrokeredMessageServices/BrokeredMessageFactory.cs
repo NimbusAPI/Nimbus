@@ -12,29 +12,29 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
+        private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
+        private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
-        private readonly ISerializer _serializer;
         private readonly ICompressor _compressor;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
-        private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
-        private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
+        private readonly ISerializer _serializer;
 
-        public BrokeredMessageFactory(ReplyQueueNameSetting replyQueueName,
-                                      ISerializer serializer,
-                                      ICompressor compressor,
-                                      IClock clock,
-                                      ILargeMessageBodyStore largeMessageBodyStore,
+        public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
-                                      MaxLargeMessageSizeSetting maxLargeMessageSize)
+                                      ReplyQueueNameSetting replyQueueName,
+                                      IClock clock,
+                                      ICompressor compressor,
+                                      ILargeMessageBodyStore largeMessageBodyStore,
+                                      ISerializer serializer)
         {
-            _replyQueueName = replyQueueName;
-            _serializer = serializer;
-            _compressor = compressor;
-            _clock = clock;
-            _largeMessageBodyStore = largeMessageBodyStore;
-            _maxSmallMessageSize = maxSmallMessageSize;
             _maxLargeMessageSize = maxLargeMessageSize;
+            _maxSmallMessageSize = maxSmallMessageSize;
+            _replyQueueName = replyQueueName;
+            _clock = clock;
+            _compressor = compressor;
+            _largeMessageBodyStore = largeMessageBodyStore;
+            _serializer = serializer;
         }
 
         public Task<BrokeredMessage> Create(object serializableObject = null)

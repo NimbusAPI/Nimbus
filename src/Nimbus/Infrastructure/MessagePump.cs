@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure
         private bool _started;
         private readonly object _mutex = new object();
 
-        public MessagePump(INimbusMessageReceiver receiver, IMessageDispatcher dispatcher, ILogger logger, IClock clock)
+        public MessagePump(IClock clock, ILogger logger, IMessageDispatcher dispatcher, INimbusMessageReceiver receiver)
         {
             _receiver = receiver;
             _dispatcher = dispatcher;

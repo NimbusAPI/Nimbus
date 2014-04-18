@@ -18,13 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     {
         protected async Task<BrokeredMessageFactory> Given()
         {
-            return new BrokeredMessageFactory(new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
-                                              new DataContractSerializer(),
-                                              new NullCompressor(),
-                                              new SystemClock(),
-                                              new UnsupportedLargeMessageBodyStore(),
-                                              new MaxSmallMessageSizeSetting {Value = 64*1024},
-                                              new MaxLargeMessageSizeSetting());
+            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting {Value = 64*1024}, new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}), new SystemClock(), new NullCompressor(), new UnsupportedLargeMessageBodyStore(), new DataContractSerializer());
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
         private readonly ILogger _logger;
 
-        public NimbusMessagingFactory(IQueueManager queueManager, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
+        public NimbusMessagingFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger, IQueueManager queueManager)
         {
             _queueManager = queueManager;
             _concurrentHandlerLimit = concurrentHandlerLimit;

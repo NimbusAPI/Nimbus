@@ -10,11 +10,10 @@ namespace Nimbus.Infrastructure.Events
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
 
-        public BusEventSender(
-            INimbusMessagingFactory messagingFactory,
-            IBrokeredMessageFactory brokeredMessageFactory,
-            ILogger logger,
-            IKnownMessageTypeVerifier knownMessageTypeVerifier)
+        public BusEventSender(IBrokeredMessageFactory brokeredMessageFactory,
+                              IKnownMessageTypeVerifier knownMessageTypeVerifier,
+                              ILogger logger,
+                              INimbusMessagingFactory messagingFactory)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;

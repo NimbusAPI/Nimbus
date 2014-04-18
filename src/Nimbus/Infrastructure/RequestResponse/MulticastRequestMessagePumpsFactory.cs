@@ -21,12 +21,12 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly IDependencyResolver _dependencyResolver;
 
-        public MulticastRequestMessagePumpsFactory(ILogger logger,
-                                                   ApplicationNameSetting applicationName,
-                                                   INimbusMessagingFactory messagingFactory,
+        public MulticastRequestMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
                                                    IDependencyResolver dependencyResolver,
+                                                   ILogger logger,
+                                                   INimbusMessagingFactory messagingFactory,
                                                    ITypeProvider typeProvider)
         {
             _logger = logger;
@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var dispatcher = new RequestMessageDispatcher(_messagingFactory, _brokeredMessageFactory, requestType, _clock, _logger, _dependencyResolver, handlerType);
                     _garbageMan.Add(dispatcher);
 
-                    var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
+                    var pump = new MessagePump(_clock, _logger, dispatcher, messageReceiver);
                     _garbageMan.Add(pump);
 
                     yield return pump;

@@ -10,28 +10,28 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class CommandMessagePumpsFactory : ICreateComponents
     {
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
-        private readonly ITypeProvider _typeProvider;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly IClock _clock;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
-        public CommandMessagePumpsFactory(ILogger logger,
-                                          INimbusMessagingFactory messagingFactory,
-                                          IBrokeredMessageFactory brokeredMessageFactory,
+        public CommandMessagePumpsFactory(IBrokeredMessageFactory brokeredMessageFactory,
                                           IClock clock,
                                           IDependencyResolver dependencyResolver,
+                                          ILogger logger,
+                                          INimbusMessagingFactory messagingFactory,
                                           ITypeProvider typeProvider)
         {
-            _logger = logger;
-            _messagingFactory = messagingFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _logger = logger;
+            _messagingFactory = messagingFactory;
             _typeProvider = typeProvider;
-            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -51,7 +51,7 @@ namespace Nimbus.Infrastructure.Commands
                     var dispatcher = new CommandMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, commandType, _clock, handlerType);
                     _garbageMan.Add(dispatcher);
 
-                    var pump = new MessagePump(messageReceiver, dispatcher, _logger, _clock);
+                    var pump = new MessagePump(_clock, _logger, dispatcher, messageReceiver);
                     _garbageMan.Add(pump);
 
                     yield return pump;

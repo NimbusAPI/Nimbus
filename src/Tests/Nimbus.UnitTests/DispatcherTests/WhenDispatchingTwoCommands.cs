@@ -38,13 +38,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
 
-            _brokeredMessageFactory = new BrokeredMessageFactory(replyQueueNameSetting,
-                                                                 serializer,
-                                                                 new NullCompressor(),
-                                                                 clock,
-                                                                 new UnsupportedLargeMessageBodyStore(),
-                                                                 new MaxSmallMessageSizeSetting(),
-                                                                 new MaxLargeMessageSizeSetting());
+            _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), replyQueueNameSetting, clock, new NullCompressor(), new UnsupportedLargeMessageBodyStore(), serializer);
 
             _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof (FooCommand), new SystemClock(), typeof (BrokerTestCommandHandler));
         }

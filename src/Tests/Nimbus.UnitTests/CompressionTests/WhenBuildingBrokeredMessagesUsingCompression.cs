@@ -29,14 +29,7 @@ namespace Nimbus.UnitTests.CompressionTests
 
         private static BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
-            return new BrokeredMessageFactory(
-                new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
-                new DataContractSerializer(),
-                compressor,
-                Substitute.For<IClock>(),
-                new UnsupportedLargeMessageBodyStore(),
-                new MaxSmallMessageSizeSetting(),
-                new MaxLargeMessageSizeSetting());
+            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}), Substitute.For<IClock>(), compressor, new UnsupportedLargeMessageBodyStore(), new DataContractSerializer());
         }
 
         protected override async Task When()

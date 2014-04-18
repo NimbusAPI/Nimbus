@@ -22,12 +22,12 @@ namespace Nimbus.Infrastructure.Events
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly INimbusMessagingFactory _messagingFactory;
 
-        internal MulticastEventMessagePumpsFactory(IDependencyResolver dependencyResolver,
-                                                   ApplicationNameSetting applicationName,
+        internal MulticastEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
-                                                   ILogger logger,
                                                    IBrokeredMessageFactory brokeredMessageFactory,
                                                    IClock clock,
+                                                   IDependencyResolver dependencyResolver,
+                                                   ILogger logger,
                                                    INimbusMessagingFactory messagingFactory,
                                                    ITypeProvider typeProvider)
         {
@@ -62,7 +62,7 @@ namespace Nimbus.Infrastructure.Events
                     var dispatcher = new MulticastEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, handlerType, _clock, eventType);
                     _garbageMan.Add(dispatcher);
 
-                    var pump = new MessagePump(receiver, dispatcher, _logger, _clock);
+                    var pump = new MessagePump(_clock, _logger, dispatcher, receiver);
                     _garbageMan.Add(pump);
 
                     yield return pump;

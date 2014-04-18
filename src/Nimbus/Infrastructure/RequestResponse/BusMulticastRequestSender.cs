@@ -15,12 +15,12 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
 
-        public BusMulticastRequestSender(INimbusMessagingFactory messagingFactory,
-                                         IBrokeredMessageFactory brokeredMessageFactory,
-                                         RequestResponseCorrelator requestResponseCorrelator,
+        public BusMulticastRequestSender(IBrokeredMessageFactory brokeredMessageFactory,
                                          IClock clock,
+                                         IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                          ILogger logger,
-                                         IKnownMessageTypeVerifier knownMessageTypeVerifier)
+                                         INimbusMessagingFactory messagingFactory,
+                                         RequestResponseCorrelator requestResponseCorrelator)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;

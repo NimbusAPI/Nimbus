@@ -16,13 +16,13 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly DefaultTimeoutSetting _responseTimeout;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
 
-        internal BusRequestSender(INimbusMessagingFactory messagingFactory,
+        internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
                                   IBrokeredMessageFactory brokeredMessageFactory,
-                                  RequestResponseCorrelator requestResponseCorrelator,
                                   IClock clock,
-                                  DefaultTimeoutSetting responseTimeout,
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
-                                  ILogger logger)
+                                  ILogger logger,
+                                  INimbusMessagingFactory messagingFactory,
+                                  RequestResponseCorrelator requestResponseCorrelator)
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
