@@ -55,7 +55,7 @@ namespace Nimbus.Extensions
                 }
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 return false;
             }
