@@ -7,8 +7,8 @@ namespace Nimbus.Infrastructure.Events
 {
     internal class MulticastEventMessageDispatcher : EventMessageDispather
     {
-        public MulticastEventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock)
-            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock)
+        public MulticastEventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock, Type eventType)
+            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock, eventType)
         {
         }
 

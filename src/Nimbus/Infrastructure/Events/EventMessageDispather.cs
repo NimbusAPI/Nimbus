@@ -14,18 +14,20 @@ namespace Nimbus.Infrastructure.Events
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         protected readonly Type HandlerType;
+        private readonly Type _eventType;
 
-        protected EventMessageDispather(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock)
+        protected EventMessageDispather(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock, Type eventType)
         {
             _dependencyResolver = dependencyResolver;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
+            _eventType = eventType;
             HandlerType = handlerType;
         }
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busEvent = await _brokeredMessageFactory.GetBody(message, HandlerType);
+            var busEvent = await _brokeredMessageFactory.GetBody(message, _eventType);
             await Dispatch((dynamic) busEvent, message);
         }
 

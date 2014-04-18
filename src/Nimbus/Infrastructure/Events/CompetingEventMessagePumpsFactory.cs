@@ -43,7 +43,7 @@ namespace Nimbus.Infrastructure.Events
             foreach (var handlerType in _competingEventHandlerTypes.Value)
             {
                 var eventTypes = handlerType
-                    .GetGenericInterfacesClosing(typeof (IHandleMulticastEvent<>))
+                    .GetGenericInterfacesClosing(typeof (IHandleCompetingEvent<>))
                     .Select(gi => gi.GetGenericArguments().Single())
                     .ToArray();
 
@@ -56,7 +56,7 @@ namespace Nimbus.Infrastructure.Events
 
                     var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                    var dispatcher = new CompetingEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, handlerType, _clock);
+                    var dispatcher = new CompetingEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, handlerType, _clock, eventType);
                     _garbageMan.Add(dispatcher);
 
                     var pump = new MessagePump(receiver, dispatcher, _logger, _clock);

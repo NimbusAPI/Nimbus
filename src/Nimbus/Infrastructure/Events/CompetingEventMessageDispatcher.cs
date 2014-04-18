@@ -7,8 +7,12 @@ namespace Nimbus.Infrastructure.Events
 {
     internal class CompetingEventMessageDispatcher : EventMessageDispather
     {
-        public CompetingEventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock)
-            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock)
+        public CompetingEventMessageDispatcher(IDependencyResolver dependencyResolver,
+                                               IBrokeredMessageFactory brokeredMessageFactory,
+                                               Type handlerType,
+                                               IClock clock,
+                                               Type eventType)
+            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock, eventType)
         {
         }
 
