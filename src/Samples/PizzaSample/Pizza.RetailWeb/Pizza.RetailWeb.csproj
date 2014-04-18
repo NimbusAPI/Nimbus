@@ -134,6 +134,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadModels\IAmAReadModel.cs" />
+    <Compile Include="ReadModels\PizzaOrderStatusHandler.cs" />
     <Compile Include="ReadModels\PizzaOrderStatusReadModel.cs" />
   </ItemGroup>
   <ItemGroup>
