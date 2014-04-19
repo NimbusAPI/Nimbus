@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
@@ -8,7 +7,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Events
 {
-    internal abstract class EventMessageDispather : IMessageDispatcher
+    internal abstract class EventMessageDispatcher : IMessageDispatcher
     {
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
@@ -16,7 +15,7 @@ namespace Nimbus.Infrastructure.Events
         protected readonly Type HandlerType;
         private readonly Type _eventType;
 
-        protected EventMessageDispather(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock, Type eventType)
+        protected EventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock, Type eventType)
         {
             _dependencyResolver = dependencyResolver;
             _brokeredMessageFactory = brokeredMessageFactory;
@@ -35,22 +34,18 @@ namespace Nimbus.Infrastructure.Events
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var wrapperTasks = new List<Task>();
-
-                ILongRunningHandler longRunningHandler;
                 Task handlerTask;
+                ILongRunningTask longRunningHandler;
                 CreateHandlerTaskFromScope(busEvent, scope, out handlerTask, out longRunningHandler);
 
                 var wrapperTask = new LongLivedTaskWrapper(handlerTask, longRunningHandler, message, _clock);
-                wrapperTasks.Add(wrapperTask.AwaitCompletion());
-
-                await Task.WhenAll(wrapperTasks);
+                await wrapperTask.AwaitCompletion();
             }
         }
 
         protected abstract void CreateHandlerTaskFromScope<TBusEvent>(TBusEvent busEvent,
                                                                       IDependencyResolverScope scope,
                                                                       out Task handlerTask,
-                                                                      out ILongRunningHandler longRunningHandler) where TBusEvent : IBusEvent;
+                                                                      out ILongRunningTask longRunningHandler) where TBusEvent : IBusEvent;
     }
 }

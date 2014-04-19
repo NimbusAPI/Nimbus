@@ -1,6 +1,6 @@
 ﻿namespace Nimbus.Handlers
 {
-    public interface ILongRunningHandler
+    public interface ILongRunningTask
     {
         bool IsAlive { get; }
     }

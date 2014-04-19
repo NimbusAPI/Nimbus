@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Nimbus.Configuration.Debug;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 
@@ -49,6 +50,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithDependencyResolver(this BusBuilderConfiguration configuration, IDependencyResolver dependencyResolver)
         {
             configuration.DependencyResolver = dependencyResolver;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithLargeMessageStorage(this BusBuilderConfiguration configuration, Action<LargeMessageStorageConfiguration> configurationAction)
+        {
+            configurationAction(configuration.LargeMessageStorageConfiguration);
             return configuration;
         }
 

@@ -5,7 +5,7 @@ using Nimbus.Handlers;
 
 namespace Nimbus.Infrastructure.Events
 {
-    internal class MulticastEventMessageDispatcher : EventMessageDispather
+    internal class MulticastEventMessageDispatcher : EventMessageDispatcher
     {
         public MulticastEventMessageDispatcher(IDependencyResolver dependencyResolver, IBrokeredMessageFactory brokeredMessageFactory, Type handlerType, IClock clock, Type eventType)
             : base(dependencyResolver, brokeredMessageFactory, handlerType, clock, eventType)
@@ -15,11 +15,11 @@ namespace Nimbus.Infrastructure.Events
         protected override void CreateHandlerTaskFromScope<TBusEvent>(TBusEvent busEvent,
                                                                       IDependencyResolverScope scope,
                                                                       out Task handlerTask,
-                                                                      out ILongRunningHandler longRunningHandler)
+                                                                      out ILongRunningTask longRunningHandler)
         {
             var handler = scope.Resolve<IHandleMulticastEvent<TBusEvent>>(HandlerType.FullName);
             handlerTask = handler.Handle(busEvent);
-            longRunningHandler = handler as ILongRunningHandler;
+            longRunningHandler = handler as ILongRunningTask;
         }
     }
 }

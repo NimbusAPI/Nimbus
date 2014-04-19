@@ -7,7 +7,7 @@ using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.FileSystem.Infrastructure
 {
-    public class FileSystemLargeMessageBodyStore : ILargeMessageBodyStore
+    internal class FileSystemLargeMessageBodyStore : ILargeMessageBodyStore
     {
         private readonly StorageDirectorySetting _storageDirectory;
         private readonly ILogger _logger;

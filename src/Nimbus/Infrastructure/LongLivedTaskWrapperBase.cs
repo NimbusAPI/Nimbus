@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure
 {
     internal class LongLivedTaskWrapper<T> : LongLivedTaskWrapperBase
     {
-        public LongLivedTaskWrapper(Task<T> handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+        public LongLivedTaskWrapper(Task<T> handlerTask, ILongRunningTask longRunningHandler, BrokeredMessage message, IClock clock)
             : base(handlerTask, longRunningHandler, message, clock)
         {
         }
@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure
 
     internal class LongLivedTaskWrapper : LongLivedTaskWrapperBase
     {
-        public LongLivedTaskWrapper(Task handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+        public LongLivedTaskWrapper(Task handlerTask, ILongRunningTask longRunningHandler, BrokeredMessage message, IClock clock)
             : base(handlerTask, longRunningHandler, message, clock)
         {
         }
@@ -39,7 +39,7 @@ namespace Nimbus.Infrastructure
     internal abstract class LongLivedTaskWrapperBase
     {
         protected readonly Task HandlerTask;
-        private readonly ILongRunningHandler _longRunningHandler;
+        private readonly ILongRunningTask _longRunningHandler;
         private readonly BrokeredMessage _message;
         private readonly IClock _clock;
 
@@ -51,7 +51,7 @@ namespace Nimbus.Infrastructure
         internal static Func<BrokeredMessage, DateTimeOffset> LockedUntilUtcStrategy = m => m.LockedUntilUtc;
         internal static Action<BrokeredMessage> RenewLockStrategy = m => m.RenewLock();
 
-        protected LongLivedTaskWrapperBase(Task handlerTask, ILongRunningHandler longRunningHandler, BrokeredMessage message, IClock clock)
+        protected LongLivedTaskWrapperBase(Task handlerTask, ILongRunningTask longRunningHandler, BrokeredMessage message, IClock clock)
         {
             HandlerTask = handlerTask;
             _longRunningHandler = longRunningHandler;
@@ -88,15 +88,15 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private async Task Watch(ILongRunningHandler longRunningHandler, BrokeredMessage message)
+        private async Task Watch(ILongRunningTask longRunningHandler, BrokeredMessage message)
         {
             while (true)
             {
                 var lockedUntil = LockedUntilUtcStrategy(message);
                 var remainingLockTime = lockedUntil.Subtract(_clock.UtcNow);
                 var halfOfRemainingLockTime = TimeSpan.FromMilliseconds(remainingLockTime.TotalMilliseconds/2);
-
-                await Task.Delay(halfOfRemainingLockTime);
+                var timeToDelay = halfOfRemainingLockTime > TimeSpan.Zero ? halfOfRemainingLockTime : TimeSpan.Zero;
+                await Task.Delay(timeToDelay);
 
                 if (_completed) return;
                 lock (_mutex)

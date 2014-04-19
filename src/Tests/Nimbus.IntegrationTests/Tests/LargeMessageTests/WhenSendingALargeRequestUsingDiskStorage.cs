@@ -26,13 +26,19 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = new ConsoleLogger();
+
+            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
+                .WithStorageDirectory(_largeMessageBodyTempPath)
+                .WithLogger(logger)
+                .Build();
+
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
-                                      .WithFileSystemMessageBodyStorage(fs => fs.WithStorageDirectory(_largeMessageBodyTempPath)
+                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
                                                                                 .WithMaxSmallMessageSize(64*1024)
                                                                                 .WithMaxLargeMessageSize(10*1048576))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(

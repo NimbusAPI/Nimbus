@@ -64,7 +64,6 @@
     <Compile Include="Configuration\INimbusConfiguration.cs" />
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
-    <Compile Include="Configuration\LargeMessages\ILargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\NamespaceCleanser.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
@@ -72,7 +71,6 @@
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
-    <Compile Include="Configuration\LargeMessages\UnsupportedLargeMessageStorageConfiguration.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\DeflateCompressor.cs" />
@@ -83,7 +81,7 @@
     <Compile Include="Infrastructure\DependencyResolution\DependencyResolverScope.cs" />
     <Compile Include="Infrastructure\DependencyResolution\TrackingScope.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\Events\EventMessageDispather.cs" />
+    <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
@@ -123,7 +121,7 @@
     <Compile Include="Infrastructure\PathFactory.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
-    <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpDispatcher.cs" />
+    <Compile Include="Infrastructure\RequestResponse\ResponseMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
@@ -135,6 +133,11 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
+    <Compile Include="Interceptors\ICommandInterceptor.cs" />
+    <Compile Include="Interceptors\IEventInterceptor.cs" />
+    <Compile Include="Interceptors\IMessageInterceptor.cs" />
+    <Compile Include="Interceptors\IRequestInterceptor.cs" />
+    <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />

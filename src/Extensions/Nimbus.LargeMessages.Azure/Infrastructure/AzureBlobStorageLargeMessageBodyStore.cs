@@ -10,7 +10,7 @@ using Nimbus.LargeMessages.Azure.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.Azure.Infrastructure
 {
-    public class AzureBlobStorageLargeMessageBodyStore : ILargeMessageBodyStore
+    internal class AzureBlobStorageLargeMessageBodyStore : ILargeMessageBodyStore
     {
         private readonly BlobStorageConnectionStringSetting _connectionString;
         private readonly ILogger _logger;

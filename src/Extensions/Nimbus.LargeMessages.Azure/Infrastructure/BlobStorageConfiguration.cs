@@ -1,20 +1,11 @@
-using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 
 namespace Nimbus.LargeMessages.Azure.Infrastructure
 {
-    public class BlobStorageConfiguration : LargeMessageStorageConfiguration
+    public class BlobStorageConfiguration
     {
-        private readonly BusBuilderConfiguration _configuration;
-
-        internal BlobStorageConfiguration(BusBuilderConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         internal BlobStorageConnectionStringSetting BlobStorageConnectionString { get; set; }
+        internal ILogger Logger { get; set; }
 
         public BlobStorageConfiguration WithBlobStorageConnectionString(string connectionString)
         {
@@ -22,9 +13,15 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
             return this;
         }
 
-        public override ILargeMessageBodyStore LargeMessageBodyStore
+        public BlobStorageConfiguration WithLogger(ILogger logger)
         {
-            get { return new AzureBlobStorageLargeMessageBodyStore(BlobStorageConnectionString, _configuration.Logger); }
+            Logger = logger;
+            return this;
+        }
+
+        public ILargeMessageBodyStore Build()
+        {
+            return new AzureBlobStorageLargeMessageBodyStore(BlobStorageConnectionString, Logger);
         }
     }
 }

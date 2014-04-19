@@ -4,7 +4,7 @@ using Pizza.Ordering.Messages;
 
 namespace Pizza.Maker.Handlers
 {
-    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>, ILongRunningHandler
+    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>, ILongRunningTask
     {
         private readonly IPizzaMaker _pizzaMaker;
 

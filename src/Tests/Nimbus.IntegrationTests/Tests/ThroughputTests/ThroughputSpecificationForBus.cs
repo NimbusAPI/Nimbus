@@ -47,14 +47,19 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output and crashes it
             _logger = new NullLogger();
 
+            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
+                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
+                                                                        .WithLogger(_logger)
+                                                                        .Build();
+
             var bus = new BusBuilder().Configure()
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithLogger(_logger)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(_typeProvider)
                                       .WithDependencyResolver(_dependencyResolver)
-                                      .WithFileSystemMessageBodyStorage(fs => fs.WithStorageDirectory(_largeMessageBodyTempPath)
-                                                                                .WithMaxSmallMessageSize(4096))
+                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
+                                                                     .WithMaxSmallMessageSize(4096))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

@@ -27,8 +27,9 @@ namespace Pizza.RetailWeb.AutofacModules
             // This is how you tell Nimbus where to find all your message types and handlers.
             var pizzaOrderingMessagesAssembly = typeof (HowLongDoPizzasTakeRequest).Assembly;
             var pizzaMakerMessagesAssembly = typeof (PizzaIsReady).Assembly;
+            var nimbusAssembly = typeof (Bus).Assembly; // for stock interceptors
 
-            var handlerTypesProvider = new AssemblyScanningTypeProvider(ThisAssembly, pizzaOrderingMessagesAssembly, pizzaMakerMessagesAssembly);
+            var handlerTypesProvider = new AssemblyScanningTypeProvider(ThisAssembly, pizzaOrderingMessagesAssembly, pizzaMakerMessagesAssembly, nimbusAssembly);
 
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()

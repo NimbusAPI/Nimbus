@@ -22,6 +22,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             return (TComponent) (object) _fakeHandler;
         }
 
+        public TComponent[] ResolveAll<TComponent>()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Dispose()
         {
         }

@@ -45,7 +45,7 @@ namespace Nimbus.Extensions
         internal static BrokeredMessage WithRequestTimeout(this BrokeredMessage message, TimeSpan timeout)
         {
             message.TimeToLive = timeout;
-            message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMilliseconds, (int)timeout.TotalMilliseconds);
+            message.Properties.Add(MessagePropertyKeys.RequestTimeoutInMilliseconds, (int) timeout.TotalMilliseconds);
             return message;
         }
 
@@ -57,7 +57,7 @@ namespace Nimbus.Extensions
 
         internal static TimeSpan GetRequestTimeout(this BrokeredMessage message)
         {
-            var requestTimeoutInMilliseconds = (int)message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
+            var requestTimeoutInMilliseconds = (int) message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
             var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
             return timeout;
         }

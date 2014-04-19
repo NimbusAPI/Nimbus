@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
-using Nimbus.LargeMessages.Azure.Configuration;
+using Nimbus.LargeMessages.Azure.Infrastructure;
 using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
@@ -22,15 +22,19 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = new ConsoleLogger();
+            var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
+                                                                  .WithBlobStorageConnectionString(CommonResources.BlobStorageConnectionString)
+                                                                  .WithLogger(logger)
+                                                                  .Build();
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
-                                      .WithAzureMessageBodyStorage(c => c.WithBlobStorageConnectionString(CommonResources.BlobStorageConnectionString)
-                                                                         .WithMaxSmallMessageSize(64*1024)
-                                                                         .WithMaxLargeMessageSize(10*1048576))
+                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
+                                                                     .WithMaxSmallMessageSize(64*1024)
+                                                                     .WithMaxLargeMessageSize(10*1048576))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

@@ -1,21 +1,16 @@
-﻿using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
-using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
+﻿using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
 using Nimbus.LargeMessages.FileSystem.Infrastructure;
 
 namespace Nimbus.LargeMessages.FileSystem.Configuration
 {
-    public class FileSystemStorageConfiguration : LargeMessageStorageConfiguration
+    public class FileSystemStorageConfiguration
     {
-        private readonly BusBuilderConfiguration _configuration;
-
-        public FileSystemStorageConfiguration(BusBuilderConfiguration configuration)
+        internal FileSystemStorageConfiguration()
         {
-            _configuration = configuration;
         }
 
         internal StorageDirectorySetting StorageDirectory { get; set; }
+        internal ILogger Logger { get; set; }
 
         public FileSystemStorageConfiguration WithStorageDirectory(string storageDirectory)
         {
@@ -23,9 +18,15 @@ namespace Nimbus.LargeMessages.FileSystem.Configuration
             return this;
         }
 
-        public override ILargeMessageBodyStore LargeMessageBodyStore
+        public FileSystemStorageConfiguration WithLogger(ILogger logger)
         {
-            get { return new FileSystemLargeMessageBodyStore(StorageDirectory, _configuration.Logger); }
+            Logger = logger;
+            return this;
+        }
+
+        public ILargeMessageBodyStore Build()
+        {
+            return new FileSystemLargeMessageBodyStore(StorageDirectory, Logger);
         }
     }
 }

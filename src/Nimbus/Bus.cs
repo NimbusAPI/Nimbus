@@ -21,6 +21,9 @@ namespace Nimbus
         private readonly IMessagePump[] _messagePumps;
         private readonly IDeadLetterQueues _deadLetterQueues;
 
+        private readonly object _mutex = new object();
+        private bool _isRunning;
+
         internal Bus(ILogger logger,
                      ICommandSender commandSender,
                      IRequestSender requestSender,
@@ -85,6 +88,12 @@ namespace Nimbus
 
         public void Start()
         {
+            lock (_mutex)
+            {
+                if (_isRunning) return;
+                _isRunning = true;
+            }
+
             _logger.Debug("Bus starting...");
 
             var handler = Starting;
@@ -109,6 +118,12 @@ namespace Nimbus
 
         public void Stop()
         {
+            lock (_mutex)
+            {
+                if (!_isRunning) return;
+                _isRunning = false;
+            }
+
             _logger.Debug("Bus stopping...");
 
             var handler = Stopping;

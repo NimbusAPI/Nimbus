@@ -22,6 +22,11 @@ namespace Nimbus.Autofac.Infrastructure
             return _lifetimeScope.ResolveNamed<TComponent>(componentName);
         }
 
+        public TComponent[] ResolveAll<TComponent>()
+        {
+            return _lifetimeScope.Resolve<TComponent[]>();
+        }
+
         public void Dispose()
         {
             Dispose(true);

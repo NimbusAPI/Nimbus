@@ -2,10 +2,10 @@
 
 namespace Nimbus.Configuration.LargeMessages
 {
-    public abstract class LargeMessageStorageConfiguration : ILargeMessageStorageConfiguration
+    public class LargeMessageStorageConfiguration : INimbusConfiguration
     {
-        public abstract ILargeMessageBodyStore LargeMessageBodyStore { get; }
-        public MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; }
-        public MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; }
+        internal ILargeMessageBodyStore LargeMessageBodyStore { get; set; }
+        internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; }
+        internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; }
     }
 }

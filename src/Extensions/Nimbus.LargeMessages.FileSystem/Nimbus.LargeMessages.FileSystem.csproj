@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigurationExtensions.cs" />
+    <Compile Include="Configuration\FileSystemStorageBuilder.cs" />
     <Compile Include="Configuration\FileSystemStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\StorageDirectorySetting.cs" />
     <Compile Include="Infrastructure\FileSystemLargeMessageBodyStore.cs" />

@@ -14,5 +14,7 @@ namespace Nimbus
 
         IEnumerable<Type> RequestHandlerTypes { get; }
         IEnumerable<Type> RequestTypes { get; }
+
+        IEnumerable<Type> InterceptorTypes { get; } 
     }
 }

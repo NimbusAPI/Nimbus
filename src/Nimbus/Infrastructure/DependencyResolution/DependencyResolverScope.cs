@@ -49,6 +49,11 @@ namespace Nimbus.Infrastructure.DependencyResolution
             return component;
         }
 
+        public TComponent[] ResolveAll<TComponent>()
+        {
+            throw new NotImplementedException();
+        }
+
         private object CreateInstance(Type implementingType)
         {
             try

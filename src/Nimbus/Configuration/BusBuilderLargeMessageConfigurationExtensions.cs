@@ -5,6 +5,12 @@ namespace Nimbus.Configuration
 {
     public static class BusBuilderLargeMessageConfigurationExtensions
     {
+        public static LargeMessageStorageConfiguration WithLargeMessageBodyStore(this LargeMessageStorageConfiguration configuration, ILargeMessageBodyStore largeMessageBodyStore)
+        {
+            configuration.LargeMessageBodyStore = largeMessageBodyStore;
+            return configuration;
+        }
+
         public static LargeMessageStorageConfiguration WithMaxSmallMessageSize(this LargeMessageStorageConfiguration configuration, int messageSize)
         {
             configuration.MaxSmallMessageSize = new MaxSmallMessageSizeSetting {Value = messageSize};

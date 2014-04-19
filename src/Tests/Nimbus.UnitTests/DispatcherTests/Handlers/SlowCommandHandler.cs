@@ -5,7 +5,7 @@ using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 
 namespace Nimbus.UnitTests.DispatcherTests.Handlers
 {
-    public class SlowCommandHandler : IHandleCommand<SlowCommand>, ILongRunningHandler
+    public class SlowCommandHandler : IHandleCommand<SlowCommand>, ILongRunningTask
     {
         public readonly Semaphore PretendToBeWorkingSemaphore = new Semaphore(0, 1);
 

@@ -4,12 +4,12 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class ResponseMessagePumpDispatcher : IMessageDispatcher
+    internal class ResponseMessageDispatcher : IMessageDispatcher
     {
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        public ResponseMessagePumpDispatcher(IBrokeredMessageFactory brokeredMessageFactory, RequestResponseCorrelator requestResponseCorrelator)
+        public ResponseMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory, RequestResponseCorrelator requestResponseCorrelator)
         {
             _requestResponseCorrelator = requestResponseCorrelator;
             _brokeredMessageFactory = brokeredMessageFactory;

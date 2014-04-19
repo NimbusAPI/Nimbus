@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="DependencyResolution\ICreateChildScopes.cs" />
     <Compile Include="DependencyResolution\IDependencyResolver.cs" />
-    <Compile Include="Handlers\ILongRunningHandler.cs" />
+    <Compile Include="Handlers\ILongRunningTask.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IDeadLetterQueue.cs" />

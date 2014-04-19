@@ -60,7 +60,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(_handlerType.FullName);
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningHandler, message, _clock);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
 
                     var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);

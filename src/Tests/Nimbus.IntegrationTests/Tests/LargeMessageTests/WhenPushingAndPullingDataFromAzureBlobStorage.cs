@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
     [Timeout(15*1000)]
-    public class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
+    internal class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
     {
         private string _id;
         private DateTimeOffset _expiresAfter;

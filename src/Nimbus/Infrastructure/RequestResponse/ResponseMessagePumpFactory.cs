@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
-        private readonly ResponseMessagePumpDispatcher _dispatcher;
+        private readonly ResponseMessageDispatcher _dispatcher;
         private readonly IQueueManager _queueManager;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IClock clock,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessagePumpDispatcher dispatcher)
+                                            ResponseMessageDispatcher dispatcher)
         {
             _logger = logger;
             _queueManager = queueManager;

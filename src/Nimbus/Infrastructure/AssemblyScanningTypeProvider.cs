@@ -6,6 +6,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Interceptors;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure
@@ -21,6 +22,7 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<Type[]> _eventTypes;
         private readonly ThreadSafeLazy<Type[]> _requestHandlerTypes;
         private readonly ThreadSafeLazy<Type[]> _requestTypes;
+        private readonly ThreadSafeLazy<Type[]> _interceptorTypes;
 
         private IEnumerable<Type> AllInstantiableTypesInScannedAssemblies
         {
@@ -39,6 +41,7 @@ namespace Nimbus.Infrastructure
             _eventTypes = new ThreadSafeLazy<Type[]>(ScanForEventTypes);
             _requestHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForRequestHandlerTypes);
             _requestTypes = new ThreadSafeLazy<Type[]>(ScanForRequestTypes);
+            _interceptorTypes = new ThreadSafeLazy<Type[]>(ScanForInterceptorTypes);
         }
 
         public IEnumerable<Type> CommandHandlerTypes
@@ -74,6 +77,11 @@ namespace Nimbus.Infrastructure
         public IEnumerable<Type> RequestTypes
         {
             get { return _requestTypes.Value; }
+        }
+
+        public IEnumerable<Type> InterceptorTypes
+        {
+            get { return _interceptorTypes.Value; }
         }
 
         protected virtual Type[] ScanAssembliesForInterestingTypes()
@@ -142,6 +150,15 @@ namespace Nimbus.Infrastructure
         {
             var types = AllInstantiableTypesInScannedAssemblies
                 .Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForInterceptorTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IMessageInterceptor<>)))
                 .ToArray();
 
             return types;
