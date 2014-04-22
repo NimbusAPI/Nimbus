@@ -14,6 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
+    [Timeout(15 * 1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         protected override Task<IBus> Given()
