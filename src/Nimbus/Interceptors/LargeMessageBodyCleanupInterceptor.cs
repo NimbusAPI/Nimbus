@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors
 {
-    internal class LargeMessageBodyCleanupInterceptor : MessageInterceptor
+    internal class LargeMessageBodyCleanupInterceptor : InboundInterceptor
     {
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 

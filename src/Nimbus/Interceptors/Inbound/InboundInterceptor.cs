@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.Interceptors
+namespace Nimbus.Interceptors.Inbound
 {
-    public abstract class MessageInterceptor : IMessageInterceptor
+    public abstract class InboundInterceptor : IInboundInterceptor
     {
         public virtual int Priority { get; protected set; }
 

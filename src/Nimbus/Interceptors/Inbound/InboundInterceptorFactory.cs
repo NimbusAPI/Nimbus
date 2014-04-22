@@ -6,18 +6,18 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 
-namespace Nimbus.Interceptors
+namespace Nimbus.Interceptors.Inbound
 {
-    internal class InterceptorFactory : IInterceptorFactory
+    internal class InboundInterceptorFactory : IInboundInterceptorFactory
     {
         private readonly GlobalInterceptorTypesSetting _globalInterceptorTypes;
 
-        public InterceptorFactory(GlobalInterceptorTypesSetting globalInterceptorTypes)
+        public InboundInterceptorFactory(GlobalInterceptorTypesSetting globalInterceptorTypes)
         {
             _globalInterceptorTypes = globalInterceptorTypes;
         }
 
-        public IMessageInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message)
+        public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message)
         {
             var globalInterceptors = GetGlobalInterceptorTypes();
             var classLevelInterceptors = GetClassLevelInterceptorTypes(handler);
@@ -28,7 +28,7 @@ namespace Nimbus.Interceptors
                 .Union(classLevelInterceptors)
                 .Union(methodLevelInterceptors)
                 .DistinctBy(t => t.FullName)
-                .Select(t => (IMessageInterceptor) scope.Resolve(t, t.FullName))
+                .Select(t => (IInboundInterceptor) scope.Resolve(t, t.FullName))
                 .OrderByDescending(i => i.Priority)
                 .ThenBy(i => i.GetType().FullName)
                 .ToArray();

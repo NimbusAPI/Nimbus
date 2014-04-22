@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Interceptors
+namespace Nimbus.Interceptors.Inbound
 {
     public sealed class InterceptorAttribute : Attribute
     {
@@ -8,7 +8,7 @@ namespace Nimbus.Interceptors
 
         public InterceptorAttribute(Type interceptorType)
         {
-            if (!typeof (IMessageInterceptor).IsAssignableFrom(interceptorType)) throw new ArgumentException("Type must be an interceptor type", "interceptorType");
+            if (!typeof (IInboundInterceptor).IsAssignableFrom(interceptorType)) throw new ArgumentException("Type must be an interceptor type", "interceptorType");
             if (interceptorType.IsInterface) throw new ArgumentException("Interceptor type must be a concrete type", "interceptorType");
 
             _interceptorType = interceptorType;

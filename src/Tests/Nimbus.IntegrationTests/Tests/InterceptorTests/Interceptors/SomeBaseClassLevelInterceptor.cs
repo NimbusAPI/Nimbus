@@ -2,11 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Interceptors;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
 {
-    public class SomeBaseClassLevelInterceptor : MessageInterceptor
+    public class SomeBaseClassLevelInterceptor : InboundInterceptor
     {
         public override async Task OnCommandHandlerExecuting(IBusCommand busCommand, BrokeredMessage brokeredMessage)
         {

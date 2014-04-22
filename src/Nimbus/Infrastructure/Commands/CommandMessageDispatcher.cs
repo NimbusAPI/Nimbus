@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Interceptors;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.Commands
@@ -13,7 +14,7 @@ namespace Nimbus.Infrastructure.Commands
     internal class CommandMessageDispatcher : IMessageDispatcher
     {
         private readonly IDependencyResolver _dependencyResolver;
-        private readonly IInterceptorFactory _interceptorFactory;
+        private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _commandType;
         private readonly IClock _clock;
@@ -21,14 +22,14 @@ namespace Nimbus.Infrastructure.Commands
 
         public CommandMessageDispatcher(
             IDependencyResolver dependencyResolver,
-            IInterceptorFactory interceptorFactory,
+            IInboundInterceptorFactory inboundInterceptorFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
             Type commandType,
             IClock clock,
             Type handlerType)
         {
             _dependencyResolver = dependencyResolver;
-            _interceptorFactory = interceptorFactory;
+            _inboundInterceptorFactory = inboundInterceptorFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _commandType = commandType;
             _clock = clock;
@@ -48,7 +49,7 @@ namespace Nimbus.Infrastructure.Commands
                 using (var scope = _dependencyResolver.CreateChildScope())
                 {
                     var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
-                    var interceptors = _interceptorFactory.CreateInterceptors(scope, handler, busCommand);
+                    var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
                     foreach (var interceptor in interceptors)
                     {

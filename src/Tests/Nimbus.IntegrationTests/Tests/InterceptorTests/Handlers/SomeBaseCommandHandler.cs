@@ -3,6 +3,7 @@ using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
 using Nimbus.Interceptors;
+using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers
 {

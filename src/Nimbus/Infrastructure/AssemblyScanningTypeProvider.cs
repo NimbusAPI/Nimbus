@@ -7,6 +7,7 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure
@@ -158,7 +159,7 @@ namespace Nimbus.Infrastructure
         private Type[] ScanForInterceptorTypes()
         {
             var types = AllInstantiableTypesInScannedAssemblies
-                .Where(t => typeof (IMessageInterceptor).IsAssignableFrom(t))
+                .Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t))
                 .ToArray();
 
             return types;
