@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.UnitTests;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
@@ -18,7 +19,17 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     {
         protected async Task<BrokeredMessageFactory> Given()
         {
-            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting {Value = 64*1024}, new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}), new SystemClock(), new NullCompressor(), new UnsupportedLargeMessageBodyStore(), new DataContractSerializer());
+            var dependencyResolver = new NullDependencyResolver();
+
+            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+                                              new MaxSmallMessageSizeSetting {Value = 64*1024},
+                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
+                                              new SystemClock(),
+                                              new NullCompressor(),
+                                              dependencyResolver,
+                                              new UnsupportedLargeMessageBodyStore(),
+                                              new NullOutboundInterceptorFactory(),
+                                              new DataContractSerializer());
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

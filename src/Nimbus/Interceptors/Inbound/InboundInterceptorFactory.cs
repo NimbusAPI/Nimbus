@@ -10,11 +10,11 @@ namespace Nimbus.Interceptors.Inbound
 {
     internal class InboundInterceptorFactory : IInboundInterceptorFactory
     {
-        private readonly GlobalInterceptorTypesSetting _globalInterceptorTypes;
+        private readonly GlobalInboundInterceptorTypesSetting _globalInboundInterceptorTypes;
 
-        public InboundInterceptorFactory(GlobalInterceptorTypesSetting globalInterceptorTypes)
+        public InboundInterceptorFactory(GlobalInboundInterceptorTypesSetting globalInboundInterceptorTypes)
         {
-            _globalInterceptorTypes = globalInterceptorTypes;
+            _globalInboundInterceptorTypes = globalInboundInterceptorTypes;
         }
 
         public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message)
@@ -38,7 +38,7 @@ namespace Nimbus.Interceptors.Inbound
 
         private IEnumerable<Type> GetGlobalInterceptorTypes()
         {
-            var globalInterceptorTypes = _globalInterceptorTypes.Value
+            var globalInterceptorTypes = _globalInboundInterceptorTypes.Value
                                                                 .ToArray();
             return globalInterceptorTypes;
         }

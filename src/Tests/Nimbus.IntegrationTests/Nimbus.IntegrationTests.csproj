@@ -184,6 +184,10 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Nimbus.UnitTests\Nimbus.UnitTests.csproj">
+      <Project>{3a562499-3da9-469e-88b6-2437fc23dd24}</Project>
+      <Name>Nimbus.UnitTests</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

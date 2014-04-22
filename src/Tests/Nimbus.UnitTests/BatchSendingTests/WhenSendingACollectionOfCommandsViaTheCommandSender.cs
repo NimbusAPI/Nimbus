@@ -34,7 +34,15 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), replyQueueNameSetting, clock, new NullCompressor(), new UnsupportedLargeMessageBodyStore(), serializer);
+            var brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+                                                                    new MaxSmallMessageSizeSetting(),
+                                                                    replyQueueNameSetting,
+                                                                    clock,
+                                                                    new NullCompressor(),
+                                                                    new NullDependencyResolver(),
+                                                                    new UnsupportedLargeMessageBodyStore(),
+                                                                    new NullOutboundInterceptorFactory(),
+                                                                    serializer);
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
 

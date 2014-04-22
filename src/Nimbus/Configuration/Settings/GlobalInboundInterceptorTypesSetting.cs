@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    public class GlobalInterceptorTypesSetting : Setting<Type[]>
+    public class GlobalInboundInterceptorTypesSetting : Setting<Type[]>
     {
         public override Type[] Default
         {

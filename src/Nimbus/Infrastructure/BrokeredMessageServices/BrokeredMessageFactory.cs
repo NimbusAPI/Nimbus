@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices
@@ -18,15 +20,18 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly IClock _clock;
         private readonly ICompressor _compressor;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
+        private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ISerializer _serializer;
+        private IDependencyResolver _dependencyResolver;
 
         public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       ReplyQueueNameSetting replyQueueName,
                                       IClock clock,
                                       ICompressor compressor,
-                                      ILargeMessageBodyStore largeMessageBodyStore,
-                                      ISerializer serializer)
+                                      IDependencyResolver dependencyResolver,
+            ILargeMessageBodyStore largeMessageBodyStore,
+                                      IOutboundInterceptorFactory outboundInterceptorFactory, ISerializer serializer)
         {
             _maxLargeMessageSize = maxLargeMessageSize;
             _maxSmallMessageSize = maxSmallMessageSize;
@@ -34,17 +39,19 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             _clock = clock;
             _compressor = compressor;
             _largeMessageBodyStore = largeMessageBodyStore;
+            _outboundInterceptorFactory = outboundInterceptorFactory;
             _serializer = serializer;
+            _dependencyResolver = dependencyResolver;
         }
 
         public Task<BrokeredMessage> Create(object serializableObject = null)
         {
             return Task.Run(async () =>
                                   {
-                                      BrokeredMessage message;
+                                      BrokeredMessage brokeredMessage;
                                       if (serializableObject == null)
                                       {
-                                          message = new BrokeredMessage();
+                                          brokeredMessage = new BrokeredMessage();
                                       }
                                       else
                                       {
@@ -60,23 +67,32 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
-                                              message = new BrokeredMessage();
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(message.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
-                                              message.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
+                                              brokeredMessage = new BrokeredMessage();
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
+                                              brokeredMessage.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
                                               //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
                                           else
                                           {
-                                              message = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
                                           }
 
-                                          message.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
+                                          brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
-                                      message.ReplyTo = _replyQueueName;
-                                      message.CorrelationId = message.MessageId; // Use the MessageId as a default CorrelationId
+                                      brokeredMessage.ReplyTo = _replyQueueName;
+                                      brokeredMessage.CorrelationId = brokeredMessage.MessageId; // Use the MessageId as a default CorrelationId
 
-                                      return message;
+                                      using (var scope = _dependencyResolver.CreateChildScope())
+                                      {
+                                          var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
+                                          foreach (var interceptor in interceptors)
+                                          {
+                                              await interceptor.Decorate(brokeredMessage, serializableObject);
+                                          }
+                                      }
+
+                                      return brokeredMessage;
                                   });
         }
 

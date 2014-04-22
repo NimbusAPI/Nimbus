@@ -32,7 +32,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithMaxDeliveryAttempts(1)
-                                      .WithGlobalInterceptorTypes(typeof (SomeGlobalInterceptor))
+                                      .WithGlobalInboundInterceptorTypes(typeof (SomeGlobalInterceptor))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>

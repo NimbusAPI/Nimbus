@@ -70,7 +70,8 @@
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
-    <Compile Include="Configuration\Settings\GlobalInterceptorTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\GlobalInboundInterceptorTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
@@ -78,7 +79,9 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
+    <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptorFactory.cs" />
     <Compile Include="Infrastructure\DependencyResolution\DependencyResolver.cs" />
     <Compile Include="Infrastructure\DependencyResolution\DependencyResolverScope.cs" />
@@ -136,10 +139,10 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
-    <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
-    <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\InterceptorAttribute.cs" />
+    <Compile Include="Interceptors\Inbound\IOutboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
+    <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />
@@ -184,9 +187,7 @@
       <Name>Nimbus.MessageContracts</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interceptors\Outbound\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -28,7 +28,15 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             _serializer = Substitute.For<ISerializer>();
             _replyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"});
 
-            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), _replyQueueNameSetting, _clock, new NullCompressor(), new UnsupportedLargeMessageBodyStore(), _serializer);
+            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+                                              new MaxSmallMessageSizeSetting(),
+                                              _replyQueueNameSetting,
+                                              _clock,
+                                              new NullCompressor(),
+                                              new NullDependencyResolver(),
+                                              new UnsupportedLargeMessageBodyStore(),
+                                              new NullOutboundInterceptorFactory(),
+                                              _serializer);
         }
 
         [TestFixture]

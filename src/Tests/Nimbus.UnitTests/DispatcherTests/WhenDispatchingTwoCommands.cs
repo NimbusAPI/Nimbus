@@ -38,9 +38,22 @@ namespace Nimbus.UnitTests.DispatcherTests
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
 
-            _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), replyQueueNameSetting, clock, new NullCompressor(), new UnsupportedLargeMessageBodyStore(), serializer);
+            _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+                                                                 new MaxSmallMessageSizeSetting(),
+                                                                 replyQueueNameSetting,
+                                                                 clock,
+                                                                 new NullCompressor(),
+                                                                 new NullDependencyResolver(),
+                                                                 new UnsupportedLargeMessageBodyStore(),
+                                                                 new NullOutboundInterceptorFactory(),
+                                                                 serializer);
 
-            _commandDispatcher = new CommandMessageDispatcher(Subject, new NullInboundInterceptorFactory(), _brokeredMessageFactory, typeof (FooCommand), new SystemClock(), typeof (BrokerTestCommandHandler));
+            _commandDispatcher = new CommandMessageDispatcher(Subject,
+                                                              new NullInboundInterceptorFactory(),
+                                                              _brokeredMessageFactory,
+                                                              typeof (FooCommand),
+                                                              new SystemClock(),
+                                                              typeof (BrokerTestCommandHandler));
         }
 
         protected override async Task When()

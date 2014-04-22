@@ -12,7 +12,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Configuration
 {
-    public class BusBuilderConfiguration: INimbusConfiguration
+    public class BusBuilderConfiguration : INimbusConfiguration
     {
         internal ITypeProvider TypeProvider { get; set; }
         internal IDependencyResolver DependencyResolver { get; set; }
@@ -31,7 +31,8 @@ namespace Nimbus.Configuration
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
-        internal GlobalInterceptorTypesSetting GlobalInterceptorTypes { get; set; }
+        internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
+        internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
 
         internal BusBuilderConfiguration()
         {

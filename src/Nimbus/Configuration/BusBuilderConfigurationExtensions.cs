@@ -96,9 +96,14 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithGlobalInterceptorTypes(this BusBuilderConfiguration configuration, params Type[] interceptorTypes)
+        public static BusBuilderConfiguration WithGlobalInboundInterceptorTypes(this BusBuilderConfiguration configuration, params Type[] interceptorTypes)
         {
-            configuration.GlobalInterceptorTypes = new GlobalInterceptorTypesSetting {Value = interceptorTypes};
+            configuration.GlobalInboundInterceptorTypes = new GlobalInboundInterceptorTypesSetting {Value = interceptorTypes};
+            return configuration;
+        }
+        public static BusBuilderConfiguration WithGlobalOutboundInterceptorTypes(this BusBuilderConfiguration configuration, params Type[] interceptorTypes)
+        {
+            configuration.GlobalOutboundInterceptorTypes = new GlobalOutboundInterceptorTypesSetting {Value = interceptorTypes};
             return configuration;
         }
 
