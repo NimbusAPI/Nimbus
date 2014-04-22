@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nimbus.Extensions
 {
-    public static class TaskExtensions
+    internal static class TaskExtensions
     {
         public static void WaitAll(this IEnumerable<Task> tasks)
         {
