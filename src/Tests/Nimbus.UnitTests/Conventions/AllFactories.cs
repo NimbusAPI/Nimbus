@@ -7,6 +7,7 @@ using Nimbus.Configuration;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices;
+using Nimbus.Interceptors;
 using NUnit.Framework;
 using Shouldly;
 
@@ -41,6 +42,7 @@ namespace Nimbus.UnitTests.Conventions
             private IEnumerable<Type> GetExcludedTypes()
             {
                 yield return typeof (BrokeredMessageFactory);
+                yield return typeof (InterceptorFactory);
             }
 
             IEnumerator IEnumerable.GetEnumerator()
