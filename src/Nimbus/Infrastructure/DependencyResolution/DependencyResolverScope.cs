@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
@@ -24,9 +25,7 @@ namespace Nimbus.Infrastructure.DependencyResolution
 
         public TComponent Resolve<TComponent>()
         {
-            var component = _componentTypes
-                .Where(t => typeof (TComponent).IsAssignableFrom(t))
-                .Where(t => t.IsInstantiable())
+            var component = ComponentsOfType<TComponent>()
                 .Select(t => (TComponent) CreateInstance(t))
                 .First();
 
@@ -37,9 +36,7 @@ namespace Nimbus.Infrastructure.DependencyResolution
 
         public TComponent Resolve<TComponent>(string componentName)
         {
-            var component = _componentTypes
-                .Where(t => typeof (TComponent).IsAssignableFrom(t))
-                .Where(t => t.IsInstantiable())
+            var component = ComponentsOfType<TComponent>()
                 .Where(t => string.CompareOrdinal(t.FullName, componentName) == 0)
                 .Select(t => (TComponent) CreateInstance(t))
                 .First();
@@ -49,9 +46,29 @@ namespace Nimbus.Infrastructure.DependencyResolution
             return component;
         }
 
-        public TComponent[] ResolveAll<TComponent>()
+        public object Resolve(Type componentType, string componentName)
         {
-            throw new NotImplementedException();
+            var component = ComponentsOfType(componentType)
+                .Where(t => string.CompareOrdinal(t.FullName, componentName) == 0)
+                .Select(CreateInstance)
+                .First();
+
+            Track(component);
+
+            return component;
+        }
+
+        private IEnumerable<Type> ComponentsOfType<TComponent>()
+        {
+            return ComponentsOfType(typeof (TComponent));
+        }
+
+        private IEnumerable<Type> ComponentsOfType(Type componentType)
+        {
+            //FIXME doesn't handle contravariance yet
+            return _componentTypes
+                .Where(componentType.IsAssignableFrom)
+                .Where(t => t.IsInstantiable());
         }
 
         private object CreateInstance(Type implementingType)

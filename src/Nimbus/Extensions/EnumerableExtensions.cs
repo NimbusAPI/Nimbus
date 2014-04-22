@@ -42,5 +42,15 @@ namespace Nimbus.Extensions
                 foreach (var descendant in children(item)) yield return descendant;
             }
         }
+
+        internal static IEnumerable<T> NotNull<T>(this IEnumerable<T> source) where T : class
+        {
+            return source.Where(item => item != null);
+        }
+
+        internal static IEnumerable<T> DistinctBy<T>(this IEnumerable<T> source, Func<T, object> key)
+        {
+            return source.GroupBy(key).Select(g => g.First());
+        }
     }
 }

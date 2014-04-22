@@ -31,6 +31,7 @@ namespace Nimbus.Configuration
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
+        internal GlobalInterceptorTypesSetting GlobalInterceptorTypes { get; set; }
 
         internal BusBuilderConfiguration()
         {

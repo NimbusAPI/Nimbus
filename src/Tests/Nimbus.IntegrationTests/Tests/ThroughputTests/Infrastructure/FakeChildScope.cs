@@ -1,3 +1,4 @@
+using System;
 using Nimbus.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
 
@@ -20,6 +21,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
         public TComponent Resolve<TComponent>(string componentName)
         {
             return (TComponent) (object) _fakeHandler;
+        }
+
+        public object Resolve(Type componentType, string componentName)
+        {
+            throw new NotImplementedException();
         }
 
         public TComponent[] ResolveAll<TComponent>()

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
@@ -94,6 +93,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithLogger(this BusBuilderConfiguration configuration, ILogger logger)
         {
             configuration.Logger = logger;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithGlobalInterceptorTypes(this BusBuilderConfiguration configuration, params Type[] interceptorTypes)
+        {
+            configuration.GlobalInterceptorTypes = new GlobalInterceptorTypesSetting {Value = interceptorTypes};
             return configuration;
         }
 

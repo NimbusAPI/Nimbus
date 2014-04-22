@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Interceptors;
 
 namespace Nimbus.Infrastructure.Commands
 {
@@ -13,6 +14,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IInterceptorFactory _interceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly ITypeProvider _typeProvider;
@@ -22,6 +24,7 @@ namespace Nimbus.Infrastructure.Commands
         public CommandMessagePumpsFactory(IBrokeredMessageFactory brokeredMessageFactory,
                                           IClock clock,
                                           IDependencyResolver dependencyResolver,
+                                          IInterceptorFactory interceptorFactory,
                                           ILogger logger,
                                           INimbusMessagingFactory messagingFactory,
                                           ITypeProvider typeProvider)
@@ -29,6 +32,7 @@ namespace Nimbus.Infrastructure.Commands
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _interceptorFactory = interceptorFactory;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _typeProvider = typeProvider;
@@ -48,7 +52,7 @@ namespace Nimbus.Infrastructure.Commands
 
                     var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
 
-                    var dispatcher = new CommandMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, commandType, _clock, handlerType);
+                    var dispatcher = new CommandMessageDispatcher(_dependencyResolver, _interceptorFactory, _brokeredMessageFactory, commandType, _clock, handlerType);
                     _garbageMan.Add(dispatcher);
 
                     var pump = new MessagePump(_clock, _logger, dispatcher, messageReceiver);

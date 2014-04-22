@@ -70,6 +70,7 @@
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
+    <Compile Include="Configuration\Settings\GlobalInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
@@ -77,6 +78,8 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Interceptors\IInterceptorFactory.cs" />
+    <Compile Include="Interceptors\InterceptorFactory.cs" />
     <Compile Include="Infrastructure\DependencyResolution\DependencyResolver.cs" />
     <Compile Include="Infrastructure\DependencyResolution\DependencyResolverScope.cs" />
     <Compile Include="Infrastructure\DependencyResolution\TrackingScope.cs" />
@@ -133,10 +136,9 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
-    <Compile Include="Interceptors\ICommandInterceptor.cs" />
-    <Compile Include="Interceptors\IEventInterceptor.cs" />
+    <Compile Include="Interceptors\MessageInterceptor.cs" />
     <Compile Include="Interceptors\IMessageInterceptor.cs" />
-    <Compile Include="Interceptors\IRequestInterceptor.cs" />
+    <Compile Include="Interceptors\InterceptorAttribute.cs" />
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />

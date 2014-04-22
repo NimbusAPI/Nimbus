@@ -1,15 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors
 {
-    public interface IMessageInterceptor<in TBusMessage>
+    public interface IMessageInterceptor
     {
         int Priority { get; }
 
-        Task OnHandlerExecuting(TBusMessage busEvent, BrokeredMessage brokeredMessage);
-        Task OnHandlerSuccess(TBusMessage busEvent, BrokeredMessage brokeredMessage);
-        Task OnHandlerError(TBusMessage busEvent, BrokeredMessage brokeredMessage, Exception exception);
+        Task OnCommandHandlerExecuting(IBusCommand busCommand, BrokeredMessage brokeredMessage);
+        Task OnCommandHandlerSuccess(IBusCommand busCommand, BrokeredMessage brokeredMessage);
+        Task OnCommandHandlerError(IBusCommand busCommand, BrokeredMessage brokeredMessage, Exception exception);
     }
 }

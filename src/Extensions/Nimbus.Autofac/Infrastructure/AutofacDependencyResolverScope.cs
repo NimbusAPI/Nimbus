@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Nimbus.DependencyResolution;
 
 namespace Nimbus.Autofac.Infrastructure
@@ -22,9 +23,9 @@ namespace Nimbus.Autofac.Infrastructure
             return _lifetimeScope.ResolveNamed<TComponent>(componentName);
         }
 
-        public TComponent[] ResolveAll<TComponent>()
+        public object Resolve(Type componentType, string componentName)
         {
-            return _lifetimeScope.Resolve<TComponent[]>();
+            return _lifetimeScope.ResolveNamed(componentName, componentType);
         }
 
         public void Dispose()

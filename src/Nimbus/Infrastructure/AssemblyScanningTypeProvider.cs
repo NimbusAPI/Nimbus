@@ -158,7 +158,7 @@ namespace Nimbus.Infrastructure
         private Type[] ScanForInterceptorTypes()
         {
             var types = AllInstantiableTypesInScannedAssemblies
-                .Where(t => t.IsClosedTypeOf(typeof (IMessageInterceptor<>)))
+                .Where(t => typeof (IMessageInterceptor).IsAssignableFrom(t))
                 .ToArray();
 
             return types;

@@ -40,7 +40,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(), new MaxSmallMessageSizeSetting(), replyQueueNameSetting, clock, new NullCompressor(), new UnsupportedLargeMessageBodyStore(), serializer);
 
-            _commandDispatcher = new CommandMessageDispatcher(Subject, _brokeredMessageFactory, typeof (FooCommand), new SystemClock(), typeof (BrokerTestCommandHandler));
+            _commandDispatcher = new CommandMessageDispatcher(Subject, new NullInterceptorFactory(), _brokeredMessageFactory, typeof (FooCommand), new SystemClock(), typeof (BrokerTestCommandHandler));
         }
 
         protected override async Task When()

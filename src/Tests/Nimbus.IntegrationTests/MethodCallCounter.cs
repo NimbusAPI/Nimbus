@@ -10,9 +10,9 @@ namespace Nimbus.IntegrationTests
 {
     public static class MethodCallCounter
     {
-        private static readonly ConcurrentDictionary<MethodInfo, ConcurrentBag<object>> _allReceivedCalls = new ConcurrentDictionary<MethodInfo, ConcurrentBag<object>>();
+        private static readonly ConcurrentDictionary<string, ConcurrentBag<object>> _allReceivedCalls = new ConcurrentDictionary<string, ConcurrentBag<object>>();
 
-        public static IEnumerable<KeyValuePair<MethodInfo, ConcurrentBag<object>>> AllReceivedCalls
+        public static IEnumerable<KeyValuePair<string, ConcurrentBag<object>>> AllReceivedCalls
         {
             get { return _allReceivedCalls; }
         }
@@ -29,7 +29,7 @@ namespace Nimbus.IntegrationTests
             var getter = getterLambda.Compile();
             var message = getter();
 
-            var messageBag = _allReceivedCalls.GetOrAdd(method, new ConcurrentBag<object>());
+            var messageBag = _allReceivedCalls.GetOrAdd(GetMethodKey(expr.Type, method), new ConcurrentBag<object>());
             messageBag.Add(message);
 
             var methodName = "{0}.{1}".FormatWith(typeof (T).FullName, method.Name);
@@ -50,13 +50,26 @@ namespace Nimbus.IntegrationTests
         {
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
-            var messageBag = _allReceivedCalls.GetOrAdd(method, new ConcurrentBag<object>());
+            var messageBag = _allReceivedCalls.GetOrAdd(GetMethodKey(expr.Type, method), new ConcurrentBag<object>());
             return messageBag;
         }
 
         public static void Clear()
         {
             _allReceivedCalls.Clear();
+        }
+
+        private static string GetMethodKey(Type type, MethodInfo method)
+        {
+            var parameters = method
+                .GetParameters()
+                .Select(p => "{0} {1}".FormatWith(p.ParameterType, p.Name))
+                .ToArray();
+
+            var parameterString = string.Join(", ", parameters);
+
+            var key = "{0}.{1}({2})".FormatWith(type.FullName, method.Name, parameterString);
+            return key;
         }
     }
 }

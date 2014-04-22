@@ -26,9 +26,9 @@ namespace Nimbus.Windsor.Infrastructure
             return _kernel.Resolve<TComponent>(componentName);
         }
 
-        public TComponent[] ResolveAll<TComponent>()
+        public object Resolve(Type componentType, string componentName)
         {
-            return _kernel.ResolveAll<TComponent>();
+            return _kernel.Resolve(componentName, componentType);
         }
 
         public void Dispose()

@@ -5,6 +5,6 @@ namespace Nimbus.DependencyResolution
     public interface IDependencyResolverScope : ICreateChildScopes, IDisposable
     {
         TComponent Resolve<TComponent>(string componentName);
-        TComponent[] ResolveAll<TComponent>();
+        object Resolve(Type componentType, string componentName);
     }
 }

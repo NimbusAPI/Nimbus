@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -12,6 +13,7 @@ namespace Nimbus.Infrastructure.Commands
     internal class CommandMessageDispatcher : IMessageDispatcher
     {
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IInterceptorFactory _interceptorFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly Type _commandType;
         private readonly IClock _clock;
@@ -19,12 +21,14 @@ namespace Nimbus.Infrastructure.Commands
 
         public CommandMessageDispatcher(
             IDependencyResolver dependencyResolver,
+            IInterceptorFactory interceptorFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
             Type commandType,
             IClock clock,
             Type handlerType)
         {
             _dependencyResolver = dependencyResolver;
+            _interceptorFactory = interceptorFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
             _commandType = commandType;
             _clock = clock;
@@ -39,45 +43,48 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
         {
-            using (var scope = _dependencyResolver.CreateChildScope())
+            try
             {
-                var interceptors = scope.ResolveAll<ICommandInterceptor<TBusCommand>>()
-                    .OrderByDescending(i => i.Priority)
-                    .ThenBy(i => i.GetType().FullName)
-                    .ToArray();
-
-                foreach (var interceptor in interceptors)
+                using (var scope = _dependencyResolver.CreateChildScope())
                 {
-                    await interceptor.OnHandlerExecuting(busCommand, message);
-                }
-
-                Exception exception;
-                try
-                {
-
                     var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
-                    var handlerTask = handler.Handle(busCommand);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
-                    await wrapper.AwaitCompletion();
+                    var interceptors = _interceptorFactory.CreateInterceptors(scope, handler, message);
+
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnCommandHandlerExecuting(busCommand, message);
+                    }
+
+                    Exception exception;
+                    try
+                    {
+                        var handlerTask = handler.Handle(busCommand);
+                        var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
+                        await wrapper.AwaitCompletion();
+
+                        foreach (var interceptor in interceptors.Reverse())
+                        {
+                            await interceptor.OnCommandHandlerSuccess(busCommand, message);
+                        }
+                        return;
+                    }
+                    catch (Exception exc)
+                    {
+                        exception = exc;
+                    }
 
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnHandlerSuccess(busCommand, message);
+                        await interceptor.OnCommandHandlerError(busCommand, message, exception);
                     }
-                    return;
+                    throw exception;
                 }
-                catch (Exception exc)
-                {
-                    exception = exc;
-                }
-
-                foreach (var interceptor in interceptors.Reverse())
-                {
-                    await interceptor.OnHandlerError(busCommand, message, exception);
-                }
-                throw exception;
+            }
+            catch (Exception e)
+            {
+                if (Debugger.IsAttached) Debugger.Break();
+                throw;
             }
         }
     }
-
 }

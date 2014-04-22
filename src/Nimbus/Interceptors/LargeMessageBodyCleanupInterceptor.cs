@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors
 {
-    internal class LargeMessageBodyCleanupInterceptor : ICommandInterceptor<IBusCommand>
+    internal class LargeMessageBodyCleanupInterceptor : MessageInterceptor
     {
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 
@@ -15,26 +14,23 @@ namespace Nimbus.Interceptors
             _largeMessageBodyStore = largeMessageBodyStore;
         }
 
-        public int Priority
+        public override int Priority
         {
             get { return 0; }
         }
 
-        public async Task OnHandlerExecuting(IBusCommand busCommand, BrokeredMessage brokeredMessage)
+        public override async Task OnCommandHandlerSuccess(IBusCommand buscommand, BrokeredMessage brokeredMessage)
         {
+            await DeleteAssociatedMessageBody(brokeredMessage);
         }
 
-        public async Task OnHandlerSuccess(IBusCommand busCommand, BrokeredMessage brokeredMessage)
+        private async Task DeleteAssociatedMessageBody(BrokeredMessage brokeredMessage)
         {
             object blobIdObject;
             if (!brokeredMessage.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobIdObject)) return;
 
-            var blobId = blobIdObject as string;
+            var blobId = (string) blobIdObject;
             await _largeMessageBodyStore.Delete(blobId);
-        }
-
-        public async Task OnHandlerError(IBusCommand busCommand, BrokeredMessage brokeredMessage, Exception exception)
-        {
         }
     }
 }
