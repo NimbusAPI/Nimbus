@@ -21,7 +21,7 @@ namespace Nimbus.Interceptors
         {
             var globalInterceptors = GetGlobalInterceptorTypes();
             var classLevelInterceptors = GetClassLevelInterceptorTypes(handler);
-            var methodLevelInterceptors = GetMethodLevelInterceptorTypes(scope, handler);
+            var methodLevelInterceptors = GetMethodLevelInterceptorTypes(handler, message);
 
             var interceptors = new Type[0]
                 .Union(globalInterceptors)
@@ -38,27 +38,41 @@ namespace Nimbus.Interceptors
 
         private IEnumerable<Type> GetGlobalInterceptorTypes()
         {
-            var globalInterceptors = _globalInterceptorTypes.Value
-                                                            .ToArray();
-            return globalInterceptors;
+            var globalInterceptorTypes = _globalInterceptorTypes.Value
+                                                                .ToArray();
+            return globalInterceptorTypes;
         }
 
         private static IEnumerable<Type> GetClassLevelInterceptorTypes(object handler)
         {
             var classHierarchy = new[] {handler.GetType()}.DepthFirst(t => new[] {t.BaseType}.NotNull()).ToArray();
 
-            var classLevelInterceptors = classHierarchy
+            var classLevelInterceptorTypes = classHierarchy
                 .SelectMany(t => t.GetCustomAttributes<InterceptorAttribute>())
                 .Select(attr => attr.InterceptorType)
                 .ToArray();
 
-            return classLevelInterceptors;
+            return classLevelInterceptorTypes;
         }
 
-        private IEnumerable<Type> GetMethodLevelInterceptorTypes(IDependencyResolverScope scope, object handler)
+        private static IEnumerable<Type> GetMethodLevelInterceptorTypes(object handler, object message)
         {
-            //FIXME it might be nice to implement this ;)
-            yield break;
+            var messageType = message.GetType();
+
+            var method = handler.GetType().GetMethods()
+                                .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
+                                .Where(m => m.GetParameters().Count() == 1)
+                                .Where(m => m.GetParameters().First().ParameterType == messageType)
+                                .Single();
+
+            var methodHierarchy = new[] {method}.DepthFirst(m => new[] {m.GetBaseDefinition()}.NotNull()).ToArray();
+
+            var methodLevelInterceptorTypes = methodHierarchy
+                .SelectMany(m => m.GetCustomAttributes<InterceptorAttribute>())
+                .Select(attr => attr.InterceptorType)
+                .ToArray();
+
+            return methodLevelInterceptorTypes;
         }
     }
 }

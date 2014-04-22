@@ -48,7 +48,7 @@ namespace Nimbus.Infrastructure.Commands
                 using (var scope = _dependencyResolver.CreateChildScope())
                 {
                     var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
-                    var interceptors = _interceptorFactory.CreateInterceptors(scope, handler, message);
+                    var interceptors = _interceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
                     foreach (var interceptor in interceptors)
                     {

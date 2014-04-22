@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
+using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
 using Nimbus.Logger;
 using NUnit.Framework;
@@ -61,6 +62,18 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         }
 
         [Test]
+        public async Task TheBaseMethodLevelInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheBaseClassLevelInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseClassLevelInterceptor>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
         public async Task TheClassLevelInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeClassLevelInterceptor>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
@@ -75,7 +88,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         [Test]
         public async Task NoOtherMethodLevelInterceptorsShouldHaveBeenInvoked()
         {
-            MethodCallCounter.AllReceivedMessages.OfType<FooCommand>().Count().ShouldBe(5);
+            MethodCallCounter.AllReceivedMessages.OfType<FooCommand>().Count().ShouldBe(11);
         }
     }
 }
