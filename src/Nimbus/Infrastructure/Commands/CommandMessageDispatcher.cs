@@ -81,7 +81,7 @@ namespace Nimbus.Infrastructure.Commands
                     throw exception;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (Debugger.IsAttached) Debugger.Break();
                 throw;
