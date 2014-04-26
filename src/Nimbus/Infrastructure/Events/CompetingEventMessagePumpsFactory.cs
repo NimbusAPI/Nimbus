@@ -6,6 +6,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -17,6 +18,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -25,6 +27,7 @@ namespace Nimbus.Infrastructure.Events
                                                  IBrokeredMessageFactory brokeredMessageFactory,
                                                  IClock clock,
                                                  IDependencyResolver dependencyResolver,
+                                                 IInboundInterceptorFactory inboundInterceptorFactory,
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
                                                  ITypeProvider typeProvider)
@@ -36,6 +39,7 @@ namespace Nimbus.Infrastructure.Events
             _clock = clock;
             _dependencyResolver = dependencyResolver;
             _typeProvider = typeProvider;
+            _inboundInterceptorFactory = inboundInterceptorFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -56,7 +60,12 @@ namespace Nimbus.Infrastructure.Events
 
                     var receiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
 
-                    var dispatcher = new CompetingEventMessageDispatcher(_dependencyResolver, _brokeredMessageFactory, handlerType, _clock, eventType);
+                    var dispatcher = new CompetingEventMessageDispatcher(_dependencyResolver,
+                                                                         _brokeredMessageFactory,
+                                                                         _inboundInterceptorFactory,
+                                                                         handlerType,
+                                                                         _clock,
+                                                                         eventType);
                     _garbageMan.Add(dispatcher);
 
                     var pump = new MessagePump(_clock, _logger, dispatcher, receiver);

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
+using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -9,21 +10,25 @@ namespace Nimbus.Infrastructure.Events
     {
         public CompetingEventMessageDispatcher(IDependencyResolver dependencyResolver,
                                                IBrokeredMessageFactory brokeredMessageFactory,
+                                               IInboundInterceptorFactory inboundInterceptorFactory,
                                                Type handlerType,
                                                IClock clock,
                                                Type eventType)
-            : base(dependencyResolver, brokeredMessageFactory, handlerType, clock, eventType)
+            : base(dependencyResolver, brokeredMessageFactory, inboundInterceptorFactory, handlerType, clock, eventType)
         {
         }
 
-        protected override void CreateHandlerTaskFromScope<TBusEvent>(TBusEvent busEvent,
-                                                                      IDependencyResolverScope scope,
-                                                                      out Task handlerTask,
-                                                                      out ILongRunningTask longRunningHandler)
+        protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent)
         {
             var handler = scope.Resolve<IHandleCompetingEvent<TBusEvent>>(HandlerType.FullName);
-            handlerTask = handler.Handle(busEvent);
-            longRunningHandler = handler as ILongRunningTask;
+            return handler;
+        }
+
+        protected override Task DispatchToHandleMethod<TBusEvent>(TBusEvent busEvent, object handler)
+        {
+            var genericHandler = (IHandleCompetingEvent<TBusEvent>) handler;
+            var handlerTask = genericHandler.Handle(busEvent);
+            return handlerTask;
         }
     }
 }
