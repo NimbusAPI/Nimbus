@@ -29,12 +29,12 @@ namespace Nimbus.Infrastructure
 
         public static string SubscriptionNameFor(string applicationName, Type handlerType)
         {
-            return Sanitize(string.Join(".", new[] {applicationName, handlerType.Name}));
+            return Shorten(Sanitize(string.Join(".", new[] {applicationName, handlerType.Name})), 50);
         }
 
         public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
         {
-            return Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name}));
+            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name})), 50);
         }
 
         private static string StripGenericQualification(Type type)
@@ -52,6 +52,17 @@ namespace Nimbus.Infrastructure
             return path;
         }
 
+        private static string Shorten(string path, int maxlength)
+        {
+            if (path.Length <= maxlength)
+                return path;
+
+            var hash = CalculateAdler32Hash(path);
+
+            var shortPath = path.Substring(0, maxlength - hash.Length) + hash;
+            return shortPath;
+        }
+
         private static char SanitiseCharacter(char currentChar)
         {
             var whiteList = _queueCharacterWhitelist.ToCharArray();
@@ -61,5 +72,39 @@ namespace Nimbus.Infrastructure
 
             return currentChar;
         }
+
+        private static string CalculateAdler32Hash(string inputString)
+        {
+            const uint BASE = 65521;
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(inputString);
+            uint checksum = 1;
+            int offset = 0;
+            int count = buffer.Length;
+
+
+            uint s1 = checksum & 0xFFFF;
+            uint s2 = checksum >> 16;
+
+            while (count > 0)
+            {
+                int n = 3800;
+                if (n > count)
+                {
+                    n = count;
+                }
+                count -= n;
+                while (--n >= 0)
+                {
+                    s1 = s1 + (uint)(buffer[offset++] & 0xff);
+                    s2 = s2 + s1;
+                }
+                s1 %= BASE;
+                s2 %= BASE;
+            }
+
+            checksum = (s2 << 16) | s1;
+            return checksum.ToString();
+        }
+
     }
 }

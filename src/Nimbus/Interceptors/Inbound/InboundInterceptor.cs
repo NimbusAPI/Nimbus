@@ -12,6 +12,7 @@ namespace Nimbus.Interceptors.Inbound
             get { return default(int); }
         }
 
+#pragma warning disable 1998
         public virtual async Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
             where TBusCommand : IBusCommand
         {
@@ -47,19 +48,17 @@ namespace Nimbus.Interceptors.Inbound
         {
         }
 
-        public virtual async Task OnEventHandlerExecuting<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
-            where TBusEvent : IBusEvent
+        public virtual async Task OnCommandHandlerExecuting(IBusCommand busCommand, BrokeredMessage brokeredMessage)
         {
         }
 
-        public virtual async Task OnEventHandlerSuccess<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
-            where TBusEvent : IBusEvent
+        public virtual async Task OnCommandHandlerSuccess(IBusCommand busCommand, BrokeredMessage brokeredMessage)
         {
         }
 
-        public virtual async Task OnEventHandlerError<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage, Exception exception)
-            where TBusEvent : IBusEvent
+        public virtual async Task OnCommandHandlerError(IBusCommand busCommand, BrokeredMessage brokeredMessage, Exception exception)
         {
         }
+#pragma warning restore 1998
     }
 }

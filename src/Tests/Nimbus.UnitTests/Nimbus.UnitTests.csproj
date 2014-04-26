@@ -104,6 +104,8 @@
     <Compile Include="Conventions\CoreHandlerInterfaces.cs" />
     <Compile Include="Conventions\CoreInfrastructureInterfaces.cs" />
     <Compile Include="Conventions\NimbusCode.cs" />
+    <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
+    <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
     <Compile Include="NullDependencyResolver.cs" />
     <Compile Include="NullDependencyResolverScope.cs" />
     <Compile Include="NullInboundInterceptorFactory.cs" />

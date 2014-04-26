@@ -1,4 +1,5 @@
-﻿namespace Nimbus.UnitTests.InfrastructureTests.MessageContracts
+﻿// ReSharper disable once CheckNamespace
+namespace Nimbus.UnitTests
 {
     public class MyCommand<T>
     {
