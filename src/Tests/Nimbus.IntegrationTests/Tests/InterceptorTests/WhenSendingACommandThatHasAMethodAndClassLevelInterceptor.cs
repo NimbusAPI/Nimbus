@@ -14,7 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    [Timeout(15 * 1000)]
+    [Timeout(15*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         protected override Task<IBus> Given()
@@ -59,31 +59,31 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         [Test]
         public async Task TheMethodLevelInterceptorShouldHaveBeenInvoked()
         {
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
         public async Task TheBaseMethodLevelInterceptorShouldHaveBeenInvoked()
         {
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
         public async Task TheBaseClassLevelInterceptorShouldHaveBeenInvoked()
         {
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseClassLevelInterceptor>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseClassLevelInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
         public async Task TheClassLevelInterceptorShouldHaveBeenInvoked()
         {
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeClassLevelInterceptor>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeClassLevelInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
         public async Task TheGlobalInterceptorShouldHaveBeenInvoked()
         {
-            MethodCallCounter.ReceivedCallsWithAnyArg<SomeGlobalInterceptor>(i => i.OnCommandHandlerExecuting(null, null)).Count().ShouldBe(1);
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeGlobalInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]

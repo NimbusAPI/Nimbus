@@ -2,7 +2,6 @@
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors
 {
@@ -20,7 +19,7 @@ namespace Nimbus.Interceptors
             get { return 0; }
         }
 
-        public override async Task OnCommandHandlerSuccess(IBusCommand buscommand, BrokeredMessage brokeredMessage)
+        public override async Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand buscommand, BrokeredMessage brokeredMessage)
         {
             await DeleteAssociatedMessageBody(brokeredMessage);
         }

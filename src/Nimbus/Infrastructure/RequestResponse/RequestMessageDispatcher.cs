@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -16,6 +17,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly Type _handlerType;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly Type _messageType;
         private readonly IClock _clock;
         private readonly ILogger _logger;
@@ -23,6 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestMessageDispatcher(
             INimbusMessagingFactory messagingFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
+            IInboundInterceptorFactory inboundInterceptorFactory,
             Type messageType,
             IClock clock,
             ILogger logger,
@@ -31,6 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
+            _inboundInterceptorFactory = inboundInterceptorFactory;
             _messageType = messageType;
             _clock = clock;
             _logger = logger;
@@ -59,6 +63,14 @@ namespace Nimbus.Infrastructure.RequestResponse
                 using (var scope = _dependencyResolver.CreateChildScope())
                 {
                     var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(_handlerType.FullName);
+                    var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
+
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnRequestHandlerExecuting(busRequest, message);
+                    }
+
+
                     var handlerTask = handler.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
