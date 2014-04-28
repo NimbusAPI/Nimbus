@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
+using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
@@ -17,6 +18,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly Type _commandType;
         private readonly IClock _clock;
         private readonly Type _handlerType;
+        private readonly ILogger _logger;
 
         public CommandMessageDispatcher(
             IDependencyResolver dependencyResolver,
@@ -24,7 +26,8 @@ namespace Nimbus.Infrastructure.Commands
             IBrokeredMessageFactory brokeredMessageFactory,
             Type commandType,
             IClock clock,
-            Type handlerType)
+            Type handlerType,
+            ILogger logger)
         {
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
@@ -32,6 +35,7 @@ namespace Nimbus.Infrastructure.Commands
             _commandType = commandType;
             _clock = clock;
             _handlerType = handlerType;
+            _logger = logger;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -49,7 +53,18 @@ namespace Nimbus.Infrastructure.Commands
 
                 foreach (var interceptor in interceptors)
                 {
+                    
+                    _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
                     await interceptor.OnCommandHandlerExecuting(busCommand, message);
+                    _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
                 }
 
                 Exception exception;
@@ -61,7 +76,19 @@ namespace Nimbus.Infrastructure.Commands
 
                     foreach (var interceptor in interceptors.Reverse())
                     {
+                        _logger.Debug("Executing OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
+
                         await interceptor.OnCommandHandlerSuccess(busCommand, message);
+
+                        _logger.Debug("Executed OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
                     }
                     return;
                 }
@@ -72,7 +99,20 @@ namespace Nimbus.Infrastructure.Commands
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
+                    _logger.Debug("Executing OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
+
                     await interceptor.OnCommandHandlerError(busCommand, message, exception);
+
+                    _logger.Debug("Executed OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        interceptor.GetType().FullName,
+                        message.SafelyGetBodyTypeNameOrDefault(),
+                        message.MessageId,
+                        message.CorrelationId);
+
                 }
                 throw exception;
             }

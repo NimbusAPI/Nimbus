@@ -109,7 +109,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 }
                 if (exception == null)
                 {
-                    foreach (var interceptor in interceptors)
+                    foreach (var interceptor in interceptors.Reverse())
                     {
                         _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
                         interceptor.GetType().FullName,

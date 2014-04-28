@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
+using Nimbus.Logger;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -53,7 +54,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                               _brokeredMessageFactory,
                                                               typeof (FooCommand),
                                                               new SystemClock(),
-                                                              typeof (BrokerTestCommandHandler));
+                                                              typeof (BrokerTestCommandHandler), new NullLogger());
         }
 
         protected override async Task When()

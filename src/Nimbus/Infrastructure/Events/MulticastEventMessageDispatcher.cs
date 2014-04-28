@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Logger;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -14,7 +15,7 @@ namespace Nimbus.Infrastructure.Events
                                                Type handlerType,
                                                IClock clock,
                                                Type eventType)
-            : base(dependencyResolver, brokeredMessageFactory, inboundInterceptorFactory, handlerType, clock, eventType)
+            : base(dependencyResolver, brokeredMessageFactory, inboundInterceptorFactory, handlerType, clock, eventType, new NullLogger())
         {
         }
 
