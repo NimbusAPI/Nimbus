@@ -49,7 +49,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _cancellationToken.Cancel();
 
             StopBatchReceiver();
-            await _workerTask;
+
+            // Why do we need to wait for the _workerTask to finish?
+            //await _workerTask;
         }
 
         protected abstract Task CreateBatchReceiver();
@@ -62,7 +64,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 try
                 {
-                    var messages = await FetchBatchInternal(_throttle.CurrentCount);
+                    var messages = await FetchBatch(_throttle.CurrentCount);
                     if (!_running) return;
                     if (messages.None()) continue;
 
@@ -94,6 +96,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
+        [Obsolete("The method is extremely expensive at scale, Task.Delay in a tight loop causes GC thrashing.", true)]
         private async Task<BrokeredMessage[]> FetchBatchInternal(int currentCount)
         {
             var fetchTask = FetchBatch(currentCount);
