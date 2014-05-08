@@ -115,7 +115,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing topics...");
 
             var topicsAsync = _namespaceManager().GetTopicsAsync();
-            if (!topicsAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+            if (!topicsAsync.Wait(TimeSpan.FromSeconds(60))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
             var topics = topicsAsync.Result;
             var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
@@ -159,7 +159,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing queues...");
 
             var queuesAsync = _namespaceManager().GetQueuesAsync();
-            if (!queuesAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+            if (!queuesAsync.Wait(TimeSpan.FromSeconds(60))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
             var queues = queuesAsync.Result;
             var queuePaths = queues.Select(q => q.Path)
