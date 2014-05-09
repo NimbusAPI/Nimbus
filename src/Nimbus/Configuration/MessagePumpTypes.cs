@@ -5,11 +5,12 @@ namespace Nimbus.Configuration
     [Flags]
     public enum MessagePumpTypes
     {
-        Default = Response,
-        All = -1,
+        Default = All,
 
         None = 0,
-        Response = 1,
+        All = -1,
+
+        Response = 1 << 0,
         Request = 1 << 1,
         Command = 1 << 2,
         MulticastRequest = 1 << 3,
