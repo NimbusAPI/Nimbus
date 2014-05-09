@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Exceptions;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
 using NUnit.Framework;
@@ -10,17 +9,17 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 {
     [TestFixture]
-    public class WhenSendingARequestThatWillThrow : TestForAllBuses
+    public class WhenSendingARequestThatWillThrow : TestForBus
     {
         private RequestThatWillThrowResponse _response;
         private Exception _exception;
 
-        public override Task Given(ITestHarnessBusFactory busFactory)
+        public override Task Given()
         {
             _response = null;
             _exception = null;
 
-            return base.Given(busFactory);
+            return base.Given();
         }
 
         public override async Task When()
@@ -37,40 +36,36 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheResponseShouldNotBeSet(ITestHarnessBusFactory busFactory)
+        public async Task TheResponseShouldNotBeSet()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _response.ShouldBe(null);
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task AnExceptionShouldBeReThrownOnTheClient(ITestHarnessBusFactory busFactory)
+        public async Task AnExceptionShouldBeReThrownOnTheClient()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _exception.ShouldNotBe(null);
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheExceptionShouldBeARequestFailedException(ITestHarnessBusFactory busFactory)
+        public async Task TheExceptionShouldBeARequestFailedException()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _exception.ShouldBeTypeOf<RequestFailedException>();
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(ITestHarnessBusFactory busFactory)
+        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _exception.Message.ShouldContain(RequestThatWillThrowHandler.ExceptionMessage);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -10,7 +9,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 {
     [TestFixture]
-    public class WhenSendingASixSecondMulticastRequest : TestForAllBuses
+    public class WhenSendingASixSecondMulticastRequest : TestForBus
     {
         private IEnumerable<BlackBallResponse> _response;
 
@@ -25,10 +24,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task WeShouldReceiveThreeResponses(ITestHarnessBusFactory busFactory)
+        public async Task WeShouldReceiveThreeResponses()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _response.Count().ShouldBe(3);

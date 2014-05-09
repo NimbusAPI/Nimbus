@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    public class WhenSendingACommandThatHasNoHandler : TestForAllBuses
+    public class WhenSendingACommandThatHasNoHandler : TestForBus
     {
         public override async Task When()
         {
@@ -15,10 +14,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task NothingShouldGoBang(ITestHarnessBusFactory busFactory)
+        public async Task NothingShouldGoBang()
         {
-            await Given(busFactory);
+            await Given();
             await When();
         }
     }

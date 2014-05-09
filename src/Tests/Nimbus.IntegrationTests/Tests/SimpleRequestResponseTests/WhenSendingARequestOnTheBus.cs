@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -8,7 +7,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 {
     [TestFixture]
-    public class WhenSendingARequestOnTheBus : TestForAllBuses
+    public class WhenSendingARequestOnTheBus : TestForBus
     {
         private SomeResponse _response;
 
@@ -20,10 +19,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task WeShouldGetSomethingNiceBack(ITestHarnessBusFactory busFactory)
+        public async Task WeShouldGetSomethingNiceBack()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _response.ShouldNotBe(null);

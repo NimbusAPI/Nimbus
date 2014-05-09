@@ -28,9 +28,9 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var logger = new ConsoleLogger();
 
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
-                .WithStorageDirectory(_largeMessageBodyTempPath)
-                .WithLogger(logger)
-                .Build();
+                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
+                                                                        .WithLogger(logger)
+                                                                        .Build();
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
@@ -39,8 +39,8 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
-                                                                                .WithMaxSmallMessageSize(64*1024)
-                                                                                .WithMaxLargeMessageSize(10*1048576))
+                                                                     .WithMaxSmallMessageSize(64*1024)
+                                                                     .WithMaxLargeMessageSize(10*1048576))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

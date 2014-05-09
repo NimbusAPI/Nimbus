@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using NUnit.Framework;
@@ -13,7 +12,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
     [TestFixture]
-    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : TestForAllBuses
+    public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : TestForBus
     {
         public override async Task When()
         {
@@ -23,10 +22,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
@@ -35,10 +33,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(ITestHarnessBusFactory busFactory)
+        public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
@@ -47,10 +44,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             MethodCallCounter.AllReceivedMessages
@@ -60,10 +56,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(ITestHarnessBusFactory busFactory)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             MethodCallCounter.AllReceivedMessages

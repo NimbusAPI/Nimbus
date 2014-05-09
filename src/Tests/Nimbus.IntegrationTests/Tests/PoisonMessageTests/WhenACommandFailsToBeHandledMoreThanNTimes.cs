@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -11,7 +10,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 {
     [TestFixture]
-    public class WhenACommandFailsToBeHandledMoreThanNTimes : TestForAllBuses
+    public class WhenACommandFailsToBeHandledMoreThanNTimes : TestForBus
     {
         private GoBangCommand _goBangCommand;
         private string _someContent;
@@ -32,10 +31,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(ITestHarnessBusFactory busFactory)
+        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
         {
-            await Given(busFactory);
+            await Given();
             await When();
 
             _deadLetterMessages.Count().ShouldBe(1);

@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.IntegrationTests.InfrastructureContracts;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 {
-    public class WhenPublishingAnEventThatIsNotHandled : TestForAllBuses
+    public class WhenPublishingAnEventThatIsNotHandled : TestForBus
     {
         public override async Task When()
         {
@@ -15,10 +14,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource("AllBusesTestCases")]
-        public async Task NoExceptionIsThrown(ITestHarnessBusFactory busFactory)
+        public async Task NoExceptionIsThrown()
         {
-            await Given(busFactory);
+            await Given();
             Should.NotThrow(async () => await When());
         }
     }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Interceptors;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.MessageContracts;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
 {

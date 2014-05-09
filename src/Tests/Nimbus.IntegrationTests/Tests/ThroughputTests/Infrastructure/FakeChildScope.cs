@@ -30,7 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
 
         public TComponent[] ResolveAll<TComponent>()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Dispose()
