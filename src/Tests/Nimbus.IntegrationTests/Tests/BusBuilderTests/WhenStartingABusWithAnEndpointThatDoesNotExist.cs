@@ -27,7 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithLogger(logger)
                                       .Build();
 
-            Should.Throw<BusException>(bus.Start);
+            Should.Throw<BusException>(() => bus.Start());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
@@ -6,6 +7,7 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
+    [DebuggerDisplay("{_receiver}")]
     internal class MessagePump : IMessagePump
     {
         private readonly INimbusMessageReceiver _receiver;
@@ -132,7 +134,7 @@ namespace Nimbus.Infrastructure
 
         public void Dispose()
         {
-            Stop().Wait();
+            Stop(); // don't await
         }
     }
 }

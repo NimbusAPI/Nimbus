@@ -41,6 +41,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             var messageReceiver = _messageReceiver;
             if (messageReceiver == null) return;
+
             try
             {
                 messageReceiver.Close();

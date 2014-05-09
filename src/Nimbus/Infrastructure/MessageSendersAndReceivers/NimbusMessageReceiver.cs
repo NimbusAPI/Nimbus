@@ -49,7 +49,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _cancellationToken.Cancel();
 
             StopBatchReceiver();
-            await _workerTask;
+
+            var workerTask = _workerTask;
+            if (workerTask != null) await workerTask;
         }
 
         protected abstract Task CreateBatchReceiver();
@@ -62,7 +64,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 try
                 {
-                    var messages = await FetchBatchInternal(_throttle.CurrentCount);
+                    var messages = await FetchBatch(_throttle.CurrentCount);
                     if (!_running) return;
                     if (messages.None()) continue;
 
@@ -94,24 +96,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        private async Task<BrokeredMessage[]> FetchBatchInternal(int currentCount)
-        {
-            var fetchTask = FetchBatch(currentCount);
-            var cancelTask = Task.Run(async () =>
-                                            {
-                                                while (!_cancellationToken.IsCancellationRequested)
-                                                {
-                                                    await Task.Delay(100);
-                                                }
-                                            });
-
-            await Task.WhenAny(fetchTask, cancelTask);
-
-            return fetchTask.IsCompleted
-                ? fetchTask.Result
-                : new BrokeredMessage[0];
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -121,8 +105,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+            try
+            {
+                Stop().Wait();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
 
-            Stop().Wait();
             _throttle.Dispose();
         }
     }

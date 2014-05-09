@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Infrastructure;
+using Nimbus.Configuration;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
@@ -18,7 +17,7 @@ namespace Nimbus
         private readonly IRequestSender _requestSender;
         private readonly IMulticastRequestSender _multicastRequestSender;
         private readonly IEventSender _eventSender;
-        private readonly IMessagePump[] _messagePumps;
+        private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
 
         private readonly object _mutex = new object();
@@ -29,7 +28,7 @@ namespace Nimbus
                      IRequestSender requestSender,
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
-                     IEnumerable<IMessagePump> messagePumps,
+                     IMessagePumpsManager messagePumpsManager,
                      IDeadLetterQueues deadLetterQueues)
         {
             _logger = logger;
@@ -38,7 +37,7 @@ namespace Nimbus
             _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
-            _messagePumps = messagePumps.ToArray();
+            _messagePumpsManager = messagePumpsManager;
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
@@ -86,7 +85,7 @@ namespace Nimbus
 
         public EventHandler<EventArgs> Starting;
 
-        public void Start()
+        public async Task Start(MessagePumpTypes messagePumpTypes = MessagePumpTypes.Default)
         {
             lock (_mutex)
             {
@@ -96,14 +95,12 @@ namespace Nimbus
 
             _logger.Debug("Bus starting...");
 
-            var handler = Starting;
-            if (handler != null) handler(this, EventArgs.Empty);
-
-            var messagePumpStartTasks = _messagePumps.Select(p => Task.Run(() => p.Start())).ToArray();
-
             try
             {
-                Task.WaitAll(messagePumpStartTasks);
+                var handler = Starting;
+                if (handler != null) handler(this, EventArgs.Empty);
+
+                await _messagePumpsManager.Start(messagePumpTypes);
             }
             catch (AggregateException aex)
             {
@@ -116,7 +113,7 @@ namespace Nimbus
 
         public EventHandler<EventArgs> Stopping;
 
-        public void Stop()
+        public async Task Stop(MessagePumpTypes messagePumpTypes = MessagePumpTypes.All)
         {
             lock (_mutex)
             {
@@ -126,14 +123,12 @@ namespace Nimbus
 
             _logger.Debug("Bus stopping...");
 
-            var handler = Stopping;
-            if (handler != null) handler(this, EventArgs.Empty);
-
-            var messagePumpStopTasks = _messagePumps.Select(p => Task.Run(() => p.Stop())).ToArray();
-
             try
             {
-                Task.WaitAll(messagePumpStopTasks);
+                var handler = Stopping;
+                if (handler != null) handler(this, EventArgs.Empty);
+
+                await _messagePumpsManager.Stop(messagePumpTypes);
             }
             catch (AggregateException aex)
             {
@@ -154,8 +149,6 @@ namespace Nimbus
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-
-            Stop();
 
             var handler = Disposing;
             if (handler == null) return;

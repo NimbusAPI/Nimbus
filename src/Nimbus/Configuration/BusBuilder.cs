@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.ServiceBus;
@@ -33,15 +32,16 @@ namespace Nimbus.Configuration
             RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
-            var namespaceManagers = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                                              .AsParallel()
-                                              .Select(i =>
-                                                      {
-                                                          var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                                                          namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
-                                                          return namespaceManager;
-                                                      })
-                                              .ToArray();
+            var namespaceManagers =
+                Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
+                          .AsParallel()
+                          .Select(i =>
+                                  {
+                                      var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                                      namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                                      return namespaceManager;
+                                  })
+                          .ToArray();
             var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(namespaceManagers);
             container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
 
@@ -64,13 +64,15 @@ namespace Nimbus.Configuration
             }
 
             logger.Debug("Creating message pumps and subscriptions.");
-            var messagePumps = new List<IMessagePump>();
-            messagePumps.Add(container.Resolve<ResponseMessagePumpFactory>().Create());
-            messagePumps.AddRange(container.Resolve<CommandMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<RequestMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll());
-            messagePumps.AddRange(container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
+
+            var messagePumps = new MessagePumpsManager(
+                container.Resolve<ResponseMessagePumpFactory>().Create(),
+                container.Resolve<RequestMessagePumpsFactory>().CreateAll(),
+                container.Resolve<CommandMessagePumpsFactory>().CreateAll(),
+                container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll(),
+                container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
+                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
+
             logger.Debug("Message pumps and subscriptions are all created.");
 
             var bus = new Bus(container.Resolve<ILogger>(),
@@ -85,8 +87,10 @@ namespace Nimbus.Configuration
 
             bus.Disposing += delegate
                              {
+                                 messagingFactories
+                                     .Do(mf => mf.CloseAsync()) // don't wait
+                                     .Done();
                                  container.Dispose();
-                                 messagingFactories.Do(mf => mf.Close()).Done();
                              };
 
             logger.Info("Bus built. Job done!");
@@ -100,6 +104,7 @@ namespace Nimbus.Configuration
             {
                 var value = prop.GetValue(configuration);
                 if (value == null) continue;
+
                 container.Register(value);
             }
         }

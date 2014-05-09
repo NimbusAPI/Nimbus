@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
@@ -16,39 +17,80 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
     [TestFixture]
     public class WhenCreatingABigBus
     {
+        private NamespaceCleanser _namespaceCleanser;
+
         [SetUp]
         public void SetUp()
         {
+            _namespaceCleanser = new NamespaceCleanser(new ConnectionStringSetting {Value = CommonResources.ServiceBusConnectionString}, new NullLogger());
+            _namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
         }
 
         [Test]
         [Timeout(10*60*1000)]
         public async Task TheStartupTimeShouldBeAcceptable()
         {
-            const int numMessageTypes = 25;
+            const int numMessageTypes = 100;
 
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
             var logger = new ConsoleLogger();
             var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
 
-            using (new AssertingStopwatch("First bus creation", TimeSpan.FromMinutes(5)))
+            var firstBus = new BusBuilder().Configure()
+                                           .WithNames("MyTestSuite", Environment.MachineName)
+                                           .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                           .WithTypesFrom(typeProvider)
+                                           .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                           .WithLogger(logger)
+                                           .Build();
+            try
             {
-                using (var bus = new BusBuilder().Configure()
-                                                 .WithNames("MyTestSuite", Environment.MachineName)
-                                                 .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                                 .WithTypesFrom(typeProvider)
-                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                 .WithLogger(logger)
-                                                 .WithDebugOptions(
-                                                     dc =>
-                                                         dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                             "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                                 .Build())
+                using (new AssertingStopwatch("First bus startup", TimeSpan.FromMinutes(1)))
+                {
+                    {
+                        try
+                        {
+                            await firstBus.Start(MessagePumpTypes.All);
+                            WriteBlankLines();
+                        }
+                        catch (AggregateException exc)
+                        {
+                            throw exc.Flatten();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                WriteBlankLines();
+                firstBus.Dispose();
+            }
+
+            WriteBlankLines();
+
+            var subsequentBus = new BusBuilder().Configure()
+                                                .WithNames("MyTestSuite", Environment.MachineName)
+                                                .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                                .WithTypesFrom(typeProvider)
+                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                .WithLogger(logger)
+                                                .Build();
+
+            try
+            {
+                using (new AssertingStopwatch("Subsequent bus startup", TimeSpan.FromSeconds(20)))
                 {
                     try
                     {
-                        bus.Start();
+                        await subsequentBus.Start(MessagePumpTypes.All);
+                        WriteBlankLines();
                     }
                     catch (AggregateException exc)
                     {
@@ -56,31 +98,18 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                     }
                 }
             }
+            finally
+            {
+                WriteBlankLines();
+                subsequentBus.Dispose();
+            }
+        }
 
+        private static void WriteBlankLines()
+        {
             for (var i = 0; i < 10; i++)
             {
                 Console.WriteLine();
-            }
-
-            using (new AssertingStopwatch("Subsequent bus creation", TimeSpan.FromSeconds(20)))
-            {
-                using (var bus = new BusBuilder().Configure()
-                                                 .WithNames("MyTestSuite", Environment.MachineName)
-                                                 .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                                 .WithTypesFrom(typeProvider)
-                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                 .WithLogger(logger)
-                                                 .Build())
-                {
-                    try
-                    {
-                        bus.Start();
-                    }
-                    catch (AggregateException exc)
-                    {
-                        throw exc.Flatten();
-                    }
-                }
             }
         }
 

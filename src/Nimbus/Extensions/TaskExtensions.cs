@@ -10,5 +10,10 @@ namespace Nimbus.Extensions
         {
             Task.WaitAll(tasks.ToArray());
         }
+
+        internal static async Task WhenAll(this IEnumerable<Task> tasks)
+        {
+            await Task.WhenAll(tasks);
+        }
     }
 }
