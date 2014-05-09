@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,10 +44,17 @@ namespace Nimbus.UnitTests.Conventions
                                    .SelectMany(t => t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                                    .Where(c => c.GetParameters().Any())
                                    .Where(IsInfrastructureConstructor)
+                                   .Where(c => !IsIgnored(c.DeclaringType))
                                    .Select(c => new TestCaseData(c)
                                                .SetName(GenerateTestName(c)))
                                    .OrderBy(t => t.TestName)
                                    .GetEnumerator();
+            }
+
+            private bool IsIgnored(Type declaringType)
+            {
+                var ignoredTypes = new[] {typeof (Bus)};
+                return ignoredTypes.Any(t => t.IsAssignableFrom(declaringType));
             }
 
             private bool IsInfrastructureConstructor(ConstructorInfo constructorInfo)
