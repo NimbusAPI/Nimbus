@@ -44,11 +44,12 @@ namespace Nimbus.Configuration
         private async Task DoForAllPumps(MessagePumpTypes waitForPumpTypes, Func<IMessagePump, Task> action)
         {
             var typesToProcessInBackground = (MessagePumpTypes)((int)waitForPumpTypes ^ -1);
+
             var messagePumpsToWaitFor = GetMessagePumps(waitForPumpTypes).ToArray();
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
             await messagePumpsToWaitFor
-                .Select(pump => Task.Run(() => action(pump)))
+                .Select(pump => Task.Run(async () => await action(pump)))
                 .WhenAll();
 
 #pragma warning disable 4014
@@ -60,7 +61,7 @@ namespace Nimbus.Configuration
                                await Task.Delay(100);   
 
                                await messagePumpsToHandleInBackground
-                                   .Select(pump => Task.Run(() => pump.Start()))
+                                   .Select(pump => Task.Run(async () => await pump.Start()))
                                    .WhenAll();
                            });
 #pragma warning restore 4014
