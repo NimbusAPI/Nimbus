@@ -12,6 +12,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
         private readonly object _sendingMutex = new object();
         private bool _flushing;
+        private bool _disposed;
 
         protected abstract void SendBatch(BrokeredMessage[] messages);
 
@@ -35,6 +36,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private void FlushMessages()
         {
             if (_flushing) return;
+            if (_disposed) return;
 
             lock (_sendingMutex)
             {
@@ -72,6 +74,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            _disposed = true;
+        }
     }
 }

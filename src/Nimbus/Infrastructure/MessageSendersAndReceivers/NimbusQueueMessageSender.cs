@@ -26,8 +26,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _queueClient.Value.SendBatch(toSend);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             if (!_queueClient.IsValueCreated) return;
             _queueClient.Value.Close();
         }
