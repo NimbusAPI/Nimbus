@@ -17,6 +17,8 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
     [Timeout(15*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
+        private const int _expectedTotalMessageCount = 11;  // 5 interceptors * 2 + 1 handler
+
         protected override Task<IBus> Given()
         {
             MethodCallCounter.Clear();
@@ -47,7 +49,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         protected override async Task When()
         {
             await Subject.Send(new FooCommand());
-            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 3);
+            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _expectedTotalMessageCount);
         }
 
         [Test]
@@ -89,7 +91,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         [Test]
         public async Task NoOtherMethodLevelInterceptorsShouldHaveBeenInvoked()
         {
-            MethodCallCounter.AllReceivedMessages.OfType<FooCommand>().Count().ShouldBe(11);
+            MethodCallCounter.AllReceivedMessages.OfType<FooCommand>().Count().ShouldBe(_expectedTotalMessageCount);
         }
     }
 }
