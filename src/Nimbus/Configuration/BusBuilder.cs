@@ -34,7 +34,6 @@ namespace Nimbus.Configuration
 
             var namespaceManagers =
                 Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                          .AsParallel()
                           .Select(i =>
                                   {
                                       var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
@@ -46,7 +45,6 @@ namespace Nimbus.Configuration
             container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
 
             var messagingFactories = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                                               .AsParallel()
                                                .Select(i =>
                                                        {
                                                            var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());

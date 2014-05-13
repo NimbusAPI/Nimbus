@@ -48,6 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
                                            .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                            .WithTypesFrom(typeProvider)
                                            .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                           .WithServerConnectionCount(100)
                                            .WithLogger(logger)
                                            .Build();
             try

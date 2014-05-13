@@ -21,7 +21,7 @@ namespace Nimbus.Configuration.Settings
             return Value.ToString();
         }
 
-        public IEnumerable<string> Validate()
+        public virtual IEnumerable<string> Validate()
         {
             yield break;
         }
