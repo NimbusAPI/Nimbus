@@ -70,7 +70,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     _flushing = false;
                 }
 
-                if (_outboundQueue.Any()) TriggerMessageFlush();
+                lock (_outboundQueue)
+                {
+                    if (_outboundQueue.Any()) TriggerMessageFlush();
+                }
             }
         }
 
