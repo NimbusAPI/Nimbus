@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Nimbus.Extensions;
 
 namespace Nimbus.Configuration
@@ -38,6 +39,9 @@ namespace Nimbus.Configuration
                     try
                     {
                         component.Dispose();
+                    }
+                    catch (TaskCanceledException)
+                    {
                     }
                     catch (ObjectDisposedException)
                     {
