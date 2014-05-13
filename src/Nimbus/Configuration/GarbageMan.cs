@@ -35,7 +35,13 @@ namespace Nimbus.Configuration
 
                 try
                 {
-                    component.Dispose();
+                    try
+                    {
+                        component.Dispose();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                    }
                 }
                 catch (Exception exc)
                 {

@@ -54,6 +54,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             catch (MessagingEntityNotFoundException)
             {
             }
+            catch (ObjectDisposedException)
+            {
+            }
         }
     }
 }
