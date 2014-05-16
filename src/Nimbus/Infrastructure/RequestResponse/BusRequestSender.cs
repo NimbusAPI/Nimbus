@@ -71,7 +71,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                           queuePath,
                           message.MessageId,
                           message.CorrelationId);
-            var response = responseCorrelationWrapper.WaitForResponse(timeout);
+            var response = await responseCorrelationWrapper.WaitForResponse(timeout);
             _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
                          message.SafelyGetBodyTypeNameOrDefault(),
                          queuePath,
@@ -79,7 +79,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                          message.CorrelationId,
                          response.GetType().FullName);
 
-            return await response;
+            return response;
         }
     }
 }
