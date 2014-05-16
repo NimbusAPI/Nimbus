@@ -12,6 +12,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly ThreadSafeLazy<TopicClient> _topicClient;
 
         public NimbusTopicMessageSender(IQueueManager queueManager, string topicPath, ILogger logger)
+            : base(logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
