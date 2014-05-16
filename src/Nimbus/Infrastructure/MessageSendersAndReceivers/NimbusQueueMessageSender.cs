@@ -1,3 +1,4 @@
+using System;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 
@@ -12,6 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly ThreadSafeLazy<MessageSender> _queueClient;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
+            : base(logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
