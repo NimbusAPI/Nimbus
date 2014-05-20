@@ -33,7 +33,7 @@ namespace Nimbus.Extensions
                 .ToArray();
 
             var handledEvents = handlers.SelectMany(hand => hand.GetInterfaces())
-                                        .Where(i => i.IsClosedTypeOf(typeof(IBusEvent)))
+                                        .Where(i => i.IsClosedTypeOf(typeof(IHandleCompetingEvent<>)) || i.IsClosedTypeOf(typeof(IHandleMulticastEvent<>)))
                                         .SelectMany(i => i.GetGenericArguments());
 
             return handledEvents.Distinct().ToArray();
