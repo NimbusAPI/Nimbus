@@ -22,6 +22,7 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>(); 
 
@@ -29,13 +30,15 @@ namespace Nimbus.Infrastructure
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
                                  ILogger logger,
-                                 DefaultMessageLockDurationSetting defaultMessageLockDuration)
+                                 DefaultMessageLockDurationSetting defaultMessageLockDuration,
+            ITypeProvider typeProvider)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
             _defaultMessageLockDuration = defaultMessageLockDuration;
+            _typeProvider = typeProvider;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -128,6 +131,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing subscriptions...");
 
             var subscriptionTasks = _knownTopics.Value
+                                                .Where(WeHaveAHandler)
                                                 .Select(FetchExistingTopicSubscriptions)
                                                 .ToArray();
 
@@ -139,6 +143,12 @@ namespace Nimbus.Infrastructure
                 .ToArray();
 
             return new ConcurrentBag<string>(subscriptionKeys);
+        }
+
+        private bool WeHaveAHandler(string topicPath)
+        {
+            var paths = _typeProvider.AllHandledEventTypes().Select(PathFactory.TopicPathFor);
+            return paths.Contains(topicPath);
         }
 
         private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
