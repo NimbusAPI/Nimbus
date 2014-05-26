@@ -62,10 +62,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Settings\RestStorageSharedAccessKeySetting.cs" />
+    <Compile Include="Configuration\Settings\RestStorageUrlSetting.cs" />
     <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\AzureRestApiBlobStorageLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BlobStorageBuilder.cs" />
     <Compile Include="Infrastructure\BlobStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\BlobStorageConnectionStringSetting.cs" />
+    <Compile Include="Infrastructure\RestApi\IRestApiHelper.cs" />
+    <Compile Include="Infrastructure\RestApi\IUrlFormatter.cs" />
+    <Compile Include="Infrastructure\RestApi\RestApiHelper.cs" />
+    <Compile Include="Infrastructure\RestApi\UrlFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +93,7 @@
     <None Include="Nimbus.LargeMessages.Azure.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
