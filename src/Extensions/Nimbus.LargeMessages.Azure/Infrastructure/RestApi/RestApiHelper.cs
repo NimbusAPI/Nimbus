@@ -7,12 +7,12 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.RestApi
 {
     internal class RestApiHelper : IRestApiHelper
     {
-        private readonly IUrlFormatter _urlFormatter;
+        private readonly IUriFormatter _uriFormatter;
         private readonly ILogger _logger;
 
-        public RestApiHelper(IUrlFormatter urlFormatter, ILogger logger)
+        public RestApiHelper(IUriFormatter uriFormatter, ILogger logger)
         {
-            _urlFormatter = urlFormatter;
+            _uriFormatter = uriFormatter;
             _logger = logger;
         }
 
@@ -21,7 +21,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.RestApi
             if (storageKey == null) throw new ArgumentNullException("storageKey");
             if (bytes == null) throw new ArgumentNullException("bytes");
 
-            string uri = _urlFormatter.FormatUrl(storageKey);
+            string uri = _uriFormatter.FormatUri(storageKey);
             _logger.Debug("Writing blob {0} to {1}", storageKey, uri);
 
             WebRequest request = CreateRequest(uri, bytes);
@@ -29,16 +29,14 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.RestApi
             {
                 await requestStream.WriteAsync(bytes, 0, bytes.Length);
             }
-            using (WebResponse resp = request.GetResponse())
-            {
-            }
+            using (WebResponse resp = request.GetResponse()) { } // throws if there was an error
         }
 
         public async Task Delete(string storageKey)
         {
             if (storageKey == null) throw new ArgumentNullException("storageKey");
 
-            string uri = _urlFormatter.FormatUrl(storageKey);
+            string uri = _uriFormatter.FormatUri(storageKey);
             _logger.Debug("Deleting blob {0} from {1}", storageKey, uri);
             using (var webClient = new WebClient())
             {
@@ -48,7 +46,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.RestApi
 
         public async Task<byte[]> Retrieve(string storageKey)
         {
-            var url = _urlFormatter.FormatUrl(storageKey);
+            var url = _uriFormatter.FormatUri(storageKey);
             _logger.Debug("Reading blob {0} from {1}", storageKey, url);
             using (var webClient = new WebClient())
             {

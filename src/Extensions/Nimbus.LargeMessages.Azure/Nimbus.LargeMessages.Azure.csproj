@@ -63,16 +63,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\Settings\RestStorageSharedAccessKeySetting.cs" />
-    <Compile Include="Configuration\Settings\RestStorageUrlSetting.cs" />
+    <Compile Include="Configuration\Settings\RestStorageUriSetting.cs" />
     <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\AzureRestApiBlobStorageLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BlobStorageBuilder.cs" />
     <Compile Include="Infrastructure\BlobStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\BlobStorageConnectionStringSetting.cs" />
     <Compile Include="Infrastructure\RestApi\IRestApiHelper.cs" />
-    <Compile Include="Infrastructure\RestApi\IUrlFormatter.cs" />
+    <Compile Include="Infrastructure\RestApi\IUriFormatter.cs" />
     <Compile Include="Infrastructure\RestApi\RestApiHelper.cs" />
-    <Compile Include="Infrastructure\RestApi\UrlFormatter.cs" />
+    <Compile Include="Infrastructure\RestApi\UriFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
