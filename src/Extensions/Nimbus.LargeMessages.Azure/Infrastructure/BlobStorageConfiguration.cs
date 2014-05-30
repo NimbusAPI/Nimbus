@@ -13,13 +13,13 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
 
         private Func<ILogger, ILargeMessageBodyStore> _storeBuilder = (logger) =>
         {
-            throw new InvalidOperationException("You are trying to build the large message store, but you have not configured the store access method.");
+            throw new InvalidOperationException("You are trying to build the large message store, but you have not configured the store access method to use.");
         };
 
         public BlobStorageConfiguration WithBlobStorageConnectionString(string connectionString)
         {
             if (RestStorageUri != null)
-                throw new InvalidOperationException("You are trying to configure blob storage, however you have already configured to use the rest api blob storage which will override this setting.");
+                throw new InvalidOperationException("You are trying to configure blob storage, however you have already configured to use the rest api blob storage.");
 
             BlobStorageConnectionString = new BlobStorageConnectionStringSetting { Value = connectionString };
             _storeBuilder = (logger) => new AzureBlobStorageLargeMessageBodyStore(BlobStorageConnectionString, logger);
@@ -29,7 +29,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
         public BlobStorageConfiguration WithRestfulStorage(string containerUri, string sharedAccessSignature)
         {
             if (BlobStorageConnectionString != null)
-                throw new InvalidOperationException("You are trying to configure the rest api storage, however you have already configured to use blob storage which will override this setting.");
+                throw new InvalidOperationException("You are trying to configure the rest api storage, however you have already configured to use blob storage.");
 
             RestStorageUri = new RestStorageUriSetting() { Value = containerUri };
             RestStorageSharedAccessSignature = new RestStorageSharedAccessKeySetting() { Value = sharedAccessSignature };
