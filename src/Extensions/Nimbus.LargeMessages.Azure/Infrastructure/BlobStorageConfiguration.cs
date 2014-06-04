@@ -11,7 +11,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
         internal RestStorageSharedAccessKeySetting RestStorageSharedAccessSignature { get; set; }
         internal ILogger Logger { get; set; }
 
-        private Func<ILogger, ILargeMessageBodyStore> _storeBuilder = (logger) =>
+        private Func<ILogger, ILargeMessageBodyStore> _storeBuilder = logger =>
         {
             throw new InvalidOperationException("You are trying to build the large message store, but you have not configured the store access method to use.");
         };
@@ -26,14 +26,14 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
             return this;
         }
 
-        public BlobStorageConfiguration WithRestfulStorage(string containerUri, string sharedAccessSignature)
+        public BlobStorageConfiguration WithRestfulStorage(Uri containerUri, string sharedAccessSignature)
         {
             if (BlobStorageConnectionString != null)
                 throw new InvalidOperationException("You are trying to configure the rest api storage, however you have already configured to use blob storage.");
 
             RestStorageUri = new RestStorageUriSetting() { Value = containerUri };
-            RestStorageSharedAccessSignature = new RestStorageSharedAccessKeySetting() { Value = sharedAccessSignature };
-            _storeBuilder = (logger) => new AzureRestApiBlobStorageLargeMessageBodyStore(new RestApiHelper(new UriFormatter(RestStorageUri, RestStorageSharedAccessSignature), logger));
+            RestStorageSharedAccessSignature = new RestStorageSharedAccessKeySetting { Value = sharedAccessSignature };
+            _storeBuilder = logger => new AzureRestApiBlobStorageLargeMessageBodyStore(new RestApiHelper(new UriFormatter(RestStorageUri, RestStorageSharedAccessSignature), logger));
             return this;
         }
 
