@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
+using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
@@ -116,7 +117,12 @@ namespace Nimbus.Infrastructure.Events
                         message.MessageId,
                         message.CorrelationId);
                 }
-                throw exception;
+
+                _logger.Debug("Failed to dispatch EventMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId{2}]",
+                    message.SafelyGetBodyTypeNameOrDefault(),
+                    message.MessageId,
+                    message.CorrelationId);
+                throw new DispatchFailedException("Failed to dispatch EventMessage", exception);
             }
         }
     }

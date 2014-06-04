@@ -76,6 +76,7 @@
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
+    <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\DeflateCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
