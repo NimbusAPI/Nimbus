@@ -56,7 +56,7 @@ namespace Nimbus.Infrastructure.Events
 
                 foreach (var interceptor in interceptors)
                 {
-                    _logger.Debug("Executing OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executing OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -64,7 +64,7 @@ namespace Nimbus.Infrastructure.Events
 
                     await interceptor.OnEventHandlerExecuting(busEvent, message);
 
-                    _logger.Debug("Executed OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executed OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -80,7 +80,7 @@ namespace Nimbus.Infrastructure.Events
 
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnEventHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executing OnEventHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -88,7 +88,7 @@ namespace Nimbus.Infrastructure.Events
 
                         await interceptor.OnEventHandlerSuccess(busEvent, message);
 
-                        _logger.Debug("Executed OnEventHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executed OnEventHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -103,7 +103,7 @@ namespace Nimbus.Infrastructure.Events
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    _logger.Debug("Executing OnEventHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executing OnEventHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -111,14 +111,14 @@ namespace Nimbus.Infrastructure.Events
 
                     await interceptor.OnEventHandlerError(busEvent, message, exception);
 
-                    _logger.Debug("Executed OnEventHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executed OnEventHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
                         message.CorrelationId);
                 }
 
-                _logger.Debug("Failed to dispatch EventMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId{2}]",
+                _logger.Debug("Failed to dispatch EventMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId:{2}]",
                     message.SafelyGetBodyTypeNameOrDefault(),
                     message.MessageId,
                     message.CorrelationId);

@@ -55,13 +55,13 @@ namespace Nimbus.Infrastructure.Commands
                 foreach (var interceptor in interceptors)
                 {
                     
-                    _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
                         message.CorrelationId);
                     await interceptor.OnCommandHandlerExecuting(busCommand, message);
-                    _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -77,7 +77,7 @@ namespace Nimbus.Infrastructure.Commands
 
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executing OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -85,7 +85,7 @@ namespace Nimbus.Infrastructure.Commands
 
                         await interceptor.OnCommandHandlerSuccess(busCommand, message);
 
-                        _logger.Debug("Executed OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executed OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -100,7 +100,7 @@ namespace Nimbus.Infrastructure.Commands
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    _logger.Debug("Executing OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executing OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -108,7 +108,7 @@ namespace Nimbus.Infrastructure.Commands
 
                     await interceptor.OnCommandHandlerError(busCommand, message, exception);
 
-                    _logger.Debug("Executed OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executed OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -116,7 +116,7 @@ namespace Nimbus.Infrastructure.Commands
 
                 }
 
-                _logger.Debug("Failed to Dispatch CommandMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId{2}]",
+                _logger.Debug("Failed to Dispatch CommandMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId:{2}]",
                     message.SafelyGetBodyTypeNameOrDefault(),
                     message.MessageId,
                     message.CorrelationId);

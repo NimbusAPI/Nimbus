@@ -66,13 +66,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 foreach (var interceptor in interceptors)
                 {
-                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]", 
+                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
                         interceptor.GetType().FullName, 
                         message.SafelyGetBodyTypeNameOrDefault(), 
                         message.MessageId, 
                         message.CorrelationId);
                     await interceptor.OnRequestHandlerExecuting(busRequest, message);
-                    _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                    _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -111,7 +111,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -119,7 +119,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                         await interceptor.OnRequestHandlerSuccess(busRequest, message);
                         
-                        _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -130,7 +130,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
@@ -138,7 +138,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                         await interceptor.OnRequestHandlerError(busRequest, message, exception);
 
-                        _logger.Debug("Executed OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId{3}]",
+                        _logger.Debug("Executed OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                         interceptor.GetType().FullName,
                         message.SafelyGetBodyTypeNameOrDefault(),
                         message.MessageId,
