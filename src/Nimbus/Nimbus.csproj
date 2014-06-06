@@ -143,7 +143,7 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
     <Compile Include="Interceptors\Inbound\InterceptorAttribute.cs" />
-    <Compile Include="Interceptors\Inbound\IOutboundInterceptorFactory.cs" />
+    <Compile Include="Interceptors\Outbound\IOutboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
