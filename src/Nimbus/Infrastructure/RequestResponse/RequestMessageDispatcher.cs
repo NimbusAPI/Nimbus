@@ -64,23 +64,23 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler,
                     busRequest);
 
-                foreach (var interceptor in interceptors)
-                {
-                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
-                        interceptor.GetType().FullName, 
-                        message.SafelyGetBodyTypeNameOrDefault(), 
-                        message.MessageId, 
-                        message.CorrelationId);
-                    await interceptor.OnRequestHandlerExecuting(busRequest, message);
-                    _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
-                }
-
                 try
                 {
+                    foreach (var interceptor in interceptors)
+                    {
+                        _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
+                            interceptor.GetType().FullName, 
+                            message.SafelyGetBodyTypeNameOrDefault(), 
+                            message.MessageId, 
+                            message.CorrelationId);
+                        await interceptor.OnRequestHandlerExecuting(busRequest, message);
+                        _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
+                    }
+
                     var handlerTask = handler.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask,
                         message, _clock);
