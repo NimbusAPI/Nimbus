@@ -8,9 +8,9 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class ResponseMessagePumpFactory : ICreateComponents
     {
         private readonly ILogger _logger;
+        private readonly ResponseMessageDispatcher _messageDispatcher;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
-        private readonly ResponseMessageDispatcher _dispatcher;
         private readonly IQueueManager _queueManager;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -21,14 +21,14 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IClock clock,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher dispatcher)
+                                            ResponseMessageDispatcher messageDispatcher)
         {
-            _logger = logger;
-            _queueManager = queueManager;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;
             _clock = clock;
-            _concurrentHandlerLimit = concurrentHandlerLimit;
-            _dispatcher = dispatcher;
+            _logger = logger;
+            _queueManager = queueManager;
+            _messageDispatcher = messageDispatcher;
         }
 
         public IMessagePump Create()
@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
 
-            var pump = new MessagePump(_clock, _logger, _dispatcher, receiver);
+            var pump = new MessagePump(_clock, _logger, _messageDispatcher, receiver);
             _garbageMan.Add(pump);
 
             return pump;

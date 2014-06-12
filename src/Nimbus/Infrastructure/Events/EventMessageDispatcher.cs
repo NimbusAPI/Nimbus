@@ -17,25 +17,19 @@ namespace Nimbus.Infrastructure.Events
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
-        protected readonly Type HandlerType;
-        private readonly Type _eventType;
         private readonly ILogger _logger;
 
-        protected EventMessageDispatcher(IDependencyResolver dependencyResolver,
-                                         IBrokeredMessageFactory brokeredMessageFactory,
-                                         IInboundInterceptorFactory inboundInterceptorFactory,
-                                         Type handlerType,
+        protected EventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
                                          IClock clock,
-                                         Type eventType,
-            ILogger logger)
+                                         IDependencyResolver dependencyResolver,
+                                         IInboundInterceptorFactory inboundInterceptorFactory,
+                                         ILogger logger)
         {
-            _dependencyResolver = dependencyResolver;
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
+            _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
-            _eventType = eventType;
             _logger = logger;
-            HandlerType = handlerType;
         }
 
         public async Task Dispatch(BrokeredMessage message)

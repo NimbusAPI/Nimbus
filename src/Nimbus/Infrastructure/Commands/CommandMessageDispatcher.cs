@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -16,27 +17,24 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly Type _commandType;
         private readonly IClock _clock;
-        private readonly Type _handlerType;
         private readonly ILogger _logger;
+        private readonly IReadOnlyDictionary<Type, Type> _handlerMap;
 
         public CommandMessageDispatcher(
+            IBrokeredMessageFactory brokeredMessageFactory,
+            IClock clock,
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
-            IBrokeredMessageFactory brokeredMessageFactory,
-            Type commandType,
-            IClock clock,
-            Type handlerType,
-            ILogger logger)
+            ILogger logger,
+            IReadOnlyDictionary<Type, Type> handlerMap)
         {
+            _brokeredMessageFactory = brokeredMessageFactory;
+            _clock = clock;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _commandType = commandType;
-            _clock = clock;
-            _handlerType = handlerType;
             _logger = logger;
+            _handlerMap = handlerMap;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -49,7 +47,11 @@ namespace Nimbus.Infrastructure.Commands
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
+                Type handlerType;
+                if (_handlerMap.TryGetValue(busCommand.GetType(), out handlerType) == false)
+                    throw new DispatchFailedException("There is no handler registered for the message type {0}.".FormatWith(busCommand.GetType()));
+                
+                var handler = scope.Resolve<IHandleCommand<TBusCommand>>(handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
                 Exception exception;

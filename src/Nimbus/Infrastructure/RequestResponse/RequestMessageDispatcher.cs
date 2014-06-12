@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
+using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
@@ -16,30 +18,27 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
-        private readonly Type _handlerType;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
-        private readonly Type _messageType;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IReadOnlyDictionary<Type, Type> _handlerMap;
 
         public RequestMessageDispatcher(
-            INimbusMessagingFactory messagingFactory,
             IBrokeredMessageFactory brokeredMessageFactory,
-            IInboundInterceptorFactory inboundInterceptorFactory,
-            Type messageType,
             IClock clock,
-            ILogger logger,
             IDependencyResolver dependencyResolver,
-            Type handlerType)
+            IInboundInterceptorFactory inboundInterceptorFactory,
+            ILogger logger,
+            INimbusMessagingFactory messagingFactory,
+            IReadOnlyDictionary<Type, Type> handlerMap)
         {
-            _messagingFactory = messagingFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
-            _inboundInterceptorFactory = inboundInterceptorFactory;
-            _messageType = messageType;
             _clock = clock;
-            _logger = logger;
             _dependencyResolver = dependencyResolver;
-            _handlerType = handlerType;
+            _inboundInterceptorFactory = inboundInterceptorFactory;
+            _logger = logger;
+            _messagingFactory = messagingFactory;
+            _handlerMap = handlerMap;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -60,9 +59,12 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(_handlerType.FullName);
-                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler,
-                    busRequest);
+                Type handlerType;
+                if (_handlerMap.TryGetValue(busRequest.GetType(), out handlerType) == false)
+                    throw new DispatchFailedException("There is no handler registered for the message type {0}.".FormatWith(busRequest.GetType()));
+                
+                var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
+                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
 
                 try
                 {
@@ -82,12 +84,10 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask,
-                        message, _clock);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
 
-                    var responseMessage =
-                        await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                    var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
 
                     _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                         responseMessage.SafelyGetBodyTypeNameOrDefault(),
@@ -167,12 +167,12 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
-            var closedGenericTypeOfIBusRequest = request.GetType()
-                .GetInterfaces()
-                .Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
-                .Single();
+            var closedGenericHandlerType =
+                request.GetType()
+                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                       .Single();
 
-            var genericArguments = closedGenericTypeOfIBusRequest.GetGenericArguments();
+            var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 

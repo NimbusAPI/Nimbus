@@ -32,5 +32,6 @@ namespace Nimbus.Infrastructure
         Task<BrokeredMessage> CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
 
         Task<object> GetBody(BrokeredMessage message);
+        Type GetBodyType(BrokeredMessage message);
     }
 }

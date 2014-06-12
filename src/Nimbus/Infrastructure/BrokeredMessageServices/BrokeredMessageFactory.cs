@@ -169,7 +169,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                   });
         }
 
-        Type GetBodyType(BrokeredMessage message)
+        public Type GetBodyType(BrokeredMessage message)
         {
             var typeName = message.SafelyGetBodyTypeNameOrDefault();
             var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();

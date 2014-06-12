@@ -39,6 +39,9 @@ namespace Nimbus.UnitTests.DispatcherTests
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
 
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap();
+
             _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                                                  new MaxSmallMessageSizeSetting(),
                                                                  replyQueueNameSetting,
@@ -48,14 +51,14 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                  new UnsupportedLargeMessageBodyStore(),
                                                                  new NullOutboundInterceptorFactory(),
                                                                  serializer,
-                                                                 new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
+                                                                 typeProvider);
 
-            _commandDispatcher = new CommandMessageDispatcher(Subject,
-                                                              new NullInboundInterceptorFactory(),
-                                                              _brokeredMessageFactory,
-                                                              typeof (FooCommand),
+            _commandDispatcher = new CommandMessageDispatcher(_brokeredMessageFactory,
                                                               new SystemClock(),
-                                                              typeof (BrokerTestCommandHandler), new NullLogger());
+                                                              Subject,
+                                                              new NullInboundInterceptorFactory(),
+                                                              new NullLogger(),
+                                                              handlerMap);
         }
 
         protected override async Task When()
