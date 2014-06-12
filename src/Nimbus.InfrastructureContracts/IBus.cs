@@ -22,9 +22,9 @@ namespace Nimbus
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse;
 
-        Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest<TRequest, TResponse>
-            where TResponse : IBusResponse;
+        Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusMulticastRequest<TRequest, TResponse>
+            where TResponse : IBusMulticastResponse;
 
         Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent;
 

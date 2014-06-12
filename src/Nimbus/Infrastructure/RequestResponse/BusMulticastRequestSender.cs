@@ -30,11 +30,12 @@ namespace Nimbus.Infrastructure.RequestResponse
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
         }
 
-        public async Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest<TRequest, TResponse>
-            where TResponse : IBusResponse
+        public async Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusMulticastRequest<TRequest, TResponse>
+            where TResponse : IBusMulticastResponse
         {
-            _knownMessageTypeVerifier.AssertValidMessageType(busRequest.GetType());
+            var requestType = busRequest.GetType();
+            _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
             var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
             var expiresAfter = _clock.UtcNow.Add(timeout);

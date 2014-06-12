@@ -2,17 +2,14 @@
 
 namespace Nimbus.MessageContracts
 {
-    // ReSharper disable UnusedTypeParameter
-    public abstract class BusRequest<TRequest, TResponse> : IBusRequest<TRequest, TResponse>
-        where TRequest : IBusRequest<TRequest, TResponse>
-        where TResponse : IBusResponse
+    public abstract class BusMulticastRequest<TRequest, TResponse> : IBusMulticastRequest<TRequest, TResponse>
+        where TRequest : IBusMulticastRequest<TRequest, TResponse>
+        where TResponse : IBusMulticastResponse
         // ReSharper restore UnusedTypeParameter
     {
-        protected BusRequest()
+        protected BusMulticastRequest()
         {
             if (GetType() != typeof (TRequest)) throw new InvalidRequestTypeException("Bus requests must have their *own* type as their first generic type parameter");
         }
     }
-
-    // ReSharper disable UnusedTypeParameter
 }

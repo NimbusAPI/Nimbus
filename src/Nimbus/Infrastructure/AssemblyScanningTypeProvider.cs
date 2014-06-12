@@ -24,6 +24,9 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<Type[]> _requestHandlerTypes;
         private readonly ThreadSafeLazy<Type[]> _requestTypes;
         private readonly ThreadSafeLazy<Type[]> _responseTypes;
+        private readonly ThreadSafeLazy<Type[]> _multicastRequestHandlerTypes;
+        private readonly ThreadSafeLazy<Type[]> _multicastRequestTypes;
+        private readonly ThreadSafeLazy<Type[]> _multicastResponseTypes;
         private readonly ThreadSafeLazy<Type[]> _interceptorTypes;
 
         private IEnumerable<Type> AllInstantiableTypesInScannedAssemblies
@@ -44,6 +47,9 @@ namespace Nimbus.Infrastructure
             _requestHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForRequestHandlerTypes);
             _requestTypes = new ThreadSafeLazy<Type[]>(ScanForRequestTypes);
             _responseTypes = new ThreadSafeLazy<Type[]>(ScanForResponseTypes);
+            _multicastRequestHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastRequestHandlerTypes);
+            _multicastRequestTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastRequestTypes);
+            _multicastResponseTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastResponseTypes);
             _interceptorTypes = new ThreadSafeLazy<Type[]>(ScanForInterceptorTypes);
         }
 
@@ -85,6 +91,21 @@ namespace Nimbus.Infrastructure
         public IEnumerable<Type> ResponseTypes
         {
             get { return _responseTypes.Value; }
+        }
+
+        public IEnumerable<Type> MulticastRequestHandlerTypes
+        {
+            get { return _multicastRequestHandlerTypes.Value; }
+        }
+
+        public IEnumerable<Type> MulticastRequestTypes
+        {
+            get { return _multicastRequestTypes.Value; }
+        }
+
+        public IEnumerable<Type> MulticastResponseTypes
+        {
+            get { return _multicastResponseTypes.Value; }
         }
 
         public IEnumerable<Type> InterceptorTypes
@@ -167,6 +188,33 @@ namespace Nimbus.Infrastructure
         {
             var types = AllInstantiableTypesInScannedAssemblies
                 .Where(t => typeof (IBusResponse).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForMulticastRequestHandlerTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IHandleMulticastRequest<,>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForMulticastRequestTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => t.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForMulticastResponseTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof (IBusMulticastResponse).IsAssignableFrom(t))
                 .ToArray();
 
             return types;

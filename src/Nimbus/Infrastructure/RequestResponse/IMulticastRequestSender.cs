@@ -7,8 +7,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal interface IMulticastRequestSender
     {
-        Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest<TRequest, TResponse>
-            where TResponse : IBusResponse;
+        Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusMulticastRequest<TRequest, TResponse>
+            where TResponse : IBusMulticastResponse;
     }
 }

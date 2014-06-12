@@ -44,9 +44,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _typeProvider.RequestHandlerTypes)
+            foreach (var handlerType in _typeProvider.MulticastRequestHandlerTypes)
             {
-                var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleRequest<,>))
+                var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleMulticastRequest<,>))
                                               .Select(gi => gi.GetGenericArguments().First())
                                               .OrderBy(t => t.FullName)
                                               .Distinct()

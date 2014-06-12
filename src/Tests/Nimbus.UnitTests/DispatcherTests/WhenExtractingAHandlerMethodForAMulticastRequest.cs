@@ -10,17 +10,17 @@ namespace Nimbus.UnitTests.DispatcherTests
         [Test]
         public void WeShouldGetTheRightMethod()
         {
-            var request = new SomeInternalRequest();
-            var handlerMethod = RequestMessageDispatcher.GetGenericDispatchMethodFor(request);
+            var request = new SomeInternalMulticastRequest();
+            var handlerMethod = MulticastRequestMessageDispatcher.GetGenericDispatchMethodFor(request);
 
             handlerMethod.ShouldNotBe(null);
         }
 
-        public class SomeInternalRequest : BusRequest<SomeInternalRequest, SomeInternalResponse>
+        public class SomeInternalMulticastRequest : BusMulticastRequest<SomeInternalMulticastRequest, SomeInternalMulticastResponse>
         {
         }
 
-        public class SomeInternalResponse : IBusResponse
+        public class SomeInternalMulticastResponse : IBusMulticastResponse
         {
         }
     }

@@ -30,6 +30,7 @@ namespace Nimbus.Infrastructure.DependencyResolution
                 .Union(_typeProvider.CompetingEventHandlerTypes)
                 .Union(_typeProvider.MulticastEventHandlerTypes)
                 .Union(_typeProvider.RequestHandlerTypes)
+                .Union(_typeProvider.MulticastRequestHandlerTypes)
                 .Union(_typeProvider.InterceptorTypes)
                 .ToArray();
         }

@@ -38,8 +38,7 @@ namespace Nimbus.Interceptors.Inbound
 
         private IEnumerable<Type> GetGlobalInterceptorTypes()
         {
-            var globalInterceptorTypes = _globalInboundInterceptorTypes.Value
-                                                                .ToArray();
+            var globalInterceptorTypes = _globalInboundInterceptorTypes.Value.ToArray();
             return globalInterceptorTypes;
         }
 
