@@ -9,6 +9,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     public class BusRequestSender : IRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IRouter _router;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
@@ -22,9 +23,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger,
                                   INimbusMessagingFactory messagingFactory,
+                                  IRouter router,
                                   RequestResponseCorrelator requestResponseCorrelator)
         {
             _messagingFactory = messagingFactory;
+            _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _logger = logger;
@@ -44,14 +47,15 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            _knownMessageTypeVerifier.AssertValidMessageType(busRequest.GetType());
+            var requestType = busRequest.GetType();
+            _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
             var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var queuePath = PathFactory.QueuePathFor(busRequest.GetType());
+            var queuePath = _router.Route(requestType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

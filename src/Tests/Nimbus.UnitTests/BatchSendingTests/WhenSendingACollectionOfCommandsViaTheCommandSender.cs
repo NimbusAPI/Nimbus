@@ -46,8 +46,9 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
+            var router = new DestinationPerMessageTypeRouter();
 
-            var busCommandSender = new BusCommandSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory);
+            var busCommandSender = new BusCommandSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory, router);
             return Task.FromResult(busCommandSender);
         }
 

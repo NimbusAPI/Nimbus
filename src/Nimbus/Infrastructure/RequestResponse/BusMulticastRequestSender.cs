@@ -9,6 +9,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class BusMulticastRequestSender : IMulticastRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IRouter _router;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
@@ -20,9 +21,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                                          IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                          ILogger logger,
                                          INimbusMessagingFactory messagingFactory,
+                                         IRouter router,
                                          RequestResponseCorrelator requestResponseCorrelator)
         {
             _messagingFactory = messagingFactory;
+            _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _clock = clock;
@@ -41,7 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var topicPath = PathFactory.TopicPathFor(busRequest.GetType());
+            var topicPath = _router.Route(requestType);
             var sender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Sending multicast request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
