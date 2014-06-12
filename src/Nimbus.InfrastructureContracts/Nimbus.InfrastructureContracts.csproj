@@ -55,6 +55,7 @@
     <Compile Include="DependencyResolution\IDependencyResolverScope.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
+    <Compile Include="IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISerializer.cs" />
