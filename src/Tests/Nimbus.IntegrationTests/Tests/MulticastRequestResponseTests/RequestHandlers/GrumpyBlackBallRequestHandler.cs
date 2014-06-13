@@ -4,7 +4,7 @@ using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContrac
 
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers
 {
-    public class GrumpyBlackBallRequestHandler : IHandleRequest<BlackBallRequest, BlackBallResponse>
+    public class GrumpyBlackBallRequestHandler : IHandleMulticastRequest<BlackBallRequest, BlackBallResponse>
     {
         public async Task<BlackBallResponse> Handle(BlackBallRequest request)
         {

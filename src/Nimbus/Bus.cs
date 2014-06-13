@@ -66,9 +66,9 @@ namespace Nimbus
             return Task.Run(() => _requestSender.SendRequest(busRequest, timeout));
         }
 
-        public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest<TRequest, TResponse>
-            where TResponse : IBusResponse
+        public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusMulticastRequest<TRequest, TResponse>
+            where TResponse : IBusMulticastResponse
         {
             return Task.Run(() => _multicastRequestSender.SendRequest(busRequest, timeout));
         }

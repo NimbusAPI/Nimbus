@@ -30,6 +30,18 @@ namespace Nimbus.Interceptors.Inbound
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse;
 
+        Task OnMulticastRequestHandlerExecuting<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+            where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusMulticastResponse;
+
+        Task OnMulticastRequestHandlerSuccess<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+            where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusMulticastResponse;
+
+        Task OnMulticastRequestHandlerError<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage, Exception exception)
+            where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusMulticastResponse;
+
         Task OnEventHandlerExecuting<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
             where TBusEvent : IBusEvent;
 

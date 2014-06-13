@@ -6,6 +6,7 @@ namespace Nimbus.Infrastructure.Events
     internal class BusEventSender : IEventSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IRouter _router;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
@@ -13,9 +14,11 @@ namespace Nimbus.Infrastructure.Events
         public BusEventSender(IBrokeredMessageFactory brokeredMessageFactory,
                               IKnownMessageTypeVerifier knownMessageTypeVerifier,
                               ILogger logger,
-                              INimbusMessagingFactory messagingFactory)
+                              INimbusMessagingFactory messagingFactory,
+                              IRouter router)
         {
             _messagingFactory = messagingFactory;
+            _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
@@ -28,7 +31,7 @@ namespace Nimbus.Infrastructure.Events
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
             var message = await _brokeredMessageFactory.Create(busEvent);
-            var topicPath = PathFactory.TopicPathFor(eventType);
+            var topicPath = _router.Route(eventType);
             var topicSender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Publishing event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

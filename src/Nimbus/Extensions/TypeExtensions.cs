@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 
 namespace Nimbus.Extensions
@@ -59,6 +61,18 @@ namespace Nimbus.Extensions
             {
                 return false;
             }
+        }
+
+        internal static string ToTypeNameSummary(this IEnumerable<Type> types, int summarizeAfter = 3, Func<Type, string> selector = null)
+        {
+            selector = selector ?? (t => t.FullName);
+            var typeArray = types as Type[] ?? types.ToArray();
+            if (typeArray.Count() <= summarizeAfter)
+            {
+                return string.Join(", ", typeArray.Select(selector));
+            }
+
+            return string.Join(", ", typeArray.Take(summarizeAfter).Select(selector)) + " and {0} more.".FormatWith(typeArray.Length - summarizeAfter);
         }
     }
 }

@@ -42,11 +42,12 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     new NullDependencyResolver(),
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     new NullOutboundInterceptorFactory(),
-                                                                    serializer);
+                                                                    serializer,
+                                                                    new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
-
-            var busCommandSender = new BusEventSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory);
+            var router = new DestinationPerMessageTypeRouter();
+            var busCommandSender = new BusEventSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory, router);
             return Task.FromResult(busCommandSender);
         }
 

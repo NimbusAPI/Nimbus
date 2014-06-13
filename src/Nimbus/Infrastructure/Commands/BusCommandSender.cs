@@ -11,16 +11,19 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IRouter _router;
 
         public BusCommandSender(IBrokeredMessageFactory brokeredMessageFactory,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
-                                INimbusMessagingFactory messagingFactory)
+                                INimbusMessagingFactory messagingFactory,
+                                IRouter router)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
             _messagingFactory = messagingFactory;
+            _router = router;
         }
 
         public async Task Send<TBusCommand>(TBusCommand busCommand)
@@ -46,7 +49,7 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Deliver(Type commandType, BrokeredMessage message)
         {
-            var queuePath = PathFactory.QueuePathFor(commandType);
+            var queuePath = _router.Route(commandType);
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

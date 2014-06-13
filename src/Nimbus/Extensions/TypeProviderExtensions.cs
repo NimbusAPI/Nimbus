@@ -14,6 +14,7 @@ namespace Nimbus.Extensions
                 .Union(typeProvider.MulticastEventHandlerTypes)
                 .Union(typeProvider.CompetingEventHandlerTypes)
                 .Union(typeProvider.RequestHandlerTypes)
+                .Union(typeProvider.MulticastRequestHandlerTypes)
                 .ToArray();
         }
 
@@ -45,6 +46,9 @@ namespace Nimbus.Extensions
                 .Union(typeProvider.CommandTypes)
                 .Union(typeProvider.EventTypes)
                 .Union(typeProvider.RequestTypes)
+                .Union(typeProvider.ResponseTypes)
+                .Union(typeProvider.MulticastRequestTypes)
+                .Union(typeProvider.MulticastResponseTypes)
                 .ToArray();
         }
 
@@ -55,6 +59,7 @@ namespace Nimbus.Extensions
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleMulticastEvent<>))) return true;
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleCompetingEvent<>))) return true;
             if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleRequest<,>))) return true;
+            if (potentialHandlerType.IsClosedTypeOf(typeof (IHandleMulticastRequest<,>))) return true;
             return false;
         }
     }

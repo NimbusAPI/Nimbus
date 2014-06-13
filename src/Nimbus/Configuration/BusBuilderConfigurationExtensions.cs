@@ -58,6 +58,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithRouter(this BusBuilderConfiguration configuration, IRouter router)
+        {
+            configuration.Router = router;
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithServerConnectionCount(this BusBuilderConfiguration configuration, int serverConnectionCount)
         {
             configuration.ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};

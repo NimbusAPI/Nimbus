@@ -1,6 +1,3 @@
-using Castle.DynamicProxy;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-using Castle.MicroKernel.ModelBuilder.Descriptors;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
@@ -22,6 +19,8 @@ namespace Nimbus.UnitTests.DispatcherTests
     public abstract class MessageDispatcherTestBase
     {
         internal BrokeredMessageFactory BrokeredMessageFactory;
+        internal TestHarnessTypeProvider TypeProvider;
+        internal HandlerMapper HandlerMapper;
 
         protected MessageDispatcherTestBase()
         {
@@ -30,6 +29,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
+            TypeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            HandlerMapper = new HandlerMapper(TypeProvider);
             BrokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                                                 new MaxSmallMessageSizeSetting(),
                                                                 replyQueueNameSetting,
@@ -38,7 +39,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                 new NullDependencyResolver(),
                                                                 new UnsupportedLargeMessageBodyStore(),
                                                                 new NullOutboundInterceptorFactory(),
-                                                                serializer);
+                                                                serializer,
+                                                                TypeProvider);
         }
 
         internal RequestMessageDispatcher GetRequestMessageDispatcher<TRequest, TResponse, TRequestHandler>(IInboundInterceptor interceptor) 
@@ -58,14 +60,13 @@ namespace Nimbus.UnitTests.DispatcherTests
                                      .Returns(new[] { interceptor });
 
             return new RequestMessageDispatcher(
-                messagingFactory,
                 BrokeredMessageFactory,
-                inboundInterceptorFactory,
-                typeof (TRequest),
                 clock,
-                logger,
                 dependencyResolver,
-                typeof (TRequestHandler));
+                inboundInterceptorFactory,
+                logger,
+                messagingFactory,
+                HandlerMapper.GetFullHandlerMap(typeof(IHandleRequest<,>)));
         }
 
         internal CommandMessageDispatcher GetCommandMessageDispatcher<TCommand, TCommandHandler>(IInboundInterceptor interceptor)
@@ -83,13 +84,12 @@ namespace Nimbus.UnitTests.DispatcherTests
                                      .Returns(new[] { interceptor });
 
             return new CommandMessageDispatcher(
+                BrokeredMessageFactory,
+                clock,
                 dependencyResolver,
                 inboundInterceptorFactory,
-                BrokeredMessageFactory,
-                typeof (TCommand),
-                clock,
-                typeof (TCommandHandler),
-                logger);
+                logger,
+                HandlerMapper.GetFullHandlerMap(typeof(IHandleCommand<>)));
         }
 
         internal EventMessageDispatcher GetEventMessageDispatcher<TEvent, TEventMessageHandler>(IInboundInterceptor interceptor)
@@ -104,14 +104,13 @@ namespace Nimbus.UnitTests.DispatcherTests
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
                                      .Returns(new[] {interceptor});
-
+            
             return new MulticastEventMessageDispatcher(
-                dependencyResolver,
                 BrokeredMessageFactory,
-                inboundInterceptorFactory,
-                typeof (TEventMessageHandler),
                 clock,
-                typeof (TEvent));
+                dependencyResolver,
+                inboundInterceptorFactory,
+                HandlerMapper.GetFullHandlerMap(typeof(IHandleMulticastEvent<>)));
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class BusMulticastRequestSender : IMulticastRequestSender
     {
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly IRouter _router;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
@@ -20,9 +21,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                                          IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                          ILogger logger,
                                          INimbusMessagingFactory messagingFactory,
+                                         IRouter router,
                                          RequestResponseCorrelator requestResponseCorrelator)
         {
             _messagingFactory = messagingFactory;
+            _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _clock = clock;
@@ -30,17 +33,18 @@ namespace Nimbus.Infrastructure.RequestResponse
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
         }
 
-        public async Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
-            where TRequest : IBusRequest<TRequest, TResponse>
-            where TResponse : IBusResponse
+        public async Task<IEnumerable<TResponse>> SendRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
+            where TRequest : IBusMulticastRequest<TRequest, TResponse>
+            where TResponse : IBusMulticastResponse
         {
-            _knownMessageTypeVerifier.AssertValidMessageType(busRequest.GetType());
+            var requestType = busRequest.GetType();
+            _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
             var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var topicPath = PathFactory.TopicPathFor(busRequest.GetType());
+            var topicPath = _router.Route(requestType);
             var sender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Sending multicast request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

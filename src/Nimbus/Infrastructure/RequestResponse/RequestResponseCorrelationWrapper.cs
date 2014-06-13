@@ -21,11 +21,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _semaphore = new SemaphoreSlim(0, int.MaxValue);
         }
 
-        public Type ResponseType
-        {
-            get { return typeof (TResponse); }
-        }
-
         public void Reply(object response)
         {
             _requestWasSuccessful = true;

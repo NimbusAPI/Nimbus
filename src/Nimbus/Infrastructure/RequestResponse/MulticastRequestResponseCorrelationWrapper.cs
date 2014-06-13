@@ -15,11 +15,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _expiresAfter = expiresAfter;
         }
 
-        public Type ResponseType
-        {
-            get { return typeof (TResponse); }
-        }
-
         public DateTimeOffset ExpiresAfter
         {
             get { return _expiresAfter; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -20,10 +21,11 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
         private readonly ICompressor _compressor;
+        private readonly IDependencyResolver _dependencyResolver;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ISerializer _serializer;
-        private IDependencyResolver _dependencyResolver;
+        private readonly ITypeProvider _typeProvider;
 
         public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
@@ -31,18 +33,21 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       IClock clock,
                                       ICompressor compressor,
                                       IDependencyResolver dependencyResolver,
-            ILargeMessageBodyStore largeMessageBodyStore,
-                                      IOutboundInterceptorFactory outboundInterceptorFactory, ISerializer serializer)
+                                      ILargeMessageBodyStore largeMessageBodyStore,
+                                      IOutboundInterceptorFactory outboundInterceptorFactory,
+                                      ISerializer serializer,
+                                      ITypeProvider typeProvider)
         {
             _maxLargeMessageSize = maxLargeMessageSize;
             _maxSmallMessageSize = maxSmallMessageSize;
             _replyQueueName = replyQueueName;
             _clock = clock;
             _compressor = compressor;
+            _dependencyResolver = dependencyResolver;
             _largeMessageBodyStore = largeMessageBodyStore;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _serializer = serializer;
-            _dependencyResolver = dependencyResolver;
+            _typeProvider = typeProvider;
         }
 
         public Task<BrokeredMessage> Create(object serializableObject = null)
@@ -134,8 +139,10 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return compressedBytes;
         }
 
-        public Task<object> GetBody(BrokeredMessage message, Type type)
+        public Task<object> GetBody(BrokeredMessage message)
         {
+            var bodyType = GetBodyType(message);
+
             return Task.Run(async () =>
                                   {
                                       byte[] bodyBytes;
@@ -157,9 +164,20 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       }
 
                                       var decompressedBytes = _compressor.Decompress(bodyBytes);
-                                      var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), type);
+                                      var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), bodyType);
                                       return deserialized;
                                   });
+        }
+
+        public Type GetBodyType(BrokeredMessage message)
+        {
+            var typeName = message.SafelyGetBodyTypeNameOrDefault();
+            var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();
+            if (candidates.Any() == false)
+                throw new Exception("The type '{0}' was not discovered by the type provider and cannot be loaded.".FormatWith(typeName));
+            
+            // The TypeProvider should not provide a list of duplicates
+            return candidates.Single();
         }
     }
 }

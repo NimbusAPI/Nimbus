@@ -27,7 +27,7 @@ namespace Nimbus.UnitTests.CompressionTests
             return BuildBrokeredMessageFactory(new DeflateCompressor());
         }
 
-        private static BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
+        private BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
             return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
@@ -37,7 +37,8 @@ namespace Nimbus.UnitTests.CompressionTests
                                               new NullDependencyResolver(),
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
-                                              new DataContractSerializer());
+                                              new DataContractSerializer(),
+                                              new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace }));
         }
 
         protected override async Task When()

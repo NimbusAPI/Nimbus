@@ -17,6 +17,7 @@ namespace Nimbus.Infrastructure
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
+        private readonly IRouter _router;
 
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
@@ -24,12 +25,13 @@ namespace Nimbus.Infrastructure
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly ITypeProvider _typeProvider;
 
-        private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>(); 
+        private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
                                  ILogger logger,
+                                 IRouter router,
                                  DefaultMessageLockDurationSetting defaultMessageLockDuration,
             ITypeProvider typeProvider)
         {
@@ -37,6 +39,7 @@ namespace Nimbus.Infrastructure
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
+            _router = router;
             _defaultMessageLockDuration = defaultMessageLockDuration;
             _typeProvider = typeProvider;
 
@@ -90,15 +93,6 @@ namespace Nimbus.Infrastructure
                 EnsureSubscriptionExists(topicPath, subscriptionName);
                 return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName);
             });
-        }
-
-        public QueueClient CreateQueueClient<T>()
-        {
-            var messageContractType = typeof(T);
-            var queueName = PathFactory.QueuePathFor(messageContractType);
-
-            EnsureQueueExists(messageContractType);
-            return _messagingFactory().CreateQueueClient(queueName);
         }
 
         public Task<QueueClient> CreateDeadLetterQueueClient<T>()
@@ -269,7 +263,7 @@ namespace Nimbus.Infrastructure
 
         private void EnsureQueueExists(Type commandType)
         {
-            var queuePath = PathFactory.QueuePathFor(commandType);
+            var queuePath = _router.Route(commandType);
             EnsureQueueExists(queuePath);
         }
 
@@ -320,7 +314,7 @@ namespace Nimbus.Infrastructure
 
         private string GetDeadLetterQueueName(Type messageContractType)
         {
-            var queuePath = PathFactory.QueuePathFor(messageContractType);
+            var queuePath = _router.Route(messageContractType);
             var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
         }

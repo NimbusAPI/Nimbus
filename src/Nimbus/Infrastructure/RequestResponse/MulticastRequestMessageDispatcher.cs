@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +12,7 @@ using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class RequestMessageDispatcher : IMessageDispatcher
+    internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
@@ -22,7 +22,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
 
-        public RequestMessageDispatcher(
+        public MulticastRequestMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
             IClock clock,
             IDependencyResolver dependencyResolver,
@@ -44,8 +44,8 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var busRequest = await _brokeredMessageFactory.GetBody(message);
             var messageType = busRequest.GetType();
-            
-            // There should only ever be a single request handler per message type
+
+            // There should only ever be a single multicast request handler associated with this dispatcher
             var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
             var dispatchMethod = GetGenericDispatchMethodFor(busRequest);
             await (Task) dispatchMethod.Invoke(this, new[] {busRequest, message, handlerType});
@@ -53,8 +53,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         // ReSharper disable UnusedMember.Local
         private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message, Type handlerType)
-            where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
-            where TBusResponse : IBusResponse
+            where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
+            where TBusResponse : IBusMulticastResponse
         {
             var replyQueueName = message.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
@@ -62,26 +62,26 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
+                var handler = scope.Resolve<IHandleMulticastRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
+
+                foreach (var interceptor in interceptors)
+                {
+                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
+                                  interceptor.GetType().FullName, 
+                                  message.SafelyGetBodyTypeNameOrDefault(), 
+                                  message.MessageId, 
+                                  message.CorrelationId);
+                    await interceptor.OnMulticastRequestHandlerExecuting(busRequest, message);
+                    _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                                  interceptor.GetType().FullName,
+                                  message.SafelyGetBodyTypeNameOrDefault(),
+                                  message.MessageId,
+                                  message.CorrelationId);
+                }
 
                 try
                 {
-                    foreach (var interceptor in interceptors)
-                    {
-                        _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
-                            interceptor.GetType().FullName, 
-                            message.SafelyGetBodyTypeNameOrDefault(), 
-                            message.MessageId, 
-                            message.CorrelationId);
-                        await interceptor.OnRequestHandlerExecuting(busRequest, message);
-                        _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                            interceptor.GetType().FullName,
-                            message.SafelyGetBodyTypeNameOrDefault(),
-                            message.MessageId,
-                            message.CorrelationId);
-                    }
-
                     var handlerTask = handler.Handle(busRequest);
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
@@ -89,16 +89,16 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
 
                     _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                        responseMessage.SafelyGetBodyTypeNameOrDefault(),
-                        replyQueueName,
-                        message.MessageId,
-                        message.CorrelationId);
+                                  responseMessage.SafelyGetBodyTypeNameOrDefault(),
+                                  replyQueueName,
+                                  message.MessageId,
+                                  message.CorrelationId);
                     await replyQueueClient.Send(responseMessage);
                     _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        replyQueueName,
-                        message.MessageId,
-                        message.CorrelationId);
+                                 message.SafelyGetBodyTypeNameOrDefault(),
+                                 replyQueueName,
+                                 message.MessageId,
+                                 message.CorrelationId);
                     
                 }
                 catch (Exception exc)
@@ -111,18 +111,18 @@ namespace Nimbus.Infrastructure.RequestResponse
                     foreach (var interceptor in interceptors.Reverse())
                     {
                         _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
+                                      interceptor.GetType().FullName,
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.MessageId,
+                                      message.CorrelationId);
 
-                        await interceptor.OnRequestHandlerSuccess(busRequest, message);
+                        await interceptor.OnMulticastRequestHandlerSuccess(busRequest, message);
                         
                         _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
+                                      interceptor.GetType().FullName,
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.MessageId,
+                                      message.CorrelationId);
                     }
                 }
                 else
@@ -130,18 +130,18 @@ namespace Nimbus.Infrastructure.RequestResponse
                     foreach (var interceptor in interceptors.Reverse())
                     {
                         _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
+                                      interceptor.GetType().FullName,
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.MessageId,
+                                      message.CorrelationId);
 
-                        await interceptor.OnRequestHandlerError(busRequest, message, exception);
+                        await interceptor.OnMulticastRequestHandlerError(busRequest, message, exception);
 
                         _logger.Debug("Executed OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
+                                      interceptor.GetType().FullName,
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.MessageId,
+                                      message.CorrelationId);
 
                     }
 
@@ -149,34 +149,32 @@ namespace Nimbus.Infrastructure.RequestResponse
                         await _brokeredMessageFactory.CreateFailedResponse(message, exception);
 
                     _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
-                        replyQueueName,
-                        exception.Message,
-                        message.MessageId,
-                        message.CorrelationId);
+                                 replyQueueName,
+                                 exception.Message,
+                                 message.MessageId,
+                                 message.CorrelationId);
                     await replyQueueClient.Send(failedResponseMessage);
                     _logger.Info("Sent failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
-                        replyQueueName,
-                        message.MessageId,
-                        message.CorrelationId);
+                                 replyQueueName,
+                                 message.MessageId,
+                                 message.CorrelationId);
                 }
             }
         }
 
         // ReSharper restore UnusedMember.Local
-
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
             var closedGenericHandlerType =
                 request.GetType()
-                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
                        .Single();
 
             var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch",
-                BindingFlags.NonPublic | BindingFlags.Instance);
+            var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
             return closedGenericMethod;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -16,40 +17,41 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly Type _commandType;
         private readonly IClock _clock;
-        private readonly Type _handlerType;
         private readonly ILogger _logger;
+        private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
 
         public CommandMessageDispatcher(
+            IBrokeredMessageFactory brokeredMessageFactory,
+            IClock clock,
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
-            IBrokeredMessageFactory brokeredMessageFactory,
-            Type commandType,
-            IClock clock,
-            Type handlerType,
-            ILogger logger)
+            ILogger logger,
+            IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
+            _brokeredMessageFactory = brokeredMessageFactory;
+            _clock = clock;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _commandType = commandType;
-            _clock = clock;
-            _handlerType = handlerType;
             _logger = logger;
+            _handlerMap = handlerMap;
         }
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busCommand = await _brokeredMessageFactory.GetBody(message, _commandType);
-            await Dispatch((dynamic) busCommand, message);
+            var busCommand = await _brokeredMessageFactory.GetBody(message);
+            var messageType = busCommand.GetType();
+
+            // There should only ever be a single command handler
+            var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
+            await Dispatch((dynamic) busCommand, message, handlerType);
         }
 
-        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
+        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message, Type handlerType) where TBusCommand : IBusCommand
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
+                var handler = scope.Resolve<IHandleCommand<TBusCommand>>(handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
                 Exception exception;
@@ -57,7 +59,6 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     foreach (var interceptor in interceptors)
                     {
-                    
                         _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                             interceptor.GetType().FullName,
                             message.SafelyGetBodyTypeNameOrDefault(),

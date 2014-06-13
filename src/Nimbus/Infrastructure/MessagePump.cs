@@ -10,20 +10,24 @@ namespace Nimbus.Infrastructure
     [DebuggerDisplay("{_receiver}")]
     internal class MessagePump : IMessagePump
     {
-        private readonly INimbusMessageReceiver _receiver;
-        private readonly IMessageDispatcher _dispatcher;
-        private readonly ILogger _logger;
         private readonly IClock _clock;
+        private readonly ILogger _logger;
+        private readonly IMessageDispatcher _messageDispatcher;
+        private readonly INimbusMessageReceiver _receiver;
 
         private bool _started;
         private readonly object _mutex = new object();
 
-        public MessagePump(IClock clock, ILogger logger, IMessageDispatcher dispatcher, INimbusMessageReceiver receiver)
+        public MessagePump(
+            IClock clock,
+            ILogger logger,
+            IMessageDispatcher messageDispatcher,
+            INimbusMessageReceiver receiver)
         {
-            _receiver = receiver;
-            _dispatcher = dispatcher;
-            _logger = logger;
             _clock = clock;
+            _logger = logger;
+            _messageDispatcher = messageDispatcher;
+            _receiver = receiver;
         }
 
         public Task Start()
@@ -69,7 +73,7 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     LogInfo("Dispatching", message);
-                    await _dispatcher.Dispatch(message);
+                    await _messageDispatcher.Dispatch(message);
                     LogDebug("Dispatched", message);
 
                     LogDebug("Completing", message);
