@@ -8,6 +8,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 using NUnit.Framework;
 using Shouldly;
 

@@ -8,6 +8,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices

@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
-using Nimbus.Interceptors.Outbound;
 
-namespace Nimbus.Interceptors.Inbound
+namespace Nimbus.Interceptors.Outbound
 {
     internal interface IOutboundInterceptorFactory
     {
