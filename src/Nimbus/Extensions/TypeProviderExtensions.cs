@@ -45,6 +45,7 @@ namespace Nimbus.Extensions
                 .Union(typeProvider.CommandTypes)
                 .Union(typeProvider.EventTypes)
                 .Union(typeProvider.RequestTypes)
+                .Union(typeProvider.ResponseTypes)
                 .ToArray();
         }
 

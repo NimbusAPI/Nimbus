@@ -44,7 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var request = await _brokeredMessageFactory.GetBody(message, _messageType);
+            var request = await _brokeredMessageFactory.GetBody(message);
             var dispatchMethod = GetGenericDispatchMethodFor(request);
             await (Task) dispatchMethod.Invoke(this, new[] {request, message});
         }

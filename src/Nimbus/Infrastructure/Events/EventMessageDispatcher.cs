@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure.Events
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busEvent = await _brokeredMessageFactory.GetBody(message, _eventType);
+            var busEvent = await _brokeredMessageFactory.GetBody(message);
             await Dispatch((dynamic) busEvent, message);
         }
 

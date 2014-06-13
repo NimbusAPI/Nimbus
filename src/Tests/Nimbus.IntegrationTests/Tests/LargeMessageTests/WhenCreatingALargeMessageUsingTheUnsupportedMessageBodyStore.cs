@@ -29,7 +29,8 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               dependencyResolver,
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
-                                              new DataContractSerializer());
+                                              new DataContractSerializer(),
+                                              new UnitTests.TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace }));
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

@@ -42,7 +42,8 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     new NullDependencyResolver(),
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     new NullOutboundInterceptorFactory(),
-                                                                    serializer);
+                                                                    serializer,
+                                                                    new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
 

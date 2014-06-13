@@ -24,8 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];
             if (success)
             {
-                var responseType = responseCorrelationWrapper.ResponseType;
-                var response = await _brokeredMessageFactory.GetBody(message, responseType);
+                var response = await _brokeredMessageFactory.GetBody(message);
                 responseCorrelationWrapper.Reply(response);
             }
             else

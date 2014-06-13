@@ -47,7 +47,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                  new NullDependencyResolver(),
                                                                  new UnsupportedLargeMessageBodyStore(),
                                                                  new NullOutboundInterceptorFactory(),
-                                                                 serializer);
+                                                                 serializer,
+                                                                 new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
 
             _commandDispatcher = new CommandMessageDispatcher(Subject,
                                                               new NullInboundInterceptorFactory(),

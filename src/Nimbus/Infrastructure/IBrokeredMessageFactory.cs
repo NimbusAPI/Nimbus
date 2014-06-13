@@ -31,6 +31,6 @@ namespace Nimbus.Infrastructure
         /// <returns>The newly minted <see cref="BrokeredMessage" /></returns>
         Task<BrokeredMessage> CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
 
-        Task<object> GetBody(BrokeredMessage message, Type type);
+        Task<object> GetBody(BrokeredMessage message);
     }
 }

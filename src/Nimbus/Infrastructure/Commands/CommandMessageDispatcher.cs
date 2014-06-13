@@ -41,7 +41,7 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var busCommand = await _brokeredMessageFactory.GetBody(message, _commandType);
+            var busCommand = await _brokeredMessageFactory.GetBody(message);
             await Dispatch((dynamic) busCommand, message);
         }
 

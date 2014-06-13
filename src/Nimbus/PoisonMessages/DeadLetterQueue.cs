@@ -23,7 +23,7 @@ namespace Nimbus.PoisonMessages
             if (result == null) return null;
 
             await result.CompleteAsync();
-            return (TBusMessageContract) await _brokeredMessageFactory.GetBody(result, typeof (TBusMessageContract));
+            return (TBusMessageContract) await _brokeredMessageFactory.GetBody(result);
         }
     }
 }

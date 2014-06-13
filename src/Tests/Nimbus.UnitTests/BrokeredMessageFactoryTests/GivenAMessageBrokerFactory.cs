@@ -36,7 +36,9 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                                               new NullDependencyResolver(),
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
-                                              _serializer);
+                                              _serializer,
+                                              new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace})
+                                              );
         }
 
         [TestFixture]
