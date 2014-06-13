@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure.RestApi
+namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
 {
-    internal interface IRestApiHelper
+    internal interface IAzureBlobStorageHttpClient
     {
         Task Upload(string storageKey, byte[] bytes);
         Task Delete(string storageKey);

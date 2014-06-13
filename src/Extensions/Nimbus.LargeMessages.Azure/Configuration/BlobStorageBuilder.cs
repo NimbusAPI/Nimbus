@@ -1,4 +1,4 @@
-namespace Nimbus.LargeMessages.Azure.Infrastructure
+namespace Nimbus.LargeMessages.Azure.Configuration
 {
     public class BlobStorageBuilder
     {

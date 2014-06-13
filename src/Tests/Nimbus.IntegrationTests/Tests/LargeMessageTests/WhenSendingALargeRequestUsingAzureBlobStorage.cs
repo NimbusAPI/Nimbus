@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
-using Nimbus.LargeMessages.Azure.Infrastructure;
+using Nimbus.LargeMessages.Azure.Configuration;
 using Nimbus.Logger;
 using NUnit.Framework;
 using Shouldly;
@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = new ConsoleLogger();
             var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
-                                                                  .WithBlobStorageConnectionString(CommonResources.BlobStorageConnectionString)
+                                                                  .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
                                                                   .WithLogger(logger)
                                                                   .Build();
             var bus = new BusBuilder().Configure()

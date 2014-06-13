@@ -12,16 +12,21 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
 {
     internal class AzureBlobStorageLargeMessageBodyStore : ILargeMessageBodyStore
     {
-        private readonly BlobStorageConnectionStringSetting _connectionString;
+        private readonly AzureStorageAccountConnectionStringSetting _azureStorageAccountConnectionString;
+        private readonly AutoCreateBlobStorageContainerNameSetting _autoCreateBlobStorageContainerName;
         private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<CloudStorageAccount> _storageAccount;
         private readonly ThreadSafeLazy<CloudBlobClient> _blobClient;
         private readonly ThreadSafeLazy<CloudBlobContainer> _container;
 
-        internal AzureBlobStorageLargeMessageBodyStore(BlobStorageConnectionStringSetting connectionString, ILogger logger)
+        internal AzureBlobStorageLargeMessageBodyStore(
+            AzureStorageAccountConnectionStringSetting azureStorageAccountConnectionString,
+            AutoCreateBlobStorageContainerNameSetting autoCreateBlobStorageContainerName,
+            ILogger logger)
         {
-            _connectionString = connectionString;
+            _azureStorageAccountConnectionString = azureStorageAccountConnectionString;
+            _autoCreateBlobStorageContainerName = autoCreateBlobStorageContainerName;
             _logger = logger;
 
             _storageAccount = new ThreadSafeLazy<CloudStorageAccount>(OpenCloudStorageAccount);
@@ -61,7 +66,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
 
         private CloudStorageAccount OpenCloudStorageAccount()
         {
-            return CloudStorageAccount.Parse(_connectionString);
+            return CloudStorageAccount.Parse(_azureStorageAccountConnectionString);
         }
 
         private CloudBlobClient CreateCloudBlobClient()
@@ -71,7 +76,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
 
         private CloudBlobContainer GetContainerReference()
         {
-            var cloudBlobContainer = _blobClient.Value.GetContainerReference("messagebodies");
+            var cloudBlobContainer = _blobClient.Value.GetContainerReference(_autoCreateBlobStorageContainerName);
             cloudBlobContainer.CreateIfNotExists(BlobContainerPublicAccessType.Blob);
             return cloudBlobContainer;
         }
