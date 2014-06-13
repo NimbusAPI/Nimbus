@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Nimbus.Handlers;
+using Nimbus.MessageContracts;
 
 namespace Nimbus.Extensions
 {
@@ -22,6 +23,20 @@ namespace Nimbus.Extensions
                                .SelectMany(t => t.GetInterfaces())
                                .Where(typeProvider.IsClosedGenericHandlerInterface)
                                .ToArray();
+        }
+
+        public static Type[] AllHandledEventTypes(this ITypeProvider typeProvider)
+        {
+            var handlers = new Type[0]
+                .Union(typeProvider.MulticastEventHandlerTypes)
+                .Union(typeProvider.CompetingEventHandlerTypes)
+                .ToArray();
+
+            var handledEvents = handlers.SelectMany(hand => hand.GetInterfaces())
+                                        .Where(i => i.IsClosedTypeOf(typeof(IHandleCompetingEvent<>)) || i.IsClosedTypeOf(typeof(IHandleMulticastEvent<>)))
+                                        .SelectMany(i => i.GetGenericArguments());
+
+            return handledEvents.Distinct().ToArray();
         }
 
         public static Type[] AllMessageContractTypes(this ITypeProvider typeProvider)
