@@ -8,12 +8,12 @@ namespace Nimbus.Infrastructure
     {
         public string Route(Type messageType)
         {
-            if (typeof (IBusCommand).IsAssignableFrom(messageType) || messageType.IsClosedTypeOf(typeof (IBusRequest<,>)))
+            if (typeof(IBusCommand).IsAssignableFrom(messageType) || messageType.IsClosedTypeOf(typeof(IBusRequest<,>)))
             {
                 return PathFactory.QueuePathFor(messageType);
             }
 
-            if (typeof (IBusEvent).IsAssignableFrom(messageType) || messageType.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
+            if (typeof(IBusEvent).IsAssignableFrom(messageType) || messageType.IsClosedTypeOf(typeof(IBusMulticastRequest<,>)))
             {
                 return PathFactory.TopicPathFor(messageType);
             }

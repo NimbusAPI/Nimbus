@@ -5,6 +5,7 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Logger;
@@ -19,6 +20,7 @@ namespace Nimbus.Configuration
         internal ILogger Logger { get; set; }
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
+        internal IRouter Router { get; set; }
 
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
@@ -38,7 +40,8 @@ namespace Nimbus.Configuration
         {
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
-
+            Router = new DestinationPerMessageTypeRouter();
+            
             Logger = new NullLogger();
             Serializer = new DataContractSerializer();
             Compressor = new NullCompressor();
