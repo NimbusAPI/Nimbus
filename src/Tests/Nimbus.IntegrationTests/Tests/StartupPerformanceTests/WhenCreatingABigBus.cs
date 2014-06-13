@@ -15,6 +15,7 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 {
     [TestFixture]
+    [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public class WhenCreatingABigBus
     {
         private NamespaceCleanser _namespaceCleanser;
