@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
-using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
@@ -21,7 +20,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly IReadOnlyDictionary<Type, Type> _handlerMap;
+        private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
 
         public RequestMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -30,7 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             IInboundInterceptorFactory inboundInterceptorFactory,
             ILogger logger,
             INimbusMessagingFactory messagingFactory,
-            IReadOnlyDictionary<Type, Type> handlerMap)
+            IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -43,13 +42,17 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var request = await _brokeredMessageFactory.GetBody(message);
-            var dispatchMethod = GetGenericDispatchMethodFor(request);
-            await (Task) dispatchMethod.Invoke(this, new[] {request, message});
+            var busRequest = await _brokeredMessageFactory.GetBody(message);
+            var messageType = busRequest.GetType();
+            
+            // There should only ever be a single request handler per message type
+            var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
+            var dispatchMethod = GetGenericDispatchMethodFor(busRequest);
+            await (Task) dispatchMethod.Invoke(this, new[] {busRequest, message, handlerType});
         }
 
         // ReSharper disable UnusedMember.Local
-        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message)
+        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage message, Type handlerType)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
@@ -59,10 +62,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                Type handlerType;
-                if (_handlerMap.TryGetValue(busRequest.GetType(), out handlerType) == false)
-                    throw new DispatchFailedException("There is no handler registered for the message type {0}.".FormatWith(busRequest.GetType()));
-                
                 var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
 

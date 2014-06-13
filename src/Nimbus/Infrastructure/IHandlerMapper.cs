@@ -5,8 +5,10 @@ namespace Nimbus.Infrastructure
 {
     internal interface IHandlerMapper
     {
-        bool TryGetHandlerTypeFor(Type messageType, out Type handlerType);
-        IReadOnlyDictionary<Type, Type> GetHandlerMapFor(IEnumerable<Type> messageTypes);
-        IReadOnlyDictionary<Type, Type> GetFullHandlerMap();
+        IReadOnlyDictionary<Type, Type[]> GetFullHandlerMap(Type openGenericHandlerType);
+        IEnumerable<Type> GetMessageTypesHandledBy(Type openGenericHandlerType, Type handlerType);
+        IEnumerable<Type> GetMessageTypesHandledBy(Type openGenericHandlerType, IEnumerable<Type> handlerTypes);
+        IReadOnlyDictionary<Type, Type[]> GetHandlerMapFor(Type openGenericHandlerType, IEnumerable<Type> messageTypes);
+        Type[] GetHandlerTypesFor(Type openGenericHandlerType, Type messageType);
     }
 }

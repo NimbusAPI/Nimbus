@@ -14,11 +14,13 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
         private readonly IClock _clock;
+        private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public RequestMessagePumpsFactory(IClock clock,
+                                          IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
@@ -28,6 +30,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
             _clock = clock;
+            _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
             _messagingFactory = messagingFactory;
             _router = router;
@@ -35,27 +38,30 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _typeProvider.RequestHandlerTypes)
+            var openGenericHandlerType = typeof(IHandleRequest<,>);
+            var handlerTypes = _typeProvider.RequestHandlerTypes.ToArray();
+
+            // Create a single connection to each request queue determined by routing
+            var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
+            var bindings = allMessageTypesHandledByThisEndpoint
+                .Select(m => new { MessageType = m, QueuePath = _router.Route(m) })
+                .GroupBy(b => b.QueuePath)
+                .Select(g => new { QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType)) });
+            
+            // Each binding to a queue can handle one or more request types depending on the routes that are defined
+            foreach (var binding in bindings)
             {
-                var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleRequest<,>))
-                                              .Select(gi => gi.GetGenericArguments().First())
-                                              .OrderBy(t => t.FullName)
-                                              .Distinct()
-                                              .ToArray();
+                var messageTypes = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, binding.HandlerTypes).ToArray();
 
-                foreach (var requestType in requestTypes)
-                {
-                    var queuePath = _router.Route(requestType);
-                    
-                    _logger.Debug("Creating message pump for request queue {0}", queuePath);
-                    var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
-                    var handlerMap = new Dictionary<Type, Type> { { requestType, handlerType } };
-                    var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(typeof (IHandleRequest<,>), handlerMap), messageReceiver);
-                    _garbageMan.Add(pump);
+                _logger.Debug("Creating message pump for request queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
+                var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
+                
+                var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
+                var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
+                _garbageMan.Add(pump);
 
-                    yield return pump;
-                }
-            }
+                yield return pump;
+            } 
         }
 
         public void Dispose()

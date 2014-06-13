@@ -5,6 +5,6 @@ namespace Nimbus.Infrastructure
 {
     internal interface IMessageDispatcherFactory
     {
-        IMessageDispatcher Create(Type handlerType, IReadOnlyDictionary<Type, Type> handlerMap);
+        IMessageDispatcher Create(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap);
     }
 }

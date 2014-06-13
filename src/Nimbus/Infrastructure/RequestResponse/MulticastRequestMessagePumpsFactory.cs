@@ -16,12 +16,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
         private readonly IClock _clock;
+        private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public MulticastRequestMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    IClock clock,
+                                                   IHandlerMapper handlerMapper,
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
                                                    INimbusMessagingFactory messagingFactory,
@@ -30,6 +32,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             _applicationName = applicationName;
             _clock = clock;
+            _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
             _messagingFactory = messagingFactory;
@@ -39,23 +42,37 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            foreach (var handlerType in _typeProvider.MulticastRequestHandlerTypes)
-            {
-                var requestTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleMulticastRequest<,>))
-                                              .Select(gi => gi.GetGenericArguments().First())
-                                              .OrderBy(t => t.FullName)
-                                              .Distinct()
-                                              .ToArray();
+            var openGenericHandlerType = typeof(IHandleMulticastRequest<,>);
+            var handlerTypes = _typeProvider.MulticastRequestHandlerTypes.ToArray();
 
-                foreach (var requestType in requestTypes)
+            // Events are routed to Topics and we'll create a competing subscription for the logical endpoint
+            var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
+            var bindings = allMessageTypesHandledByThisEndpoint
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m)})
+                .GroupBy(b => b.TopicPath)
+                .Select(g => new
+                             {
+                                 TopicPath = g.Key,
+                                 MessageTypes = g.Select(x => x.MessageType),
+                                 HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))
+                             })
+                .ToArray();
+
+            if (bindings.Any(b => b.MessageTypes.Count() > 1))
+                throw new NotSupportedException("Routing multiple message types through a single Topic is not supported.");
+
+            foreach (var binding in bindings)
+            {
+                foreach (var handlerType in binding.HandlerTypes)
                 {
-                    var topicPath = _router.Route(requestType);
+                    var messageType = binding.MessageTypes.Single();
                     var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, handlerType);
-                    
-                    _logger.Debug("Creating message pump for multicast request {0}/{1}", topicPath, subscriptionName);
-                    var messageReceiver = _messagingFactory.GetTopicReceiver(topicPath, subscriptionName);
-                    var handlerMap = new Dictionary<Type, Type> { { requestType, handlerType } };
-                    var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(typeof(IHandleMulticastRequest<,>), handlerMap), messageReceiver);
+
+                    _logger.Debug("Creating message pump for multicast request subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
+                    var messageReceiver = _messagingFactory.GetTopicReceiver(binding.TopicPath, subscriptionName);
+
+                    var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
+                    var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
                     _garbageMan.Add(pump);
 
                     yield return pump;

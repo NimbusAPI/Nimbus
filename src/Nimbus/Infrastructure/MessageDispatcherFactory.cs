@@ -34,14 +34,14 @@ namespace Nimbus.Infrastructure
             _messagingFactory = messagingFactory;
         }
 
-        public IMessageDispatcher Create(Type handlerType, IReadOnlyDictionary<Type, Type> handlerMap)
+        public IMessageDispatcher Create(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
-            return BuildDispatcher(handlerType, handlerMap);
+            return BuildDispatcher(openGenericHandlerType, handlerMap);
         }
 
-        private IMessageDispatcher BuildDispatcher(Type handlerType, IReadOnlyDictionary<Type, Type> handlerMap)
+        private IMessageDispatcher BuildDispatcher(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
-            if (handlerType == typeof(IHandleCommand<>))
+            if (openGenericHandlerType == typeof(IHandleCommand<>))
             {
                 return new CommandMessageDispatcher(_brokeredMessageFactory,
                                                     _clock,
@@ -51,7 +51,7 @@ namespace Nimbus.Infrastructure
                                                     handlerMap);
             }
 
-            if (handlerType == typeof (IHandleCompetingEvent<>))
+            if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
             {
                 return new CompetingEventMessageDispatcher(_brokeredMessageFactory,
                                                            _clock,
@@ -60,7 +60,7 @@ namespace Nimbus.Infrastructure
                                                            handlerMap);
             }
 
-            if (handlerType == typeof (IHandleMulticastEvent<>))
+            if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
             {
                 return new MulticastEventMessageDispatcher(_brokeredMessageFactory,
                                                            _clock,
@@ -69,7 +69,7 @@ namespace Nimbus.Infrastructure
                                                            handlerMap);
             }
 
-            if (handlerType == typeof (IHandleRequest<,>))
+            if (openGenericHandlerType == typeof (IHandleRequest<,>))
             {
                 return new RequestMessageDispatcher(_brokeredMessageFactory,
                                                     _clock,
@@ -80,7 +80,7 @@ namespace Nimbus.Infrastructure
                                                     handlerMap);
             }
 
-            if (handlerType == typeof (IHandleMulticastRequest<,>))
+            if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
             {
                 return new MulticastRequestMessageDispatcher(_brokeredMessageFactory,
                                                              _clock,
@@ -93,7 +93,7 @@ namespace Nimbus.Infrastructure
 
             throw new NotSupportedException(
                 "There is no dispatcher for the handler type {0}."
-                    .FormatWith(handlerType.FullName));
+                    .FormatWith(openGenericHandlerType.FullName));
         }
     }
 }

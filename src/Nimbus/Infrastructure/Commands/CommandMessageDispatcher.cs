@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly ILogger _logger;
-        private readonly IReadOnlyDictionary<Type, Type> _handlerMap;
+        private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
 
         public CommandMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.Commands
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
             ILogger logger,
-            IReadOnlyDictionary<Type, Type> handlerMap)
+            IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -40,17 +40,17 @@ namespace Nimbus.Infrastructure.Commands
         public async Task Dispatch(BrokeredMessage message)
         {
             var busCommand = await _brokeredMessageFactory.GetBody(message);
-            await Dispatch((dynamic) busCommand, message);
+            var messageType = busCommand.GetType();
+
+            // There should only ever be a single command handler
+            var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
+            await Dispatch((dynamic) busCommand, message, handlerType);
         }
 
-        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message) where TBusCommand : IBusCommand
+        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage message, Type handlerType) where TBusCommand : IBusCommand
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                Type handlerType;
-                if (_handlerMap.TryGetValue(busCommand.GetType(), out handlerType) == false)
-                    throw new DispatchFailedException("There is no handler registered for the message type {0}.".FormatWith(busCommand.GetType()));
-                
                 var handler = scope.Resolve<IHandleCommand<TBusCommand>>(handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
@@ -59,7 +59,6 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     foreach (var interceptor in interceptors)
                     {
-                    
                         _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                             interceptor.GetType().FullName,
                             message.SafelyGetBodyTypeNameOrDefault(),

@@ -2,38 +2,52 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.ConcurrentCollections;
+using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 
 namespace Nimbus.Infrastructure
 {
-    internal class HandlerMapper : IHandlerMapper
+    internal class HandlerMapper : IHandlerMapper, IValidatableConfigurationSetting
     {
         private readonly ITypeProvider _typeProvider;
-        private readonly ThreadSafeLazy<Dictionary<Type, Type>> _handlerMap;
+        private readonly ThreadSafeLazy<IReadOnlyDictionary<Type, IReadOnlyDictionary<Type, Type[]>>> _handlerMap;
 
         public HandlerMapper(ITypeProvider typeProvider)
         {
             _typeProvider = typeProvider;
-            _handlerMap = new ThreadSafeLazy<Dictionary<Type, Type>>(Build);
+            _handlerMap = new ThreadSafeLazy<IReadOnlyDictionary<Type, IReadOnlyDictionary<Type, Type[]>>>(Build);
         }
 
-        public bool TryGetHandlerTypeFor(Type messageType, out Type handlerType)
+        public Type[] GetHandlerTypesFor(Type openGenericHandlerType, Type messageType)
         {
-            return _handlerMap.Value.TryGetValue(messageType, out handlerType);
+            return _handlerMap.Value[openGenericHandlerType][messageType];
         }
 
-        public IReadOnlyDictionary<Type, Type> GetHandlerMapFor(IEnumerable<Type> messageTypes)
+        public IReadOnlyDictionary<Type, Type[]> GetHandlerMapFor(Type openGenericHandlerType, IEnumerable<Type> messageTypes)
         {
-            return _handlerMap.Value.Where(x => messageTypes.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+            return _handlerMap.Value[openGenericHandlerType].Where(x => messageTypes.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public IReadOnlyDictionary<Type, Type> GetFullHandlerMap()
+        public IReadOnlyDictionary<Type, Type[]> GetFullHandlerMap(Type openGenericHandlerType)
         {
-            return _handlerMap.Value;
+            return _handlerMap.Value[openGenericHandlerType];
         }
 
-        private Dictionary<Type, Type> Build()
+        public IEnumerable<Type> GetMessageTypesHandledBy(Type openGenericHandlerType, Type handlerType)
+        {
+            return GetMessageTypesHandledBy(openGenericHandlerType, new[] {handlerType});
+        }
+
+        public IEnumerable<Type> GetMessageTypesHandledBy(Type openGenericHandlerType, IEnumerable<Type> handlerTypes)
+        {
+            return handlerTypes
+                .SelectMany(h => h.GetGenericInterfacesClosing(openGenericHandlerType).Select(gi => gi.GetGenericArguments().First()))
+                .OrderBy(m => m.Name)
+                .Distinct();
+        }
+
+        private IReadOnlyDictionary<Type, IReadOnlyDictionary<Type, Type[]>> Build()
         {
             var commandHandlerMap = BuildHandlerMap(_typeProvider.CommandHandlerTypes, typeof(IHandleCommand<>));
             var competingEventHandlerMap = BuildHandlerMap(_typeProvider.CompetingEventHandlerTypes, typeof(IHandleCompetingEvent<>));
@@ -41,36 +55,34 @@ namespace Nimbus.Infrastructure
             var requestHandlerMap = BuildHandlerMap(_typeProvider.RequestHandlerTypes, typeof(IHandleRequest<,>));
             var multicastRequestHandlerMap = BuildHandlerMap(_typeProvider.MulticastRequestHandlerTypes, typeof(IHandleMulticastRequest<,>));
 
-            var map = commandHandlerMap.Concat(competingEventHandlerMap)
-                                       .Concat(multicastEventHandlerMap)
-                                       .Concat(requestHandlerMap)
-                                       .Concat(multicastRequestHandlerMap)
-                                       .ToDictionary(x => x.Key, x => x.Value);
+            var map = new Dictionary<Type, IReadOnlyDictionary<Type, Type[]>>
+                      {
+                          {commandHandlerMap.Key, commandHandlerMap.Value},
+                          {competingEventHandlerMap.Key, competingEventHandlerMap.Value},
+                          {multicastEventHandlerMap.Key, multicastEventHandlerMap.Value},
+                          {requestHandlerMap.Key, requestHandlerMap.Value},
+                          {multicastRequestHandlerMap.Key, multicastRequestHandlerMap.Value},
+                      };
 
-            //AssertSingleHandlers(map);
-
-            return map.ToDictionary(x => x.Key, x => x.Value.Single());
+            return map;
         }
 
-        private IEnumerable<KeyValuePair<Type, Type[]>> BuildHandlerMap(IEnumerable<Type> handlerTypes, Type openGenericHandlerType)
+        private KeyValuePair<Type, IReadOnlyDictionary<Type, Type[]>> BuildHandlerMap(IEnumerable<Type> handlerTypes, Type openGenericHandlerType)
         {
             var handlers = handlerTypes as Type[] ?? handlerTypes.ToArray();
-            var messages = GetMessageTypesHandledBy(handlers, openGenericHandlerType);
-            var handlerMap = MapMessagesToHandlers(messages, handlers, openGenericHandlerType);
+            var messages = GetMessageTypesHandledBy(openGenericHandlerType, handlers);
+            var handlerMap = MapMessagesToHandlers(openGenericHandlerType, messages, handlers);
 
-            return handlerMap;
+            return new KeyValuePair<Type, IReadOnlyDictionary<Type, Type[]>>(openGenericHandlerType, handlerMap);
         }
 
-        private IEnumerable<Type> GetMessageTypesHandledBy(IEnumerable<Type> handlerTypes, Type openGenericHandlerType)
-        {
-            return handlerTypes.SelectMany(h => h.GetGenericInterfacesClosing(openGenericHandlerType).Select(gi => gi.GetGenericArguments().First())).OrderBy(m => m.Name).Distinct();
-        }
-
-        private IEnumerable<KeyValuePair<Type, Type[]>> MapMessagesToHandlers(IEnumerable<Type> messageTypes, IEnumerable<Type> handlerTypes, Type openGenericHandlerType)
+        private IReadOnlyDictionary<Type, Type[]> MapMessagesToHandlers(Type openGenericHandlerType, IEnumerable<Type> messageTypes, IEnumerable<Type> handlerTypes)
         {
             return messageTypes.ToDictionary(
                 m => m,
-                m => handlerTypes.Where(h => h.GetGenericInterfacesClosing(openGenericHandlerType).Select(gi => gi.GetGenericArguments().First()).Contains(m)).ToArray());
+                m => handlerTypes
+                    .Where(h => h.GetGenericInterfacesClosing(openGenericHandlerType).Select(gi => gi.GetGenericArguments().First()).Contains(m))
+                    .ToArray());
         }
 
         private static void AssertSingleHandlers(IEnumerable<KeyValuePair<Type, Type[]>> map)
@@ -82,5 +94,28 @@ namespace Nimbus.Infrastructure
                 throw new NotSupportedException("The following messages have multiple handlers registered: {0}{1}".FormatWith(Environment.NewLine, description));
             }
         }
+
+        public IEnumerable<string> Validate()
+        {
+            var validationErrors = new string[0]
+                .Union(CheckForUnsupportedMultipleHandlers())
+                .ToArray();
+
+            return validationErrors;
+        }
+
+        private IEnumerable<string> CheckForUnsupportedMultipleHandlers()
+        {
+            var validationErrors =
+                _handlerMap.Value
+                           .Where(genericMapping => genericMapping.Key == typeof (IHandleCommand<>) || genericMapping.Key == typeof (IHandleRequest<,>))
+                           .SelectMany(genericMapping => genericMapping.Value.ToArray())
+                           .Where(mapping => mapping.Value.Count() > 1)
+                           .Select(mapping => "The message contract type {0} has multiple handlers: {1}".FormatWith(mapping.Key, mapping.Value.ToTypeNameSummary()))
+                           .ToArray();
+
+            return validationErrors;
+        }
+
     }
 }

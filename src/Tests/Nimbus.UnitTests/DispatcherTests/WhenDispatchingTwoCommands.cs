@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
+using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
@@ -40,7 +41,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                 new InstanceNameSetting {Value = "TestInstance"});
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap();
+            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof(IHandleCommand<>));
 
             _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                                                  new MaxSmallMessageSizeSetting(),

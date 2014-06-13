@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -14,20 +15,23 @@ namespace Nimbus.Infrastructure.Events
     internal abstract class EventMessageDispatcher : IMessageDispatcher
     {
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
 
         protected EventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
-                                         IClock clock,
-                                         IDependencyResolver dependencyResolver,
-                                         IInboundInterceptorFactory inboundInterceptorFactory,
-                                         ILogger logger)
+            IClock clock,
+            IDependencyResolver dependencyResolver,
+            IReadOnlyDictionary<Type, Type[]> handlerMap,
+            IInboundInterceptorFactory inboundInterceptorFactory,
+            ILogger logger)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
+            _handlerMap = handlerMap;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
         }
@@ -35,17 +39,21 @@ namespace Nimbus.Infrastructure.Events
         public async Task Dispatch(BrokeredMessage message)
         {
             var busEvent = await _brokeredMessageFactory.GetBody(message);
-            await Dispatch((dynamic) busEvent, message);
+            var messageType = busEvent.GetType();
+
+            // There should only ever be a single event handler associated with this dispatcher
+            var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
+            await (Task) Dispatch((dynamic) busEvent, message, handlerType);
         }
 
-        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent) where TBusEvent : IBusEvent;
+        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType) where TBusEvent : IBusEvent;
         protected abstract Task DispatchToHandleMethod<TBusEvent>(TBusEvent busEvent, object handler) where TBusEvent : IBusEvent;
 
-        private async Task Dispatch<TBusEvent>(TBusEvent busEvent, BrokeredMessage message) where TBusEvent : IBusEvent
+        private async Task Dispatch<TBusEvent>(TBusEvent busEvent, BrokeredMessage message, Type handlerType) where TBusEvent : IBusEvent
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = CreateHandlerFromScope(scope, busEvent);
+                var handler = CreateHandlerFromScope(scope, busEvent, handlerType);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busEvent);
 
                 Exception exception;

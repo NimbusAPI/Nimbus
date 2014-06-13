@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
@@ -12,6 +11,7 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly IClock _clock;
         private readonly ILogger _logger;
+        private readonly IHandlerMapper _handlerMapper;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public CommandMessagePumpsFactory(IClock clock,
+                                          IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
@@ -27,6 +28,7 @@ namespace Nimbus.Infrastructure.Commands
                                           ITypeProvider typeProvider)
         {
             _clock = clock;
+            _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
             _messagingFactory = messagingFactory;
@@ -36,24 +38,29 @@ namespace Nimbus.Infrastructure.Commands
 
         public IEnumerable<IMessagePump> CreateAll()
         {
+            var openGenericHandlerType = typeof(IHandleCommand<>);
             var handlerTypes = _typeProvider.CommandHandlerTypes.ToArray();
 
-            foreach (var handlerType in handlerTypes)
+            // Create a single connection to each command queue determined by routing
+            var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
+            var bindings = allMessageTypesHandledByThisEndpoint
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m)})
+                .GroupBy(b => b.QueuePath)
+                .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
+
+            // Each binding to a queue can handle one or more command types depending on the routes that are defined
+            foreach (var binding in bindings)
             {
-                var commandTypes = handlerType.GetGenericInterfacesClosing(typeof (IHandleCommand<>)).Select(gi => gi.GetGenericArguments().First());
+                var messageTypes = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, binding.HandlerTypes).ToArray();
+                
+                _logger.Debug("Creating message pump for command queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
+                var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
 
-                foreach (var commandType in commandTypes)
-                {
-                    var queuePath = _router.Route(commandType);
+                var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
+                var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
+                _garbageMan.Add(pump);
 
-                    _logger.Debug("Creating message pump for {0}", queuePath);
-                    var messageReceiver = _messagingFactory.GetQueueReceiver(queuePath);
-                    var handlerMap = new Dictionary<Type, Type>{{commandType, handlerType}};
-                    var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(typeof (IHandleCommand<>), handlerMap), messageReceiver);
-                    _garbageMan.Add(pump);
-
-                    yield return pump;
-                }
+                yield return pump;
             }
         }
 
