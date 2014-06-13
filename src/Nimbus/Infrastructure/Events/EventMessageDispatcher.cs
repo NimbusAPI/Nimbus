@@ -54,26 +54,26 @@ namespace Nimbus.Infrastructure.Events
                 var handler = CreateHandlerFromScope(scope, busEvent);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busEvent);
 
-                foreach (var interceptor in interceptors)
-                {
-                    _logger.Debug("Executing OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
-
-                    await interceptor.OnEventHandlerExecuting(busEvent, message);
-
-                    _logger.Debug("Executed OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
-                }
-
                 Exception exception;
                 try
                 {
+                    foreach (var interceptor in interceptors)
+                    {
+                        _logger.Debug("Executing OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
+
+                        await interceptor.OnEventHandlerExecuting(busEvent, message);
+
+                        _logger.Debug("Executed OnEventHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
+                    }
+
                     var handlerTask = DispatchToHandleMethod(busEvent, handler);
                     var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
                     await wrapper.AwaitCompletion();

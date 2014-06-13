@@ -52,25 +52,25 @@ namespace Nimbus.Infrastructure.Commands
                 var handler = scope.Resolve<IHandleCommand<TBusCommand>>(_handlerType.FullName);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
-                foreach (var interceptor in interceptors)
-                {
-                    
-                    _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
-                    await interceptor.OnCommandHandlerExecuting(busCommand, message);
-                    _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                        interceptor.GetType().FullName,
-                        message.SafelyGetBodyTypeNameOrDefault(),
-                        message.MessageId,
-                        message.CorrelationId);
-                }
-
                 Exception exception;
                 try
                 {
+                    foreach (var interceptor in interceptors)
+                    {
+                    
+                        _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
+                        await interceptor.OnCommandHandlerExecuting(busCommand, message);
+                        _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
+                    }
+
                     var handlerTask = handler.Handle(busCommand);
                     var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
                     await wrapper.AwaitCompletion();
