@@ -61,7 +61,7 @@ namespace Nimbus.Infrastructure
 
         protected async Task<Task> AwaitCompletionInternal(Task handlerTask)
         {
-            var tasks = new List<Task> {handlerTask};
+            var tasks = new List<Task> { WaitForCompletion(handlerTask) };
 
             if (_longRunningHandler != null)
             {
