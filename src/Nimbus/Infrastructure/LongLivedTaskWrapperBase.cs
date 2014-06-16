@@ -63,6 +63,16 @@ namespace Nimbus.Infrastructure
         {
             var tasks = new List<Task> {handlerTask};
 
+#pragma warning disable 4014
+            handlerTask.ContinueWith(t =>
+#pragma warning restore 4014
+            {
+                lock (_mutex)
+                {
+                    _completed = true;
+                }
+            });
+
             if (_longRunningHandler != null)
             {
                 var watcherTask = Watch(_longRunningHandler, _message);
@@ -77,15 +87,6 @@ namespace Nimbus.Infrastructure
             }
 
             return firstTaskToComplete;
-        }
-
-        private async Task WaitForCompletion(Task handlerTask)
-        {
-            await Task.Run(async () => { await handlerTask; });
-            lock (_mutex)
-            {
-                _completed = true;
-            }
         }
 
         private async Task Watch(ILongRunningTask longRunningHandler, BrokeredMessage message)
