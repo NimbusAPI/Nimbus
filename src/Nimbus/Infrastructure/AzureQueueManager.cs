@@ -305,7 +305,7 @@ namespace Nimbus.Infrastructure
                     if (!exc.Message.Contains("SubCode=40901")) throw;
 
                     // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
-                    if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath));
+                    if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
                 }
 
                 _knownQueues.Value.Add(queuePath);
