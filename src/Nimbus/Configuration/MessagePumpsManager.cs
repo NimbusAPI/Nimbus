@@ -61,7 +61,7 @@ namespace Nimbus.Configuration
                                await Task.Delay(100);   
 
                                await messagePumpsToHandleInBackground
-                                   .Select(pump => Task.Run(async () => await pump.Start()))
+                                   .Select(pump => Task.Run(async () => await action(pump)))
                                    .WhenAll();
                            });
 #pragma warning restore 4014
