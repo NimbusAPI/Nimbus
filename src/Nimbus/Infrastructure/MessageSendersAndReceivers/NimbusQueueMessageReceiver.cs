@@ -33,6 +33,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize)
         {
+            if (_messageReceiver.IsClosed) return new BrokeredMessage[0];
             var messages = await _messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
             return messages.ToArray();
         }
@@ -44,7 +45,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             try
             {
-                messageReceiver.Close();
+                if (!messageReceiver.IsClosed) messageReceiver.Close();
             }
             catch (MessagingEntityNotFoundException)
             {
