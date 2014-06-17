@@ -4,3 +4,5 @@
 [Bb]in
 _ReSharper.*
 [Ll]ogs
+*.ncrunchproject
+.gitignore

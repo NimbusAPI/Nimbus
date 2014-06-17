@@ -62,10 +62,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Settings\AutoCreateBlobStorageContainerNameSetting.cs" />
+    <Compile Include="Configuration\Settings\AzureBlobStorageContainerSharedAccessSignatureSetting.cs" />
+    <Compile Include="Configuration\Settings\AzureBlobStorageContainerUriSetting.cs" />
+    <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
-    <Compile Include="Infrastructure\BlobStorageBuilder.cs" />
-    <Compile Include="Infrastructure\BlobStorageConfiguration.cs" />
-    <Compile Include="Configuration\Settings\BlobStorageConnectionStringSetting.cs" />
+    <Compile Include="Infrastructure\Http\AzureBlobStorageHttpLargeMessageBodyStore.cs" />
+    <Compile Include="Configuration\BlobStorageBuilder.cs" />
+    <Compile Include="Configuration\BlobStorageConfiguration.cs" />
+    <Compile Include="Configuration\Settings\AzureStorageAccountConnectionStringSetting.cs" />
+    <Compile Include="Infrastructure\Http\IAzureBlobStorageHttpClient.cs" />
+    <Compile Include="Infrastructure\Http\IUriFormatter.cs" />
+    <Compile Include="Infrastructure\Http\AzureBlobStorageHttpClient.cs" />
+    <Compile Include="Infrastructure\Http\UriFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +95,7 @@
     <None Include="Nimbus.LargeMessages.Azure.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

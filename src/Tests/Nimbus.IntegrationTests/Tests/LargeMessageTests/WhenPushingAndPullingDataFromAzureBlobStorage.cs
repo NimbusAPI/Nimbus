@@ -23,7 +23,10 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected override async Task<AzureBlobStorageLargeMessageBodyStore> Given()
         {
             var logger = new ConsoleLogger();
-            return new AzureBlobStorageLargeMessageBodyStore(new BlobStorageConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString}, logger);
+            return new AzureBlobStorageLargeMessageBodyStore(
+                new AzureStorageAccountConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString},
+                new AutoCreateBlobStorageContainerNameSetting(),
+                logger);
         }
 
         protected override async Task When()
