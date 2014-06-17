@@ -81,7 +81,7 @@ namespace Nimbus.Configuration
                               messagePumps,
                               container.Resolve<DeadLetterQueues>());
 
-            bus.Starting += delegate { container.Resolve<AzureQueueManager>().WarmUp(); };
+            bus.Starting += delegate { };
 
             bus.Disposing += delegate
                              {
