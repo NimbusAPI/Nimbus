@@ -33,7 +33,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             base.Dispose(disposing);
 
             if (!_queueClient.IsValueCreated) return;
-            _queueClient.Value.Close();
+            if (!_queueClient.Value.IsClosed) _queueClient.Value.Close();
         }
     }
 }
