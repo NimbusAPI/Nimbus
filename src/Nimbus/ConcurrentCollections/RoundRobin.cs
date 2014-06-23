@@ -24,5 +24,53 @@ namespace Nimbus.ConcurrentCollections
                 return _items[_index];
             }
         }
+
+        private void ReturnToPool(Wrapper wrapper)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public class Wrapper: IDisposable
+        {
+            private readonly T _value;
+            private readonly RoundRobin<T> _owner;
+            private bool _isFaulted;
+
+            public Wrapper(T value, RoundRobin<T> owner )
+            {
+                _value = value;
+                _owner = owner;
+            }
+
+            public T Value
+            {
+                get { return _value; }
+            }
+
+            public bool IsFaulted
+            {
+                get { return _isFaulted; }
+            }
+
+            public void MarkAsFaulted()
+            {
+                _isFaulted = true;
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposing) return;
+
+                _owner.ReturnToPool(this);
+            }
+        }
+
     }
+
 }
