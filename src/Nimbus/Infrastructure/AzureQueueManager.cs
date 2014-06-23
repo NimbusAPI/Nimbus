@@ -141,7 +141,7 @@ namespace Nimbus.Infrastructure
 
         private bool WeHaveAHandler(string topicPath)
         {
-            var paths = _typeProvider.AllHandledEventTypes().Select(PathFactory.TopicPathFor);
+            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
             return paths.Contains(topicPath);
         }
 

@@ -25,10 +25,11 @@ namespace Nimbus.UnitTests.Conventions
                 var referenceType = typeof (IMessagePump);
 
                 return referenceType.Assembly.GetTypes()
+                                    .Where(t => t.Namespace != null)
                                     .Where(t => t.Namespace == referenceType.Namespace || t.Namespace.StartsWith(referenceType.Namespace + "."))
                                     .Where(t => t.IsInterface)
                                     .Select(t => new TestCaseData(t)
-                                                .SetName(t.FullName)
+                                                     .SetName(t.FullName)
                     ).GetEnumerator();
             }
 

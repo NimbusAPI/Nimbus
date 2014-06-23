@@ -151,9 +151,7 @@ namespace Nimbus
             if (!disposing) return;
 
             var handler = Disposing;
-            if (handler == null) return;
-
-            handler(this, EventArgs.Empty);
+            if (handler != null) handler(this, EventArgs.Empty);
         }
     }
 }
