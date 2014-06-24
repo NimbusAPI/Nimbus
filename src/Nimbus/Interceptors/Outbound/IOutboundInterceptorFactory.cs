@@ -22,7 +22,7 @@ namespace Nimbus.Interceptors.Outbound
         {
             return _globalOutboundInterceptorTypes
                 .Value
-                .Select(t => (IOutboundInterceptor) scope.Resolve(t, t.FullName))
+                .Select(t => (IOutboundInterceptor) scope.Resolve(t))
                 .ToArray();
         }
     }

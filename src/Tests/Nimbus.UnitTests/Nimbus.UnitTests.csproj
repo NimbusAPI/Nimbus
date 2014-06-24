@@ -127,6 +127,7 @@
     <Compile Include="DispatcherTests\WhenInboundInterceptorThrowsExceptionOnRequestHandlerExecuting.cs" />
     <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
+    <Compile Include="InterceptorTests\WhenBuildingABusWithAutofacAndInterceptors.cs" />
     <Compile Include="NullDependencyResolver.cs" />
     <Compile Include="NullDependencyResolverScope.cs" />
     <Compile Include="NullInboundInterceptorFactory.cs" />

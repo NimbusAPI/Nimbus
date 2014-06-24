@@ -46,6 +46,17 @@ namespace Nimbus.Infrastructure.DependencyResolution
             return component;
         }
 
+        public object Resolve(Type componentType)
+        {
+            var component = ComponentsOfType(componentType)
+                .Select(CreateInstance)
+                .First();
+
+            Track(component);
+
+            return component;
+        }
+
         public object Resolve(Type componentType, string componentName)
         {
             var component = ComponentsOfType(componentType)

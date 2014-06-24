@@ -26,6 +26,11 @@ namespace Nimbus.Windsor.Infrastructure
             return _kernel.Resolve<TComponent>(componentName);
         }
 
+        public object Resolve(Type componentType)
+        {
+            return _kernel.Resolve(componentType);
+        }
+
         public object Resolve(Type componentType, string componentName)
         {
             return _kernel.Resolve(componentName, componentType);
