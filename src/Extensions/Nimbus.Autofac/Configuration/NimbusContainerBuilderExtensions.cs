@@ -28,7 +28,7 @@ namespace Nimbus.Configuration
             builder.RegisterSource(new ContravariantRegistrationSource());
             typeProvider.InterceptorTypes
                         .Do(t => builder.RegisterType(t)
-                                        .AsImplementedInterfaces()
+                                        .AsSelf()
                                         .InstancePerLifetimeScope())
                         .Done();
 

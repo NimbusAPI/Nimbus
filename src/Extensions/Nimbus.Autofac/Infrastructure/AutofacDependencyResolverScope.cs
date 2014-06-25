@@ -23,6 +23,11 @@ namespace Nimbus.Autofac.Infrastructure
             return _lifetimeScope.ResolveNamed<TComponent>(componentName);
         }
 
+        public object Resolve(Type componentType)
+        {
+            return _lifetimeScope.Resolve(componentType);
+        }
+
         public object Resolve(Type componentType, string componentName)
         {
             return _lifetimeScope.ResolveNamed(componentName, componentType);

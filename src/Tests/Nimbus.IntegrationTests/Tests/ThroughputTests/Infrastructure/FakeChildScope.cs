@@ -23,6 +23,11 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
             return (TComponent) (object) _fakeHandler;
         }
 
+        public object Resolve(Type componentType)
+        {
+            throw new NotImplementedException();
+        }
+
         public object Resolve(Type componentType, string componentName)
         {
             throw new NotImplementedException();

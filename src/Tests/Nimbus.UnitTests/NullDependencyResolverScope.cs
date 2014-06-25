@@ -19,6 +19,11 @@ namespace Nimbus.UnitTests
             throw new NotImplementedException();
         }
 
+        public object Resolve(Type componentType)
+        {
+            throw new NotImplementedException();
+        }
+
         public object Resolve(Type componentType, string componentName)
         {
             throw new NotImplementedException();
