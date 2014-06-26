@@ -11,7 +11,7 @@ namespace Nimbus.Configuration
         private static readonly PropertyInfo _isClosedOrClosingProperty =
             typeof (MessagingFactory).GetProperty("IsClosedOrClosing", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-        public static bool IsBorked(this MessagingFactory messagingFactory)
+        internal static bool IsBorked(this MessagingFactory messagingFactory)
         {
             var isFaulted = (bool) _isFaultedProperty.GetValue(messagingFactory);
             if (isFaulted) return true;
