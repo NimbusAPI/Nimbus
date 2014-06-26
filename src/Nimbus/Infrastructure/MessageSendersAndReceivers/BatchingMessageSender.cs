@@ -73,12 +73,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                 _outboundQueue.AddRange(toSend);
                             }
                         }
-                        else
-                        {
-                            // Until recycling is implemented we have no option but to fail fast
-                            _logger.Error(ex, "FATAL: The BatchingMessageSender has failed and cannot be recovered: {0}", ex.Message);
-                            Environment.FailFast("The BatchingMessageSender has failed and cannot be recovered: {0}".FormatWith(ex.Message), ex);
-                        }
                     }
                 }
                 finally
