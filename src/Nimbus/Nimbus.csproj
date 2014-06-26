@@ -88,6 +88,7 @@
     <Compile Include="Infrastructure\IHandlerMapper.cs" />
     <Compile Include="Infrastructure\IMessageDispatcherFactory.cs" />
     <Compile Include="Infrastructure\MessageDispatcherFactory.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\MessagingExceptionExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\SingleQueueAndTopicPerEventTypeRouter.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
     <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\BatchingMessageSender.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\ThrottlingMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />

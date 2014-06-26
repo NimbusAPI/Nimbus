@@ -14,7 +14,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly object _sendingMutex = new object();
         private bool _flushing;
         private bool _disposed;
-		
+
         protected BatchingMessageSender(ILogger logger)
         {
             _logger = logger;
@@ -65,7 +65,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     }
                     catch (Exception ex)
                     {
-                        if (ShouldRetry(ex))
+                        if (ex.IsTransientFault())
                         {
                             _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
                             lock (_outboundQueue)
@@ -91,17 +91,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     if (_outboundQueue.Any()) TriggerMessageFlush();
                 }
             }
-        }
-
-        private bool ShouldRetry(Exception exception)
-        {
-            // Refer to: http://msdn.microsoft.com/en-us/library/hh418082.aspx
-            return
-                exception is TimeoutException || // Retry might help in some cases; add retry logic to code.
-                exception is ServerBusyException || // Client may retry after certain interval. If a retry results in a different exception, check retry behavior of that exception.
-                exception is MessagingCommunicationException || // Retry might help if there are intermittent connectivity issues.
-                exception is QuotaExceededException || // Retry might help if messages have been removed in the meantime.
-                exception is MessagingEntityDisabledException; // Retry might help if the entity has been activated in the interim.
         }
 
         public void Dispose()

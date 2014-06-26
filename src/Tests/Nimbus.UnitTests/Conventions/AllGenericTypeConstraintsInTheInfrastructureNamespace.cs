@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Handlers;
 using NUnit.Framework;
 using Shouldly;
 
@@ -23,7 +24,7 @@ namespace Nimbus.UnitTests.Conventions
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {
-                var referenceType = typeof (IDependencyResolver);
+                var referenceType = typeof(IHandleCommand<>);
 
                 var interfaceTypes = referenceType.Assembly.GetTypes()
                                                   .Where(t => t.Namespace.StartsWith(referenceType.Namespace))
