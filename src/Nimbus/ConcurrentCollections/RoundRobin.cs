@@ -30,14 +30,13 @@ namespace Nimbus.ConcurrentCollections
             throw new NotImplementedException();
         }
 
-
-        public class Wrapper: IDisposable
+        public class Wrapper : IDisposable
         {
             private readonly T _value;
             private readonly RoundRobin<T> _owner;
             private bool _isFaulted;
 
-            public Wrapper(T value, RoundRobin<T> owner )
+            public Wrapper(RoundRobin<T> owner, T value)
             {
                 _value = value;
                 _owner = owner;
@@ -70,7 +69,5 @@ namespace Nimbus.ConcurrentCollections
                 _owner.ReturnToPool(this);
             }
         }
-
     }
-
 }
