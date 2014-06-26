@@ -67,6 +67,7 @@
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
+    <Compile Include="Configuration\MessagingFactoryExtensions.cs" />
     <Compile Include="Configuration\NamespaceCleanser.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
