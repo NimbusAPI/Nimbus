@@ -114,6 +114,7 @@
     <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\ApatheticBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\GrumpyBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\HappyBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />

@@ -8,6 +8,8 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
     {
         public async Task<BlackBallResponse> Handle(BlackBallRequest request)
         {
+            MethodCallCounter.RecordCall<HappyBlackBallRequestHandler>(handler => handler.Handle(request));
+
             return new BlackBallResponse
                    {
                        IsBlackBalled = false,

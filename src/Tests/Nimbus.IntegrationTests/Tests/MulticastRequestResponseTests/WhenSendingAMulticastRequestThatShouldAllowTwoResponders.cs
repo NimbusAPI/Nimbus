@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
@@ -11,7 +10,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
     [TestFixture]
     public class WhenSendingAMulticastRequestThatShouldAllowTwoResponders : TestForBus
     {
-        private IEnumerable<BlackBallResponse> _response;
+        private BlackBallResponse[] _response;
 
         protected override async Task When()
         {
@@ -20,13 +19,19 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone",
                           };
 
-            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(3));
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(3))).ToArray();
         }
 
         [Test]
         public async Task WeShouldReceiveTwoResponses()
         {
             _response.Count().ShouldBe(2);
+        }
+
+        [Test]
+        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest()
+        {
+            MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
     }
 }
