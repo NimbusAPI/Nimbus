@@ -131,7 +131,7 @@
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\Interceptors\TestInterceptor.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\FirstCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\SecondCommand.cs" />
-    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenSendingACommandOnTheBus.cs" />
+    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenDispatchingACommandOnTheBusAndSendingASecondCommand.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />

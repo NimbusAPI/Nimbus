@@ -8,6 +8,7 @@ using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts.Exceptions;
@@ -22,6 +23,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly IClock _clock;
         private readonly ICompressor _compressor;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ISerializer _serializer;
@@ -33,6 +35,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       IClock clock,
                                       ICompressor compressor,
                                       IDependencyResolver dependencyResolver,
+                                      IDispatchContextManager dispatchContextManager,
                                       ILargeMessageBodyStore largeMessageBodyStore,
                                       IOutboundInterceptorFactory outboundInterceptorFactory,
                                       ISerializer serializer,
@@ -44,6 +47,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             _clock = clock;
             _compressor = compressor;
             _dependencyResolver = dependencyResolver;
+            _dispatchContextManager = dispatchContextManager;
             _largeMessageBodyStore = largeMessageBodyStore;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _serializer = serializer;
@@ -54,6 +58,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         {
             return Task.Run(async () =>
                                   {
+                                      var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
                                       BrokeredMessage brokeredMessage;
                                       if (serializableObject == null)
                                       {
@@ -87,7 +92,9 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       }
 
                                       brokeredMessage.ReplyTo = _replyQueueName;
-                                      brokeredMessage.CorrelationId = brokeredMessage.MessageId; // Use the MessageId as a default CorrelationId
+
+                                      // Use the CorrelationId for the current dispatch, otherwise start a new CorrelationId using the message we're sending
+                                      brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId ?? brokeredMessage.MessageId;
 
                                       using (var scope = _dependencyResolver.CreateChildScope())
                                       {

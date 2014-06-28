@@ -7,6 +7,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
@@ -42,6 +43,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     clock,
                                                                     new NullCompressor(),
                                                                     new NullDependencyResolver(),
+                                                                    new DispatchContextManager(), 
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     new NullOutboundInterceptorFactory(),
                                                                     serializer,

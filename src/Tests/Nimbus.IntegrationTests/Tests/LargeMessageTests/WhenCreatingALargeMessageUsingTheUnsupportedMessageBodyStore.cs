@@ -10,6 +10,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Tests.Common;
+using Nimbus.Infrastructure.Dispatching;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
@@ -27,6 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               new SystemClock(),
                                               new NullCompressor(),
                                               dependencyResolver,
+                                              new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
                                               new DataContractSerializer(),

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
@@ -13,14 +12,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
     [Timeout(15*1000)]
-    public class WhenSendingACommandOnTheBus : TestForBus
+    public class WhenDispatchingACommandOnTheBusAndSendingASecondCommand : TestForBus
     {
-        public override BusBuilderConfiguration WithCustomConfiguration(BusBuilderConfiguration builder)
-        {
-            return builder.WithGlobalInboundInterceptorTypes(typeof (TestInterceptor));
-        }
-
-        public override async Task Given()
+        protected override async Task Given()
         {
             await base.Given();
 
@@ -28,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             FirstCommandHandler.Bus = Bus;
         }
 
-        public override async Task When()
+        protected override async Task When()
         {
             var someCommand = new FirstCommand();
             await Bus.Send(someCommand);
@@ -36,11 +30,8 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        public async Task TheCommandBrokerShouldReceiveThatCommand()
+        public async Task ThenTheCorrelationIdFromTheFirstMessageShouldByPropagatedByTheSecond()
         {
-            await Given();
-            await When();
-
             TestInterceptor.ReceivedCorrelationIds.GroupBy(x => x).Count().ShouldBe(1);
         }
     }

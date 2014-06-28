@@ -1,7 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger;
 using Nimbus.Tests.Common;
 
@@ -29,6 +32,8 @@ namespace Nimbus.IntegrationTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
+                                      .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                      .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)

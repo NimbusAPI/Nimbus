@@ -85,6 +85,11 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
+    <Compile Include="Infrastructure\Dispatching\DispatchContext.cs" />
+    <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
+    <Compile Include="Infrastructure\Dispatching\IDispatchContext.cs" />
+    <Compile Include="Infrastructure\Dispatching\IDispatchContextManager.cs" />
+    <Compile Include="Infrastructure\Dispatching\NullDispatchContext.cs" />
     <Compile Include="Infrastructure\HandlerMapper.cs" />
     <Compile Include="Infrastructure\IHandlerMapper.cs" />
     <Compile Include="Infrastructure\IMessageDispatcherFactory.cs" />

@@ -7,6 +7,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using NSubstitute;
@@ -36,6 +37,7 @@ namespace Nimbus.UnitTests.CompressionTests
                                               Substitute.For<IClock>(),
                                               compressor,
                                               new NullDependencyResolver(),
+                                              new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
                                               new DataContractSerializer(),
