@@ -20,7 +20,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone",
                           };
 
-            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(4));
+            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(3));
         }
 
         [Test]
