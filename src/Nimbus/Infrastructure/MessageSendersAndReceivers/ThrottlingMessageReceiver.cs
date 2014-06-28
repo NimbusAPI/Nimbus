@@ -26,21 +26,20 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
-        public Task Start(Func<BrokeredMessage, Task> callback)
+        public async Task Start(Func<BrokeredMessage, Task> callback)
         {
-            return Task.Run(() =>
-                            {
-                                lock (_mutex)
-                                {
-                                    if (_running) return;
-                                    _running = true;
+            lock (_mutex)
+            {
+                if (_running) return;
+                _running = true;
+            }
 
-                                    _cancellationTokenSource = new CancellationTokenSource();
-                                    var cancellationTask = Task.Run(() => { _cancellationTokenSource.Token.WaitHandle.WaitOne(); }, _cancellationTokenSource.Token);
+            await WarmUp();
 
-                                    _workerTask = Task.Run(() => Worker(callback, cancellationTask));
-                                }
-                            });
+            _cancellationTokenSource = new CancellationTokenSource();
+            var cancellationTask = Task.Run(() => { _cancellationTokenSource.Token.WaitHandle.WaitOne(); }, _cancellationTokenSource.Token);
+
+            _workerTask = Task.Run(() => Worker(callback, cancellationTask));
         }
 
         public async Task Stop()
@@ -57,6 +56,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             var workerTask = _workerTask;
             if (workerTask != null) await workerTask;
         }
+
+        protected abstract Task WarmUp();
 
         protected abstract Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask);
 

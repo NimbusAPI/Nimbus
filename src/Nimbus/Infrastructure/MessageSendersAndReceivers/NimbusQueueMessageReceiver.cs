@@ -26,6 +26,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return _queuePath;
         }
 
+        protected override async Task WarmUp()
+        {
+            await GetMessageReceiver();
+        }
+
         protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
             try

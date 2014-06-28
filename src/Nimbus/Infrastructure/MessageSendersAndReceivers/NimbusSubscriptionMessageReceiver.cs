@@ -31,6 +31,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return "{0}/{1}".FormatWith(_topicPath, _subscriptionName);
         }
 
+        protected override async Task WarmUp()
+        {
+            await GetSubscriptionClient();
+        }
+
         protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
             try
