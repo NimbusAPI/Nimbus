@@ -48,7 +48,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             // There should only ever be a single multicast request handler associated with this dispatcher
             var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
             var dispatchMethod = GetGenericDispatchMethodFor(busRequest);
-            await (Task) dispatchMethod.Invoke(this, new[] {busRequest, message, handlerType});
+            await (Task)dispatchMethod.Invoke(this, new[] { busRequest, message, handlerType });
         }
 
         // ReSharper disable UnusedMember.Local
@@ -67,10 +67,10 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 foreach (var interceptor in interceptors)
                 {
-                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]", 
-                                  interceptor.GetType().FullName, 
-                                  message.SafelyGetBodyTypeNameOrDefault(), 
-                                  message.MessageId, 
+                    _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                                  interceptor.GetType().FullName,
+                                  message.SafelyGetBodyTypeNameOrDefault(),
+                                  message.MessageId,
                                   message.CorrelationId);
                     await interceptor.OnMulticastRequestHandlerExecuting(busRequest, message);
                     _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
@@ -86,20 +86,29 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
 
-                    var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                    // ReSharper disable CompareNonConstrainedGenericWithNull
+                    if (response != null)
+                    // ReSharper restore CompareNonConstrainedGenericWithNull
+                    {
+                        var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
 
-                    _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                  responseMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  replyQueueName,
-                                  message.MessageId,
-                                  message.CorrelationId);
-                    await replyQueueClient.Send(responseMessage);
-                    _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                 message.SafelyGetBodyTypeNameOrDefault(),
-                                 replyQueueName,
-                                 message.MessageId,
-                                 message.CorrelationId);
-                    
+                        _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                                      responseMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      replyQueueName,
+                                      message.MessageId,
+                                      message.CorrelationId);
+                        await replyQueueClient.Send(responseMessage);
+                        _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
+                                     message.SafelyGetBodyTypeNameOrDefault(),
+                                     replyQueueName,
+                                     message.MessageId,
+                                     message.CorrelationId);
+                    }
+                    else
+                    {
+                        _logger.Info("Handler declined to reply. [MessageId: {0}, CorrelationId: {1}]", message.MessageId, message.CorrelationId);
+                    }
+
                 }
                 catch (Exception exc)
                 {
@@ -117,7 +126,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                       message.CorrelationId);
 
                         await interceptor.OnMulticastRequestHandlerSuccess(busRequest, message);
-                        
+
                         _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
                                       message.SafelyGetBodyTypeNameOrDefault(),
@@ -167,15 +176,15 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var closedGenericHandlerType =
                 request.GetType()
-                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
+                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof(IBusMulticastRequest<,>)))
                        .Single();
 
             var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
-            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            var openGenericMethod = typeof(MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] { requestType, responseType });
             return closedGenericMethod;
         }
     }
