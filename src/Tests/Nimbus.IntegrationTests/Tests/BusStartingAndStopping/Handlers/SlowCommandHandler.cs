@@ -11,7 +11,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers
         {
             MethodCallCounter.RecordCall<SlowCommandHandler>(h => h.Handle(busCommand));
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
         }
     }
 }
