@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -46,13 +45,13 @@ namespace Nimbus.Infrastructure.Events
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof(IHandleMulticastEvent<>);
+            var openGenericHandlerType = typeof (IHandleMulticastEvent<>);
             var handlerTypes = _typeProvider.MulticastEventHandlerTypes.ToArray();
 
             // Events are routed to Topics and we'll create a subscription per instance of the logical endpoint to enable multicast behaviour
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, TopicPath = _router.Route(m)})
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic)})
                 .GroupBy(b => b.TopicPath)
                 .Select(g => new
                              {

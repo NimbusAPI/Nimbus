@@ -8,6 +8,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure
 {
@@ -263,7 +264,7 @@ namespace Nimbus.Infrastructure
 
         private void EnsureQueueExists(Type commandType)
         {
-            var queuePath = _router.Route(commandType);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
             EnsureQueueExists(queuePath);
         }
 
@@ -314,7 +315,7 @@ namespace Nimbus.Infrastructure
 
         private string GetDeadLetterQueueName(Type messageContractType)
         {
-            var queuePath = _router.Route(messageContractType);
+            var queuePath = _router.Route(messageContractType, QueueOrTopic.Queue);
             var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
         }

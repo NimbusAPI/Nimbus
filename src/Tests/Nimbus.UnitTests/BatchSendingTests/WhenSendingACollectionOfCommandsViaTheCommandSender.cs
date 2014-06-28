@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.Routing;
 using Nimbus.MessageContracts;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;

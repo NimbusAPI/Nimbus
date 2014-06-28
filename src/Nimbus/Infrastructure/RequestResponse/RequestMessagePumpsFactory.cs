@@ -4,6 +4,7 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -38,16 +39,16 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof(IHandleRequest<,>);
+            var openGenericHandlerType = typeof (IHandleRequest<,>);
             var handlerTypes = _typeProvider.RequestHandlerTypes.ToArray();
 
             // Create a single connection to each request queue determined by routing
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new { MessageType = m, QueuePath = _router.Route(m) })
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue)})
                 .GroupBy(b => b.QueuePath)
-                .Select(g => new { QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType)) });
-            
+                .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
+
             // Each binding to a queue can handle one or more request types depending on the routes that are defined
             foreach (var binding in bindings)
             {
@@ -55,13 +56,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 _logger.Debug("Creating message pump for request queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
                 var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
-                
+
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
                 var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
                 _garbageMan.Add(pump);
 
                 yield return pump;
-            } 
+            }
         }
 
         public void Dispose()

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -55,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var queuePath = _router.Route(requestType);
+            var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

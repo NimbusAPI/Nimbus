@@ -8,8 +8,10 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.Infrastructure.Routing;
 using Nimbus.Logger;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
