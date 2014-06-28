@@ -132,7 +132,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             try
             {
                 // ReSharper disable CSharpWarnings::CS4014
+#pragma warning disable 4014
                 Stop();
+#pragma warning restore 4014
                 // ReSharper restore CSharpWarnings::CS4014
             }
             catch (ObjectDisposedException)

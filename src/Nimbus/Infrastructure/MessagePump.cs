@@ -144,7 +144,9 @@ namespace Nimbus.Infrastructure
         public void Dispose()
         {
             // ReSharper disable CSharpWarnings::CS4014
-            Stop(); // don't await
+#pragma warning disable 4014
+            Stop();
+#pragma warning restore 4014
             // ReSharper restore CSharpWarnings::CS4014
         }
     }
