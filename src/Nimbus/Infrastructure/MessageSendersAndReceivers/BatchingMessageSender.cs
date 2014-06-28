@@ -1,107 +1,109 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal abstract class BatchingMessageSender : INimbusMessageSender
     {
+        private const int _maxConcurrentFlushTasks = 10;
+
         private readonly ILogger _logger;
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
-        private readonly object _sendingMutex = new object();
-        private bool _flushing;
         private bool _disposed;
-		
+
+        private readonly object _enqueuingMutex = new object();
+        private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(_maxConcurrentFlushTasks, _maxConcurrentFlushTasks);
+
+        private Task _pendingFlushTask;
+
         protected BatchingMessageSender(ILogger logger)
         {
             _logger = logger;
         }
 
-        protected abstract void SendBatch(BrokeredMessage[] messages);
+        protected abstract Task SendBatch(BrokeredMessage[] messages);
 
-        public Task Send(BrokeredMessage message)
+        public async Task Send(BrokeredMessage message)
         {
-            return Task.Run(() =>
-                            {
-                                lock (_outboundQueue)
-                                {
-                                    _outboundQueue.Add(message);
-                                }
-                                TriggerMessageFlush();
-                            });
-        }
-
-        private void TriggerMessageFlush()
-        {
-            Task.Run(() => FlushMessages());
-        }
-
-        private void FlushMessages()
-        {
-            if (_flushing) return;
-            if (_disposed) return;
-
-            lock (_sendingMutex)
+            Task taskToAwait;
+            lock (_enqueuingMutex)
             {
-                try
+                _outboundQueue.Add(message);
+                taskToAwait = GetOrCreateNextFlushTask();
+            }
+
+            await taskToAwait;
+        }
+
+        private Task GetOrCreateNextFlushTask()
+        {
+            lock (_enqueuingMutex)
+            {
+                if (_pendingFlushTask == null)
                 {
-                    _flushing = true;
-                    BrokeredMessage[] toSend;
-
-                    lock (_outboundQueue)
-                    {
-                        toSend = _outboundQueue.Take(100).ToArray();
-                        _outboundQueue.RemoveRange(0, toSend.Length);
-                    }
-
-                    if (toSend.None()) return;
-
-                    try
-                    {
-                        SendBatch(toSend);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ShouldRetry(ex))
-                        {
-                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
-                            lock (_outboundQueue)
-                            {
-                                _outboundQueue.AddRange(toSend);
-                            }
-                        }
-                        else
-                        {
-                            // Until recycling is implemented we have no option but to fail fast
-                            _logger.Error(ex, "FATAL: The BatchingMessageSender has failed and cannot be recovered: {0}", ex.Message);
-                            Environment.FailFast("The BatchingMessageSender has failed and cannot be recovered: {0}".FormatWith(ex.Message), ex);
-                        }
-                    }
-                }
-                finally
-                {
-                    _flushing = false;
+                    _pendingFlushTask = FlushMessages();
                 }
 
-                lock (_outboundQueue)
-                {
-                    if (_outboundQueue.Any()) TriggerMessageFlush();
-                }
+                return _pendingFlushTask;
             }
         }
 
-        private bool ShouldRetry(Exception exception)
+        private async Task FlushMessages()
         {
-            // Refer to: http://msdn.microsoft.com/en-us/library/hh418082.aspx
-            return
-                exception is TimeoutException || // Retry might help in some cases; add retry logic to code.
-                exception is ServerBusyException || // Client may retry after certain interval. If a retry results in a different exception, check retry behavior of that exception.
-                exception is MessagingCommunicationException || // Retry might help if there are intermittent connectivity issues.
-                exception is QuotaExceededException || // Retry might help if messages have been removed in the meantime.
-                exception is MessagingEntityDisabledException; // Retry might help if the entity has been activated in the interim.
+            if (_disposed) return;
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await _sendingSemaphore.WaitAsync();
+
+                BrokeredMessage[] toSend;
+                lock (_enqueuingMutex)
+                {
+                    toSend = _outboundQueue.ToArray();
+                    _outboundQueue.Clear();
+                    _pendingFlushTask = null;
+                }
+                if (toSend.None()) return;
+
+                for (var retries = 0; retries < 3; retries++)
+                {
+                    try
+                    {
+                        await SendBatch(toSend);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.IsTransientFault())
+                        {
+                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                    toSend = toSend
+                        .Select(m => m.Clone())
+                        .ToArray();
+
+                    await Task.Delay(TimeSpan.FromSeconds(retries*2));
+                }
+
+                throw new BusException("Retry count exceeded while sending message batch.");
+            }
+            finally
+            {
+                _sendingSemaphore.Release();
+            }
         }
 
         public void Dispose()

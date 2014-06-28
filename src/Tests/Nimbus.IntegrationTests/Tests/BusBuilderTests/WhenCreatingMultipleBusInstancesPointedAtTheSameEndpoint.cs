@@ -30,7 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         [SetUp]
         public void SetUp()
         {
-            ClearMeABus();
+            Task.Run(async () => { await ClearMeABus(); }).Wait();
         }
 
         [TearDown]
@@ -42,7 +42,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 .Done();
         }
 
-        private void ClearMeABus()
+        private async Task ClearMeABus()
         {
             // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
             // deleting queues and topics is slow.
@@ -58,37 +58,37 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                              .WithLogger(logger)
                                              .WithDebugOptions(
                                                  dc =>
-                                                     dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                         "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                                 dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                     "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                 ;
 
             using (var bus = busBuilder.Build())
             {
-                bus.Start();
+                await bus.Start();
             }
         }
 
         private Task<Bus> BuildMeABus()
         {
-            return Task.Run(() =>
-                            {
-                                // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-                                // deleting queues and topics is slow.
-                                var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            return Task.Run(async () =>
+                                  {
+                                      // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
+                                      // deleting queues and topics is slow.
+                                      var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
-                                var logger = new ConsoleLogger();
+                                      var logger = new ConsoleLogger();
 
-                                var bus = new BusBuilder().Configure()
-                                                          .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                          .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                                          .WithTypesFrom(typeProvider)
-                                                          .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                          .WithLogger(logger)
-                                                          .Build();
-                                bus.ShouldNotBe(null);
-                                bus.Start();
-                                return bus;
-                            });
+                                      var bus = new BusBuilder().Configure()
+                                                                .WithNames("IntegrationTestHarness", Environment.MachineName)
+                                                                .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                                                .WithTypesFrom(typeProvider)
+                                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                                .WithLogger(logger)
+                                                                .Build();
+                                      bus.ShouldNotBe(null);
+                                      await bus.Start();
+                                      return bus;
+                                  });
         }
     }
 }

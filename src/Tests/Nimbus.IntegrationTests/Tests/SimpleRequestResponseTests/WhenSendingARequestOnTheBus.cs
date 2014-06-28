@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
 
-        public override async Task When()
+        protected override async Task When()
         {
             _response = await Bus.Request(new SomeRequest(), _timeout);
         }

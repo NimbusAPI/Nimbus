@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
         private const int _maxDeliveryAttempts = 3;
 
-        public override async Task When()
+        protected override async Task When()
         {
             _someContent = Guid.NewGuid().ToString();
             _goBangCommand = new GoBangCommand(_someContent);
@@ -33,9 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         [Test]
         public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
         {
-            await Given();
-            await When();
-
             _deadLetterMessages.Count().ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }

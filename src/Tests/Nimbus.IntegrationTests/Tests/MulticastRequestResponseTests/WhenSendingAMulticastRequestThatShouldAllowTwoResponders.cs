@@ -9,26 +9,23 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 {
     [TestFixture]
-    public class WhenSendingATwoSecondMulticastRequest : TestForBus
+    public class WhenSendingAMulticastRequestThatShouldAllowTwoResponders : TestForBus
     {
         private IEnumerable<BlackBallResponse> _response;
 
-        public override async Task When()
+        protected override async Task When()
         {
             var request = new BlackBallRequest
                           {
                               ProspectiveMemberName = "Fred Flintstone",
                           };
 
-            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2));
+            _response = await Bus.MulticastRequest(request, TimeSpan.FromSeconds(3));
         }
 
         [Test]
         public async Task WeShouldReceiveTwoResponses()
         {
-            await Given();
-            await When();
-
             _response.Count().ShouldBe(2);
         }
     }

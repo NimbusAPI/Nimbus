@@ -100,8 +100,8 @@
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\GrumpyBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\HappyBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
-    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingASixSecondMulticastRequest.cs" />
-    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingATwoSecondMulticastRequest.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
+    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowTwoResponders.cs" />
     <Compile Include="TestForBus.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />

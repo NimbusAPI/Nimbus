@@ -1,6 +1,6 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly string _queuePath;
         private readonly ILogger _logger;
 
-        private readonly ThreadSafeLazy<MessageSender> _queueClient;
+        private MessageSender _messageSender;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
             : base(logger)
@@ -18,22 +18,61 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _queueManager = queueManager;
             _queuePath = queuePath;
             _logger = logger;
-
-            _queueClient = new ThreadSafeLazy<MessageSender>(() => _queueManager.CreateMessageSender(_queuePath).Result);
         }
 
-        protected override void SendBatch(BrokeredMessage[] toSend)
+        protected override async Task SendBatch(BrokeredMessage[] toSend)
         {
+            var messageSender = GetMessageSender();
+
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _queuePath, toSend.Length);
-            _queueClient.Value.SendBatch(toSend);
+            try
+            {
+                await messageSender.SendBatchAsync(toSend);
+            }
+            catch (Exception exc)
+            {
+                if (exc.IsTransientFault()) throw;
+                DiscardMessageSender();
+                throw;
+            }
+        }
+
+        private MessageSender GetMessageSender()
+        {
+            if (_messageSender != null) return _messageSender;
+
+            _messageSender = _queueManager.CreateMessageSender(_queuePath).Result;
+            return _messageSender;
+        }
+
+        private void DiscardMessageSender()
+        {
+            var messageSender = _messageSender;
+            _messageSender = null;
+
+            if (messageSender == null) return;
+            if (messageSender.IsClosed) return;
+
+            try
+            {
+                messageSender.Close();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc, "Failed to close MessageSender instance before discarding it.");
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
-            if (!_queueClient.IsValueCreated) return;
-            if (!_queueClient.Value.IsClosed) _queueClient.Value.Close();
+            try
+            {
+                DiscardMessageSender();
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal abstract class NimbusMessageReceiver : INimbusMessageReceiver
+    internal abstract class ThrottlingMessageReceiver : INimbusMessageReceiver
     {
         protected readonly ConcurrentHandlerLimitSetting ConcurrentHandlerLimit;
         private readonly ILogger _logger;
@@ -17,9 +17,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly object _mutex = new object();
         private Task _workerTask;
         private readonly SemaphoreSlim _throttle;
-        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        protected NimbusMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
+        protected ThrottlingMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
         {
             ConcurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
@@ -34,8 +34,12 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 _running = true;
             }
 
-            await CreateBatchReceiver();
-            _workerTask = Task.Run(() => Worker(callback));
+            await WarmUp();
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            var cancellationTask = Task.Run(() => { _cancellationTokenSource.Token.WaitHandle.WaitOne(); }, _cancellationTokenSource.Token);
+
+            _workerTask = Task.Run(() => Worker(callback, cancellationTask));
         }
 
         public async Task Stop()
@@ -44,27 +48,26 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 if (!_running) return;
                 _running = false;
+
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource = null;
             }
-
-            _cancellationToken.Cancel();
-
-            StopBatchReceiver();
 
             var workerTask = _workerTask;
             if (workerTask != null) await workerTask;
         }
 
-        protected abstract Task CreateBatchReceiver();
-        protected abstract Task<BrokeredMessage[]> FetchBatch(int batchSize);
-        protected abstract void StopBatchReceiver();
+        protected abstract Task WarmUp();
 
-        private async Task Worker(Func<BrokeredMessage, Task> callback)
+        protected abstract Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask);
+
+        private async Task Worker(Func<BrokeredMessage, Task> callback, Task cancellationTask)
         {
             while (_running)
             {
                 try
                 {
-                    var messages = await FetchBatch(_throttle.CurrentCount);
+                    var messages = await FetchBatch(_throttle.CurrentCount, cancellationTask);
                     if (!_running) return;
                     if (messages.None()) continue;
 
@@ -73,7 +76,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                       {
                                           try
                                           {
-                                              await _throttle.WaitAsync(_cancellationToken.Token);
+                                              await _throttle.WaitAsync(_cancellationTokenSource.Token);
                                               await callback(m);
                                           }
                                           finally
@@ -105,6 +108,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+
             try
             {
                 Stop().Wait();

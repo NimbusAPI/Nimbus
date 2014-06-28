@@ -6,12 +6,13 @@ using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusQueueMessageReceiver : NimbusMessageReceiver
+    internal class NimbusQueueMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
 
-        private MessageReceiver _messageReceiver;
+        private volatile MessageReceiver _messageReceiver;
+        private readonly object _mutex = new object();
 
         public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
             : base(concurrentHandlerLimit, logger)
@@ -25,33 +26,74 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return _queuePath;
         }
 
-        protected override async Task CreateBatchReceiver()
+        protected override async Task WarmUp()
         {
-            _messageReceiver = await _queueManager.CreateMessageReceiver(_queuePath);
-            _messageReceiver.PrefetchCount = ConcurrentHandlerLimit;
+            await GetMessageReceiver();
         }
 
-        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize)
+        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
-            if (_messageReceiver.IsClosed) return new BrokeredMessage[0];
-            var messages = await _messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
-            return messages.ToArray();
-        }
-
-        protected override void StopBatchReceiver()
-        {
-            var messageReceiver = _messageReceiver;
-            if (messageReceiver == null) return;
-
             try
             {
-                if (!messageReceiver.IsClosed) messageReceiver.Close();
+                var messageReceiver = await GetMessageReceiver();
+
+                var receiveTask = messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
+                await Task.WhenAny(receiveTask, cancellationTask);
+
+                if (cancellationTask.IsCompleted)
+                {
+                    DiscardMessageReceiver();
+                    return new BrokeredMessage[0];
+                }
+
+                var messages = await receiveTask;
+                return messages.ToArray();
+            }
+            catch (Exception exc)
+            {
+                if (exc.IsTransientFault()) throw;
+                DiscardMessageReceiver();
+                throw;
+            }
+        }
+
+        private async Task<MessageReceiver> GetMessageReceiver()
+        {
+            if (_messageReceiver != null) return _messageReceiver;
+
+            _messageReceiver = await _queueManager.CreateMessageReceiver(_queuePath);
+            _messageReceiver.PrefetchCount = ConcurrentHandlerLimit;
+            return _messageReceiver;
+        }
+
+        private void DiscardMessageReceiver()
+        {
+            var messageReceiver = _messageReceiver;
+            _messageReceiver = null;
+
+            if (messageReceiver == null) return;
+            if (messageReceiver.IsClosed) return;
+
+            messageReceiver.Close();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (!disposing) return;
+
+                DiscardMessageReceiver();
             }
             catch (MessagingEntityNotFoundException)
             {
             }
             catch (ObjectDisposedException)
             {
+            }
+            finally
+            {
+                base.Dispose(disposing);
             }
         }
     }

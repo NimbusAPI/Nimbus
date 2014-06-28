@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
@@ -10,7 +9,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
     {
         public async Task<BlackBallResponse> Handle(BlackBallRequest request)
         {
-            Thread.Sleep(TimeSpan.FromSeconds(4));
+            await Task.Delay(TimeSpan.FromSeconds(3));
 
             return new BlackBallResponse
                    {

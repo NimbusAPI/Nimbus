@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
@@ -32,27 +30,30 @@ namespace Nimbus.Configuration
             RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
-            var namespaceManagers =
-                Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                          .Select(i =>
-                                  {
-                                      var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                                      namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
-                                      return namespaceManager;
-                                  })
-                          .ToArray();
-            var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(namespaceManagers);
+            var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
+                container.Resolve<ServerConnectionCountSetting>(),
+                () =>
+                {
+                    var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                    namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                    return namespaceManager;
+                },
+                nsm => false,
+                nsm => { });
+
             container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
 
-            var messagingFactories = Enumerable.Range(0, container.Resolve<ServerConnectionCountSetting>())
-                                               .Select(i =>
-                                                       {
-                                                           var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                                                           messagingFactory.PrefetchCount = 20;
-                                                           return messagingFactory;
-                                                       })
-                                               .ToArray();
-            var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(messagingFactories);
+            var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
+                container.Resolve<ServerConnectionCountSetting>(),
+                () =>
+                {
+                    var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
+                    messagingFactory.PrefetchCount = 20;
+                    return messagingFactory;
+                },
+                mf => mf.IsBorked(),
+                mf => { });
+
             container.Register<Func<MessagingFactory>>(c => messagingFactoryRoundRobin.GetNext);
 
             if (configuration.Debugging.RemoveAllExistingNamespaceElements)
@@ -61,7 +62,7 @@ namespace Nimbus.Configuration
                 namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
             }
 
-            logger.Debug("Creating message pumps and subscriptions.");
+            logger.Debug("Creating message pumps...");
 
             var messagePumps = new MessagePumpsManager(
                 container.Resolve<ResponseMessagePumpFactory>().Create(),
@@ -71,7 +72,7 @@ namespace Nimbus.Configuration
                 container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
                 container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
 
-            logger.Debug("Message pumps and subscriptions are all created.");
+            logger.Debug("Message pumps are all created.");
 
             var bus = new Bus(container.Resolve<ILogger>(),
                               container.Resolve<ICommandSender>(),
@@ -82,14 +83,7 @@ namespace Nimbus.Configuration
                               container.Resolve<DeadLetterQueues>());
 
             bus.Starting += delegate { container.Resolve<AzureQueueManager>().WarmUp(); };
-
-            bus.Disposing += delegate
-                             {
-                                 messagingFactories
-                                     .Do(mf => mf.CloseAsync()) // don't wait
-                                     .Done();
-                                 container.Dispose();
-                             };
+            bus.Disposing += delegate { container.Dispose(); };
 
             logger.Info("Bus built. Job done!");
 

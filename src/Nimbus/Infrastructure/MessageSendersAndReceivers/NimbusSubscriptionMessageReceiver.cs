@@ -7,7 +7,7 @@ using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusSubscriptionMessageReceiver : NimbusMessageReceiver
+    internal class NimbusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
@@ -31,32 +31,74 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             return "{0}/{1}".FormatWith(_topicPath, _subscriptionName);
         }
 
-        protected override async Task CreateBatchReceiver()
+        protected override async Task WarmUp()
         {
-            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
-            _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
+            await GetSubscriptionClient();
         }
 
-        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize)
+        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
-            if (_subscriptionClient.IsClosed) return new BrokeredMessage[0];
-            var messages = await _subscriptionClient.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
-            return messages.ToArray();
-        }
-
-        protected override void StopBatchReceiver()
-        {
-            var subscriptionClient = _subscriptionClient;
-            if (subscriptionClient == null) return;
             try
             {
-                if (!subscriptionClient.IsClosed) subscriptionClient.Close();
+                var subscriptionClient = await GetSubscriptionClient();
+
+                var receiveTask = subscriptionClient.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
+                await Task.WhenAny(receiveTask, cancellationTask);
+
+                if (cancellationTask.IsCompleted)
+                {
+                    DiscardSubscriptionClient();
+                    return new BrokeredMessage[0];
+                }
+
+                var messages = await receiveTask;
+                return messages.ToArray();
+            }
+            catch (Exception exc)
+            {
+                if (exc.IsTransientFault()) throw;
+                DiscardSubscriptionClient();
+                throw;
+            }
+        }
+
+        private async Task<SubscriptionClient> GetSubscriptionClient()
+        {
+            if (_subscriptionClient != null) return _subscriptionClient;
+
+            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
+            _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
+            return _subscriptionClient;
+        }
+
+        private void DiscardSubscriptionClient()
+        {
+            var subscriptionClient = _subscriptionClient;
+            _subscriptionClient = null;
+
+            if (subscriptionClient == null) return;
+            if (subscriptionClient.IsClosed) return;
+
+            subscriptionClient.Close();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (!disposing) return;
+
+                DiscardSubscriptionClient();
             }
             catch (MessagingEntityNotFoundException)
             {
             }
             catch (ObjectDisposedException)
             {
+            }
+            finally
+            {
+                base.Dispose(disposing);
             }
         }
     }

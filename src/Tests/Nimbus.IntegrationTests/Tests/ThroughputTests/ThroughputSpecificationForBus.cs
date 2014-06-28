@@ -63,7 +63,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
-            bus.Start();
+            await bus.Start();
             return bus;
         }
 
@@ -84,33 +84,40 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            Task.Run(async () =>
+                           {
+                               Subject = await Given();
+                               await When();
+                           }).Wait();
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            Task.Run(async () =>
+                           {
+                               await Subject.Stop();
+                               _dependencyResolver = null;
+
+                               if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
+                           });
+        }
+
         public abstract IEnumerable<Task> SendMessages(IBus bus);
 
         [Test]
         public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
-            Subject = await Given();
-            await When();
-
             _fakeHandler.ActualNumMessagesReceived.ShouldBe(_fakeHandler.ExpectedNumMessagesReceived);
         }
 
         [Test]
         public async Task WeShouldGetAcceptableThroughput()
         {
-            Subject = await Given();
-            await When();
-
             _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            Subject.Stop();
-            _dependencyResolver = null;
-
-            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
         }
     }
 }
