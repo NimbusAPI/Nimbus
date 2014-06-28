@@ -8,6 +8,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Interceptors.Inbound;
@@ -38,6 +39,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                 clock,
                                                                 new NullCompressor(),
                                                                 new NullDependencyResolver(),
+                                                                new DispatchContextManager(), 
                                                                 new UnsupportedLargeMessageBodyStore(),
                                                                 new NullOutboundInterceptorFactory(),
                                                                 serializer,

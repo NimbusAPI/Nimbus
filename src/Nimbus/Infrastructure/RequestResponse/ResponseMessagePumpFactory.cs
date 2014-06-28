@@ -1,6 +1,7 @@
 ﻿using System;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -11,6 +12,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ResponseMessageDispatcher _messageDispatcher;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IQueueManager _queueManager;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
@@ -19,6 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         internal ResponseMessagePumpFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                             ReplyQueueNameSetting replyQueueName,
                                             IClock clock,
+                                            IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
                                             IQueueManager queueManager,
                                             ResponseMessageDispatcher messageDispatcher)
@@ -26,6 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;
             _clock = clock;
+            _dispatchContextManager = dispatchContextManager;
             _logger = logger;
             _queueManager = queueManager;
             _messageDispatcher = messageDispatcher;
@@ -36,7 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
 
-            var pump = new MessagePump(_clock, _logger, _messageDispatcher, receiver);
+            var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcher, receiver);
             _garbageMan.Add(pump);
 
             return pump;

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
@@ -12,6 +13,7 @@ namespace Nimbus.Infrastructure
     internal class MessagePump : IMessagePump
     {
         private readonly IClock _clock;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILogger _logger;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly INimbusMessageReceiver _receiver;
@@ -21,11 +23,13 @@ namespace Nimbus.Infrastructure
 
         public MessagePump(
             IClock clock,
+            IDispatchContextManager dispatchContextManager,
             ILogger logger,
             IMessageDispatcher messageDispatcher,
             INimbusMessageReceiver receiver)
         {
             _clock = clock;
+            _dispatchContextManager = dispatchContextManager;
             _logger = logger;
             _messageDispatcher = messageDispatcher;
             _receiver = receiver;
@@ -78,7 +82,10 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     LogInfo("Dispatching", message);
-                    await _messageDispatcher.Dispatch(message);
+                    using (_dispatchContextManager.StartNewDispatchContext(new DispatchContext(message)))
+                    {
+                        await _messageDispatcher.Dispatch(message);
+                    }
                     LogDebug("Dispatched", message);
 
                     LogDebug("Completing", message);

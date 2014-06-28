@@ -10,6 +10,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Tests.Common;
+using Nimbus.Infrastructure.Dispatching;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
@@ -27,6 +28,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
         {
             _clock = Substitute.For<IClock>();
             _serializer = Substitute.For<ISerializer>();
+
             _replyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"});
 
             return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
@@ -35,6 +37,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                                               _clock,
                                               new NullCompressor(),
                                               new NullDependencyResolver(),
+                                              new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
                                               _serializer,

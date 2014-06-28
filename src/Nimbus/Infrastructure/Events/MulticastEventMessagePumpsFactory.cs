@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
 using Nimbus.Routing;
+using Nimbus.Infrastructure.Dispatching;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -15,6 +16,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly IClock _clock;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
         private readonly INimbusMessagingFactory _messagingFactory;
@@ -25,6 +27,7 @@ namespace Nimbus.Infrastructure.Events
         internal MulticastEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
                                                    IClock clock,
+                                                   IDispatchContextManager dispatchContextManager,
                                                    IHandlerMapper handlerMapper,
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
@@ -35,6 +38,7 @@ namespace Nimbus.Infrastructure.Events
             _applicationName = applicationName;
             _instanceName = instanceName;
             _clock = clock;
+            _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
@@ -75,7 +79,7 @@ namespace Nimbus.Infrastructure.Events
                     var messageReceiver = _messagingFactory.GetTopicReceiver(binding.TopicPath, subscriptionName);
 
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
-                    var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
+                    var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
                     _garbageMan.Add(pump);
 
                     yield return pump;

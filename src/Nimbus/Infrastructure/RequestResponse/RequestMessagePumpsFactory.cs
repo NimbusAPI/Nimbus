@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Routing;
+using Nimbus.Infrastructure.Dispatching;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -15,12 +16,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
         private readonly IClock _clock;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
         public RequestMessagePumpsFactory(IClock clock,
+                                          IDispatchContextManager dispatchContextManager,
                                           IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
@@ -31,6 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
             _clock = clock;
+            _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
             _messagingFactory = messagingFactory;
@@ -58,7 +62,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
 
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
-                var pump = new MessagePump(_clock, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
+                var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
                 _garbageMan.Add(pump);
 
                 yield return pump;
