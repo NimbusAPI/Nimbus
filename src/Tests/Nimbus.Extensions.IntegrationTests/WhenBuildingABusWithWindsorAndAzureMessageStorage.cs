@@ -3,10 +3,9 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.IntegrationTests;
 using Nimbus.LargeMessages.Azure.Configuration;
-using Nimbus.LargeMessages.Azure.Infrastructure;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 using Nimbus.Windsor.Configuration;
 using NUnit.Framework;
 
@@ -30,10 +29,10 @@ namespace Nimbus.Extensions.IntegrationTests
 
                 container.Register(Component.For<ILargeMessageBodyStore>()
                                             .UsingFactoryMethod(c => new BlobStorageBuilder()
-                                                                    .Configure()
-                                                                    .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
-                                                                    .WithLogger(c.Resolve<ILogger>())
-                                                                    .Build())
+                                                                         .Configure()
+                                                                         .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
+                                                                         .WithLogger(c.Resolve<ILogger>())
+                                                                         .Build())
                                             .LifestyleSingleton());
 
                 container.Register(Component.For<IBus>()

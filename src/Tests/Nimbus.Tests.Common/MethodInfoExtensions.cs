@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Nimbus.Extensions;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Common
 {
     public static class MethodInfoExtensions
     {

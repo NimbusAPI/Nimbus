@@ -1,7 +1,7 @@
 using System;
 using Nimbus.DependencyResolution;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Common
 {
     internal class NullDependencyResolverScope : IDependencyResolverScope
     {

@@ -11,6 +11,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -70,8 +71,6 @@ namespace Nimbus.UnitTests.DispatcherTests
             await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command1));
             await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command2));
         }
-
-#pragma warning disable 4014
 
         [Test]
         [TestCaseSource("TestCases")]

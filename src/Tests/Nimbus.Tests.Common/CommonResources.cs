@@ -3,7 +3,7 @@ using System.IO;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Common
 {
     public class CommonResources
     {

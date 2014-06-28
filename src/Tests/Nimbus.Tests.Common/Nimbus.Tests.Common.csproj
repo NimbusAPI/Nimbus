@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{20845AC6-E809-4445-8CBB-0614A014552E}</ProjectGuid>
+    <ProjectGuid>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nimbus.Extensions.IntegrationTests</RootNamespace>
-    <AssemblyName>Nimbus.Extensions.IntegrationTests</AssemblyName>
+    <RootNamespace>Nimbus.Tests.Common</RootNamespace>
+    <AssemblyName>Nimbus.Tests.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,18 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\packages\Castle.Core.3.2.2\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor">
-      <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,30 +39,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WhenBuildingABusWithAutofacAndFileSystemMessageStorage.cs" />
+    <Compile Include="CommonResources.cs" />
+    <Compile Include="MethodCallCounter.cs" />
+    <Compile Include="MethodInfoExtensions.cs" />
+    <Compile Include="NullDependencyResolver.cs" />
+    <Compile Include="NullDependencyResolverScope.cs" />
+    <Compile Include="NullInboundInterceptorFactory.cs" />
+    <Compile Include="NullOutboundInterceptorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WhenBuildingABusWithWindsorAndAzureMessageStorage.cs" />
+    <Compile Include="TestHarnessTypeProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">
-      <Project>{90dd5b3b-4efb-484d-a20b-39cb95f66c2e}</Project>
-      <Name>Nimbus.Autofac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.Azure\Nimbus.LargeMessages.Azure.csproj">
-      <Project>{3D86BFFC-7718-4A33-8CF9-E286B455B993}</Project>
-      <Name>Nimbus.LargeMessages.Azure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.FileSystem\Nimbus.LargeMessages.FileSystem.csproj">
-      <Project>{7FEB8D9E-1451-4132-8E3B-30D8E7F84126}</Project>
-      <Name>Nimbus.LargeMessages.FileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Windsor\Nimbus.Windsor.csproj">
-      <Project>{7fcf3124-24ec-40ca-95fd-e30315d0dde2}</Project>
-      <Name>Nimbus.Windsor</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
@@ -87,10 +61,6 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
-      <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
-      <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

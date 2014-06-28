@@ -1,10 +1,9 @@
 using Nimbus.DependencyResolution;
-using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Common
 {
-    internal class NullOutboundInterceptorFactory : IOutboundInterceptorFactory
+    public class NullOutboundInterceptorFactory : IOutboundInterceptorFactory
     {
         public IOutboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope)
         {

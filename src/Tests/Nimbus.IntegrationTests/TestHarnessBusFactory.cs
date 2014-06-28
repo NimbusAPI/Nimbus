@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests
 {

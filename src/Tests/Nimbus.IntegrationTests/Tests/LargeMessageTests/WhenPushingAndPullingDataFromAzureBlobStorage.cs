@@ -6,6 +6,7 @@ using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.LargeMessages.Azure.Infrastructure;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
 

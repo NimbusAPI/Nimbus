@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Nimbus.Extensions;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Common
 {
     public static class MethodCallCounter
     {
