@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
@@ -19,14 +20,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _logger = logger;
         }
 
-        protected override void SendBatch(BrokeredMessage[] toSend)
+        protected override async Task SendBatch(BrokeredMessage[] toSend)
         {
             var topicClient = GetTopicClient();
 
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _topicPath, toSend.Length);
             try
             {
-                topicClient.SendBatch(toSend);
+                await topicClient.SendBatchAsync(toSend);
             }
             catch (Exception exc)
             {

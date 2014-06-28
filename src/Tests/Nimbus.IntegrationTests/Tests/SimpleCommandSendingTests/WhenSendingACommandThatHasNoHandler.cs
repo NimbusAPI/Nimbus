@@ -16,8 +16,6 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         [Test]
         public async Task NothingShouldGoBang()
         {
-            await Given();
-            await When();
         }
     }
 }

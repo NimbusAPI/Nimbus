@@ -33,9 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         [Test]
         public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
         {
-            await Given();
-            await When();
-
             _deadLetterMessages.Count().ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }

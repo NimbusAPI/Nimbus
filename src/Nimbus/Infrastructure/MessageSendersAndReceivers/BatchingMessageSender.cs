@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -11,79 +12,90 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         private readonly ILogger _logger;
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
-        private readonly object _sendingMutex = new object();
-        private bool _flushing;
         private bool _disposed;
+
+        private readonly object _enqueuingMutex = new object();
+        private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(1, 1);
+
+        private Task _pendingFlushTask;
 
         protected BatchingMessageSender(ILogger logger)
         {
             _logger = logger;
         }
 
-        protected abstract void SendBatch(BrokeredMessage[] messages);
+        protected abstract Task SendBatch(BrokeredMessage[] messages);
 
-        public Task Send(BrokeredMessage message)
+        public async Task Send(BrokeredMessage message)
         {
-            return Task.Run(() =>
-                            {
-                                lock (_outboundQueue)
-                                {
-                                    _outboundQueue.Add(message);
-                                }
-                                TriggerMessageFlush();
-                            });
+            Task taskToAwait;
+            lock (_enqueuingMutex)
+            {
+                _outboundQueue.Add(message);
+                taskToAwait = GetOrCreateNextFlushTask();
+            }
+
+            await taskToAwait;
         }
 
-        private void TriggerMessageFlush()
+        private Task GetOrCreateNextFlushTask()
         {
-            Task.Run(() => FlushMessages());
+            lock (_enqueuingMutex)
+            {
+                if (_pendingFlushTask == null)
+                {
+                    _pendingFlushTask = FlushMessages();
+                }
+
+                return _pendingFlushTask;
+            }
         }
 
-        private void FlushMessages()
+        private async Task FlushMessages()
         {
-            if (_flushing) return;
             if (_disposed) return;
 
-            lock (_sendingMutex)
+            try
             {
-                try
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await _sendingSemaphore.WaitAsync();
+
+                BrokeredMessage[] toSend;
+                lock (_enqueuingMutex)
                 {
-                    _flushing = true;
-                    BrokeredMessage[] toSend;
+                    toSend = _outboundQueue.ToArray();
+                    _outboundQueue.Clear();
+                    _pendingFlushTask = null;
+                }
+                if (toSend.None()) return;
 
-                    lock (_outboundQueue)
-                    {
-                        toSend = _outboundQueue.Take(100).ToArray();
-                        _outboundQueue.RemoveRange(0, toSend.Length);
-                    }
-
-                    if (toSend.None()) return;
-
+                for (var retries = 0; retries < 3; retries++)
+                {
                     try
                     {
-                        SendBatch(toSend);
+                        await SendBatch(toSend);
+                        return;
                     }
                     catch (Exception ex)
                     {
                         if (ex.IsTransientFault())
                         {
                             _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
-                            lock (_outboundQueue)
-                            {
-                                _outboundQueue.AddRange(toSend);
-                            }
+                        }
+                        else
+                        {
+                            throw;
                         }
                     }
-                }
-                finally
-                {
-                    _flushing = false;
+
+                    await Task.Delay(TimeSpan.FromSeconds(retries*2));
                 }
 
-                lock (_outboundQueue)
-                {
-                    if (_outboundQueue.Any()) TriggerMessageFlush();
-                }
+                throw new BusException("Retry count exceeded while sending message batch.");
+            }
+            finally
+            {
+                _sendingSemaphore.Release();
             }
         }
 
