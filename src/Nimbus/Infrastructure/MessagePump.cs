@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
@@ -16,7 +17,7 @@ namespace Nimbus.Infrastructure
         private readonly INimbusMessageReceiver _receiver;
 
         private bool _started;
-        private readonly object _mutex = new object();
+        private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
 
         public MessagePump(
             IClock clock,
@@ -30,38 +31,42 @@ namespace Nimbus.Infrastructure
             _receiver = receiver;
         }
 
-        public Task Start()
+        public async Task Start()
         {
-            return Task.Run(async () =>
-                                  {
-                                      lock (_mutex)
-                                      {
-                                          if (_started)
-                                              throw new InvalidOperationException(
-                                                  "Message pump either is already running or was previously running and has not completed shutting down.");
-                                          _started = true;
-                                      }
+            try
+            {
+                await _startStopSemaphore.WaitAsync();
 
-                                      _logger.Debug("Message pump for {0} starting...", _receiver);
-                                      await _receiver.Start(Dispatch);
-                                      _logger.Debug("Message pump for {0} started", _receiver);
-                                  });
+                if (_started) return;
+                _started = true;
+
+                _logger.Debug("Message pump for {0} starting...", _receiver);
+                await _receiver.Start(Dispatch);
+                _logger.Debug("Message pump for {0} started", _receiver);
+            }
+            finally
+            {
+                _startStopSemaphore.Release();
+            }
         }
 
-        public Task Stop()
+        public async Task Stop()
         {
-            return Task.Run(async () =>
-                                  {
-                                      lock (_mutex)
-                                      {
-                                          if (!_started) return;
-                                          _started = false;
-                                      }
+            try
+            {
+                await _startStopSemaphore.WaitAsync();
 
-                                      _logger.Debug("Message pump for {0} stopping...", _receiver);
-                                      await _receiver.Stop();
-                                      _logger.Debug("Message pump for {0} stopped.", _receiver);
-                                  });
+                if (!_started) return;
+                _started = false;
+
+                _logger.Debug("Message pump for {0} stopping...", _receiver);
+                await _receiver.Stop();
+                _logger.Debug("Message pump for {0} stopped.", _receiver);
+            }
+            finally
+            {
+                _startStopSemaphore.Release();
+            }
         }
 
         private async Task Dispatch(BrokeredMessage message)
@@ -138,7 +143,11 @@ namespace Nimbus.Infrastructure
 
         public void Dispose()
         {
-            Stop(); // don't await
+            // ReSharper disable CSharpWarnings::CS4014
+#pragma warning disable 4014
+            Stop();
+#pragma warning restore 4014
+            // ReSharper restore CSharpWarnings::CS4014
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithLogger(logger)
                                       .Build();
 
-            await bus.Start(MessagePumpTypes.All);
+            await bus.Start();
         }
     }
 }
