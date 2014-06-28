@@ -35,14 +35,14 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public void TheBusShouldStopBeforeAllTheCommandsAreHandled()
+        public async Task TheBusShouldStopBeforeAllTheCommandsAreHandled()
         {
             Console.WriteLine("Observed a total of {0} command handler invocations", _commandHandlerInvocationCount);
             _commandHandlerInvocationCount.ShouldBeLessThan(_totalCommands);
         }
 
         [Test]
-        public void AtLeastSomeOfTheCommandsShouldHaveBeenHandled()
+        public async Task AtLeastSomeOfTheCommandsShouldHaveBeenHandled()
         {
             _commandHandlerInvocationCount.ShouldBeGreaterThan(0);
         }

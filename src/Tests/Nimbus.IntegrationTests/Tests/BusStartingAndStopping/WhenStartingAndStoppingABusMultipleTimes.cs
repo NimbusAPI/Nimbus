@@ -16,7 +16,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public void NothingShouldGoBang()
+        public async Task NothingShouldGoBang()
         {
         }
     }
