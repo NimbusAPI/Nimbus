@@ -72,8 +72,6 @@ namespace Nimbus.UnitTests.DispatcherTests
             await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command2));
         }
 
-#pragma warning disable 4014
-
         [Test]
         [TestCaseSource("TestCases")]
         public async Task Command1ShouldBeDispatchedToTheCorrectHandler(AllDependencyResolversTestContext context)

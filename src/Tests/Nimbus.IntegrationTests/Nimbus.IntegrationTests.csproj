@@ -60,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonResources.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />

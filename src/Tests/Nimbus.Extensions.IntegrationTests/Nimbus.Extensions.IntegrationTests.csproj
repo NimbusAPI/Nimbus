@@ -88,9 +88,9 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Nimbus.IntegrationTests\Nimbus.IntegrationTests.csproj">
-      <Project>{5baac418-8993-48fb-994b-2f06a4b5a26b}</Project>
-      <Name>Nimbus.IntegrationTests</Name>
+    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
+      <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
+      <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

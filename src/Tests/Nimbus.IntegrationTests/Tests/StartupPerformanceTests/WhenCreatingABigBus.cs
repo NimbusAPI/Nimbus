@@ -10,6 +10,7 @@ using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
 using Nimbus.MessageContracts;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
