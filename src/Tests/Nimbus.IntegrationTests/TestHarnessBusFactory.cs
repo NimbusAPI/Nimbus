@@ -19,6 +19,7 @@ namespace Nimbus.IntegrationTests
         public async Task<Bus> CreateAndStart()
         {
             var logger = new ConsoleLogger();
+            //var logger = new NullLogger();
 
             // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
             // deleting queues and topics is slow.

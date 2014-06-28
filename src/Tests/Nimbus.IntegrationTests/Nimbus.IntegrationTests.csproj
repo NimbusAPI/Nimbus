@@ -87,6 +87,13 @@
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\QuickCommand.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\Handlers\QuickCommandHandler.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\SlowCommand.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\Handlers\SlowCommandHandler.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\WhenStartingAndStoppingABusMultipleTimes.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\WhenStoppingTheBusWhileThereAreManyCommandsInAQueue.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrow.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />

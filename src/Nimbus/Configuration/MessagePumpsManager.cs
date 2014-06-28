@@ -10,11 +10,11 @@ namespace Nimbus.Configuration
     internal class MessagePumpsManager : IMessagePumpsManager
     {
         private readonly IMessagePump _responseMessagePump;
-        private readonly IEnumerable<IMessagePump> _requestMessagePumps;
-        private readonly IEnumerable<IMessagePump> _commandMessagePumps;
-        private readonly IEnumerable<IMessagePump> _multicastEventMessagePumps;
-        private readonly IEnumerable<IMessagePump> _competingEventMessagePumps;
-        private readonly IEnumerable<IMessagePump> _multicastRequestMessagePumps;
+        private readonly IMessagePump[] _requestMessagePumps;
+        private readonly IMessagePump[] _commandMessagePumps;
+        private readonly IMessagePump[] _multicastEventMessagePumps;
+        private readonly IMessagePump[] _competingEventMessagePumps;
+        private readonly IMessagePump[] _multicastRequestMessagePumps;
 
         public MessagePumpsManager(IMessagePump responseMessagePump,
                                    IEnumerable<IMessagePump> requestMessagePumps,
@@ -24,11 +24,11 @@ namespace Nimbus.Configuration
                                    IEnumerable<IMessagePump> competingEventMessagePumps)
         {
             _responseMessagePump = responseMessagePump;
-            _commandMessagePumps = commandMessagePumps;
-            _requestMessagePumps = requestMessagePumps;
-            _multicastRequestMessagePumps = multicastRequestMessagePumps;
-            _multicastEventMessagePumps = multicastEventMessagePumps;
-            _competingEventMessagePumps = competingEventMessagePumps;
+            _commandMessagePumps = commandMessagePumps.ToArray();
+            _requestMessagePumps = requestMessagePumps.ToArray();
+            _multicastRequestMessagePumps = multicastRequestMessagePumps.ToArray();
+            _multicastEventMessagePumps = multicastEventMessagePumps.ToArray();
+            _competingEventMessagePumps = competingEventMessagePumps.ToArray();
         }
 
         public async Task Start(MessagePumpTypes messagePumpTypes)
