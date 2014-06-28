@@ -5,8 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
 using Nimbus.Routing;
-using Nimbus.Extensions;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure.Dispatching;
 
 namespace Nimbus.Infrastructure.Events
