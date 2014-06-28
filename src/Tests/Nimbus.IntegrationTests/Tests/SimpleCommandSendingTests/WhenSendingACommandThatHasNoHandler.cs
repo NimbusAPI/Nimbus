@@ -7,7 +7,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
     [TestFixture]
     public class WhenSendingACommandThatHasNoHandler : TestForBus
     {
-        public override async Task When()
+        protected override async Task When()
         {
             var someCommand = new SomeCommandThatHasNoHandler();
             await Bus.Send(someCommand);

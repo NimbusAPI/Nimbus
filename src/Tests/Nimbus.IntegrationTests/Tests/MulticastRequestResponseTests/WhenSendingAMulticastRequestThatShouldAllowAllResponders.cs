@@ -9,11 +9,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 {
     [TestFixture]
-    public class WhenSendingASixSecondMulticastRequest : TestForBus
+    public class WhenSendingAMulticastRequestThatShouldAllowAllResponders : TestForBus
     {
         private IEnumerable<BlackBallResponse> _response;
 
-        public override async Task When()
+        protected override async Task When()
         {
             var request = new BlackBallRequest
                           {
@@ -26,9 +26,6 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         [Test]
         public async Task WeShouldReceiveThreeResponses()
         {
-            await Given();
-            await When();
-
             _response.Count().ShouldBe(3);
         }
     }

@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
     [TestFixture]
     public class WhenPublishingAnEventThatWeOnlyHandleViaCompetition : TestForBus
     {
-        public override async Task When()
+        protected override async Task When()
         {
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             await Bus.Publish(myEvent);
@@ -25,9 +25,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
                              .Count()
                              .ShouldBe(1);
@@ -36,9 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaCompetition>()
                              .Count()
@@ -48,8 +42,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
+            ;
 
             MethodCallCounter.AllReceivedMessages
                              .Count()

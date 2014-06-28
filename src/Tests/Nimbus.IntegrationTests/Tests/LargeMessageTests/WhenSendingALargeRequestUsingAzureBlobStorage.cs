@@ -38,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
-            bus.Start();
+            await bus.Start();
             return bus;
         }
 

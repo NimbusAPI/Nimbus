@@ -14,8 +14,8 @@ namespace Nimbus.IntegrationTests
 
         private Stopwatch _sw;
 
-        [SetUp]
-        public void SetUp()
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
         {
             Task.Run(async () =>
                            {
@@ -29,8 +29,18 @@ namespace Nimbus.IntegrationTests
                            }).Wait();
         }
 
+        [SetUp]
+        public virtual void SetUp()
+        {
+        }
+
         [TearDown]
         public virtual void TearDown()
+        {
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
         {
             var disposable = Subject as IDisposable;
             if (disposable != null) disposable.Dispose();

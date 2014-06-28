@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
     [TestFixture]
     public class WhenPublishingAnEventThatWeOnlyHandleViaMulticast : TestForBus
     {
-        public override async Task When()
+        protected override async Task When()
         {
             var myEvent = new SomeEventWeOnlyHandleViaMulticast();
             await Bus.Publish(myEvent);
@@ -25,9 +25,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaMulticast) null))
                              .Count()
                              .ShouldBe(1);
@@ -36,9 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaMulticast>()
                              .Count()
@@ -48,9 +42,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .Count()
                              .ShouldBe(1);

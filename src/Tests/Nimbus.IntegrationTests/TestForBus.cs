@@ -10,13 +10,28 @@ namespace Nimbus.IntegrationTests
     {
         protected Bus Bus { get; private set; }
 
-        [SetUp]
-        public void SetUp()
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
         {
-            MethodCallCounter.Clear();
+            Task.Run(async () =>
+            {
+                MethodCallCounter.Clear();
+
+                Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                await Given();
+                Console.WriteLine();
+                Console.WriteLine();
+
+                await When();
+                Console.WriteLine();
+                Console.WriteLine();
+            }).Wait();
         }
 
-        [TearDown]
+        [TestFixtureTearDown]
         public void TearDown()
         {
             Console.WriteLine();
@@ -24,14 +39,10 @@ namespace Nimbus.IntegrationTests
             Bus.Dispose();
         }
 
-        public virtual async Task Given()
+        protected virtual async Task Given()
         {
-            Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
-
-            Console.WriteLine();
-            Console.WriteLine();
         }
 
-        public abstract Task When();
+        protected abstract Task When();
     }
 }

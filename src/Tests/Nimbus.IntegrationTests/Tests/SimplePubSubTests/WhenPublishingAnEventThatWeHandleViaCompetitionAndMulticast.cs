@@ -14,7 +14,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
     [TestFixture]
     public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : TestForBus
     {
-        public override async Task When()
+        protected override async Task When()
         {
             await Bus.Publish(new SomeEventWeHandleViaMulticastAndCompetition());
 
@@ -24,9 +24,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
@@ -35,9 +32,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
@@ -46,9 +40,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
                              .Count()
@@ -58,9 +49,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         [Test]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given();
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .Count()
                              .ShouldBe(2);

@@ -17,9 +17,9 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
     [Timeout(15*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
-        private const int _expectedTotalMessageCount = 11;  // 5 interceptors * 2 + 1 handler
+        private const int _expectedTotalMessageCount = 11; // 5 interceptors * 2 + 1 handler
 
-        protected override Task<IBus> Given()
+        protected override async Task<IBus> Given()
         {
             MethodCallCounter.Clear();
 
@@ -38,12 +38,12 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
-            bus.Start();
+            await bus.Start();
 
-            return Task.FromResult((IBus) bus);
+            return bus;
         }
 
         protected override async Task When()

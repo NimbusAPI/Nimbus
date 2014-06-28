@@ -27,7 +27,6 @@ namespace Nimbus.IntegrationTests
             _sw.Stop();
 
             Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
-            Subject = null;
         }
     }
 }
