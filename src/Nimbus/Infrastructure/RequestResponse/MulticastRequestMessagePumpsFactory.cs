@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -42,13 +42,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof(IHandleMulticastRequest<,>);
+            var openGenericHandlerType = typeof (IHandleMulticastRequest<,>);
             var handlerTypes = _typeProvider.MulticastRequestHandlerTypes.ToArray();
 
             // Events are routed to Topics and we'll create a competing subscription for the logical endpoint
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, TopicPath = _router.Route(m)})
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic)})
                 .GroupBy(b => b.TopicPath)
                 .Select(g => new
                              {

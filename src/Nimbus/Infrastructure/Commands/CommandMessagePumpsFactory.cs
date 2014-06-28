@@ -4,6 +4,7 @@ using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Commands
 {
@@ -38,13 +39,13 @@ namespace Nimbus.Infrastructure.Commands
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof(IHandleCommand<>);
+            var openGenericHandlerType = typeof (IHandleCommand<>);
             var handlerTypes = _typeProvider.CommandHandlerTypes.ToArray();
 
             // Create a single connection to each command queue determined by routing
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, QueuePath = _router.Route(m)})
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue)})
                 .GroupBy(b => b.QueuePath)
                 .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
 
@@ -52,7 +53,7 @@ namespace Nimbus.Infrastructure.Commands
             foreach (var binding in bindings)
             {
                 var messageTypes = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, binding.HandlerTypes).ToArray();
-                
+
                 _logger.Debug("Creating message pump for command queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
                 var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
 

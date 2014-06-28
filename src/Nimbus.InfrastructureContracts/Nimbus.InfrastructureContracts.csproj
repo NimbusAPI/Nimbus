@@ -56,10 +56,11 @@
     <Compile Include="DependencyResolution\IDependencyResolverScope.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
-    <Compile Include="IRouter.cs" />
+    <Compile Include="Routing\IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISerializer.cs" />
+    <Compile Include="Routing\QueueOrTopic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">

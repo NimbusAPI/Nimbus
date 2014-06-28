@@ -68,6 +68,23 @@
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeMulticastHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeAbstractCommandType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeAbstractEventType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeAbstractRequestType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeAbstractResponseType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteCommandType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteEventType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteRequestType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteResponseType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeCompetingHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeMulticastHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenPublishingAnEventThatHasAnAbstractBaseType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingACommandThatHasAnAbstractBaseType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingAMulticastRequestThatHasAnAbstractBaseType.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingARequestThatHasAnAbstractBaseType.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
@@ -190,6 +207,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

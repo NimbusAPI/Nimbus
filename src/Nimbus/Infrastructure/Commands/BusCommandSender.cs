@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Commands
 {
@@ -49,7 +50,7 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Deliver(Type commandType, BrokeredMessage message)
         {
-            var queuePath = _router.Route(commandType);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

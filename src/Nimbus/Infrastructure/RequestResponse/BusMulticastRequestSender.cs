@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.MessageContracts;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -44,7 +45,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var topicPath = _router.Route(requestType);
+            var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
             var sender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Sending multicast request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

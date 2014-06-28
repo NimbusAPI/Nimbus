@@ -1,0 +1,16 @@
+﻿using System.Threading.Tasks;
+using Nimbus.Handlers;
+using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
+
+namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers
+{
+    public class SomeConcreteRequestTypeMulticastHandler : IHandleMulticastRequest<SomeConcreteRequestType, SomeConcreteResponseType>
+    {
+        public async Task<SomeConcreteResponseType> Handle(SomeConcreteRequestType request)
+        {
+            MethodCallCounter.RecordCall<SomeConcreteRequestTypeMulticastHandler>(ch => ch.Handle(request));
+
+            return new SomeConcreteResponseType();
+        }
+    }
+}

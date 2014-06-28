@@ -4,6 +4,7 @@ using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
+using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {

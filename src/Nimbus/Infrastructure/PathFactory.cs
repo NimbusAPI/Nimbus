@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 
 namespace Nimbus.Infrastructure
 {
@@ -34,7 +35,7 @@ namespace Nimbus.Infrastructure
 
         public static string SubscriptionNameFor(string applicationName, string instanceName)
         {
-            return Shorten(Sanitize(string.Join(".", new[] { applicationName, instanceName })), 50);
+            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName})), 50);
         }
 
         public static string SubscriptionNameFor(string applicationName, Type handlerType)
@@ -86,18 +87,17 @@ namespace Nimbus.Infrastructure
         private static string CalculateAdler32Hash(string inputString)
         {
             const uint BASE = 65521;
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(inputString);
+            var buffer = Encoding.UTF8.GetBytes(inputString);
             uint checksum = 1;
-            int offset = 0;
-            int count = buffer.Length;
+            var offset = 0;
+            var count = buffer.Length;
 
-
-            uint s1 = checksum & 0xFFFF;
-            uint s2 = checksum >> 16;
+            var s1 = checksum & 0xFFFF;
+            var s2 = checksum >> 16;
 
             while (count > 0)
             {
-                int n = 3800;
+                var n = 3800;
                 if (n > count)
                 {
                     n = count;
@@ -105,7 +105,7 @@ namespace Nimbus.Infrastructure
                 count -= n;
                 while (--n >= 0)
                 {
-                    s1 = s1 + (uint)(buffer[offset++] & 0xff);
+                    s1 = s1 + (uint) (buffer[offset++] & 0xff);
                     s2 = s2 + s1;
                 }
                 s1 %= BASE;
@@ -115,6 +115,5 @@ namespace Nimbus.Infrastructure
             checksum = (s2 << 16) | s1;
             return checksum.ToString();
         }
-
     }
 }

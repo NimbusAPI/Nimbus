@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Extensions;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -31,7 +32,7 @@ namespace Nimbus.Infrastructure.Events
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
             var message = await _brokeredMessageFactory.Create(busEvent);
-            var topicPath = _router.Route(eventType);
+            var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
             var topicSender = _messagingFactory.GetTopicSender(topicPath);
 
             _logger.Debug("Publishing event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
