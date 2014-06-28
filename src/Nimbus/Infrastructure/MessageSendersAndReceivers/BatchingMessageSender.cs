@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -10,12 +11,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal abstract class BatchingMessageSender : INimbusMessageSender
     {
+        private const int _maxConcurrentFlushTasks = 10;
+
         private readonly ILogger _logger;
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
         private bool _disposed;
 
         private readonly object _enqueuingMutex = new object();
-        private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(_maxConcurrentFlushTasks, _maxConcurrentFlushTasks);
 
         private Task _pendingFlushTask;
 
@@ -87,6 +90,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                             throw;
                         }
                     }
+
+                    toSend = toSend
+                        .Select(m => m.Clone())
+                        .ToArray();
 
                     await Task.Delay(TimeSpan.FromSeconds(retries*2));
                 }
