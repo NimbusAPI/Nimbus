@@ -9,7 +9,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
-using Nimbus.UnitTests;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
@@ -30,7 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               new UnsupportedLargeMessageBodyStore(),
                                               new NullOutboundInterceptorFactory(),
                                               new DataContractSerializer(),
-                                              new UnitTests.TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace }));
+                                              new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

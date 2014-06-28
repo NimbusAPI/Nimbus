@@ -66,7 +66,6 @@
     <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="MethodCallCounter.cs" />
-    <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeHandler.cs" />
@@ -200,9 +199,9 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Nimbus.UnitTests\Nimbus.UnitTests.csproj">
-      <Project>{3a562499-3da9-469e-88b6-2437fc23dd24}</Project>
-      <Name>Nimbus.UnitTests</Name>
+    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
+      <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
+      <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

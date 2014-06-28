@@ -9,6 +9,7 @@ using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
 

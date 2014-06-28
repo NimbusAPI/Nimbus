@@ -128,10 +128,6 @@
     <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
     <Compile Include="InterceptorTests\WhenBuildingABusWithAutofacAndInterceptors.cs" />
-    <Compile Include="NullDependencyResolver.cs" />
-    <Compile Include="NullDependencyResolverScope.cs" />
-    <Compile Include="NullInboundInterceptorFactory.cs" />
-    <Compile Include="NullOutboundInterceptorFactory.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
@@ -173,8 +169,6 @@
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\WindsorDependencyResolverFactory.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\TestForAllDependencyResolvers.cs" />
     <Compile Include="DependencyResolverTests\CommandHandlerResolutionTests\WhenResolvingAHandlerForASimpleCommand.cs" />
-    <Compile Include="MethodCallCounter.cs" />
-    <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingASingleResponse.cs" />
     <Compile Include="MulticastRequestResponseTests\GivenAWrapperWithTwoResponses.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingAThreeResponses.cs" />
@@ -185,7 +179,6 @@
       </SubType>
     </Compile>
     <Compile Include="SpecificationForAsync.cs" />
-    <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="DispatcherTests\WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
     <Compile Include="DispatcherTests\WhenExtractingADispatchMethodForARequest.cs" />
@@ -214,6 +207,10 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1b793c01-e824-4449-b93d-277626b1791f}</Project>
       <Name>Nimbus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
+      <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
+      <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.Handlers\Nimbus.UnitTests.TestAssemblies.Handlers.csproj">
       <Project>{0747e41e-8bc7-4ce9-82ae-9051f3f6e55b}</Project>

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Logger;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests

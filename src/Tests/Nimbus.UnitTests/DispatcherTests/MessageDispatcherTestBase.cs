@@ -12,6 +12,7 @@ using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
+using Nimbus.Tests.Common;
 using NSubstitute;
 
 namespace Nimbus.UnitTests.DispatcherTests

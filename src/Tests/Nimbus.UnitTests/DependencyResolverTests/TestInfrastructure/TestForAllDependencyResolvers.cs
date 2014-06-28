@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Tests.Common;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories;
 using NUnit.Framework;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
+using Nimbus.Tests.Common;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 
 #pragma warning disable 4014

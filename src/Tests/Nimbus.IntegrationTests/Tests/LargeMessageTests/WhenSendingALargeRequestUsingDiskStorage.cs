@@ -7,6 +7,7 @@ using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Logger;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
 

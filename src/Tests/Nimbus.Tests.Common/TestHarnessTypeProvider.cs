@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Common
 {
     public class TestHarnessTypeProvider : AssemblyScanningTypeProvider
     {

@@ -8,6 +8,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.MessageContracts;
+using Nimbus.Tests.Common;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;

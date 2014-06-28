@@ -1,8 +1,7 @@
 ﻿using Nimbus.DependencyResolution;
-using Nimbus.Interceptors;
 using Nimbus.Interceptors.Inbound;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Common
 {
     public class NullInboundInterceptorFactory : IInboundInterceptorFactory
     {
