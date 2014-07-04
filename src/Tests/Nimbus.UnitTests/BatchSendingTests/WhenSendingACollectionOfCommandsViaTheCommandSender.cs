@@ -42,17 +42,17 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     replyQueueNameSetting,
                                                                     clock,
                                                                     new NullCompressor(),
-                                                                    new NullDependencyResolver(),
                                                                     new DispatchContextManager(), 
                                                                     new UnsupportedLargeMessageBodyStore(),
-                                                                    new NullOutboundInterceptorFactory(),
                                                                     serializer,
                                                                     new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();
+            var dependencyResolver = new NullDependencyResolver();
+            var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
 
-            var busCommandSender = new BusCommandSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory, router);
+            var busCommandSender = new BusCommandSender(brokeredMessageFactory, dependencyResolver, knownMessageTypeVerifier, logger, messagingFactory, outboundInterceptorFactory, router);
             return Task.FromResult(busCommandSender);
         }
 

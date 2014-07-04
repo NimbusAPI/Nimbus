@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Interceptors.Inbound;
-using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.BrokeredMessageServices
@@ -22,10 +19,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
         private readonly ICompressor _compressor;
-        private readonly IDependencyResolver _dependencyResolver;
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
-        private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ISerializer _serializer;
         private readonly ITypeProvider _typeProvider;
 
@@ -34,10 +29,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       ReplyQueueNameSetting replyQueueName,
                                       IClock clock,
                                       ICompressor compressor,
-                                      IDependencyResolver dependencyResolver,
                                       IDispatchContextManager dispatchContextManager,
                                       ILargeMessageBodyStore largeMessageBodyStore,
-                                      IOutboundInterceptorFactory outboundInterceptorFactory,
                                       ISerializer serializer,
                                       ITypeProvider typeProvider)
         {
@@ -46,10 +39,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             _replyQueueName = replyQueueName;
             _clock = clock;
             _compressor = compressor;
-            _dependencyResolver = dependencyResolver;
             _dispatchContextManager = dispatchContextManager;
             _largeMessageBodyStore = largeMessageBodyStore;
-            _outboundInterceptorFactory = outboundInterceptorFactory;
             _serializer = serializer;
             _typeProvider = typeProvider;
         }
@@ -95,15 +86,6 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
                                       // Use the CorrelationId for the current dispatch, otherwise start a new CorrelationId using the message we're sending
                                       brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId ?? brokeredMessage.MessageId;
-
-                                      using (var scope = _dependencyResolver.CreateChildScope())
-                                      {
-                                          var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                                          foreach (var interceptor in interceptors)
-                                          {
-                                              await interceptor.Decorate(brokeredMessage, serializableObject);
-                                          }
-                                      }
 
                                       return brokeredMessage;
                                   });
@@ -182,7 +164,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();
             if (candidates.Any() == false)
                 throw new Exception("The type '{0}' was not discovered by the type provider and cannot be loaded.".FormatWith(typeName));
-            
+
             // The TypeProvider should not provide a list of duplicates
             return candidates.Single();
         }

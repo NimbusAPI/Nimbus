@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
@@ -11,6 +12,7 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
@@ -42,16 +44,16 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     replyQueueNameSetting,
                                                                     clock,
                                                                     new NullCompressor(),
-                                                                    new NullDependencyResolver(),
                                                                     new DispatchContextManager(), 
                                                                     new UnsupportedLargeMessageBodyStore(),
-                                                                    new NullOutboundInterceptorFactory(),
                                                                     serializer,
                                                                     new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();
-            var busCommandSender = new BusEventSender(brokeredMessageFactory, knownMessageTypeVerifier, logger, messagingFactory, router);
+            var dependencyResolver = new NullDependencyResolver();
+            var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
+            var busCommandSender = new BusEventSender(brokeredMessageFactory, dependencyResolver, knownMessageTypeVerifier, logger, messagingFactory, outboundInterceptorFactory, router);
             return Task.FromResult(busCommandSender);
         }
 

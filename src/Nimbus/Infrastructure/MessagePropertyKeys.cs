@@ -13,5 +13,7 @@
         public const string LargeBodyBlobIdentifier = "LargeBodyBlobIdentifier";
         public const string MessageType = "MessageType";
         public const string InReplyToRequestId = "InReplyToRequestId";
+        public const string SentToQueue = "SentToQueue";
+        public const string SentToTopic = "SentToTopic";
     }
 }

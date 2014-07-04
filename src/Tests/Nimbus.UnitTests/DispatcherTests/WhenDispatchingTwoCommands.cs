@@ -50,10 +50,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                  replyQueueNameSetting,
                                                                  clock,
                                                                  new NullCompressor(),
-                                                                 new NullDependencyResolver(),
                                                                  new DispatchContextManager(), 
                                                                  new UnsupportedLargeMessageBodyStore(),
-                                                                 new NullOutboundInterceptorFactory(),
                                                                  serializer,
                                                                  typeProvider);
 

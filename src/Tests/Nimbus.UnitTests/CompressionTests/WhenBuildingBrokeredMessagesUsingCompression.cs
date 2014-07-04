@@ -36,10 +36,8 @@ namespace Nimbus.UnitTests.CompressionTests
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
                                               Substitute.For<IClock>(),
                                               compressor,
-                                              new NullDependencyResolver(),
                                               new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
-                                              new NullOutboundInterceptorFactory(),
                                               new DataContractSerializer(),
                                               new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace }));
         }
