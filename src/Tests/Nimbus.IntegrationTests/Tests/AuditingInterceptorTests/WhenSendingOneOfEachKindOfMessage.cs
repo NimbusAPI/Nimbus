@@ -16,6 +16,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 {
     [TestFixture]
+    [Timeout(5 * 1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
         private object[] _allAuditedMessages;
@@ -75,57 +76,57 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeCommand()
+        public async Task ThereShouldBeAnAuditRecordForSomeCommand()
         {
             _allAuditedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeCommandSentViaDelay()
+        public async Task ThereShouldBeAnAuditRecordForSomeCommandSentViaDelay()
         {
             _allAuditedMessages.OfType<SomeCommandSentViaDelay>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeRequest()
+        public async Task ThereShouldBeAnAuditRecordForSomeRequest()
         {
             _allAuditedMessages.OfType<SomeRequest>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeResponse()
+        public async Task ThereShouldBeAnAuditRecordForSomeResponse()
         {
             _allAuditedMessages.OfType<SomeResponse>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeMulticastRequest()
+        public async Task ThereShouldBeAnAuditRecordForSomeMulticastRequest()
         {
             _allAuditedMessages.OfType<SomeMulticastRequest>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeMulticastResponse()
+        public async Task ThereShouldBeAnAuditRecordForSomeMulticastResponse()
         {
             _allAuditedMessages.OfType<SomeMulticastResponse>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeAnAuditRecordForSomeEvent()
+        public async Task ThereShouldBeAnAuditRecordForSomeEvent()
         {
             _allAuditedMessages.OfType<SomeEvent>().Count().ShouldBe(1);
         }
 
         [Test]
-        public void ThereShouldBeATotalOfSevenAuditRecords()
+        public async Task ThereShouldBeATotalOfSevenAuditRecords()
         {
             MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(7);
         }
 
         [Test]
-        public void ThereShouldBeATotalOfSevenRecordedMethodCalls()
+        public async Task ThereShouldBeOnlyOneKindOfRecordedMethodCall()
         {
-            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
+            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(1);
         }
     }
 }
