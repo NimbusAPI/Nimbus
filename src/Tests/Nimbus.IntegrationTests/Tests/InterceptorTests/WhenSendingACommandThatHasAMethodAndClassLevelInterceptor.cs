@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
@@ -60,37 +59,67 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         }
 
         [Test]
-        public async Task TheMethodLevelInterceptorShouldHaveBeenInvoked()
+        public async Task TheMethodLevelExecutingInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheBaseMethodLevelInterceptorShouldHaveBeenInvoked()
+        public async Task TheMethodLevelSuccessInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerSuccess<FooCommand>(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheBaseMethodLevelExecutingInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheBaseClassLevelInterceptorShouldHaveBeenInvoked()
+        public async Task TheBaseMethodLevelSuccessInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseMethodLevelInterceptorForFoo>(i => i.OnCommandHandlerSuccess<FooCommand>(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheBaseClassLevelExecutingInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseClassLevelInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheClassLevelInterceptorShouldHaveBeenInvoked()
+        public async Task TheBaseClassLevelSuccessInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeBaseClassLevelInterceptor>(i => i.OnCommandHandlerSuccess<FooCommand>(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheClassLevelExecutingInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeClassLevelInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheGlobalInterceptorShouldHaveBeenInvoked()
+        public async Task TheClassLevelSuccessInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeClassLevelInterceptor>(i => i.OnCommandHandlerSuccess<FooCommand>(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheGlobalExecutingInterceptorShouldHaveBeenInvoked()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeGlobalInterceptor>(i => i.OnCommandHandlerExecuting<FooCommand>(null, null)).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task NoOtherMethodLevelInterceptorsShouldHaveBeenInvoked()
+        public async Task TheGlobalSuccessInterceptorShouldHaveBeenInvoked()
+        {
+            MethodCallCounter.ReceivedCallsWithAnyArg<SomeGlobalInterceptor>(i => i.OnCommandHandlerSuccess<FooCommand>(null, null)).Count().ShouldBe(1);
+        }
+
+        [Test]
+        public async Task TheCorrectNumberOfInterceptorsShouldHaveBeenInvoked()
         {
             MethodCallCounter.AllReceivedMessages.OfType<FooCommand>().Count().ShouldBe(_expectedTotalMessageCount);
         }
