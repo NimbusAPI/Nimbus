@@ -115,7 +115,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
             return Task.Run(async () =>
                                   {
-                                      var responseMessage = (await Create(responseContent)).WithCorrelationId(originalRequest.CorrelationId);
+                                      var responseMessage = (await Create(responseContent)).WithReplyToRequestId(originalRequest.MessageId);
                                       responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = true;
 
                                       return responseMessage;
@@ -128,7 +128,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
             return Task.Run(async () =>
                                   {
-                                      var responseMessage = (await Create()).WithCorrelationId(originalRequest.CorrelationId);
+                                      var responseMessage = (await Create()).WithReplyToRequestId(originalRequest.MessageId);
                                       responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = false;
                                       foreach (var prop in exception.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
 
