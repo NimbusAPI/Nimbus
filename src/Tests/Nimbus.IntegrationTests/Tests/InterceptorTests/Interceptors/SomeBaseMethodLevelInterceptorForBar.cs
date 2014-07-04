@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
 {

@@ -31,6 +31,8 @@ namespace Nimbus.UnitTests.CompressionTests
 
         private BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
+            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var serializer = new DataContractSerializer(typeProvider);
             return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
@@ -38,8 +40,8 @@ namespace Nimbus.UnitTests.CompressionTests
                                               compressor,
                                               new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
-                                              new DataContractSerializer(),
-                                              new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace }));
+                                              serializer,
+                                              typeProvider);
         }
 
         protected override async Task When()

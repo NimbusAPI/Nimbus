@@ -27,11 +27,11 @@ namespace Nimbus.UnitTests.DispatcherTests
         protected MessageDispatcherTestBase()
         {
             var clock = Substitute.For<IClock>();
-            var serializer = new DataContractSerializer();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
             TypeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);
             BrokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                                                 new MaxSmallMessageSizeSetting(),

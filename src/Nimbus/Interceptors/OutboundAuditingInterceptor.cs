@@ -46,6 +46,13 @@ namespace Nimbus.Interceptors
             await _bus.Publish(auditEvent);
         }
 
+        public override async Task OnMulticastResponseSending<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+        {
+            var timestamp = _clock.UtcNow;
+            var auditEvent = new AuditEvent(busResponse, brokeredMessage.Properties, timestamp);
+            await _bus.Publish(auditEvent);
+        }
+
         public override async Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
         {
             // Quis custodiet ipsos custodes? ;)

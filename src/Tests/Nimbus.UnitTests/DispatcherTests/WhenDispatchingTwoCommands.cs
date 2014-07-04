@@ -37,12 +37,12 @@ namespace Nimbus.UnitTests.DispatcherTests
             await base.Given(context);
 
             var clock = new SystemClock();
-            var serializer = new DataContractSerializer();
+            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
 
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof(IHandleCommand<>));
 
             _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
@@ -80,7 +80,6 @@ namespace Nimbus.UnitTests.DispatcherTests
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
-                             .Select(args => args[0])
                              .Cast<FooCommand>()
                              .Select(c => c.Id)
                              .ShouldContain(_id1);
@@ -94,7 +93,6 @@ namespace Nimbus.UnitTests.DispatcherTests
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
-                             .Select(args => args[0])
                              .Cast<FooCommand>()
                              .Select(c => c.Id)
                              .ShouldContain(_id2);

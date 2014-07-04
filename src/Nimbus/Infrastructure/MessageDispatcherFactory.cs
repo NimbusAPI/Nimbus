@@ -93,7 +93,7 @@ namespace Nimbus.Infrastructure
                                                              _inboundInterceptorFactory,
                                                              _logger,
                                                              _messagingFactory,
-                                                             handlerMap);
+                                                             _outboundInterceptorFactory, handlerMap);
             }
 
             throw new NotSupportedException(

@@ -33,7 +33,8 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var serializer = new DataContractSerializer();
+            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
@@ -45,7 +46,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                                     new DispatchContextManager(), 
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     serializer,
-                                                                    new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
+                                                                    typeProvider);
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();

@@ -31,6 +31,10 @@ namespace Nimbus.Interceptors.Outbound
         {
         }
 
+        public virtual async Task OnMulticastResponseSending<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage) where TBusResponse : IBusMulticastResponse
+        {
+        }
+
         public virtual async Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage) where TBusEvent : IBusEvent
         {
         }

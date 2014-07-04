@@ -20,6 +20,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     {
         protected async Task<BrokeredMessageFactory> Given()
         {
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting {Value = 64*1024},
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
@@ -27,8 +28,8 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               new NullCompressor(),
                                               new DispatchContextManager(),
                                               new UnsupportedLargeMessageBodyStore(),
-                                              new DataContractSerializer(),
-                                              new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
+                                              new DataContractSerializer(typeProvider),
+                                              typeProvider);
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

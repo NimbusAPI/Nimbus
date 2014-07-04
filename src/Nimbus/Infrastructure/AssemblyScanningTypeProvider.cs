@@ -9,11 +9,14 @@ using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
+using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Infrastructure
 {
     public class AssemblyScanningTypeProvider : ITypeProvider, IValidatableConfigurationSetting
     {
+        private readonly Assembly[] _controlMessageAssemblies = {typeof (AuditEvent).Assembly};
+
         private readonly Assembly[] _assemblies;
         private readonly ThreadSafeLazy<Type[]> _allInstantiableTypesInScannedAssemblies;
         private readonly ThreadSafeLazy<Type[]> _commandHandlerTypes;
@@ -36,7 +39,10 @@ namespace Nimbus.Infrastructure
 
         public AssemblyScanningTypeProvider(params Assembly[] assemblies)
         {
-            _assemblies = assemblies;
+            _assemblies = new Assembly[0]
+                .Union(assemblies)
+                .Union(_controlMessageAssemblies)
+                .ToArray();
 
             _allInstantiableTypesInScannedAssemblies = new ThreadSafeLazy<Type[]>(ScanAssembliesForInterestingTypes);
             _commandHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForCommandHandlerTypes);
@@ -223,7 +229,7 @@ namespace Nimbus.Infrastructure
         private Type[] ScanForInterceptorTypes()
         {
             var types = AllInstantiableTypesInScannedAssemblies
-                .Where(t => typeof(IInboundInterceptor).IsAssignableFrom(t) || typeof(IOutboundInterceptor).IsAssignableFrom(t))
+                .Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t) || typeof (IOutboundInterceptor).IsAssignableFrom(t))
                 .ToArray();
 
             return types;
@@ -277,7 +283,7 @@ namespace Nimbus.Infrastructure
 
             var validationErrors = typesFromMissingAssemblies
                 .Select(t => "The message contract type {0} is referenced by one of your handlers but its assembly ({1}) is not included in the list of assemblies to scan."
-                            .FormatWith(t.FullName, t.Assembly.FullName))
+                                 .FormatWith(t.FullName, t.Assembly.FullName))
                 .ToArray();
 
             return validationErrors;

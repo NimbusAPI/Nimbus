@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
 

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers
 {

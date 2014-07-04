@@ -22,6 +22,9 @@ namespace Nimbus.Interceptors.Outbound
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse;
 
+        Task OnMulticastResponseSending<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+            where TBusResponse : IBusMulticastResponse;
+
         Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
             where TBusEvent : IBusEvent;
     }
