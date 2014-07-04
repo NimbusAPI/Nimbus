@@ -5,7 +5,7 @@ using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Interceptors
 {
-    internal class LargeMessageBodyCleanupInterceptor : InboundInterceptor
+    public class LargeMessageBodyCleanupInterceptor : InboundInterceptor
     {
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 
