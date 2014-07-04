@@ -181,7 +181,6 @@
     <Compile Include="Tests\ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
-    <Compile Include="Extensions\ThreadExtensions.cs" />
     <Compile Include="Tests\ThroughputTests\ThroughputSpecificationForBus.cs" />
     <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
     <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />

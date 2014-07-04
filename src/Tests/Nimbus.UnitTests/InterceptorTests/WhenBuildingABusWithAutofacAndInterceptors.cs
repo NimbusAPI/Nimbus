@@ -6,6 +6,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Interceptors.Outbound;
 using NSubstitute;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.UnitTests.InterceptorTests
 {
@@ -37,7 +38,8 @@ namespace Nimbus.UnitTests.InterceptorTests
                                          };
                 var outboundInterceptorFactory = new OutboundInterceptorFactory(interceptorSetting);
                 var interceptors = outboundInterceptorFactory.CreateInterceptors(scope);
-                Assert.AreEqual(1, interceptors.Count());
+
+                interceptors.Count().ShouldBe(1);
             }
         }
     }

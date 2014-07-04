@@ -30,6 +30,8 @@ namespace Nimbus.UnitTests.DispatcherTests
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
 
+        private const int _expectedCallCount = 2;
+
         protected override async Task Given(AllDependencyResolversTestContext context)
         {
             MethodCallCounter.Clear();
@@ -37,20 +39,20 @@ namespace Nimbus.UnitTests.DispatcherTests
             await base.Given(context);
 
             var clock = new SystemClock();
-            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
 
-            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof(IHandleCommand<>));
+            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
             _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                                                  new MaxSmallMessageSizeSetting(),
                                                                  replyQueueNameSetting,
                                                                  clock,
                                                                  new NullCompressor(),
-                                                                 new DispatchContextManager(), 
+                                                                 new DispatchContextManager(),
                                                                  new UnsupportedLargeMessageBodyStore(),
                                                                  serializer,
                                                                  typeProvider);
@@ -80,6 +82,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
+                             .Select(c => c.Single())
                              .Cast<FooCommand>()
                              .Select(c => c.Id)
                              .ShouldContain(_id1);
@@ -93,6 +96,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
+                             .Select(c => c.Single())
                              .Cast<FooCommand>()
                              .Select(c => c.Id)
                              .ShouldContain(_id2);
@@ -105,7 +109,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             await Given(context);
             await When();
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null)).Count().ShouldBe(2);
+            var calls = MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null));
+            calls.Count().ShouldBe(_expectedCallCount);
         }
 
         [Test]
@@ -115,7 +120,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             await Given(context);
             await When();
 
-            MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Dispose()).Count().ShouldBe(2);
+            var calls = MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Dispose());
+            calls.Count().ShouldBe(_expectedCallCount);
         }
     }
 }
