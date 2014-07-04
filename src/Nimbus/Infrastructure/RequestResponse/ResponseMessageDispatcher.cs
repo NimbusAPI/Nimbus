@@ -17,8 +17,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(BrokeredMessage message)
         {
-            var correlationId = Guid.Parse(message.CorrelationId);
-            var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(correlationId);
+            var requestId = Guid.Parse((string)message.Properties[MessagePropertyKeys.InReplyToRequestId]);
+            var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
             if (responseCorrelationWrapper == null) return;
 
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];

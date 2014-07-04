@@ -24,6 +24,11 @@ namespace Nimbus.Extensions
             return message;
         }
 
+        internal static BrokeredMessage WithReplyToRequestId(this BrokeredMessage message, string requestId)
+        {
+            return message.WithProperty(MessagePropertyKeys.InReplyToRequestId, requestId);
+        }
+
         internal static BrokeredMessage WithReplyTo(this BrokeredMessage message, string replyTo)
         {
             message.ReplyTo = replyTo;
