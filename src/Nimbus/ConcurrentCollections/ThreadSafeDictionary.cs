@@ -97,6 +97,22 @@ namespace Nimbus.ConcurrentCollections
             }
         }
 
+        public IDictionary<TKey, TValue> ToDictionary()
+        {
+            lock (_dictionary)
+            {
+                return _dictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            }
+        }
+
+        public void Clear()
+        {
+            lock (_dictionary)
+            {
+                _dictionary.Clear();
+            }
+        }
+
         private object LockForKey(TKey key)
         {
             object mutexForKey;

@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
 namespace Nimbus.Tests.Common
 {
     public static class MethodCallCounter
     {
-        private static readonly ConcurrentDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ConcurrentDictionary<string, ConcurrentBag<object[]>>();
+        private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
 
         public static IEnumerable<KeyValuePair<string, ConcurrentBag<object[]>>> AllReceivedCalls
         {
-            get { return _allReceivedCalls; }
+            get { return _allReceivedCalls.ToDictionary(); }
         }
 
         public static void RecordCall<T>(Expression<Action<T>> expr)
@@ -34,7 +35,8 @@ namespace Nimbus.Tests.Common
                 args.Add(arg);
             }
 
-            var methodCallBag = _allReceivedCalls.GetOrAdd(GetMethodKey(expr.Type, method), new ConcurrentBag<object[]>());
+            var key = GetMethodKey(expr.Type, method);
+            var methodCallBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             methodCallBag.Add(args.ToArray());
 
             var methodName = "{0}.{1}".FormatWith(typeof (T).FullName, method.Name);
@@ -45,8 +47,10 @@ namespace Nimbus.Tests.Common
         {
             get
             {
-                var messageBags = _allReceivedCalls.Values;
+                var messageBags = _allReceivedCalls.ToDictionary().Values;
+
                 var messages = messageBags
+                    .Where(kvp => true)
                     .SelectMany(c => c)
                     .SelectMany(args => args)
                     .ToArray();
@@ -58,7 +62,8 @@ namespace Nimbus.Tests.Common
         {
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
-            var messageBag = _allReceivedCalls.GetOrAdd(GetMethodKey(expr.Type, method), new ConcurrentBag<object[]>());
+            var key = GetMethodKey(expr.Type, method);
+            var messageBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             return messageBag;
         }
 
