@@ -8,6 +8,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -18,18 +19,19 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
+        private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
 
-        public MulticastRequestMessageDispatcher(
-            IBrokeredMessageFactory brokeredMessageFactory,
-            IClock clock,
-            IDependencyResolver dependencyResolver,
-            IInboundInterceptorFactory inboundInterceptorFactory,
-            ILogger logger,
-            INimbusMessagingFactory messagingFactory,
-            IReadOnlyDictionary<Type, Type[]> handlerMap)
+        public MulticastRequestMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
+                                                 IClock clock,
+                                                 IDependencyResolver dependencyResolver,
+                                                 IInboundInterceptorFactory inboundInterceptorFactory,
+                                                 ILogger logger,
+                                                 INimbusMessagingFactory messagingFactory,
+                                                 IOutboundInterceptorFactory outboundInterceptorFactory,
+                                                 IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -38,6 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
+            _outboundInterceptorFactory = outboundInterceptorFactory;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -48,7 +51,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             // There should only ever be a single multicast request handler associated with this dispatcher
             var handlerType = _handlerMap.GetSingleHandlerTypeFor(messageType);
             var dispatchMethod = GetGenericDispatchMethodFor(busRequest);
-            await (Task)dispatchMethod.Invoke(this, new[] { busRequest, message, handlerType });
+            await (Task) dispatchMethod.Invoke(this, new[] {busRequest, message, handlerType});
         }
 
         // ReSharper disable UnusedMember.Local
@@ -63,9 +66,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = scope.Resolve<IHandleMulticastRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
-                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
+                var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
 
-                foreach (var interceptor in interceptors)
+                foreach (var interceptor in inboundInterceptors)
                 {
                     _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
@@ -88,9 +91,17 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                     // ReSharper disable CompareNonConstrainedGenericWithNull
                     if (response != null)
-                    // ReSharper restore CompareNonConstrainedGenericWithNull
+                        // ReSharper restore CompareNonConstrainedGenericWithNull
                     {
-                        var responseMessage = await _brokeredMessageFactory.CreateSuccessfulResponse(response, message);
+                        var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, message))
+                            .DestinedForQueue(replyQueueName)
+                            ;
+
+                        var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
+                        foreach (var interceptor in outboundInterceptors)
+                        {
+                            await interceptor.OnMulticastResponseSending(response, message);
+                        }
 
                         _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                                       responseMessage.SafelyGetBodyTypeNameOrDefault(),
@@ -108,7 +119,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                     {
                         _logger.Info("Handler declined to reply. [MessageId: {0}, CorrelationId: {1}]", message.MessageId, message.CorrelationId);
                     }
-
                 }
                 catch (Exception exc)
                 {
@@ -117,7 +127,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 }
                 if (exception == null)
                 {
-                    foreach (var interceptor in interceptors.Reverse())
+                    foreach (var interceptor in inboundInterceptors.Reverse())
                     {
                         _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
@@ -136,7 +146,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 }
                 else
                 {
-                    foreach (var interceptor in interceptors.Reverse())
+                    foreach (var interceptor in inboundInterceptors.Reverse())
                     {
                         _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
@@ -151,7 +161,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                                       message.SafelyGetBodyTypeNameOrDefault(),
                                       message.MessageId,
                                       message.CorrelationId);
-
                     }
 
                     var failedResponseMessage =
@@ -176,15 +185,15 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var closedGenericHandlerType =
                 request.GetType()
-                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof(IBusMulticastRequest<,>)))
+                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
                        .Single();
 
             var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof(MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
-            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] { requestType, responseType });
+            var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
             return closedGenericMethod;
         }
     }

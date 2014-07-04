@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BusMulticastRequest.cs" />
     <Compile Include="BusRequest.cs" />
+    <Compile Include="ControlMessages\AuditEvent.cs" />
     <Compile Include="Exceptions\BusException.cs" />
     <Compile Include="Exceptions\InvalidRequestTypeException.cs" />
     <Compile Include="IBusCommand.cs" />

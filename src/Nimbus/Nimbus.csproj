@@ -84,6 +84,7 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
@@ -158,9 +159,12 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\MessagePropertyKeys.cs" />
     <Compile Include="Interceptors\Inbound\InterceptorAttribute.cs" />
+    <Compile Include="Interceptors\OutboundAuditingInterceptor.cs" />
+    <Compile Include="Interceptors\Outbound\OutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
+    <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />

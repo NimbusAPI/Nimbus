@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
+using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers
 {

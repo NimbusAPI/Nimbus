@@ -9,8 +9,8 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
-using Nimbus.Tests.Common;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
@@ -20,19 +20,16 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     {
         protected async Task<BrokeredMessageFactory> Given()
         {
-            var dependencyResolver = new NullDependencyResolver();
-
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting {Value = 64*1024},
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
                                               new SystemClock(),
                                               new NullCompressor(),
-                                              dependencyResolver,
-                                              new DispatchContextManager(), 
+                                              new DispatchContextManager(),
                                               new UnsupportedLargeMessageBodyStore(),
-                                              new NullOutboundInterceptorFactory(),
-                                              new DataContractSerializer(),
-                                              new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace}));
+                                              new DataContractSerializer(typeProvider),
+                                              typeProvider);
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)

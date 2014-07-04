@@ -1,26 +1,20 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Autofac;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Interceptors.Outbound;
 using NSubstitute;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.UnitTests.InterceptorTests
 {
     [TestFixture]
     public class WhenRegisteringInterceptorsWithAutofac
     {
-        class DummyInterceptor : IOutboundInterceptor
+        private class DummyInterceptor : OutboundInterceptor
         {
-            public Task Decorate(BrokeredMessage brokeredMessage, object busMessage)
-            {
-                throw new NotImplementedException();
-            }
         }
 
         [Test]
@@ -38,12 +32,14 @@ namespace Nimbus.UnitTests.InterceptorTests
             using (var dependencyResolver = container.Resolve<IDependencyResolver>())
             using (var scope = dependencyResolver.CreateChildScope())
             {
-                var interceptorSetting = new GlobalOutboundInterceptorTypesSetting {
-                    Value = interceptorTypes
-                };
+                var interceptorSetting = new GlobalOutboundInterceptorTypesSetting
+                                         {
+                                             Value = interceptorTypes
+                                         };
                 var outboundInterceptorFactory = new OutboundInterceptorFactory(interceptorSetting);
                 var interceptors = outboundInterceptorFactory.CreateInterceptors(scope);
-                Assert.AreEqual(1, interceptors.Count());
+
+                interceptors.Count().ShouldBe(1);
             }
         }
     }

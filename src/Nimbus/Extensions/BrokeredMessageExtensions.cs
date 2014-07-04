@@ -29,6 +29,16 @@ namespace Nimbus.Extensions
             return message.WithProperty(MessagePropertyKeys.InReplyToRequestId, requestId);
         }
 
+        internal static BrokeredMessage DestinedForQueue(this BrokeredMessage message, string queuePath)
+        {
+            return message.WithProperty(MessagePropertyKeys.SentToQueue, queuePath);
+        }
+
+        internal static BrokeredMessage DestinedForTopic(this BrokeredMessage message, string topicPath)
+        {
+            return message.WithProperty(MessagePropertyKeys.SentToTopic, topicPath);
+        }
+
         internal static BrokeredMessage WithReplyTo(this BrokeredMessage message, string replyTo)
         {
             message.ReplyTo = replyTo;

@@ -5,7 +5,6 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Routing;
@@ -43,9 +42,8 @@ namespace Nimbus.Configuration
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
             Router = new DestinationPerMessageTypeRouter();
-            
+
             Logger = new NullLogger();
-            Serializer = new DataContractSerializer();
             Compressor = new NullCompressor();
         }
 
@@ -57,6 +55,11 @@ namespace Nimbus.Configuration
 
         private void AssertConfigurationIsValid()
         {
+            if (Serializer == null && TypeProvider != null)
+            {
+                Serializer = new DataContractSerializer(TypeProvider);
+            }
+
             var validatableComponents = GetType().GetProperties()
                                                  .Select(p => p.GetValue(this))
                                                  .OfType<IValidatableConfigurationSetting>()

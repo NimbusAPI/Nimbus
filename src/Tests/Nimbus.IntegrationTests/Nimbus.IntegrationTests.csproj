@@ -64,7 +64,6 @@
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
-    <Compile Include="MethodCallCounter.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeHandler.cs" />
@@ -83,6 +82,17 @@
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingACommandThatHasAnAbstractBaseType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingAMulticastRequestThatHasAnAbstractBaseType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingARequestThatHasAnAbstractBaseType.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\Handlers\AuditEventHandler.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\Handlers\SomeMulticastRequestHandler.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\Handlers\SomeRequestHandler.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeCommand.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeCommandSentViaDelay.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeEvent.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeMulticastRequest.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeMulticastResponse.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeRequest.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeResponse.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\WhenSendingOneOfEachKindOfMessage.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
@@ -171,7 +181,6 @@
     <Compile Include="Tests\ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
-    <Compile Include="Extensions\ThreadExtensions.cs" />
     <Compile Include="Tests\ThroughputTests\ThroughputSpecificationForBus.cs" />
     <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
     <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />

@@ -7,6 +7,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 
 namespace Nimbus.Infrastructure
 {
@@ -16,6 +17,7 @@ namespace Nimbus.Infrastructure
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
+        private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
 
@@ -24,7 +26,8 @@ namespace Nimbus.Infrastructure
                                         IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
-                                        INimbusMessagingFactory messagingFactory)
+                                        INimbusMessagingFactory messagingFactory,
+                                        IOutboundInterceptorFactory outboundInterceptorFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -32,6 +35,7 @@ namespace Nimbus.Infrastructure
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _messagingFactory = messagingFactory;
+            _outboundInterceptorFactory = outboundInterceptorFactory;
         }
 
         public IMessageDispatcher Create(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
@@ -41,7 +45,7 @@ namespace Nimbus.Infrastructure
 
         private IMessageDispatcher BuildDispatcher(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
-            if (openGenericHandlerType == typeof(IHandleCommand<>))
+            if (openGenericHandlerType == typeof (IHandleCommand<>))
             {
                 return new CommandMessageDispatcher(_brokeredMessageFactory,
                                                     _clock,
@@ -75,6 +79,7 @@ namespace Nimbus.Infrastructure
                                                     _clock,
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
+                                                    _outboundInterceptorFactory,
                                                     _logger,
                                                     _messagingFactory,
                                                     handlerMap);
@@ -88,7 +93,7 @@ namespace Nimbus.Infrastructure
                                                              _inboundInterceptorFactory,
                                                              _logger,
                                                              _messagingFactory,
-                                                             handlerMap);
+                                                             _outboundInterceptorFactory, handlerMap);
             }
 
             throw new NotSupportedException(

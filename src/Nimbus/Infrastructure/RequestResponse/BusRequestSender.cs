@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
 
@@ -17,13 +19,17 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
         private readonly DefaultTimeoutSetting _responseTimeout;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
         internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
                                   IBrokeredMessageFactory brokeredMessageFactory,
                                   IClock clock,
+                                  IDependencyResolver dependencyResolver,
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger,
                                   INimbusMessagingFactory messagingFactory,
+                                  IOutboundInterceptorFactory outboundInterceptorFactory,
                                   IRouter router,
                                   RequestResponseCorrelator requestResponseCorrelator)
         {
@@ -31,6 +37,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
+            _outboundInterceptorFactory = outboundInterceptorFactory;
+            _dependencyResolver = dependencyResolver;
             _logger = logger;
             _clock = clock;
             _responseTimeout = responseTimeout;
@@ -51,12 +59,24 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = busRequest.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
-            var message = (await _brokeredMessageFactory.Create(busRequest)).WithRequestTimeout(timeout);
+            var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
+            var message = (await _brokeredMessageFactory.Create(busRequest))
+                .WithRequestTimeout(timeout)
+                .DestinedForQueue(queuePath)
+                ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
 
-            var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
+            using (var scope = _dependencyResolver.CreateChildScope())
+            {
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
+                foreach (var interceptor in interceptors)
+                {
+                    await interceptor.OnRequestSending(busRequest, message);
+                }
+            }
+
             var sender = _messagingFactory.GetQueueSender(queuePath);
 
             _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",

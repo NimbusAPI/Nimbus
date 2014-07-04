@@ -36,10 +36,8 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
                                               _replyQueueNameSetting,
                                               _clock,
                                               new NullCompressor(),
-                                              new NullDependencyResolver(),
                                               new DispatchContextManager(), 
                                               new UnsupportedLargeMessageBodyStore(),
-                                              new NullOutboundInterceptorFactory(),
                                               _serializer,
                                               new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace})
                                               );

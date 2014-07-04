@@ -5,6 +5,7 @@ using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.BusBuilderTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
 

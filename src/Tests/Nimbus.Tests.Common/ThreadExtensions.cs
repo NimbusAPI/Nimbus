@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace Nimbus.IntegrationTests.Extensions
+namespace Nimbus.Tests.Common
 {
     public static class ThreadExtensions
     {

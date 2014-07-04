@@ -48,6 +48,7 @@
     <Compile Include="NullOutboundInterceptorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="ThreadExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
