@@ -1,6 +1,7 @@
 ﻿namespace Nimbus.MessageContracts
 {
-    public interface IBusMulticastRequest<TRequest, TResponse>
+    public interface IBusMulticastRequest<TBusRequest, TBusResponse> where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
+                                                                     where TBusResponse : IBusMulticastResponse
     {
     }
 }
