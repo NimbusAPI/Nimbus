@@ -14,10 +14,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
+    [Timeout(TimeoutSeconds * 1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         private const int _expectedTotalMessageCount = 11; // 5 interceptors * 2 + 1 handler
+        public const int TimeoutSeconds = 15;
 
         protected override async Task<IBus> Given()
         {
@@ -49,7 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         protected override async Task When()
         {
             await Subject.Send(new FooCommand());
-            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _expectedTotalMessageCount);
+            TimeSpan.FromSeconds(TimeoutSeconds).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _expectedTotalMessageCount);
 
             MethodCallCounter.Dump();
         }
