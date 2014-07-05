@@ -34,7 +34,6 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         protected override async Task Given(AllDependencyResolversTestContext context)
         {
-            MethodCallCounter.Clear();
 
             await base.Given(context);
 
@@ -67,11 +66,15 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         protected override async Task When()
         {
+            MethodCallCounter.Clear();
+
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
             await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command1));
             await _commandDispatcher.Dispatch(await _brokeredMessageFactory.Create(command2));
+
+            MethodCallCounter.Stop();
         }
 
         [Test]

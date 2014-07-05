@@ -12,6 +12,7 @@ namespace Nimbus.Tests.Common
     public static class MethodCallCounter
     {
         private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
+        private static bool _stopped;
 
         public static IEnumerable<KeyValuePair<string, ConcurrentBag<object[]>>> AllReceivedCalls
         {
@@ -20,6 +21,8 @@ namespace Nimbus.Tests.Common
 
         public static void RecordCall<T>(Expression<Action<T>> expr)
         {
+            if (_stopped) throw new InvalidOperationException("{0} was not expecting any more calls!".FormatWith((typeof (MethodCallCounter).Name)));
+
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
 
@@ -65,9 +68,24 @@ namespace Nimbus.Tests.Common
             return messageBag;
         }
 
+        public static int TotalReceivedCalls()
+        {
+            var calls = AllReceivedCalls
+                .SelectMany(kvp => kvp.Value)
+                .ToArray();
+
+            return calls.Count();
+        }
+
         public static void Clear()
         {
             _allReceivedCalls.Clear();
+            _stopped = false;
+        }
+
+        public static void Stop()
+        {
+            _stopped = true;
         }
 
         private static string GetMethodKey(Type type, MethodInfo method)

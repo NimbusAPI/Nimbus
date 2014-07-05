@@ -26,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
 
             await Bus.Send(_goBangCommand);
 
-            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
+            await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
             _deadLetterMessages = (await FetchAllDeadLetterMessages(Bus)).ToArray();
         }

@@ -19,7 +19,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await Bus.Publish(new SomeEventWeHandleViaMulticastAndCompetition());
 
-            TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
+            await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
         }
 
         [Test]

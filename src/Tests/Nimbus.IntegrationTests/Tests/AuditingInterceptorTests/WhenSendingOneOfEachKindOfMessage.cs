@@ -67,7 +67,8 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                 Subject.Publish(new SomeEvent())
                 );
 
-            TimeSpan.FromSeconds(2).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
+            await TimeSpan.FromSeconds(2).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
+            MethodCallCounter.Stop();
 
             _allAuditedMessages = MethodCallCounter.AllReceivedMessages
                                                    .OfType<AuditEvent>()

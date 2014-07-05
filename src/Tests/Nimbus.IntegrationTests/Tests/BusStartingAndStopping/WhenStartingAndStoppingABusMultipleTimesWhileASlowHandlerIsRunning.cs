@@ -23,13 +23,13 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             Enumerable.Range(0, _totalCommands)
                       .Select(i => Bus.Send(new SlowCommand()))
                       .WaitAll();
-            TimeSpan.FromSeconds(TimeoutSeconds).SleepUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Any());
 
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
 
-            TimeSpan.FromSeconds(TimeoutSeconds).SleepUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count() >= _totalCommands);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count() >= _totalCommands);
 
             await Bus.Stop();
         }

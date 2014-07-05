@@ -33,6 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             await Task.Delay(TimeSpan.FromSeconds(2));
             _additionalCommandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
             Console.WriteLine("Number of commands received after that: {0}", _additionalCommandHandlerInvocationCount);
+            MethodCallCounter.Stop();
         }
 
         [Test]
