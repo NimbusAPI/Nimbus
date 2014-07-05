@@ -35,12 +35,11 @@ namespace Nimbus.Tests.Common
                 args.Add(arg);
             }
 
-            var key = GetMethodKey(expr.Type, method);
+            var key = GetMethodKey(typeof (T), method);
             var methodCallBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             methodCallBag.Add(args.ToArray());
 
-            var methodName = "{0}.{1}".FormatWith(typeof (T).FullName, method.Name);
-            Console.WriteLine("Observed call to {0}({1})".FormatWith(methodName, string.Join(", ", args.Select(a => a.GetType()))));
+            Console.WriteLine("Observed call to {0}".FormatWith(key));
         }
 
         public static IEnumerable<object> AllReceivedMessages
@@ -50,7 +49,6 @@ namespace Nimbus.Tests.Common
                 var messageBags = _allReceivedCalls.ToDictionary().Values;
 
                 var messages = messageBags
-                    .Where(kvp => true)
                     .SelectMany(c => c)
                     .SelectMany(args => args)
                     .ToArray();
@@ -62,7 +60,7 @@ namespace Nimbus.Tests.Common
         {
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
-            var key = GetMethodKey(expr.Type, method);
+            var key = GetMethodKey(typeof (T), method);
             var messageBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             return messageBag;
         }
@@ -83,6 +81,31 @@ namespace Nimbus.Tests.Common
 
             var key = "{0}.{1}({2})".FormatWith(type.FullName, method.Name, parameterString);
             return key;
+        }
+
+        public static void Dump()
+        {
+            var allReceivedCalls = _allReceivedCalls
+                .ToDictionary();
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Total calls observed: {0}", allReceivedCalls.Values.SelectMany(v => v).Count());
+
+            foreach (var kvp in allReceivedCalls)
+            {
+                foreach (var methodCall in kvp.Value)
+                {
+                    Console.WriteLine("\t{0}({1})", kvp.Key, string.Join(", ", methodCall));
+                    Console.WriteLine();
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
         }
     }
 }

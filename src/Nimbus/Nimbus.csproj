@@ -150,7 +150,6 @@
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="Infrastructure\IClock.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusMulticastRequestSender.cs" />
     <Compile Include="Extensions\TypeProviderExtensions.cs" />
     <Compile Include="Exceptions\BusConfigurationException.cs" />

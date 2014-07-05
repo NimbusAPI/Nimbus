@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus
 {
-    internal interface IClock
+    public interface IClock
     {
         DateTimeOffset UtcNow { get; }
     }

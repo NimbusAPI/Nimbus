@@ -7,7 +7,7 @@ using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Interceptors
 {
-    internal class OutboundAuditingInterceptor : OutboundInterceptor
+    public class OutboundAuditingInterceptor : OutboundInterceptor
     {
         private readonly IBus _bus;
         private readonly IClock _clock;
