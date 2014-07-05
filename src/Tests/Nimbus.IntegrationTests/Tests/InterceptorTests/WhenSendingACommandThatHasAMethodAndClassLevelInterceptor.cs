@@ -50,6 +50,8 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         {
             await Subject.Send(new FooCommand());
             TimeSpan.FromSeconds(10).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _expectedTotalMessageCount);
+
+            MethodCallCounter.Dump();
         }
 
         [Test]
