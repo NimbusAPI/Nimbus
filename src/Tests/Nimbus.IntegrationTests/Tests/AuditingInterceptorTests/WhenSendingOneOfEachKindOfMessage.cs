@@ -125,9 +125,9 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         }
 
         [Test]
-        public async Task ThereShouldBeOnlyOneKindOfRecordedMethodCall()
+        public async Task ThereShouldBeATotalOfSevenRecordedHandlerCalls()
         {
-            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(1);
+            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             Enumerable.Range(0, _totalCommands)
                       .Select(i => Bus.Send(new SlowCommand()))
                       .WaitAll();
-            await Task.Delay(TimeSpan.FromMilliseconds(1000));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
             await Bus.Stop();
 
             _commandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();

@@ -14,11 +14,6 @@ namespace Nimbus.Tests.Common
         private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
         private static bool _stopped;
 
-        public static IEnumerable<KeyValuePair<string, ConcurrentBag<object[]>>> AllReceivedCalls
-        {
-            get { return _allReceivedCalls.ToDictionary(); }
-        }
-
         public static void RecordCall<T>(Expression<Action<T>> expr)
         {
             if (_stopped) throw new InvalidOperationException("{0} was not expecting any more calls!".FormatWith((typeof (MethodCallCounter).Name)));
@@ -45,6 +40,37 @@ namespace Nimbus.Tests.Common
             Console.WriteLine("Observed call to {0}".FormatWith(key));
         }
 
+        public static IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls
+        {
+            get
+            {
+                var callsGroupedByMethodName = _allReceivedCalls
+                    .ToDictionary();
+
+                foreach (var methodName in callsGroupedByMethodName.Keys)
+                {
+                    foreach (var callWithArgs in callsGroupedByMethodName[methodName])
+                    {
+                        yield return new KeyValuePair<string, object[]>(methodName, callWithArgs);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<object[]> AllReceivedCallArgs
+        {
+            get
+            {
+                var messageBags = _allReceivedCalls.ToDictionary().Values;
+
+                var messages = messageBags
+                    .SelectMany(c => c)
+                    .ToArray();
+
+                return messages;
+            }
+        }
+
         public static IEnumerable<object> AllReceivedMessages
         {
             get
@@ -68,13 +94,9 @@ namespace Nimbus.Tests.Common
             return messageBag;
         }
 
-        public static int TotalReceivedCalls()
+        public static int TotalReceivedCalls
         {
-            var calls = AllReceivedCalls
-                .SelectMany(kvp => kvp.Value)
-                .ToArray();
-
-            return calls.Count();
+            get { return AllReceivedCalls.Count(); }
         }
 
         public static void Clear()

@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
-using Nimbus.IntegrationTests.Tests.BusBuilderTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -15,21 +13,30 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
     [Timeout(TimeoutSeconds*1000)]
     public class WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning : TestForBus
     {
-        public const int TimeoutSeconds = 20;
+        private SlowCommand[] _commands;
+        private Guid[] _sentCommandIds;
+        public const int TimeoutSeconds = 30;
         private const int _totalCommands = 100;
 
         protected override async Task When()
         {
-            Enumerable.Range(0, _totalCommands)
-                      .Select(i => Bus.Send(new SlowCommand()))
-                      .WaitAll();
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Any());
+            _commands = Enumerable.Range(0, _totalCommands)
+                                  .Select(i => new SlowCommand(Guid.NewGuid()))
+                                  .ToArray();
+
+            _commands
+                .Select(c => Bus.Send(c))
+                .WaitAll();
+
+            _sentCommandIds = _commands.Select(c => c.SomeId).ToArray();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Any());
 
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count() >= _totalCommands);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler);
 
             await Bus.Stop();
         }
@@ -49,9 +56,15 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public async Task TheCorrectNumberOfCommandsShouldHaveBeenHandled()
+        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler()
         {
-            MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count().ShouldBe(_totalCommands);
+            AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler().ShouldBe(true);
+        }
+
+        private bool AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler()
+        {
+            return MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>()
+                                    .All(c => _sentCommandIds.Contains(c.SomeId));
         }
     }
 }

@@ -83,9 +83,7 @@ namespace Nimbus.Infrastructure.Commands
                                       message.SafelyGetBodyTypeNameOrDefault(),
                                       message.MessageId,
                                       message.CorrelationId);
-
                         await interceptor.OnCommandHandlerSuccess(busCommand, message);
-
                         _logger.Debug("Executed OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
                                       message.SafelyGetBodyTypeNameOrDefault(),
@@ -106,9 +104,7 @@ namespace Nimbus.Infrastructure.Commands
                                   message.SafelyGetBodyTypeNameOrDefault(),
                                   message.MessageId,
                                   message.CorrelationId);
-
                     await interceptor.OnCommandHandlerError(busCommand, message, exception);
-
                     _logger.Debug("Executed OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
                                   message.SafelyGetBodyTypeNameOrDefault(),
@@ -120,6 +116,7 @@ namespace Nimbus.Infrastructure.Commands
                               message.SafelyGetBodyTypeNameOrDefault(),
                               message.MessageId,
                               message.CorrelationId);
+
                 throw new DispatchFailedException("Failed to Dispatch CommandMessage", exception);
             }
         }
