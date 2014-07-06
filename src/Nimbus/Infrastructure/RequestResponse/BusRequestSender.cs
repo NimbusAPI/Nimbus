@@ -60,13 +60,14 @@ namespace Nimbus.Infrastructure.RequestResponse
             _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
             var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
+
             var message = (await _brokeredMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForQueue(queuePath)
                 ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.MessageId), expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
