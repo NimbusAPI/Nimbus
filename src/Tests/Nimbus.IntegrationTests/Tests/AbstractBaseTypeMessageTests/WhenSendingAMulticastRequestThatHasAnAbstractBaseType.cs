@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
             var request = new SomeConcreteRequestType();
             _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2))).ToArray();
 
-            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]

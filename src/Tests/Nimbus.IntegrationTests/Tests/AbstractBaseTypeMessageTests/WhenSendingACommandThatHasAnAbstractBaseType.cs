@@ -17,7 +17,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         {
             var someCommand = new SomeConcreteCommandType();
             await Bus.Send(someCommand);
-            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]

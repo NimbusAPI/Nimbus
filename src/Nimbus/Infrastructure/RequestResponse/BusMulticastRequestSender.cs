@@ -56,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 .DestinedForTopic(topicPath)
                 ;
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.CorrelationId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.MessageId), expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {

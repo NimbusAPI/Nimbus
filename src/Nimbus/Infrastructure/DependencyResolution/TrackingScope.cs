@@ -7,12 +7,16 @@ namespace Nimbus.Infrastructure.DependencyResolution
 {
     public abstract class TrackingScope
     {
+        private readonly object _mutex = new object();
         private readonly List<object> _components = new List<object>();
         private bool _disposed;
 
         protected virtual void Track(object component)
         {
-            _components.Add(component);
+            lock (_mutex)
+            {
+                _components.Add(component);
+            }
         }
 
         public void Dispose()

@@ -12,14 +12,12 @@ namespace Nimbus.Tests.Common
     public static class MethodCallCounter
     {
         private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
-
-        public static IEnumerable<KeyValuePair<string, ConcurrentBag<object[]>>> AllReceivedCalls
-        {
-            get { return _allReceivedCalls.ToDictionary(); }
-        }
+        private static bool _stopped;
 
         public static void RecordCall<T>(Expression<Action<T>> expr)
         {
+            if (_stopped) throw new InvalidOperationException("{0} was not expecting any more calls!".FormatWith((typeof (MethodCallCounter).Name)));
+
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
 
@@ -40,6 +38,37 @@ namespace Nimbus.Tests.Common
             methodCallBag.Add(args.ToArray());
 
             Console.WriteLine("Observed call to {0}".FormatWith(key));
+        }
+
+        public static IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls
+        {
+            get
+            {
+                var callsGroupedByMethodName = _allReceivedCalls
+                    .ToDictionary();
+
+                foreach (var methodName in callsGroupedByMethodName.Keys)
+                {
+                    foreach (var callWithArgs in callsGroupedByMethodName[methodName])
+                    {
+                        yield return new KeyValuePair<string, object[]>(methodName, callWithArgs);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<object[]> AllReceivedCallArgs
+        {
+            get
+            {
+                var messageBags = _allReceivedCalls.ToDictionary().Values;
+
+                var messages = messageBags
+                    .SelectMany(c => c)
+                    .ToArray();
+
+                return messages;
+            }
         }
 
         public static IEnumerable<object> AllReceivedMessages
@@ -65,9 +94,20 @@ namespace Nimbus.Tests.Common
             return messageBag;
         }
 
+        public static int TotalReceivedCalls
+        {
+            get { return AllReceivedCalls.Count(); }
+        }
+
         public static void Clear()
         {
             _allReceivedCalls.Clear();
+            _stopped = false;
+        }
+
+        public static void Stop()
+        {
+            _stopped = true;
         }
 
         private static string GetMethodKey(Type type, MethodInfo method)

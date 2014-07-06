@@ -16,7 +16,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         {
             var busEvent = new SomeConcreteEventType();
             await Bus.Publish(busEvent);
-            TimeSpan.FromSeconds(5).SleepUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
+            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
         }
 
         [Test]

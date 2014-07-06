@@ -27,6 +27,7 @@ namespace Nimbus.IntegrationTests
                 Console.WriteLine();
 
                 await When();
+                MethodCallCounter.Stop();
                 Console.WriteLine();
                 Console.WriteLine();
             }).Wait();

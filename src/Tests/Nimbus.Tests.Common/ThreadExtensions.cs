@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Nimbus.Tests.Common
 {
     public static class ThreadExtensions
     {
-        public static void SleepUntil(this TimeSpan timeout, Func<bool> exitCondition)
+        public static async Task WaitUntil(this TimeSpan timeout, Func<bool> exitCondition)
         {
             var sw = Stopwatch.StartNew();
             while (true)
             {
                 if (exitCondition()) return;
-                if (sw.Elapsed >= timeout) return;
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                if (sw.Elapsed >= timeout) throw new TimeoutException();
+
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
         }
     }
