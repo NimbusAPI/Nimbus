@@ -77,7 +77,7 @@ namespace Nimbus.Infrastructure.Events
                     }
 
                     var handlerTask = DispatchToHandleMethod(busEvent, handler);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapper = new LongLivedTaskWrapper(_logger, handlerTask, handler as ILongRunningTask, message, _clock);
                     await wrapper.AwaitCompletion();
 
                     foreach (var interceptor in interceptors.Reverse())
