@@ -38,6 +38,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
+            if (batchSize < 1)
+                return new BrokeredMessage[0];
+
             try
             {
                 var subscriptionClient = await GetSubscriptionClient();
