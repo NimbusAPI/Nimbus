@@ -104,6 +104,11 @@
     <Compile Include="Conventions\CoreHandlerInterfaces.cs" />
     <Compile Include="Conventions\CoreInfrastructureInterfaces.cs" />
     <Compile Include="Conventions\NimbusCode.cs" />
+    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\Handlers\CombinedFooBarHandler.cs" />
+    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\MessageContracts\BarCommand.cs" />
+    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingAutofac.cs" />
+    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingWindsor.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyCommandHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyEventHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyRequestHandler.cs" />
