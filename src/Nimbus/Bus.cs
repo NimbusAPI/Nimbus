@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 
@@ -19,6 +21,8 @@ namespace Nimbus
         private readonly IEventSender _eventSender;
         private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
+        private TaskFactory _taskFactory;
+
 
         private readonly object _mutex = new object();
         private bool _isRunning;
@@ -38,18 +42,21 @@ namespace Nimbus
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
             _messagePumpsManager = messagePumpsManager;
+
+            _taskFactory = new TaskFactory(PriorityScheduler.Lowest);
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
             // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
             // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
-            return Task.Run(() => _commandSender.Send(busCommand));
+            return _taskFactory.StartNew(() => _commandSender.Send(busCommand));
+            //return  Task.Run(() => _commandSender.Send(busCommand));
         }
 
         public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
         {
-            return Task.Run(() => _commandSender.SendAt(busCommand, deliveryTime));
+            return _taskFactory.StartNew(() => _commandSender.SendAt(busCommand, deliveryTime));
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)

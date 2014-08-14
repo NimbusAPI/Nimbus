@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -20,6 +21,7 @@ namespace Nimbus.Infrastructure
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         public MessageDispatcherFactory(IBrokeredMessageFactory brokeredMessageFactory,
                                         IClock clock,
@@ -27,7 +29,8 @@ namespace Nimbus.Infrastructure
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
                                         INimbusMessagingFactory messagingFactory,
-                                        IOutboundInterceptorFactory outboundInterceptorFactory)
+                                        IOutboundInterceptorFactory outboundInterceptorFactory,
+                                        DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -36,6 +39,7 @@ namespace Nimbus.Infrastructure
             _logger = logger;
             _messagingFactory = messagingFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
         }
 
         public IMessageDispatcher Create(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
@@ -52,7 +56,8 @@ namespace Nimbus.Infrastructure
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _logger,
-                                                    handlerMap);
+                                                    handlerMap,
+                                                    _defaultMessageLockDuration);
             }
 
             if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
@@ -61,7 +66,8 @@ namespace Nimbus.Infrastructure
                                                            _clock,
                                                            _dependencyResolver,
                                                            _inboundInterceptorFactory,
-                                                           handlerMap);
+                                                           handlerMap,
+                                                           _defaultMessageLockDuration);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
@@ -70,7 +76,8 @@ namespace Nimbus.Infrastructure
                                                            _clock,
                                                            _dependencyResolver,
                                                            _inboundInterceptorFactory,
-                                                           handlerMap);
+                                                           handlerMap,
+                                                           _defaultMessageLockDuration);
             }
 
             if (openGenericHandlerType == typeof (IHandleRequest<,>))
@@ -82,7 +89,8 @@ namespace Nimbus.Infrastructure
                                                     _outboundInterceptorFactory,
                                                     _logger,
                                                     _messagingFactory,
-                                                    handlerMap);
+                                                    handlerMap,
+                                                    _defaultMessageLockDuration);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
@@ -93,7 +101,9 @@ namespace Nimbus.Infrastructure
                                                              _inboundInterceptorFactory,
                                                              _logger,
                                                              _messagingFactory,
-                                                             _outboundInterceptorFactory, handlerMap);
+                                                             _outboundInterceptorFactory,
+                                                             handlerMap,
+                                                             _defaultMessageLockDuration);
             }
 
             throw new NotSupportedException(

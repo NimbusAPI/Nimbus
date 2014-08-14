@@ -34,7 +34,6 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         protected override async Task Given(AllDependencyResolversTestContext context)
         {
-
             await base.Given(context);
 
             var clock = new SystemClock();
@@ -61,7 +60,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                               Subject,
                                                               new NullInboundInterceptorFactory(),
                                                               new NullLogger(),
-                                                              handlerMap);
+                                                              handlerMap,
+                                                              new DefaultMessageLockDurationSetting());
         }
 
         protected override async Task When()

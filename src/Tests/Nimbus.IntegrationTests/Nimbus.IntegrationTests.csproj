@@ -154,6 +154,10 @@
     <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
     <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
+    <Compile Include="Tests\ThreadStarvationTests\Handlers\CommandThatWillFloodTheBusHandler.cs" />
+    <Compile Include="Tests\ThreadStarvationTests\MessageContracts\CommandThatWillFloodTheBus.cs" />
+    <Compile Include="Tests\ThreadStarvationTests\RollingLogger.cs" />
+    <Compile Include="Tests\ThreadStarvationTests\WhenSmashingTheBusForMoreThanTheMessageLockDuration.cs" />
     <Compile Include="Tests\ThroughputTests\Infrastructure\FakeChildScope.cs" />
     <Compile Include="Tests\ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
     <Compile Include="Tests\ThroughputTests\EventHandlers\FakeHandler.cs" />

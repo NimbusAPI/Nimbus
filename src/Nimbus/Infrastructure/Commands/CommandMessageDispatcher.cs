@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
@@ -20,6 +21,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         public CommandMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -27,7 +29,7 @@ namespace Nimbus.Infrastructure.Commands
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
             ILogger logger,
-            IReadOnlyDictionary<Type, Type[]> handlerMap)
+            IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -35,6 +37,7 @@ namespace Nimbus.Infrastructure.Commands
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _handlerMap = handlerMap;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -73,7 +76,7 @@ namespace Nimbus.Infrastructure.Commands
                     }
 
                     var handlerTask = handler.Handle(busCommand);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock, _logger, _defaultMessageLockDuration);
                     await wrapper.AwaitCompletion();
 
                     foreach (var interceptor in interceptors.Reverse())

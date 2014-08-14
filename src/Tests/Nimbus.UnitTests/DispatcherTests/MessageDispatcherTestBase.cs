@@ -70,7 +70,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                 outboundInterceptorFactory,
                 logger,
                 messagingFactory,
-                HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)));
+                HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),
+                new DefaultMessageLockDurationSetting());
         }
 
         internal CommandMessageDispatcher GetCommandMessageDispatcher<TCommand, TCommandHandler>(IInboundInterceptor interceptor)
@@ -93,7 +94,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                 dependencyResolver,
                 inboundInterceptorFactory,
                 logger,
-                HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)));
+                HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)),
+                new DefaultMessageLockDurationSetting());
         }
 
         internal EventMessageDispatcher GetEventMessageDispatcher<TEvent, TEventMessageHandler>(IInboundInterceptor interceptor)
@@ -114,7 +116,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                 clock,
                 dependencyResolver,
                 inboundInterceptorFactory,
-                HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)));
+                HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)),
+                new DefaultMessageLockDurationSetting());
         }
     }
 }

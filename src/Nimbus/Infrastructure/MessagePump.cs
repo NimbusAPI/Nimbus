@@ -6,6 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.TaskScheduling;
 
 namespace Nimbus.Infrastructure
 {
@@ -75,6 +76,10 @@ namespace Nimbus.Infrastructure
 
         private async Task Dispatch(BrokeredMessage message)
         {
+            // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
+            // bail - it will already have been picked up by someone else.
+            if (message.LockedUntilUtc <= _clock.UtcNow) return;
+
             try
             {
                 Exception exception = null;
@@ -84,11 +89,12 @@ namespace Nimbus.Infrastructure
                     LogInfo("Dispatching", message);
                     using (_dispatchContextManager.StartNewDispatchContext(new DispatchContext(message)))
                     {
-                        await _messageDispatcher.Dispatch(message);
+                        await Task.Factory.StartNew(() => _messageDispatcher.Dispatch(message), new CancellationToken(), TaskCreationOptions.None, PriorityScheduler.BelowNormal);
                     }
                     LogDebug("Dispatched", message);
 
                     LogDebug("Completing", message);
+                    message.Properties[MessagePropertyKeys.DispatchComplete] = true;
                     await message.CompleteAsync();
                     LogInfo("Completed", message);
 

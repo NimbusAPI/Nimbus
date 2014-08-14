@@ -48,7 +48,7 @@ namespace Nimbus.Configuration
                 () =>
                 {
                     var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    messagingFactory.PrefetchCount = 20;
+                    messagingFactory.PrefetchCount = container.Resolve<ConcurrentHandlerLimitSetting>();
                     return messagingFactory;
                 },
                 mf => mf.IsBorked(),

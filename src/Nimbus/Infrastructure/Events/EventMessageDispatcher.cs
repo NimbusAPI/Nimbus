@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
@@ -20,13 +21,14 @@ namespace Nimbus.Infrastructure.Events
         private readonly IClock _clock;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
+        private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         protected EventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
             IClock clock,
             IDependencyResolver dependencyResolver,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
             IInboundInterceptorFactory inboundInterceptorFactory,
-            ILogger logger)
+            ILogger logger, DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -34,6 +36,7 @@ namespace Nimbus.Infrastructure.Events
             _handlerMap = handlerMap;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -77,7 +80,7 @@ namespace Nimbus.Infrastructure.Events
                     }
 
                     var handlerTask = DispatchToHandleMethod(busEvent, handler);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock, _logger, _defaultMessageLockDuration);
                     await wrapper.AwaitCompletion();
 
                     foreach (var interceptor in interceptors.Reverse())

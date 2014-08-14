@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
@@ -13,12 +14,8 @@ namespace Nimbus.Infrastructure.Events
 {
     internal class MulticastEventMessageDispatcher : EventMessageDispatcher
     {
-        public MulticastEventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
-                                               IClock clock,
-                                               IDependencyResolver dependencyResolver,
-                                               IInboundInterceptorFactory inboundInterceptorFactory,
-                                               IReadOnlyDictionary<Type, Type[]> handlerMap)
-            : base(brokeredMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, new NullLogger())
+        public MulticastEventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory, IClock clock, IDependencyResolver dependencyResolver, IInboundInterceptorFactory inboundInterceptorFactory, IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
+            : base(brokeredMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, new NullLogger(), defaultMessageLockDuration)
         {
         }
 

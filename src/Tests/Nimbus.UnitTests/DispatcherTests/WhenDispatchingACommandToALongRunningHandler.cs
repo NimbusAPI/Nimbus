@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
+using Nimbus.Logger;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 using NUnit.Framework;
@@ -20,6 +22,8 @@ namespace Nimbus.UnitTests.DispatcherTests
         private SlowCommandHandler _handler;
         private Task _handlerTask;
         private SystemClock _clock;
+        private ConsoleLogger _logger;
+        private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         protected override async Task<LongLivedTaskWrapper> Given()
         {
@@ -27,11 +31,13 @@ namespace Nimbus.UnitTests.DispatcherTests
             _handler = new SlowCommandHandler();
             _brokeredMessage = new BrokeredMessage(_slowCommand);
             _clock = new SystemClock();
+            _logger = new ConsoleLogger();
+            _defaultMessageLockDuration = new DefaultMessageLockDurationSetting();
 
             _renewLockCalled = false;
             _handlerTask = _handler.Handle(_slowCommand);
 
-            LongLivedTaskWrapperBase.RenewLockStrategy = m =>
+            LongLivedTaskWrapperBase.RenewLockStrategy = async m =>
                                                      {
                                                          _renewLockCalled = true;
                                                          _lockedUntil = _clock.UtcNow.AddSeconds(1);
@@ -40,7 +46,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             LongLivedTaskWrapperBase.LockedUntilUtcStrategy = m => _lockedUntil;
 
             _lockedUntil = DateTimeOffset.UtcNow.AddSeconds(1);
-            return new LongLivedTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock);
+            return new LongLivedTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock, _logger, _defaultMessageLockDuration);
         }
 
         protected override async Task When()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -23,6 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
+        private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
         public RequestMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -32,7 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             IOutboundInterceptorFactory outboundInterceptorFactory,
             ILogger logger,
             INimbusMessagingFactory messagingFactory,
-            IReadOnlyDictionary<Type, Type[]> handlerMap)
+            IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -42,6 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -87,7 +90,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock, _logger, _defaultMessageLockDuration);
                     var response = await wrapperTask.AwaitCompletion();
 
                     var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, message))
