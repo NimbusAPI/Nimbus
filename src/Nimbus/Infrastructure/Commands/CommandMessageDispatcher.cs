@@ -73,7 +73,7 @@ namespace Nimbus.Infrastructure.Commands
                     }
 
                     var handlerTask = handler.Handle(busCommand);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapper = new LongLivedTaskWrapper(_logger, handlerTask, handler as ILongRunningTask, message, _clock);
                     await wrapper.AwaitCompletion();
 
                     foreach (var interceptor in interceptors.Reverse())

@@ -4,6 +4,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
@@ -40,7 +41,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             LongLivedTaskWrapperBase.LockedUntilUtcStrategy = m => _lockedUntil;
 
             _lockedUntil = DateTimeOffset.UtcNow.AddSeconds(1);
-            return new LongLivedTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock);
+            return new LongLivedTaskWrapper(Substitute.For<ILogger>(), _handlerTask, _handler, _brokeredMessage, _clock);
         }
 
         protected override async Task When()

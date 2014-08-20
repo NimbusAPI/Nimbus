@@ -127,6 +127,8 @@
     <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingDiskStorage.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
+    <Compile Include="Tests\LongRunningHandlerTests\CommandHandlers\LongRunningEventHandler.cs" />
+    <Compile Include="Tests\LongRunningHandlerTests\MessageContracts\LongRunningCommandCompletedEvent.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\ApatheticBlackBallRequestHandler.cs" />
@@ -142,6 +144,9 @@
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\FirstCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\SecondCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenDispatchingACommandOnTheBusAndSendingASecondCommand.cs" />
+    <Compile Include="Tests\LongRunningHandlerTests\CommandHandlers\LongRunningCommandHandler.cs" />
+    <Compile Include="Tests\LongRunningHandlerTests\MessageContracts\LongRunningCommand.cs" />
+    <Compile Include="Tests\LongRunningHandlerTests\WhenHandlingALongRunningCommandOnTheBus.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />

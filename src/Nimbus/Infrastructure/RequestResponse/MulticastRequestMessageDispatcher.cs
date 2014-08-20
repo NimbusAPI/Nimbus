@@ -86,7 +86,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 try
                 {
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(_logger, handlerTask, handler as ILongRunningTask, message, _clock);
                     var response = await wrapperTask.AwaitCompletion();
 
                     // ReSharper disable CompareNonConstrainedGenericWithNull
