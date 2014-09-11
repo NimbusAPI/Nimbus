@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csproj", "{1B793C01-E824-4449-B93D-277626B1791F}"
 EndProject
@@ -64,6 +64,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Extensions.IntegrationTests", "Tests\Nimbus.Extensions.IntegrationTests\Nimbus.Extensions.IntegrationTests.csproj", "{20845AC6-E809-4445-8CBB-0614A014552E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Tests.Common", "Tests\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj", "{14AA0204-59C2-488D-BF5E-205CCA59E99D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "Nimbus.Ninject\Nimbus.Ninject.csproj", "{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,6 +169,10 @@ Global
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,5 +200,6 @@ Global
 		{7FEB8D9E-1451-4132-8E3B-30D8E7F84126} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{20845AC6-E809-4445-8CBB-0614A014552E} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D} = {0942FED4-86C1-468A-85DE-98B88DF22384}
+		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 	EndGlobalSection
 EndGlobal

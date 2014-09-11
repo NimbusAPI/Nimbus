@@ -40,6 +40,9 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -54,6 +57,7 @@
   <ItemGroup>
     <Compile Include="WhenBuildingABusWithAutofacAndFileSystemMessageStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WhenBuildingABusWithNinjectAndFileSystemMessageStorage.cs" />
     <Compile Include="WhenBuildingABusWithWindsorAndAzureMessageStorage.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +87,10 @@
     <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702a4f7e-97c5-4651-b704-65c6d0d70c1c}</Project>
       <Name>Nimbus.MessageContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Nimbus.Ninject\Nimbus.Ninject.csproj">
+      <Project>{9c0550b4-f516-45e4-9be2-48b8b02bdb50}</Project>
+      <Name>Nimbus.Ninject</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
