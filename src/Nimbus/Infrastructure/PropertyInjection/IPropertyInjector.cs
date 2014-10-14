@@ -1,6 +1,6 @@
 namespace Nimbus.Infrastructure.PropertyInjection
 {
-    public interface IPropertyInjector
+    internal interface IPropertyInjector
     {
         void Inject(object handlerOrInterceptor);
     }
