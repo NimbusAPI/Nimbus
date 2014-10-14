@@ -8,6 +8,8 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.LongRunningTasks;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -24,7 +26,8 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
-        private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly NimbusTaskFactory _taskFactory;
 
         public RequestMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -34,7 +37,9 @@ namespace Nimbus.Infrastructure.RequestResponse
             IOutboundInterceptorFactory outboundInterceptorFactory,
             ILogger logger,
             INimbusMessagingFactory messagingFactory,
-            IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
+            IReadOnlyDictionary<Type, Type[]> handlerMap,
+            DefaultMessageLockDurationSetting defaultMessageLockDuration,
+            NimbusTaskFactory taskFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -45,6 +50,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
+            _taskFactory = taskFactory;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -90,7 +96,13 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock, _logger, _defaultMessageLockDuration);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask,
+                                                                             handler as ILongRunningTask,
+                                                                             message,
+                                                                             _clock,
+                                                                             _logger,
+                                                                             _defaultMessageLockDuration,
+                                                                             _taskFactory);
                     var response = await wrapperTask.AwaitCompletion();
 
                     var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, message))

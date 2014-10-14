@@ -85,6 +85,8 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
+    <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
@@ -99,7 +101,6 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Routing\SingleQueueAndTopicPerMessageTypeRouter.cs" />
     <Compile Include="Bus.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\PriorityScheduler.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
+    <Compile Include="Infrastructure\LongRunningTasks\LongLivedTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />
@@ -166,10 +167,13 @@
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskFactory.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskScheduler.cs" />
+    <Compile Include="Logging\StructuredLoggingNormalizer.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
-    <Compile Include="Logger\ConsoleLogger.cs" />
-    <Compile Include="Logger\NullLogger.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\NullLogger.cs" />
     <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="Configuration\BusBuilder.cs" />
     <Compile Include="Configuration\BusBuilderConfiguration.cs" />
@@ -194,6 +198,7 @@
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\DataContractSerializer.cs" />
     <Compile Include="Configuration\MessagePumpTypes.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\TaskContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

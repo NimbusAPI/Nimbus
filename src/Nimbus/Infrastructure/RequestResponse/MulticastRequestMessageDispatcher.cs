@@ -8,6 +8,8 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.LongRunningTasks;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -24,7 +26,8 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
-        private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly NimbusTaskFactory _taskFactory;
 
         public MulticastRequestMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
                                                  IClock clock,
@@ -33,7 +36,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                  ILogger logger,
                                                  INimbusMessagingFactory messagingFactory,
                                                  IOutboundInterceptorFactory outboundInterceptorFactory,
-                                                 IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
+                                                 IReadOnlyDictionary<Type, Type[]> handlerMap,
+                                                 DefaultMessageLockDurationSetting defaultMessageLockDuration,
+                                                 NimbusTaskFactory taskFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -43,6 +48,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
+            _taskFactory = taskFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
 
@@ -89,7 +95,13 @@ namespace Nimbus.Infrastructure.RequestResponse
                 try
                 {
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, handler as ILongRunningTask, message, _clock, _logger, _defaultMessageLockDuration);
+                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask,
+                                                                             handler as ILongRunningTask,
+                                                                             message,
+                                                                             _clock,
+                                                                             _logger,
+                                                                             _defaultMessageLockDuration,
+                                                                             _taskFactory);
                     var response = await wrapperTask.AwaitCompletion();
 
                     // ReSharper disable CompareNonConstrainedGenericWithNull

@@ -6,6 +6,7 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests

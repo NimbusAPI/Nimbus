@@ -4,7 +4,7 @@ using Autofac;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.Logger;
+using Nimbus.Logging;
 using NUnit.Framework;
 
 namespace Nimbus.Extensions.IntegrationTests

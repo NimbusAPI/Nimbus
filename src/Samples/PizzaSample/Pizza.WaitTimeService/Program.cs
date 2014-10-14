@@ -5,7 +5,7 @@ using Autofac;
 using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.Logger;
+using Nimbus.Logging;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 

@@ -4,7 +4,7 @@ using Castle.Windsor;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.LargeMessages.Azure.Configuration;
-using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using Nimbus.Windsor.Configuration;
 using NUnit.Framework;

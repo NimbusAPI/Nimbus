@@ -7,6 +7,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.PoisonMessages;
 
@@ -82,7 +83,11 @@ namespace Nimbus.Configuration
                               messagePumps,
                               container.Resolve<DeadLetterQueues>());
 
-            bus.Starting += delegate { container.Resolve<AzureQueueManager>().WarmUp(); };
+            bus.Starting += delegate
+                            {
+                                container.Resolve<AzureQueueManager>().WarmUp();
+                                container.Resolve<PropertyInjector>().Bus = bus;
+                            };
             bus.Disposing += delegate { container.Dispose(); };
 
             logger.Info("Bus built. Job done!");

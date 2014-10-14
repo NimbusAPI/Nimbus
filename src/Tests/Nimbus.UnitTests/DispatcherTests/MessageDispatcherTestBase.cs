@@ -10,7 +10,9 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
@@ -23,6 +25,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         internal BrokeredMessageFactory BrokeredMessageFactory;
         internal TestHarnessTypeProvider TypeProvider;
         internal HandlerMapper HandlerMapper;
+        private NimbusTaskFactory _taskFactory;
 
         protected MessageDispatcherTestBase()
         {
@@ -54,6 +57,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
+            _taskFactory = new NimbusTaskFactory(logger);
             scope.Resolve<IHandleRequest<TRequest, TResponse>>(Arg.Any<string>()).Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
@@ -71,7 +75,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                 logger,
                 messagingFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),
-                new DefaultMessageLockDurationSetting());
+                new DefaultMessageLockDurationSetting(),
+                _taskFactory);
         }
 
         internal CommandMessageDispatcher GetCommandMessageDispatcher<TCommand, TCommandHandler>(IInboundInterceptor interceptor)
@@ -95,7 +100,9 @@ namespace Nimbus.UnitTests.DispatcherTests
                 inboundInterceptorFactory,
                 logger,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)),
-                new DefaultMessageLockDurationSetting());
+                new DefaultMessageLockDurationSetting(),
+                new NimbusTaskFactory(logger),
+                Substitute.For<IPropertyInjector>());
         }
 
         internal EventMessageDispatcher GetEventMessageDispatcher<TEvent, TEventMessageHandler>(IInboundInterceptor interceptor)
@@ -103,6 +110,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             where TEventMessageHandler : IHandleMulticastEvent<TEvent>, new()
         {
             var clock = Substitute.For<IClock>();
+            var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
             scope.Resolve<IHandleMulticastEvent<TEvent>>(Arg.Any<string>()).Returns(new TEventMessageHandler());
@@ -117,7 +125,10 @@ namespace Nimbus.UnitTests.DispatcherTests
                 dependencyResolver,
                 inboundInterceptorFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)),
-                new DefaultMessageLockDurationSetting());
+                new DefaultMessageLockDurationSetting(),
+                new NimbusTaskFactory(logger),
+                Substitute.For<IPropertyInjector>(),
+                logger);
         }
     }
 }

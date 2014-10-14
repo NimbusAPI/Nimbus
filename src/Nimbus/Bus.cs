@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Commands;
@@ -21,8 +20,7 @@ namespace Nimbus
         private readonly IEventSender _eventSender;
         private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
-        private TaskFactory _taskFactory;
-
+        private readonly NimbusTaskFactory _taskFactory;
 
         private readonly object _mutex = new object();
         private bool _isRunning;
@@ -43,46 +41,49 @@ namespace Nimbus
             _deadLetterQueues = deadLetterQueues;
             _messagePumpsManager = messagePumpsManager;
 
-            _taskFactory = new TaskFactory(PriorityScheduler.Lowest);
+            _taskFactory = new NimbusTaskFactory(logger);
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
             // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
             // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
-            return _taskFactory.StartNew(() => _commandSender.Send(busCommand));
+            return _taskFactory.StartNew(() => _commandSender.Send(busCommand), TaskContext.Send).Unwrap();
             //return  Task.Run(() => _commandSender.Send(busCommand));
         }
 
         public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
         {
-            return _taskFactory.StartNew(() => _commandSender.SendAt(busCommand, deliveryTime));
+            return _taskFactory.StartNew(() => _commandSender.SendAt(busCommand, deliveryTime), TaskContext.Send).Unwrap();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return Task.Run(() => _requestSender.SendRequest(busRequest));
+            //return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest), TaskContext.Send);
+            return null;
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return Task.Run(() => _requestSender.SendRequest(busRequest, timeout));
+            //return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest, timeout), TaskContext.Send);
+            return null;
         }
 
         public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusMulticastRequest<TRequest, TResponse>
             where TResponse : IBusMulticastResponse
         {
-            return Task.Run(() => _multicastRequestSender.SendRequest(busRequest, timeout));
+            //return _taskFactory.StartNew(() => _multicastRequestSender.SendRequest(busRequest, timeout), TaskContext.Send);
+            return null;
         }
 
         public Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
-            return Task.Run(() => _eventSender.Publish(busEvent));
+            return _taskFactory.StartNew(() => _eventSender.Publish(busEvent), TaskContext.Send).Unwrap();
         }
 
         public IDeadLetterQueues DeadLetterQueues

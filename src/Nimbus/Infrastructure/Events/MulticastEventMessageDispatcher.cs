@@ -1,27 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
-using Nimbus.Exceptions;
-using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.Logger;
 
 namespace Nimbus.Infrastructure.Events
 {
     internal class MulticastEventMessageDispatcher : EventMessageDispatcher
     {
-        public MulticastEventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory, IClock clock, IDependencyResolver dependencyResolver, IInboundInterceptorFactory inboundInterceptorFactory, IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration)
-            : base(brokeredMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, new NullLogger(), defaultMessageLockDuration)
+        private readonly IPropertyInjector _propertyInjector;
+
+        public MulticastEventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
+                                               IClock clock,
+                                               IDependencyResolver dependencyResolver,
+                                               IInboundInterceptorFactory inboundInterceptorFactory,
+                                               IReadOnlyDictionary<Type, Type[]> handlerMap,
+                                               DefaultMessageLockDurationSetting defaultMessageLockDuration,
+                                               NimbusTaskFactory taskFactory,
+                                               IPropertyInjector propertyInjector,
+                                               ILogger logger)
+            : base(brokeredMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, logger, defaultMessageLockDuration, taskFactory)
         {
+            _propertyInjector = propertyInjector;
         }
 
         protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType)
         {
             var handler = scope.Resolve<IHandleMulticastEvent<TBusEvent>>(handlerType.FullName);
+            _propertyInjector.Inject(handler);
             return handler;
         }
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;

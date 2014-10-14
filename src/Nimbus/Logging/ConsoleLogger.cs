@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Logger
+namespace Nimbus.Logging
 {
     public class ConsoleLogger : ILogger
     {
@@ -51,7 +51,8 @@ namespace Nimbus.Logger
         private static void OutputMessage(string format, object[] args)
         {
             var prefix = TimestampFunc().ToLocalTime().ToString();
-            var message = string.Format(format, args);
+            var normalizedFormat = format.NormalizeToStringFormat();
+            var message = string.Format(normalizedFormat, args);
             Console.WriteLine("{0}: {1}", prefix, message);
         }
     }

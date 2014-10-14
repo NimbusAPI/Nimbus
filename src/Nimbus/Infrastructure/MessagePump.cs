@@ -18,6 +18,7 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly INimbusMessageReceiver _receiver;
+        private readonly NimbusTaskFactory _taskFactory;
 
         private bool _started;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
@@ -27,13 +28,15 @@ namespace Nimbus.Infrastructure
             IDispatchContextManager dispatchContextManager,
             ILogger logger,
             IMessageDispatcher messageDispatcher,
-            INimbusMessageReceiver receiver)
+            INimbusMessageReceiver receiver,
+            NimbusTaskFactory taskFactory)
         {
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
             _logger = logger;
             _messageDispatcher = messageDispatcher;
             _receiver = receiver;
+            _taskFactory = taskFactory;
         }
 
         public async Task Start()
@@ -45,9 +48,9 @@ namespace Nimbus.Infrastructure
                 if (_started) return;
                 _started = true;
 
-                _logger.Debug("Message pump for {0} starting...", _receiver);
+                _logger.Debug("Message pump for {Receiver} starting...", _receiver);
                 await _receiver.Start(Dispatch);
-                _logger.Debug("Message pump for {0} started", _receiver);
+                _logger.Debug("Message pump for {Receiver} started", _receiver);
             }
             finally
             {
@@ -64,9 +67,9 @@ namespace Nimbus.Infrastructure
                 if (!_started) return;
                 _started = false;
 
-                _logger.Debug("Message pump for {0} stopping...", _receiver);
+                _logger.Debug("Message pump for {Receiver} stopping...", _receiver);
                 await _receiver.Stop();
-                _logger.Debug("Message pump for {0} stopped.", _receiver);
+                _logger.Debug("Message pump for {Receiver} stopped.", _receiver);
             }
             finally
             {
@@ -89,28 +92,40 @@ namespace Nimbus.Infrastructure
                     LogInfo("Dispatching", message);
                     using (_dispatchContextManager.StartNewDispatchContext(new DispatchContext(message)))
                     {
-                        await Task.Factory.StartNew(() => _messageDispatcher.Dispatch(message), new CancellationToken(), TaskCreationOptions.None, PriorityScheduler.BelowNormal);
+                        await _taskFactory.StartNew(() => _messageDispatcher.Dispatch(message), TaskContext.Dispatch).Unwrap();
                     }
                     LogDebug("Dispatched", message);
 
                     LogDebug("Completing", message);
                     message.Properties[MessagePropertyKeys.DispatchComplete] = true;
-                    await message.CompleteAsync();
+                    await _taskFactory.StartNew(() => message.CompleteAsync(), TaskContext.CompleteOrAbandon).Unwrap();
                     LogInfo("Completed", message);
 
                     return;
                 }
+
                 catch (Exception exc)
                 {
+                    if (exc is MessageLockLostException || (exc.InnerException is MessageLockLostException))
+                    {
+                        _logger.Error(exc,
+                                      "Message completion failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.ReplyTo,
+                                      message.MessageId,
+                                      message.CorrelationId);
+                        return;
+                    }
+
+                    _logger.Error(exc,
+                                  "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
+                                  message.SafelyGetBodyTypeNameOrDefault(),
+                                  message.ReplyTo,
+                                  message.MessageId,
+                                  message.CorrelationId);
+
                     exception = exc;
                 }
-
-                _logger.Error(exception,
-                              "Message dispatch failed for {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                              message.SafelyGetBodyTypeNameOrDefault(),
-                              message.ReplyTo,
-                              message.MessageId,
-                              message.CorrelationId);
 
                 try
                 {
@@ -121,7 +136,7 @@ namespace Nimbus.Infrastructure
                 catch (Exception exc)
                 {
                     _logger.Error(exc,
-                                  "Could not call Abandon() on message {0} from {1} [MessageId:{2}, CorrelationId:{3}]. Possible lock expiry?",
+                                  "Could not call Abandon() on message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}].",
                                   message.SafelyGetBodyTypeNameOrDefault(),
                                   message.MessageId,
                                   message.CorrelationId,
@@ -136,7 +151,7 @@ namespace Nimbus.Infrastructure
 
         private void LogDebug(string activity, BrokeredMessage message)
         {
-            _logger.Debug("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
+            _logger.Debug("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                           activity,
                           message.SafelyGetBodyTypeNameOrDefault(),
                           message.ReplyTo,
@@ -146,7 +161,7 @@ namespace Nimbus.Infrastructure
 
         private void LogInfo(string activity, BrokeredMessage message)
         {
-            _logger.Info("{0} message {1} from {2} [MessageId:{3}, CorrelationId:{4}]",
+            _logger.Info("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                          activity,
                          message.SafelyGetBodyTypeNameOrDefault(),
                          message.ReplyTo,
