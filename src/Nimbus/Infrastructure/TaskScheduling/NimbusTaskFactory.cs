@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure.TaskScheduling
 {
-    public class NimbusTaskFactory
+    internal class NimbusTaskFactory : INimbusTaskFactory
     {
         private readonly Dictionary<ThreadPriority, NimbusTaskScheduler> _schedulers = new Dictionary<ThreadPriority, NimbusTaskScheduler>();
 

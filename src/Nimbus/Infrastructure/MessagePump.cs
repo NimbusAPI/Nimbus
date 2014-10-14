@@ -18,7 +18,7 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly INimbusMessageReceiver _receiver;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         private bool _started;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure
             ILogger logger,
             IMessageDispatcher messageDispatcher,
             INimbusMessageReceiver receiver,
-            NimbusTaskFactory taskFactory)
+            INimbusTaskFactory taskFactory)
         {
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;

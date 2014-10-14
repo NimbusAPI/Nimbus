@@ -20,7 +20,7 @@ namespace Nimbus.Infrastructure.Events
                                                IInboundInterceptorFactory inboundInterceptorFactory,
                                                IReadOnlyDictionary<Type, Type[]> handlerMap,
                                                DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                               NimbusTaskFactory taskFactory,
+                                               INimbusTaskFactory taskFactory,
                                                IPropertyInjector propertyInjector,
                                                ILogger logger)
             : base(brokeredMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, logger, defaultMessageLockDuration, taskFactory)

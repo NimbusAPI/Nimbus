@@ -26,7 +26,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         private SystemClock _clock;
         private ConsoleLogger _logger;
         private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private NimbusTaskFactory _taskFactory;
+        private INimbusTaskFactory _taskFactory;
 
         protected override async Task<LongLivedTaskWrapper> Given()
         {

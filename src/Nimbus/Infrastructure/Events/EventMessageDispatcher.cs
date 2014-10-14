@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         protected EventMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
                                          IClock clock,
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.Events
                                          IInboundInterceptorFactory inboundInterceptorFactory,
                                          ILogger logger,
                                          DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                         NimbusTaskFactory taskFactory)
+                                         INimbusTaskFactory taskFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;

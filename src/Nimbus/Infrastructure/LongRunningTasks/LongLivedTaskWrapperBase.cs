@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                                     IClock clock,
                                     ILogger logger,
                                     TimeSpan messageLockDuration,
-                                    NimbusTaskFactory taskFactory)
+                                    INimbusTaskFactory taskFactory)
             : base(handlerTask, longRunningHandler, message, clock, logger, messageLockDuration, taskFactory)
         {
         }
@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                                     IClock clock,
                                     ILogger logger,
                                     TimeSpan messageLockDuration,
-                                    NimbusTaskFactory taskFactory)
+                                    INimbusTaskFactory taskFactory)
             : base(handlerTask, longRunningHandler, message, clock, logger, messageLockDuration, taskFactory)
         {
         }
@@ -65,7 +65,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
         private DateTimeOffset _createdAt;
         private DateTimeOffset _instructedToWatchAt;
         private DateTimeOffset _startedWatchingAt;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         protected LongLivedTaskWrapperBase(Task handlerTask,
                                            ILongRunningTask longRunningHandler,
@@ -73,7 +73,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                                            IClock clock,
                                            ILogger logger,
                                            TimeSpan messageLockDuration,
-                                           NimbusTaskFactory taskFactory)
+                                           INimbusTaskFactory taskFactory)
         {
             if (handlerTask == null) throw new ArgumentNullException("handlerTask");
             if (longRunningHandler == null) throw new ArgumentNullException("longRunningHandler");

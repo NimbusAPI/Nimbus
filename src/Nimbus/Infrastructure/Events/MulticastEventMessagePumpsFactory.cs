@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IRouter _router;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         internal MulticastEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.Events
                                                    INimbusMessagingFactory messagingFactory,
                                                    IRouter router,
                                                    ITypeProvider typeProvider,
-                                                   NimbusTaskFactory taskFactory)
+                                                   INimbusTaskFactory taskFactory)
         {
             _applicationName = applicationName;
             _instanceName = instanceName;

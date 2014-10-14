@@ -18,11 +18,11 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IHandlerMapper _handlerMapper;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTaskFactory _taskFactory;
         private readonly IRouter _router;
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly NimbusTaskFactory _taskFactory;
 
         public CommandMessagePumpsFactory(IClock clock,
                                           IDispatchContextManager dispatchContextManager,
@@ -30,9 +30,9 @@ namespace Nimbus.Infrastructure.Commands
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
+                                          INimbusTaskFactory taskFactory,
                                           IRouter router,
-                                          ITypeProvider typeProvider,
-                                          NimbusTaskFactory taskFactory)
+                                          ITypeProvider typeProvider)
         {
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;

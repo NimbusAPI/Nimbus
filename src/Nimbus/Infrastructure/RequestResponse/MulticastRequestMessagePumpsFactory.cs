@@ -23,7 +23,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         public MulticastRequestMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    IClock clock,
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    INimbusMessagingFactory messagingFactory,
                                                    IRouter router,
                                                    ITypeProvider typeProvider,
-                                                   NimbusTaskFactory taskFactory)
+                                                   INimbusTaskFactory taskFactory)
         {
             _applicationName = applicationName;
             _clock = clock;

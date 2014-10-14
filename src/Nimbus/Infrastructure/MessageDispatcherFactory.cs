@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public MessageDispatcherFactory(IBrokeredMessageFactory brokeredMessageFactory,
@@ -34,9 +34,9 @@ namespace Nimbus.Infrastructure
                                         ILogger logger,
                                         INimbusMessagingFactory messagingFactory,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
+                                        IPropertyInjector propertyInjector,
                                         DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        NimbusTaskFactory taskFactory,
-                                        IPropertyInjector propertyInjector)
+                                        INimbusTaskFactory taskFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;

@@ -25,7 +25,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         internal BrokeredMessageFactory BrokeredMessageFactory;
         internal TestHarnessTypeProvider TypeProvider;
         internal HandlerMapper HandlerMapper;
-        private NimbusTaskFactory _taskFactory;
+        private INimbusTaskFactory _taskFactory;
 
         protected MessageDispatcherTestBase()
         {

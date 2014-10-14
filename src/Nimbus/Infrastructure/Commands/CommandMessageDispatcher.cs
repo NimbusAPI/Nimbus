@@ -25,7 +25,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private NimbusTaskFactory _taskFactory;
+        private INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public CommandMessageDispatcher(
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.Commands
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
             ILogger logger,
-            IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration, NimbusTaskFactory taskFactory, IPropertyInjector propertyInjector)
+            IReadOnlyDictionary<Type, Type[]> handlerMap, DefaultMessageLockDurationSetting defaultMessageLockDuration, INimbusTaskFactory taskFactory, IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;

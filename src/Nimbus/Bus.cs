@@ -20,7 +20,7 @@ namespace Nimbus
         private readonly IEventSender _eventSender;
         private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         private readonly object _mutex = new object();
         private bool _isRunning;

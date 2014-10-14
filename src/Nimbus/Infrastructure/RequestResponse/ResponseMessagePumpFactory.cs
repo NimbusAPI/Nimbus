@@ -11,7 +11,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly ILogger _logger;
         private readonly ResponseMessageDispatcher _messageDispatcher;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             ILogger logger,
                                             IQueueManager queueManager,
                                             ResponseMessageDispatcher messageDispatcher,
-                                            NimbusTaskFactory taskFactory)
+                                            INimbusTaskFactory taskFactory)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;

@@ -27,7 +27,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly NimbusTaskFactory _taskFactory;
+        private readonly INimbusTaskFactory _taskFactory;
 
         public MulticastRequestMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
                                                  IClock clock,
@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                  IOutboundInterceptorFactory outboundInterceptorFactory,
                                                  IReadOnlyDictionary<Type, Type[]> handlerMap,
                                                  DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                                 NimbusTaskFactory taskFactory)
+                                                 INimbusTaskFactory taskFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
