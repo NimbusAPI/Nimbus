@@ -25,9 +25,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IClock clock,
                                             IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
+                                            INimbusTaskFactory taskFactory,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher messageDispatcher,
-                                            INimbusTaskFactory taskFactory)
+                                            ResponseMessageDispatcher messageDispatcher)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;

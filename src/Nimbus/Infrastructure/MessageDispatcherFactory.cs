@@ -27,16 +27,16 @@ namespace Nimbus.Infrastructure
         private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MessageDispatcherFactory(IBrokeredMessageFactory brokeredMessageFactory,
+        public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
+                                        IBrokeredMessageFactory brokeredMessageFactory,
                                         IClock clock,
                                         IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
                                         INimbusMessagingFactory messagingFactory,
+                                        INimbusTaskFactory taskFactory,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
-                                        IPropertyInjector propertyInjector,
-                                        DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        INimbusTaskFactory taskFactory)
+                                        IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;

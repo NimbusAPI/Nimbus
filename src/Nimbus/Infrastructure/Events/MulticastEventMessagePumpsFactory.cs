@@ -34,9 +34,9 @@ namespace Nimbus.Infrastructure.Events
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
                                                    INimbusMessagingFactory messagingFactory,
+                                                   INimbusTaskFactory taskFactory,
                                                    IRouter router,
-                                                   ITypeProvider typeProvider,
-                                                   INimbusTaskFactory taskFactory)
+                                                   ITypeProvider typeProvider)
         {
             _applicationName = applicationName;
             _instanceName = instanceName;

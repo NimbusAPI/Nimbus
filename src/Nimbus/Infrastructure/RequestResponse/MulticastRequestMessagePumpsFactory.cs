@@ -32,9 +32,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
                                                    INimbusMessagingFactory messagingFactory,
+                                                   INimbusTaskFactory taskFactory,
                                                    IRouter router,
-                                                   ITypeProvider typeProvider,
-                                                   INimbusTaskFactory taskFactory)
+                                                   ITypeProvider typeProvider)
         {
             _applicationName = applicationName;
             _clock = clock;
