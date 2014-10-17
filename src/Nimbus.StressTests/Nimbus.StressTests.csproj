@@ -71,15 +71,39 @@
     <Compile Include="ThreadStarvationTests\Handlers\NoOpCommandHandler.cs" />
     <Compile Include="ThreadStarvationTests\MessageContracts\SmashTheBusCommand.cs" />
     <Compile Include="ThreadStarvationTests\Handlers\SmashTheBusCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\SpecificationForAsync.cs" />
+    <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="ThreadStarvationTests\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
     <Compile Include="ThreadStarvationTests\WhenCreatingALargeMessageCascade.cs" />
     <Compile Include="ThreadStarvationTests\WhenSmashingTheBusForMoreThanTheMessageLockDuration.cs" />
+    <Compile Include="ThroughputTests\EventHandlers\FakeHandler.cs" />
+    <Compile Include="ThroughputTests\Infrastructure\FakeChildScope.cs" />
+    <Compile Include="ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\BarCommand.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\BarEvent.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\BazCommand.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\BazEvent.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\FooEvent.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\FooRequest.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\FooResponse.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\QuxCommand.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\QuxEvent.cs" />
+    <Compile Include="ThroughputTests\ThroughputSpecificationForBus.cs" />
+    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
+    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Extensions\Nimbus.LargeMessages.FileSystem\Nimbus.LargeMessages.FileSystem.csproj">
+      <Project>{7FEB8D9E-1451-4132-8E3B-30D8E7F84126}</Project>
+      <Name>Nimbus.LargeMessages.FileSystem</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
       <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>

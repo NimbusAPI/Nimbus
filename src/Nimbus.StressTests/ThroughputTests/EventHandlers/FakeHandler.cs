@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
+using Nimbus.StressTests.ThroughputTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers
+namespace Nimbus.StressTests.ThroughputTests.EventHandlers
 {
     /// <summary>
     ///     This class needs to exist so that our bus knows to subscribe to these types of message. That's all. It's not

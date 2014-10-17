@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 
-namespace Nimbus.StressTests.ThreadStarvationTests
+namespace Nimbus.StressTests
 {
     public abstract class SpecificationForAsync<T> where T : class
     {

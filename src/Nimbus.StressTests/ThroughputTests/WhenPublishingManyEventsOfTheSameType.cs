@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.MessageContracts;
+using Nimbus.StressTests.ThroughputTests.MessageContracts;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.Tests.ThroughputTests
+namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
-    [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     public class WhenPublishingManyEventsOfTheSameType : ThroughputSpecificationForBus
     {
         protected override int ExpectedMessagesPerSecond

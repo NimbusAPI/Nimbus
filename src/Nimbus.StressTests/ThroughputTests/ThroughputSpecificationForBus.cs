@@ -5,21 +5,20 @@ using System.IO;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.Logger;
-using Nimbus.Logging;
+using Nimbus.Logger.Serilog;
+using Nimbus.StressTests.ThroughputTests.EventHandlers;
+using Nimbus.StressTests.ThroughputTests.Infrastructure;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
+using Serilog;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.ThroughputTests
+namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
-    [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
     [Timeout(60*1000)]
-    public abstract class ThroughputSpecificationForBus : SpecificationFor<Bus>
+    public abstract class ThroughputSpecificationForBus : SpecificationForAsync<Bus>
     {
         private TimeSpan _timeout;
         private AssemblyScanningTypeProvider _typeProvider;
@@ -38,7 +37,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         protected abstract int ExpectedMessagesPerSecond { get; }
 
-        public override async Task<Bus> Given()
+        protected override async Task<Bus> Given()
         {
             _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
@@ -46,8 +45,14 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             _dependencyResolver = new FakeDependencyResolver(_fakeHandler);
             _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            //_logger = new ConsoleLogger();    // useful for debugging but it fills up the test runner with way too much output and crashes it
-            _logger = new NullLogger();
+
+            var log = new LoggerConfiguration()
+                .WriteTo.Seq("http://localhost:5341")
+                .MinimumLevel.Debug()
+                .CreateLogger();
+
+            _logger = new SerilogLogger(log);
+            //_logger = new NullLogger();
 
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
                                                                         .WithStorageDirectory(_largeMessageBodyTempPath)
@@ -69,7 +74,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
             return bus;
         }
 
-        public override async Task When()
+        protected override async Task When()
         {
             Console.WriteLine("Starting to send messages...");
             _stopwatch = Stopwatch.StartNew();

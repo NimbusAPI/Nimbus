@@ -1,7 +1,7 @@
 ﻿using Nimbus.DependencyResolution;
-using Nimbus.IntegrationTests.Tests.ThroughputTests.EventHandlers;
+using Nimbus.StressTests.ThroughputTests.EventHandlers;
 
-namespace Nimbus.IntegrationTests.Tests.ThroughputTests.Infrastructure
+namespace Nimbus.StressTests.ThroughputTests.Infrastructure
 {
     public class FakeDependencyResolver : IDependencyResolver
     {
