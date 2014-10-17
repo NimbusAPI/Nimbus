@@ -75,10 +75,6 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                                            TimeSpan messageLockDuration,
                                            INimbusTaskFactory taskFactory)
         {
-            if (handlerTask == null) throw new ArgumentNullException("handlerTask");
-            if (longRunningHandler == null) throw new ArgumentNullException("longRunningHandler");
-            if (message == null) throw new ArgumentNullException("message");
-
             HandlerTask = handlerTask;
             _longRunningHandler = longRunningHandler;
             _message = message;

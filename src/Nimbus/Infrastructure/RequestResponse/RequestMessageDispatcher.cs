@@ -96,14 +96,17 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var handlerTask = handler.Handle(busRequest);
-                    var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask,
-                                                                             handler as ILongRunningTask,
-                                                                             message,
-                                                                             _clock,
-                                                                             _logger,
-                                                                             _defaultMessageLockDuration,
-                                                                             _taskFactory);
-                    var response = await wrapperTask.AwaitCompletion();
+                    var longRunningTask = handler as ILongRunningTask;
+                    TBusResponse response;
+                    if (longRunningTask != null)
+                    {
+                        var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        response = await wrapperTask.AwaitCompletion();
+                    }
+                    else
+                    {
+                        response = await handlerTask;
+                    }
 
                     var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, message))
                         .DestinedForQueue(replyQueueName);
