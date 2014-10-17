@@ -188,7 +188,7 @@
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="DispatcherTests\WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
     <Compile Include="DispatcherTests\WhenExtractingADispatchMethodForARequest.cs" />
-    <Compile Include="ParameterCheckingTests\WhenPassingANullArgumentToAConstructor.cs" />
+    <Compile Include="ParameterCheckingTests\FodyShouldThrowAnArgumentNullException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
