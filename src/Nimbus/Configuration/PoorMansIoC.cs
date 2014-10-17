@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
+using NullGuard;
 
 namespace Nimbus.Configuration
 {
@@ -53,7 +54,7 @@ namespace Nimbus.Configuration
             }
             catch (Exception exc)
             {
-                throw new DependencyResolutionException("Could not resolve tyoe: {0}".FormatWith(type.FullName), exc);
+                throw new DependencyResolutionException("Could not resolve type: {0}".FormatWith(type.FullName), exc);
             }
         }
 
