@@ -49,7 +49,6 @@ namespace Nimbus
             // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
             // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
             return _taskFactory.StartNew(() => _commandSender.Send(busCommand), TaskContext.Send).Unwrap();
-            //return  Task.Run(() => _commandSender.Send(busCommand));
         }
 
         public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
@@ -61,24 +60,21 @@ namespace Nimbus
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            //return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest), TaskContext.Send);
-            return null;
+            return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest), TaskContext.Send).Unwrap();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            //return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest, timeout), TaskContext.Send);
-            return null;
+            return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest, timeout), TaskContext.Send).Unwrap();
         }
 
         public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusMulticastRequest<TRequest, TResponse>
             where TResponse : IBusMulticastResponse
         {
-            //return _taskFactory.StartNew(() => _multicastRequestSender.SendRequest(busRequest, timeout), TaskContext.Send);
-            return null;
+            return _taskFactory.StartNew(() => _multicastRequestSender.SendRequest(busRequest, timeout), TaskContext.Send).Unwrap();
         }
 
         public Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
