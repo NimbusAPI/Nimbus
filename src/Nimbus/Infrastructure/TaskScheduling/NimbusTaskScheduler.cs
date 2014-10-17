@@ -112,6 +112,10 @@ namespace Nimbus.Infrastructure.TaskScheduling
                     {
                         break;
                     }
+                    catch (ThreadAbortException)
+                    {
+                        break;
+                    }
                     catch (Exception exc)
                     {
                         _logger.Error(exc, exc.Message);
