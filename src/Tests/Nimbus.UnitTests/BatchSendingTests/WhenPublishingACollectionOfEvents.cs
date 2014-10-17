@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
@@ -26,8 +28,9 @@ namespace Nimbus.UnitTests.BatchSendingTests
             _eventSender = Substitute.For<IEventSender>();
             var messagePumpsManager = Substitute.For<IMessagePumpsManager>();
             var deadLetterQueues = Substitute.For<IDeadLetterQueues>();
+            var taskFactory = new NimbusTaskFactory(logger);
 
-            var bus = new Bus(logger, commandSender, requestSender, multicastRequestSender, _eventSender, messagePumpsManager, deadLetterQueues);
+            var bus = new Bus(logger, commandSender, requestSender, multicastRequestSender, _eventSender, messagePumpsManager, deadLetterQueues, taskFactory);
             return Task.FromResult(bus);
         }
 

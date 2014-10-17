@@ -146,6 +146,8 @@ namespace Nimbus.Tests.Common
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
+
+            Console.WriteLine("Total calls observed: {0}", allReceivedCalls.Values.SelectMany(v => v).Count());
         }
     }
 }

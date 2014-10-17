@@ -6,7 +6,7 @@ namespace Nimbus.Configuration.Settings
     {
         public override int Default
         {
-            get { return Environment.ProcessorCount*4; }
+            get { return Environment.ProcessorCount * Environment.ProcessorCount; }
         }
     }
 }

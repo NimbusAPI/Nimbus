@@ -6,6 +6,7 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger.Serilog;
+using Nimbus.Logging;
 using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -17,11 +18,11 @@ namespace Nimbus.StressTests.ThreadStarvationTests
     [Timeout(_timeoutSeconds*1000)]
     public class WhenCreatingALargeMessageCascade : SpecificationForAsync<Bus>
     {
-        private const int _timeoutSeconds = 180;
+        private const int _timeoutSeconds = 300;
         private static readonly TimeSpan _messageLockDuration = TimeSpan.FromSeconds(30);
         private const int _numInitialMessages = 10;
 
-        private const int _expectedMessageCount = 1000;
+        private const int _expectedMessageCount = 3000;
 
         protected override async Task<Bus> Given()
         {
@@ -32,6 +33,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests
                 .CreateLogger();
 
             var logger = new SerilogLogger(log);
+            //var logger = new NullLogger();
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
@@ -70,7 +72,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests
         [Test]
         public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
-            MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(1000);
+            MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(_expectedMessageCount);
         }
     }
 }

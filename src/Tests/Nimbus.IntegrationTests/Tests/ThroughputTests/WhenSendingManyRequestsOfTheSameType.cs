@@ -17,7 +17,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         protected override int NumMessagesToSend
         {
-            get { return 1000; }
+            get { return 4000; }
         }
 
         public override IEnumerable<Task> SendMessages(IBus bus)

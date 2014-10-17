@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.ThroughputTests
 
         protected virtual int NumMessagesToSend
         {
-            get { return 4000; }
+            get { return 8000; }
         }
 
         protected abstract int ExpectedMessagesPerSecond { get; }

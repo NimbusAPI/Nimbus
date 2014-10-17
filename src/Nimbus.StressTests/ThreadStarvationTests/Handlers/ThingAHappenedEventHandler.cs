@@ -12,7 +12,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
 
         public async Task Handle(ThingAHappenedEvent busEvent)
         {
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 30; i++)
             {
                 await Bus.Send(new DoThingBCommand());
             }

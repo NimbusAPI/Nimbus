@@ -31,7 +31,8 @@ namespace Nimbus
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
-                     IDeadLetterQueues deadLetterQueues)
+                     IDeadLetterQueues deadLetterQueues,
+                     INimbusTaskFactory taskFactory)
         {
             _logger = logger;
             _commandSender = commandSender;
@@ -39,9 +40,8 @@ namespace Nimbus
             _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
+            _taskFactory = taskFactory;
             _messagePumpsManager = messagePumpsManager;
-
-            _taskFactory = new NimbusTaskFactory(logger);
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand

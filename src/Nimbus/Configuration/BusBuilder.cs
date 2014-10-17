@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
@@ -63,6 +64,9 @@ namespace Nimbus.Configuration
                 namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
             }
 
+            var taskFactory = new NimbusTaskFactory(container.Resolve<ILogger>());
+            container.Register(taskFactory);
+
             logger.Debug("Creating message pumps...");
 
             var messagePumps = new MessagePumpsManager(
@@ -71,7 +75,8 @@ namespace Nimbus.Configuration
                 container.Resolve<CommandMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
-                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
+                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll(),
+                taskFactory);
 
             logger.Debug("Message pumps are all created.");
 
@@ -81,14 +86,19 @@ namespace Nimbus.Configuration
                               container.Resolve<IMulticastRequestSender>(),
                               container.Resolve<IEventSender>(),
                               messagePumps,
-                              container.Resolve<DeadLetterQueues>());
+                              container.Resolve<DeadLetterQueues>(),
+                              container.Resolve<INimbusTaskFactory>());
 
             bus.Starting += delegate
                             {
                                 container.Resolve<AzureQueueManager>().WarmUp();
                                 container.Resolve<PropertyInjector>().Bus = bus;
                             };
-            bus.Disposing += delegate { container.Dispose(); };
+            bus.Disposing += delegate
+                             {
+                                 container.Dispose();
+                                 taskFactory.Dispose();
+                             };
 
             logger.Info("Bus built. Job done!");
 
