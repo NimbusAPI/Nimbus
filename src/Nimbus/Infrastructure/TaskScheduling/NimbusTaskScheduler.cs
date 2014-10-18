@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.TaskScheduling
 {
@@ -10,11 +11,12 @@ namespace Nimbus.Infrastructure.TaskScheduling
     {
         private readonly ThreadPriority _priority;
         private readonly ILogger _logger;
+        private readonly MinimumThreadPoolThreadsSetting _minimumThreadPoolThreads;
+        private readonly MaximumThreadPoolThreadsSetting _maximumThreadPoolThreads;
+
         private readonly List<Task> _tasks = new List<Task>();
         private readonly SemaphoreSlim _tasksSemaphore = new SemaphoreSlim(0);
         private readonly SemaphoreSlim _watcherSemaphore = new SemaphoreSlim(0);
-        private readonly int _minThreadCount;
-        private readonly int _maxThreadCount;
         private int _currentThreadCount;
         private int _shouldKillOneThread;
         private bool _disposed;
@@ -27,14 +29,15 @@ namespace Nimbus.Infrastructure.TaskScheduling
         private const int _scaleDownWhenWeHitPercentage = 20;
         public const string LogTaskSchedulerCompilerDirective = "LogTaskScheduler";
 
-        public NimbusTaskScheduler(ThreadPriority priority, ILogger logger)
+        public NimbusTaskScheduler(ThreadPriority priority,
+                                   ILogger logger,
+                                   MinimumThreadPoolThreadsSetting minimumThreadPoolThreads,
+                                   MaximumThreadPoolThreadsSetting maximumThreadPoolThreads)
         {
             _priority = priority;
             _logger = logger;
-
-            var absoluteMinimumThreadCount = Math.Max(Environment.ProcessorCount, 4);
-            _minThreadCount = absoluteMinimumThreadCount*2;
-            _maxThreadCount = absoluteMinimumThreadCount*absoluteMinimumThreadCount;
+            _minimumThreadPoolThreads = minimumThreadPoolThreads;
+            _maximumThreadPoolThreads = maximumThreadPoolThreads;
 
             var watcher = new Thread(Watcher)
                           {
@@ -55,14 +58,14 @@ namespace Nimbus.Infrastructure.TaskScheduling
                 {
                     // If we need more threads, we probably need them in a hurry :p
                     var deficit = Environment.ProcessorCount;
-                    if (_currentThreadCount + deficit > _maxThreadCount) deficit = _maxThreadCount - _currentThreadCount;
+                    if (_currentThreadCount + deficit > _maximumThreadPoolThreads) deficit = _maximumThreadPoolThreads - _currentThreadCount;
 
                     for (var i = 0; i < deficit; i++) AddOneThread();
                 }
                 else if (percentageOfThreadPoolInUse < _scaleDownWhenWeHitPercentage)
                 {
                     // If we have too many threads, let's scale them back down gently so that we don't fluctuate like a crazy thing.
-                    if (_currentThreadCount > _minThreadCount)
+                    if (_currentThreadCount > _minimumThreadPoolThreads)
                     {
                         RemoveOneThread();
                     }

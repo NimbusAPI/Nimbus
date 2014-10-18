@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -19,10 +20,10 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
     public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
         private const int _timeoutSeconds = 180;
-        private const int _numMessagesToSend = 128; // if we have more cores than this then we're doing pretty well...
         private static readonly TimeSpan _messageLockDuration = CommandThatWillBlockTheThreadHandler.SleepDuration.Add(TimeSpan.FromSeconds(1));
 
         private ILogger _logger;
+        private int _numMessagesToSend;
 
         protected override async Task<Bus> Given()
         {
@@ -57,6 +58,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task When()
         {
+            _numMessagesToSend = new MaximumThreadPoolThreadsSetting().Default*2;
+
             var commands = Enumerable.Range(0, _numMessagesToSend)
                                      .Select(j => new CommandThatWillBlockTheThread())
                                      .ToArray();

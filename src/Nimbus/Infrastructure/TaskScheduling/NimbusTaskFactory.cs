@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.TaskScheduling
@@ -12,11 +13,11 @@ namespace Nimbus.Infrastructure.TaskScheduling
         private readonly Dictionary<ThreadPriority, NimbusTaskScheduler> _schedulers = new Dictionary<ThreadPriority, NimbusTaskScheduler>();
         private bool _disposed;
 
-        public NimbusTaskFactory(ILogger logger)
+        public NimbusTaskFactory(ILogger logger, MinimumThreadPoolThreadsSetting minimumThreadPoolThreads, MaximumThreadPoolThreadsSetting maximumThreadPoolThreads)
         {
             foreach (var priority in Enum.GetValues(typeof (ThreadPriority)).Cast<ThreadPriority>())
             {
-                _schedulers[priority] = new NimbusTaskScheduler(priority, logger);
+                _schedulers[priority] = new NimbusTaskScheduler(priority, logger, minimumThreadPoolThreads, maximumThreadPoolThreads);
             }
         }
 

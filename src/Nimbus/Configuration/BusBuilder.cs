@@ -64,9 +64,6 @@ namespace Nimbus.Configuration
                 namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
             }
 
-            var taskFactory = new NimbusTaskFactory(container.Resolve<ILogger>());
-            container.Register(taskFactory);
-
             logger.Debug("Creating message pumps...");
 
             var messagePumps = new MessagePumpsManager(
@@ -76,7 +73,7 @@ namespace Nimbus.Configuration
                 container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
                 container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll(),
-                taskFactory);
+                container.Resolve<INimbusTaskFactory>());
 
             logger.Debug("Message pumps are all created.");
 
@@ -94,11 +91,7 @@ namespace Nimbus.Configuration
                                 container.Resolve<AzureQueueManager>().WarmUp();
                                 container.Resolve<PropertyInjector>().Bus = bus;
                             };
-            bus.Disposing += delegate
-                             {
-                                 container.Dispose();
-                                 taskFactory.Dispose();
-                             };
+            bus.Disposing += delegate { container.Dispose(); };
 
             logger.Info("Bus built. Job done!");
 
