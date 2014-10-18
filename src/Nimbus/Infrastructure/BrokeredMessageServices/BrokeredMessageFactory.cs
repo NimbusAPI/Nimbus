@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,9 +75,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           }
                                           else
                                           {
-                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                              brokeredMessage = new BrokeredMessage(messageBodyBytes);
                                           }
-
                                           brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
@@ -143,13 +141,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       }
                                       else
                                       {
-                                          // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
-                                          using (var dataStream = message.GetBody<Stream>())
-                                          using (var memoryStream = new MemoryStream())
-                                          {
-                                              dataStream.CopyTo(memoryStream);
-                                              bodyBytes = memoryStream.ToArray();
-                                          }
+                                          bodyBytes = message.GetBody<byte[]>();
                                       }
 
                                       var decompressedBytes = _compressor.Decompress(bodyBytes);

@@ -85,6 +85,8 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="BrokeredMessageFactoryTests\GivenAMessageBrokerFactory.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCloningABrokeredMessage.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />
     <Compile Include="CompressionTests\WhenUsingDeflateCompressor.cs" />
     <Compile Include="CompressionTests\WhenUsingGzipCompressor.cs" />

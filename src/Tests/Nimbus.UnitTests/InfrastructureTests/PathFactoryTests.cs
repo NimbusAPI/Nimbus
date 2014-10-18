@@ -1,4 +1,5 @@
 ﻿using Nimbus.Infrastructure;
+using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 

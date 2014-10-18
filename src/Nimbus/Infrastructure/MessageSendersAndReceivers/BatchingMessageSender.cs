@@ -31,6 +31,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Send(BrokeredMessage message)
         {
+            var clone = message.Clone();
+
             Task taskToAwait;
             lock (_enqueuingMutex)
             {

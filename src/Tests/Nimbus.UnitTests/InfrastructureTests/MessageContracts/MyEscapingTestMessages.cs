@@ -1,7 +1,7 @@
 ﻿using Nimbus.MessageContracts;
 
 // ReSharper disable once CheckNamespace
-namespace Nimbus.UnitTests
+namespace Nimbus.UnitTests.InfrastructureTests.MessageContracts
 {
     public class MyEscapingTestMessages
     {
