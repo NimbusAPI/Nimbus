@@ -59,7 +59,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests
         protected override async Task When()
         {
             _numMessagesSent = 0;
-            const int batchSize = 200;
+            const int batchSize = 17;   // because why not?
 
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed < _timeToRun)
@@ -70,8 +70,6 @@ namespace Nimbus.StressTests.ThreadStarvationTests
 
                 await Subject.SendAll(commands);
                 Interlocked.Add(ref _numMessagesSent, batchSize);
-
-                await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
             await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesSent);
