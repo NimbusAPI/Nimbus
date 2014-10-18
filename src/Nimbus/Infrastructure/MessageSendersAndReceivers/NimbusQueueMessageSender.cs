@@ -29,9 +29,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 await messageSender.SendBatchAsync(toSend);
             }
-            catch (Exception exc)
+            catch (Exception)
             {
-                if (exc.IsTransientFault()) throw;
                 DiscardMessageSender();
                 throw;
             }
@@ -55,6 +54,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             try
             {
+                _logger.Info("Discarding message sender for {QueuePath}", _queuePath);
                 messageSender.Close();
             }
             catch (Exception exc)
