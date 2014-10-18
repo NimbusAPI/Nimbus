@@ -14,7 +14,12 @@ namespace Pizza.Ordering
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
+        {
+            Task.Run(() => MainAsync()).Wait();
+        }
+
+        public static async Task MainAsync()
         {
             // This is how you tell Nimbus where to find all your message types and handlers.
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(), typeof (NewOrderRecieved).Assembly, typeof (OrderPizzaCommand).Assembly);
@@ -27,7 +32,7 @@ namespace Pizza.Ordering
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .Build();
-            bus.Start();
+            await bus.Start(MessagePumpTypes.Response);
 
             while (true)
             {
@@ -41,31 +46,15 @@ namespace Pizza.Ordering
                 {
                     case "1":
 
-                        HowLongDoesAPizzaTake(bus);
-
+                        await HowLongDoesAPizzaTake(bus);
                         break;
 
                     case "2":
-
-                        Console.WriteLine("What's the customer's name?");
-                        var customerName = Console.ReadLine().Trim();
-
-                        if (string.IsNullOrWhiteSpace(customerName))
-                        {
-                            Console.WriteLine("You need to enter a customer name.");
-                            continue;
-                        }
-
-                        var command = new OrderPizzaCommand {CustomerName = customerName};
-
-                        bus.Send(command);
-
-                        Console.WriteLine("Pizza ordered for {0}", customerName);
-
+                        await OrderAPizza(bus);
                         break;
 
                     case "3":
-                        bus.Stop();
+                        await bus.Stop();
                         return;
 
                     default:
@@ -74,10 +63,26 @@ namespace Pizza.Ordering
             }
         }
 
+        private static async Task OrderAPizza(Bus bus)
+        {
+            Console.WriteLine("What's the customer's name?");
+            var customerName = Console.ReadLine().Trim();
+
+            if (string.IsNullOrWhiteSpace(customerName))
+            {
+                Console.WriteLine("You need to enter a customer name.");
+                return;
+            }
+
+            var command = new OrderPizzaCommand {CustomerName = customerName};
+            await bus.Send(command);
+
+            Console.WriteLine("Pizza ordered for {0}", customerName);
+        }
+
         public static async Task HowLongDoesAPizzaTake(Bus bus)
         {
             var response = await bus.Request(new HowLongDoPizzasTakeRequest(), TimeSpan.FromSeconds(10));
-
             Console.WriteLine("Pizzas take about {0} minutes", response.Minutes);
         }
     }
