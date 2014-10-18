@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.PropertyInjection;
@@ -8,15 +8,17 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
 {
     public class ThingAHappenedEventHandler : IHandleCompetingEvent<ThingAHappenedEvent>, IRequireBus, ILongRunningTask
     {
+        public const int NumberOfDoThingBCommands = 11;
+
         public IBus Bus { get; set; }
 
         public async Task Handle(ThingAHappenedEvent busEvent)
         {
-            for (var i = 0; i < 30; i++)
-            {
-                await Bus.Send(new DoThingBCommand());
-            }
-            await Task.Delay(TimeSpan.FromSeconds(30));
+            var commands = Enumerable.Range(0, NumberOfDoThingBCommands)
+                                     .Select(i => new DoThingBCommand())
+                                     .ToArray();
+
+            await Bus.SendAll(commands);
         }
 
         public bool IsAlive

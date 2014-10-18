@@ -6,7 +6,7 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger.Serilog;
-using Nimbus.Logging;
+using Nimbus.StressTests.ThreadStarvationTests.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -20,9 +20,9 @@ namespace Nimbus.StressTests.ThreadStarvationTests
     {
         private const int _timeoutSeconds = 300;
         private static readonly TimeSpan _messageLockDuration = TimeSpan.FromSeconds(30);
-        private const int _numInitialMessages = 10;
+        public const int NumberOfDoThingACommands = 10;
 
-        private const int _expectedMessageCount = 3000;
+        private const int _expectedMessageCount = NumberOfDoThingACommands*ThingAHappenedEventHandler.NumberOfDoThingBCommands*ThingBHappenedEventHandler.NumberOfDoThingCCommands;
 
         protected override async Task<Bus> Given()
         {
@@ -59,7 +59,9 @@ namespace Nimbus.StressTests.ThreadStarvationTests
 
         protected override async Task When()
         {
-            var tasks = Enumerable.Range(0, _numInitialMessages)
+            Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof(DoThingCCommand).Name);
+
+            var tasks = Enumerable.Range(0, NumberOfDoThingACommands)
                                   .AsParallel()
                                   .Select(i => Subject.Send(new DoThingACommand()))
                                   .ToArray();

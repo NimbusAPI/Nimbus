@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
@@ -13,6 +14,7 @@ namespace Nimbus.Tests.Common
     {
         private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
         private static bool _stopped;
+        private static int _callCount;
 
         public static void RecordCall<T>(Expression<Action<T>> expr)
         {
@@ -37,7 +39,8 @@ namespace Nimbus.Tests.Common
             var methodCallBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             methodCallBag.Add(args.ToArray());
 
-            Console.WriteLine("Observed call to {0}".FormatWith(key));
+            var callCount = Interlocked.Increment(ref _callCount);
+            Console.WriteLine("{0:00000} | Observed call to {1}".FormatWith(callCount, key));
         }
 
         public static IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls
@@ -101,6 +104,7 @@ namespace Nimbus.Tests.Common
 
         public static void Clear()
         {
+            _callCount = 0;
             _allReceivedCalls.Clear();
             _stopped = false;
         }
