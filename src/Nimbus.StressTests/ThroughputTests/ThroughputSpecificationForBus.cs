@@ -18,7 +18,6 @@ namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
     [Timeout(60*1000)]
-    [Ignore("Muting until I can get Seq installed on the build server so I can see what's going on. Logging to console is killing TeamCity and R# :p")]
     public abstract class ThroughputSpecificationForBus : SpecificationForAsync<Bus>
     {
         private TimeSpan _timeout;
@@ -92,26 +91,13 @@ namespace Nimbus.StressTests.ThroughputTests
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
         }
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
-        {
-            Task.Run(async () =>
-                           {
-                               Subject = await Given();
-                               await When();
-                           }).Wait();
-        }
-
         [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        public override void TestFixtureTearDown()
         {
-            Task.Run(async () =>
-                           {
-                               await Subject.Stop();
-                               _dependencyResolver = null;
-
-                               if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
-                           });
+            Subject.Stop().Wait();
+            _dependencyResolver = null;
+            base.TestFixtureTearDown();
+            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
         }
 
         public abstract IEnumerable<Task> SendMessages(IBus bus);

@@ -16,7 +16,7 @@ namespace Nimbus.StressTests
         private Stopwatch _sw;
 
         [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        public virtual void TestFixtureSetUp()
         {
             Task.Run(async () =>
                            {
@@ -49,7 +49,7 @@ namespace Nimbus.StressTests
         }
 
         [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        public virtual void TestFixtureTearDown()
         {
             var disposable = Subject as IDisposable;
             if (disposable != null) disposable.Dispose();
