@@ -9,9 +9,11 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 {
     public class CommandThatWillBlockTheThreadHandler : IHandleCommand<CommandThatWillBlockTheThread>, ILongRunningTask
     {
+        public static readonly TimeSpan SleepDuration = TimeSpan.FromSeconds(15);
+
         public async Task Handle(CommandThatWillBlockTheThread busCommand)
         {
-            Thread.Sleep(TimeSpan.FromSeconds(1)); // deliberately block the handling thread
+            Thread.Sleep(SleepDuration); // deliberately block the handling thread
             MethodCallCounter.RecordCall<CommandThatWillBlockTheThreadHandler>(h => h.Handle(busCommand));
         }
 

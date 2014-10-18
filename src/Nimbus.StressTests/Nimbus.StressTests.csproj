@@ -74,7 +74,7 @@
     <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
-    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSmashingTheBusForMoreThanTheMessageLockDuration.cs" />
+    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool.cs" />
     <Compile Include="ThroughputTests\EventHandlers\FakeHandler.cs" />
     <Compile Include="ThroughputTests\Infrastructure\FakeChildScope.cs" />
     <Compile Include="ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />

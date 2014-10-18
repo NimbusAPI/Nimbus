@@ -18,7 +18,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
         private readonly TimeSpan _messageLockDuration;
         private readonly INimbusTaskFactory _taskFactory;
 
-        private const double _acceptableRemainingLockProportion = 2/3;
+        private const double _acceptableRemainingLockProportion = (double)2/3;
 
         // BrokeredMessage is sealed and can't easily be mocked so we sub our our
         // invocation strategies for its properties/methods instead.  -andrewh 12/3/2014
@@ -95,9 +95,11 @@ namespace Nimbus.Infrastructure.LongRunningTasks
 
                 if (timeToDelay > TimeSpan.Zero)
                 {
-                    _logger.Debug("Sleeping for {SleepDuration} before checking whether lock for message {MessageId} requires renewal.",
-                                  timeToDelay,
-                                  message.MessageId);
+                    _logger.Debug(
+                        "Sleeping for {SleepDuration} before checking whether lock for message {MessageId} requires renewal (currently has {LockTimeRemaining} remaining seconds).",
+                        timeToDelay,
+                        message.MessageId,
+                        remainingLockTime);
                     await Task.Delay(timeToDelay);
                     //Thread.Sleep(timeToDelay);
                 }

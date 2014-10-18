@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger.Serilog;
+using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -17,13 +16,13 @@ using Shouldly;
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync
 {
     [Timeout(_timeoutSeconds*1000)]
-    public class WhenSmashingTheBusForMoreThanTheMessageLockDuration : SpecificationForAsync<Bus>
+    public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
         private const int _timeoutSeconds = 180;
-        private static readonly TimeSpan _messageLockDuration = TimeSpan.FromSeconds(9);
-        private readonly TimeSpan _timeToRun = _messageLockDuration.Add(TimeSpan.FromSeconds(1));
+        private const int _numMessagesToSend = 128; // if we have more cores than this then we're doing pretty well...
+        private static readonly TimeSpan _messageLockDuration = CommandThatWillBlockTheThreadHandler.SleepDuration.Add(TimeSpan.FromSeconds(1));
+
         private ILogger _logger;
-        private int _numMessagesSent;
 
         protected override async Task<Bus> Given()
         {
@@ -58,32 +57,22 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task When()
         {
-            _numMessagesSent = 0;
-            const int batchSize = 17;   // because why not?
+            var commands = Enumerable.Range(0, _numMessagesToSend)
+                                     .Select(j => new CommandThatWillBlockTheThread())
+                                     .ToArray();
 
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed < _timeToRun)
-            {
-                var commands = Enumerable.Range(0, batchSize)
-                                         .Select(j => new CommandThatWillBlockTheThread())
-                                         .ToArray();
+            await Subject.SendAll(commands);
 
-                await Subject.SendAll(commands);
-                Interlocked.Add(ref _numMessagesSent, batchSize);
-            }
-
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesSent);
+            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
         }
 
         [Test]
         public async Task WeShouldHaveReceivedTheCorrectNumberOfCommands()
         {
-            Console.WriteLine("Messages sent: {0}", _numMessagesSent);
-
             var numMessagesReceived = MethodCallCounter.AllReceivedMessages.OfType<CommandThatWillBlockTheThread>().Count();
             Console.WriteLine("Messages received: {0}", numMessagesReceived);
 
-            numMessagesReceived.ShouldBe(_numMessagesSent);
+            numMessagesReceived.ShouldBe(_numMessagesToSend);
         }
     }
 }
