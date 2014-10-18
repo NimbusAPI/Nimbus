@@ -100,7 +100,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     TBusResponse response;
                     if (longRunningTask != null)
                     {
-                        var wrapperTask = new LongLivedTaskWrapper<TBusResponse>(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        var wrapperTask = new LongRunningTaskWrapper<TBusResponse>(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
                         response = await wrapperTask.AwaitCompletion();
                     }
                     else

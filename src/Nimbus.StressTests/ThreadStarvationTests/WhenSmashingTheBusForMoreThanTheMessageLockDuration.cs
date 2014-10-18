@@ -20,11 +20,9 @@ namespace Nimbus.StressTests.ThreadStarvationTests
     public class WhenSmashingTheBusForMoreThanTheMessageLockDuration : SpecificationForAsync<Bus>
     {
         private const int _timeoutSeconds = 180;
-        private const int _secondsToRun = 20;
         private static readonly TimeSpan _messageLockDuration = TimeSpan.FromSeconds(9);
-        private readonly TimeSpan _timeToRun = TimeSpan.FromSeconds(_secondsToRun);
+        private readonly TimeSpan _timeToRun = _messageLockDuration.Add(TimeSpan.FromSeconds(1));
         private ILogger _logger;
-        private bool _abort;
         private int _numMessagesSent;
 
         protected override async Task<Bus> Given()
@@ -53,7 +51,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests
                                           dc.RemoveAllExistingNamespaceElementsOnStartup(
                                               "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
-            await bus.Start(MessagePumpTypes.All);
+            await bus.Start();
 
             return bus;
         }
@@ -74,11 +72,9 @@ namespace Nimbus.StressTests.ThreadStarvationTests
                 Interlocked.Add(ref _numMessagesSent, batchSize);
 
                 await Task.Delay(TimeSpan.FromSeconds(1));
-
-                if (_abort) return;
             }
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => _abort || MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesSent);
+            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesSent);
         }
 
         [Test]

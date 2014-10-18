@@ -14,7 +14,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.DispatcherTests
 {
     [TestFixture]
-    internal class WhenDispatchingACommandToALongRunningHandler : SpecificationForAsync<LongLivedTaskWrapper>
+    internal class WhenDispatchingACommandToALongRunningHandler : SpecificationForAsync<LongRunningTaskWrapper>
     {
         private SlowCommand _slowCommand;
         private BrokeredMessage _brokeredMessage;
@@ -28,7 +28,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         private DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private INimbusTaskFactory _taskFactory;
 
-        protected override async Task<LongLivedTaskWrapper> Given()
+        protected override async Task<LongRunningTaskWrapper> Given()
         {
             _slowCommand = new SlowCommand();
             _handler = new SlowCommandHandler();
@@ -41,16 +41,16 @@ namespace Nimbus.UnitTests.DispatcherTests
             _renewLockCalled = false;
             _handlerTask = _handler.Handle(_slowCommand);
 
-            LongLivedTaskWrapperBase.RenewLockStrategy = async m =>
+            LongRunningTaskWrapperBase.RenewLockStrategy = async m =>
                                                      {
                                                          _renewLockCalled = true;
                                                          _lockedUntil = _clock.UtcNow.AddSeconds(1);
                                                          _handler.PretendToBeWorkingSemaphore.Release();
                                                      };
-            LongLivedTaskWrapperBase.LockedUntilUtcStrategy = m => _lockedUntil;
+            LongRunningTaskWrapperBase.LockedUntilUtcStrategy = m => _lockedUntil;
 
             _lockedUntil = DateTimeOffset.UtcNow.AddSeconds(1);
-            return new LongLivedTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+            return new LongRunningTaskWrapper(_handlerTask, _handler, _brokeredMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
         }
 
         protected override async Task When()

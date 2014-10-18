@@ -92,7 +92,7 @@ namespace Nimbus.Infrastructure.Commands
                     var longRunningTask = handler as ILongRunningTask;
                     if (longRunningTask != null)
                     {
-                        var wrapper = new LongLivedTaskWrapper(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
                         await wrapper.AwaitCompletion();
                     }
                     else

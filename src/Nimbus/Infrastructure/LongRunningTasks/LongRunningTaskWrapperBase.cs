@@ -8,47 +8,7 @@ using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.LongRunningTasks
 {
-    internal class LongLivedTaskWrapper<T> : LongLivedTaskWrapperBase
-    {
-        public LongLivedTaskWrapper(Task<T> handlerTask,
-                                    ILongRunningTask longRunningHandler,
-                                    BrokeredMessage message,
-                                    IClock clock,
-                                    ILogger logger,
-                                    TimeSpan messageLockDuration,
-                                    INimbusTaskFactory taskFactory)
-            : base(handlerTask, longRunningHandler, message, clock, logger, messageLockDuration, taskFactory)
-        {
-        }
-
-        public async Task<T> AwaitCompletion()
-        {
-            var firstTaskToComplete = await AwaitCompletionInternal(HandlerTask);
-            return await ((Task<T>) firstTaskToComplete);
-        }
-    }
-
-    internal class LongLivedTaskWrapper : LongLivedTaskWrapperBase
-    {
-        public LongLivedTaskWrapper(Task handlerTask,
-                                    ILongRunningTask longRunningHandler,
-                                    BrokeredMessage message,
-                                    IClock clock,
-                                    ILogger logger,
-                                    TimeSpan messageLockDuration,
-                                    INimbusTaskFactory taskFactory)
-            : base(handlerTask, longRunningHandler, message, clock, logger, messageLockDuration, taskFactory)
-        {
-        }
-
-        public async Task AwaitCompletion()
-        {
-            var firstTaskToComplete = await AwaitCompletionInternal(HandlerTask);
-            await firstTaskToComplete;
-        }
-    }
-
-    internal abstract class LongLivedTaskWrapperBase
+    internal abstract class LongRunningTaskWrapperBase
     {
         protected readonly Task HandlerTask;
         private readonly ILongRunningTask _longRunningHandler;
@@ -56,24 +16,22 @@ namespace Nimbus.Infrastructure.LongRunningTasks
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly TimeSpan _messageLockDuration;
+        private readonly INimbusTaskFactory _taskFactory;
+
+        private const double _acceptableRemainingLockProportion = 2/3;
 
         // BrokeredMessage is sealed and can't easily be mocked so we sub our our
         // invocation strategies for its properties/methods instead.  -andrewh 12/3/2014
         internal static Func<BrokeredMessage, DateTimeOffset> LockedUntilUtcStrategy = m => m.LockedUntilUtc;
         internal static Func<BrokeredMessage, Task> RenewLockStrategy = m => m.RenewLockAsync();
 
-        private DateTimeOffset _createdAt;
-        private DateTimeOffset _instructedToWatchAt;
-        private DateTimeOffset _startedWatchingAt;
-        private readonly INimbusTaskFactory _taskFactory;
-
-        protected LongLivedTaskWrapperBase(Task handlerTask,
-                                           ILongRunningTask longRunningHandler,
-                                           BrokeredMessage message,
-                                           IClock clock,
-                                           ILogger logger,
-                                           TimeSpan messageLockDuration,
-                                           INimbusTaskFactory taskFactory)
+        protected LongRunningTaskWrapperBase(Task handlerTask,
+                                             ILongRunningTask longRunningHandler,
+                                             BrokeredMessage message,
+                                             IClock clock,
+                                             ILogger logger,
+                                             INimbusTaskFactory taskFactory,
+                                             TimeSpan messageLockDuration)
         {
             HandlerTask = handlerTask;
             _longRunningHandler = longRunningHandler;
@@ -82,8 +40,6 @@ namespace Nimbus.Infrastructure.LongRunningTasks
             _logger = logger;
             _messageLockDuration = messageLockDuration;
             _taskFactory = taskFactory;
-
-            _createdAt = _clock.UtcNow;
 
             _logger.Debug("Long-lived task wrapper created for message {MessageId}", message.MessageId);
         }
@@ -106,17 +62,13 @@ namespace Nimbus.Infrastructure.LongRunningTasks
 
         private Task Watch(ILongRunningTask longRunningHandler, BrokeredMessage message)
         {
-            _instructedToWatchAt = _clock.UtcNow;
-
             _logger.Debug("Starting long-running task wrapper for message {MessageId}", message.MessageId);
-            var task = _taskFactory.StartNew( () => WatchHandlerTask(longRunningHandler, message), TaskContext.LongRunningTaskWatcher).Unwrap();
+            var task = _taskFactory.StartNew(() => WatchHandlerTask(longRunningHandler, message), TaskContext.LongRunningTaskWatcher).Unwrap();
             return task;
         }
 
         private async Task WatchHandlerTask(ILongRunningTask longRunningHandler, BrokeredMessage message)
         {
-            _startedWatchingAt = _clock.UtcNow;
-
             _logger.Debug("Started long-running task wrapper for message {MessageId}", message.MessageId);
 
             while (true)
@@ -135,7 +87,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                     return;
                 }
 
-                var acceptableRemainingLockDuration = TimeSpan.FromMilliseconds(_messageLockDuration.TotalMilliseconds*2/3);
+                var acceptableRemainingLockDuration = TimeSpan.FromMilliseconds(_messageLockDuration.TotalMilliseconds*_acceptableRemainingLockProportion);
                 var remainingTimeBeforeRenewalRequired = remainingLockTime - acceptableRemainingLockDuration;
                 var timeToDelay = remainingTimeBeforeRenewalRequired <= TimeSpan.Zero
                                       ? TimeSpan.Zero
