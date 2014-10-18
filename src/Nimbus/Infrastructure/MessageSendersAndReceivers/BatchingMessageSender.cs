@@ -74,11 +74,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 }
                 if (toSend.None()) return;
 
+                var clonedMessages = toSend
+                    .Select(m => m.Clone())
+                    .ToArray();
+
                 for (var retries = 0; retries < 3; retries++)
                 {
                     try
                     {
-                        await SendBatch(toSend);
+                        await SendBatch(clonedMessages);
                         return;
                     }
                     catch (Exception ex)
@@ -92,10 +96,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                             throw;
                         }
                     }
-
-                    toSend = toSend
-                        .Select(m => m.Clone())
-                        .ToArray();
 
                     await Task.Delay(TimeSpan.FromSeconds(retries*2));
                 }
