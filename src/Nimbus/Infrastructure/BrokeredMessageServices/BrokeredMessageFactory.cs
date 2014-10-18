@@ -126,28 +126,25 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return compressedBytes;
         }
 
-        public Task<object> GetBody(BrokeredMessage message)
+        public async Task<object> GetBody(BrokeredMessage message)
         {
             var bodyType = GetBodyType(message);
 
-            return Task.Run(async () =>
-                                  {
-                                      byte[] bodyBytes;
+            byte[] bodyBytes;
 
-                                      object blobId;
-                                      if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
-                                      {
-                                          bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
-                                      }
-                                      else
-                                      {
-                                          bodyBytes = message.GetBody<byte[]>();
-                                      }
+            object blobId;
+            if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
+            {
+                bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
+            }
+            else
+            {
+                bodyBytes = message.GetBody<byte[]>();
+            }
 
-                                      var decompressedBytes = _compressor.Decompress(bodyBytes);
-                                      var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), bodyType);
-                                      return deserialized;
-                                  });
+            var decompressedBytes = _compressor.Decompress(bodyBytes);
+            var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), bodyType);
+            return deserialized;
         }
 
         public Type GetBodyType(BrokeredMessage message)
