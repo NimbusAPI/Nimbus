@@ -2,9 +2,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.PropertyInjection;
-using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
+using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 
-namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
+namespace Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers
 {
     public class ThingBHappenedEventHandler : IHandleCompetingEvent<ThingBHappenedEvent>, IRequireBus, ILongRunningTask
     {

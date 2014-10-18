@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
-using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
+using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
 using Nimbus.Tests.Common;
 
-namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
+namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers
 {
     public class CommandThatWillBlockTheThreadHandler : IHandleCommand<CommandThatWillBlockTheThread>, ILongRunningTask
     {

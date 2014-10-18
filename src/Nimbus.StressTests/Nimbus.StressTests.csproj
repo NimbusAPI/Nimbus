@@ -55,26 +55,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\DoThingACommand.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\DoThingACommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\DoThingBCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\DoThingBCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\DoThingCCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\DoThingCCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\ThingAHappenedEvent.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\ThingAHappenedEventHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\ThingBHappenedEvent.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\ThingBHappenedEventHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\CommandThatWillBlockTheThread.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\NoOpCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\NoOpCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\MessageContracts\SmashTheBusCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Handlers\SmashTheBusCommandHandler.cs" />
+    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingACommand.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingACommandHandler.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingBCommand.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingBCommandHandler.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingCCommand.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingCCommandHandler.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingAHappenedEvent.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingAHappenedEventHandler.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingBHappenedEvent.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingBHappenedEventHandler.cs" />
+    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\MessageContracts\CommandThatWillBlockTheThread.cs" />
+    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\MessageContracts\NoOpCommand.cs" />
+    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\Handlers\NoOpCommandHandler.cs" />
+    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\MessageContracts\SmashTheBusCommand.cs" />
+    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\Handlers\SmashTheBusCommandHandler.cs" />
     <Compile Include="SpecificationForAsync.cs" />
-    <Compile Include="ThreadStarvationTests\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
-    <Compile Include="ThreadStarvationTests\WhenCreatingALargeMessageCascade.cs" />
-    <Compile Include="ThreadStarvationTests\WhenSmashingTheBusForMoreThanTheMessageLockDuration.cs" />
+    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
+    <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
+    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSmashingTheBusForMoreThanTheMessageLockDuration.cs" />
     <Compile Include="ThroughputTests\EventHandlers\FakeHandler.cs" />
     <Compile Include="ThroughputTests\Infrastructure\FakeChildScope.cs" />
     <Compile Include="ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
@@ -125,6 +125,7 @@
       <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

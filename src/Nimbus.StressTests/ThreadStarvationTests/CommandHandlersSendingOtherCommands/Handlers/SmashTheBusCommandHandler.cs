@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.PropertyInjection;
-using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
+using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.MessageContracts;
 
-namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
+namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers
 {
     public class SmashTheBusCommandHandler: IHandleCommand<SmashTheBusCommand>, ILongRunningTask, IRequireBus
     {

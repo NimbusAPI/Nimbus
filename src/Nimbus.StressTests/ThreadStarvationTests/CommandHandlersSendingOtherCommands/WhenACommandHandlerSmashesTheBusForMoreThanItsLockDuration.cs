@@ -6,14 +6,14 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Logger.Serilog;
-using Nimbus.StressTests.ThreadStarvationTests.Handlers;
-using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
+using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers;
+using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Serilog;
 using Shouldly;
 
-namespace Nimbus.StressTests.ThreadStarvationTests
+namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands
 {
     internal class WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration : SpecificationForAsync<Bus>
     {

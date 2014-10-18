@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Nimbus.Handlers;
-using Nimbus.StressTests.ThreadStarvationTests.MessageContracts;
+using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 using Nimbus.Tests.Common;
 
-namespace Nimbus.StressTests.ThreadStarvationTests.Handlers
+namespace Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers
 {
     public class DoThingCCommandHandler : IHandleCommand<DoThingCCommand>
     {
