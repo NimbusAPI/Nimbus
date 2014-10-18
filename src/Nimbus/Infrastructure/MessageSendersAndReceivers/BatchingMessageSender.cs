@@ -85,7 +85,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     {
                         if (ex.IsTransientFault())
                         {
-                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
+                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}, {2}", ex.GetType().Name, ex.Message, ex.ToString());
                         }
                         else
                         {

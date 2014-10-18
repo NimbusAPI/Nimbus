@@ -48,6 +48,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
             var log = new LoggerConfiguration()
                 .WriteTo.Seq("http://localhost:5341")
+                .WriteTo.ColoredConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
