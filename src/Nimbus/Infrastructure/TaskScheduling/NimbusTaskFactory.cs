@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.TaskScheduling
         private readonly Dictionary<ThreadPriority, NimbusTaskScheduler> _schedulers = new Dictionary<ThreadPriority, NimbusTaskScheduler>();
         private bool _disposed;
 
-        public NimbusTaskFactory(ILogger logger, MinimumThreadPoolThreadsSetting minimumThreadPoolThreads, MaximumThreadPoolThreadsSetting maximumThreadPoolThreads)
+        public NimbusTaskFactory(MaximumThreadPoolThreadsSetting maximumThreadPoolThreads, MinimumThreadPoolThreadsSetting minimumThreadPoolThreads, ILogger logger)
         {
             foreach (var priority in Enum.GetValues(typeof (ThreadPriority)).Cast<ThreadPriority>())
             {

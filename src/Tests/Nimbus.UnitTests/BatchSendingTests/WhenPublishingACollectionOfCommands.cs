@@ -28,7 +28,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var eventSender = Substitute.For<IEventSender>();
             var messagePumpsManager = Substitute.For<IMessagePumpsManager>();
             var deadLetterQueues = Substitute.For<IDeadLetterQueues>();
-            var taskFactory = new NimbusTaskFactory(logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting());
+            var taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger);
 
             var bus = new Bus(logger, _commandSender, requestSender, multicastRequestSender, eventSender, messagePumpsManager, deadLetterQueues, taskFactory);
             return Task.FromResult(bus);

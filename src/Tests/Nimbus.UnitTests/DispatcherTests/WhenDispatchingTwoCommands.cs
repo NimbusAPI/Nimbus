@@ -66,7 +66,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                               new NullLogger(),
                                                               handlerMap,
                                                               new DefaultMessageLockDurationSetting(),
-                                                              new NimbusTaskFactory(logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting()),
+                                                              new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                                                               Substitute.For<IPropertyInjector>());
         }
 

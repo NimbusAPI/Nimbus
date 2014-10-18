@@ -36,7 +36,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             _clock = new SystemClock();
             _logger = new ConsoleLogger();
             _defaultMessageLockDuration = new DefaultMessageLockDurationSetting();
-            _taskFactory = new NimbusTaskFactory(_logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting());
+            _taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), _logger);
 
             _renewLockCalled = false;
             _handlerTask = _handler.Handle(_slowCommand);

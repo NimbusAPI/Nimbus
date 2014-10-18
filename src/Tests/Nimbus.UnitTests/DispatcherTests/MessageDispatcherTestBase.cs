@@ -58,7 +58,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
-            _taskFactory = new NimbusTaskFactory(logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting());
+            _taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger);
             scope.Resolve<IHandleRequest<TRequest, TResponse>>(Arg.Any<string>()).Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
@@ -102,7 +102,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                 logger,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)),
                 new DefaultMessageLockDurationSetting(),
-                new NimbusTaskFactory(logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting()),
+                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                 Substitute.For<IPropertyInjector>());
         }
 
@@ -127,7 +127,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                 inboundInterceptorFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)),
                 new DefaultMessageLockDurationSetting(),
-                new NimbusTaskFactory(logger, new MinimumThreadPoolThreadsSetting(), new MaximumThreadPoolThreadsSetting()),
+                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                 Substitute.For<IPropertyInjector>(),
                 logger);
         }
