@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -60,11 +58,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             if (_disposed) return;
 
+            await _sendingSemaphore.WaitAsync();
+            await Task.Delay(TimeSpan.FromMilliseconds(100));   // sleep *after* we grab a semaphore to allow messages to be batched
             try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
-                await _sendingSemaphore.WaitAsync();
-
                 BrokeredMessage[] toSend;
                 lock (_enqueuingMutex)
                 {
@@ -74,33 +71,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 }
                 if (toSend.None()) return;
 
-                var clonedMessages = toSend
-                    .Select(m => m.Clone())
-                    .ToArray();
-
-                for (var retries = 0; retries < 3; retries++)
-                {
-                    try
-                    {
-                        await SendBatch(clonedMessages);
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex.IsTransientFault())
-                        {
-                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}, {2}", ex.GetType().Name, ex.Message, ex.ToString());
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-
-                    await Task.Delay(TimeSpan.FromSeconds(retries*2));
-                }
-
-                throw new BusException("Retry count exceeded while sending message batch.");
+                await SendBatch(toSend);
             }
             finally
             {
