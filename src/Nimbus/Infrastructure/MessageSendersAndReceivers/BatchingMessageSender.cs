@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -10,64 +11,56 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     internal abstract class BatchingMessageSender : INimbusMessageSender
     {
         private const int _maxConcurrentFlushTasks = 10;
+        private const int _maximumBatchSize = 100;
 
-        private readonly ILogger _logger;
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
         private bool _disposed;
 
-        private readonly object _enqueuingMutex = new object();
+        private readonly object _mutex = new object();
         private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(_maxConcurrentFlushTasks, _maxConcurrentFlushTasks);
 
-        private Task _pendingFlushTask;
-
-        protected BatchingMessageSender(ILogger logger)
-        {
-            _logger = logger;
-        }
+        private Task _lazyFlushTask;
 
         protected abstract Task SendBatch(BrokeredMessage[] messages);
 
-        public async Task Send(BrokeredMessage message)
+        public Task Send(BrokeredMessage message)
         {
-            var clone = message.Clone();
-
-            Task taskToAwait;
-            lock (_enqueuingMutex)
+            lock (_mutex)
             {
                 _outboundQueue.Add(message);
-                taskToAwait = GetOrCreateNextFlushTask();
-            }
 
-            await taskToAwait;
-        }
-
-        private Task GetOrCreateNextFlushTask()
-        {
-            lock (_enqueuingMutex)
-            {
-                if (_pendingFlushTask == null)
+                if (_outboundQueue.Count >= _maximumBatchSize)
                 {
-                    _pendingFlushTask = FlushMessages();
+                    return DoBatchSendNow();
                 }
 
-                return _pendingFlushTask;
+                if (_lazyFlushTask == null)
+                {
+                    _lazyFlushTask = FlushMessagesLazily();
+                }
+                return _lazyFlushTask;
             }
         }
 
-        private async Task FlushMessages()
+        private async Task FlushMessagesLazily()
         {
             if (_disposed) return;
 
+            await Task.Delay(TimeSpan.FromMilliseconds(100)); // sleep *after* we grab a semaphore to allow messages to be batched
+            _lazyFlushTask = null;
+            await DoBatchSendNow();
+        }
+
+        private async Task DoBatchSendNow()
+        {
             await _sendingSemaphore.WaitAsync();
-            await Task.Delay(TimeSpan.FromMilliseconds(100));   // sleep *after* we grab a semaphore to allow messages to be batched
             try
             {
                 BrokeredMessage[] toSend;
-                lock (_enqueuingMutex)
+                lock (_mutex)
                 {
-                    toSend = _outboundQueue.ToArray();
-                    _outboundQueue.Clear();
-                    _pendingFlushTask = null;
+                    toSend = _outboundQueue.Take(_maximumBatchSize).ToArray();
+                    _outboundQueue.RemoveRange(0, toSend.Length);
                 }
                 if (toSend.None()) return;
 

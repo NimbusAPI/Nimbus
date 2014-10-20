@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private MessageSender _messageSender;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
-            : base(logger)
+            : base()
         {
             _queueManager = queueManager;
             _queuePath = queuePath;

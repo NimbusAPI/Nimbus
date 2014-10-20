@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private TopicClient _topicClient;
 
         public NimbusTopicMessageSender(IQueueManager queueManager, string topicPath, ILogger logger)
-            : base(logger)
+            : base()
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
