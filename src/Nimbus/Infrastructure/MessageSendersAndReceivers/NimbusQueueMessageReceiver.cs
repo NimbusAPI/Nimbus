@@ -33,8 +33,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
-            if (batchSize < 1)
-                return new BrokeredMessage[0];
+            if (batchSize < 1) return new BrokeredMessage[0];
 
             try
             {
@@ -43,8 +42,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var receiveTask = messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
                 await Task.WhenAny(receiveTask, cancellationTask);
 
-                if (cancellationTask.IsCompleted)
-                    return new BrokeredMessage[0];
+                if (cancellationTask.IsCompleted) return new BrokeredMessage[0];
                 
                 var messages = await receiveTask;
                 return messages.ToArray();
