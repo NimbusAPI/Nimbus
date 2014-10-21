@@ -6,7 +6,7 @@ namespace Nimbus.Configuration.Settings
     {
         public override TimeSpan Default
         {
-            get { return TimeSpan.FromSeconds(60); }
+            get { return TimeSpan.FromSeconds(30); }
         }
     }
 }

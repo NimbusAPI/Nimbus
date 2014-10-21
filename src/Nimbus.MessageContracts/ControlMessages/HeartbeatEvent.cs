@@ -16,5 +16,6 @@ namespace Nimbus.MessageContracts.ControlMessages
         public long WorkingSet64 { get; set; }
         public long PeakWorkingSet64 { get; set; }
         public long VirtualMemorySize64 { get; set; }
+        public PerformanceCounterDto[] PerformanceCounters { get; set; }
     }
 }

@@ -1,8 +1,10 @@
-﻿namespace Nimbus.Infrastructure.Heartbeat
+﻿using System.Threading.Tasks;
+
+namespace Nimbus.Infrastructure.Heartbeat
 {
     internal interface IHeartbeat
     {
-        void Start();
-        void Stop();
+        Task Start();
+        Task Stop();
     }
 }

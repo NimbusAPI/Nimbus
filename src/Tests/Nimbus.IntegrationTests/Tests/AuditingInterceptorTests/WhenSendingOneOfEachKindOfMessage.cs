@@ -42,6 +42,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                                       .WithDependencyResolver(dependencyResolver)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithMaxDeliveryAttempts(1)
+                                      .WithHeartbeatInterval(TimeSpan.MaxValue)
                                       .WithGlobalOutboundInterceptorTypes(typeof (OutboundAuditingInterceptor))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
