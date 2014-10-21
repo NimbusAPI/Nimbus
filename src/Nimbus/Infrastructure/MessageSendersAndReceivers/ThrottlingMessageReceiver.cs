@@ -28,9 +28,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Start(Func<BrokeredMessage, Task> callback)
         {
+            await _startStopSemaphore.WaitAsync();
+
             try
             {
-                await _startStopSemaphore.WaitAsync();
 
                 if (_running) return;
                 _running = true;
