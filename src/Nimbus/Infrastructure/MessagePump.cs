@@ -41,10 +41,10 @@ namespace Nimbus.Infrastructure
 
         public async Task Start()
         {
+            await _startStopSemaphore.WaitAsync();
+
             try
             {
-                await _startStopSemaphore.WaitAsync();
-
                 if (_started) return;
                 _started = true;
 
@@ -60,10 +60,10 @@ namespace Nimbus.Infrastructure
 
         public async Task Stop()
         {
+            await _startStopSemaphore.WaitAsync();
+
             try
             {
-                await _startStopSemaphore.WaitAsync();
-
                 if (!_started) return;
                 _started = false;
 

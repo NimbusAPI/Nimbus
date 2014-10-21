@@ -87,6 +87,7 @@ namespace Nimbus.Infrastructure.TaskScheduling
                     try
                     {
                         _tasksSemaphore.Wait(_disposedCancellationTokenSource.Token);
+
                         if (_disposed) break;
 
                         Task task;

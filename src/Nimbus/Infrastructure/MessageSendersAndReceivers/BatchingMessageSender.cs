@@ -54,6 +54,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private async Task DoBatchSendNow()
         {
             await _sendingSemaphore.WaitAsync();
+
             try
             {
                 BrokeredMessage[] toSend;
