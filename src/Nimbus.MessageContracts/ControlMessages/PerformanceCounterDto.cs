@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Nimbus.MessageContracts.ControlMessages
 {
-    [DebuggerDisplay("{Timestamp} {CounterName} {CategoryName} {Instance} {Value:###,###,##0},nq")]
+    [DebuggerDisplay("{Timestamp} {CounterName} {CategoryName} {Instance} {Value}")]
     public class PerformanceCounterDto
     {
         public PerformanceCounterDto()

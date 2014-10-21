@@ -4,8 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
 using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Infrastructure.Heartbeat
@@ -15,12 +18,24 @@ namespace Nimbus.Infrastructure.Heartbeat
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
         private readonly IEventSender _eventSender;
         private readonly IClock _clock;
+
+        private readonly List<PerformanceCounterBase> _performanceCounters = new List<PerformanceCounterBase>();
+        private readonly List<PerformanceCounterDto> _performanceCounterHistory = new List<PerformanceCounterDto>();
+        private readonly object _mutex = new object();
+
+        private static readonly ThreadSafeLazy<Type[]> _performanceCounterTypes = new ThreadSafeLazy<Type[]>(() => typeof (Heartbeat).Assembly
+                                                                                                                                     .DefinedTypes
+                                                                                                                                     .Select(ti => ti.AsType())
+                                                                                                                                     .Where(
+                                                                                                                                         t =>
+                                                                                                                                         typeof (PerformanceCounterBase)
+                                                                                                                                             .IsAssignableFrom(t))
+                                                                                                                                     .Where(t => !t.IsAbstract)
+                                                                                                                                     .ToArray());
+
         private Timer _heartbeatTimer;
         private Timer _collectTimer;
         private bool _isRunning;
-        private readonly List<PerformanceCounterWrapper> _performanceCounters = new List<PerformanceCounterWrapper>();
-        private readonly List<PerformanceCounterDto> _performanceCounterHistory = new List<PerformanceCounterDto>();
-        private readonly object _mutex = new object();
 
         public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender)
         {
@@ -62,18 +77,17 @@ namespace Nimbus.Infrastructure.Heartbeat
         {
             if (_isRunning) return;
 
-            try
+            foreach (var counterType in _performanceCounterTypes.Value)
             {
-                var processName = Process.GetCurrentProcess().ProcessName;
-
-                _performanceCounters.Add(new PerformanceCounterWrapper(new PerformanceCounter("Process", "% Processor Time", processName), v => v/Environment.ProcessorCount));
-                _performanceCounters.Add(new PerformanceCounterWrapper(new PerformanceCounter("Process", "% Processor Time", "_Total"), v => v/Environment.ProcessorCount));
-                _performanceCounters.Add(new PerformanceCounterWrapper(new PerformanceCounter("Process", "Working Set", processName), v => v));
-                _performanceCounters.Add(new PerformanceCounterWrapper(new PerformanceCounter("Process", "Working Set", "_Total"), v => v));
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // We're not running with admin privileges? Oh, well. No performance counters for you.
+                try
+                {
+                    var counter = (PerformanceCounterBase) Activator.CreateInstance(counterType);
+                    _performanceCounters.Add(counter);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // We're not running with admin privileges? Oh, well. No performance counter for you.
+                }
             }
 
             _collectTimer = new Timer(TimeSpan.FromSeconds(5).TotalMilliseconds)
@@ -106,7 +120,11 @@ namespace Nimbus.Infrastructure.Heartbeat
             _heartbeatTimer.Dispose();
             _heartbeatTimer = null;
 
-            foreach (var counter in _performanceCounters) counter.Dispose();
+            _performanceCounters
+                .AsParallel()
+                .OfType<IDisposable>()
+                .Do(c => c.Dispose())
+                .Done();
             _performanceCounters.Clear();
         }
 
@@ -151,52 +169,6 @@ namespace Nimbus.Infrastructure.Heartbeat
         {
             if (!disposing) return;
             Stop().Wait();
-        }
-
-        private sealed class PerformanceCounterWrapper : IDisposable
-        {
-            private readonly PerformanceCounter _counter;
-            private readonly Func<float, float> _transform;
-
-            public PerformanceCounterWrapper(PerformanceCounter counter, Func<float, float> transform)
-            {
-                _counter = counter;
-                _transform = transform;
-            }
-
-            public string CategoryName
-            {
-                get { return _counter.CategoryName; }
-            }
-
-            public string CounterName
-            {
-                get { return _counter.CounterName; }
-            }
-
-            public string InstanceName
-            {
-                get { return _counter.InstanceName; }
-            }
-
-            public long GetNextTransformedValue()
-            {
-                var value = _counter.NextValue();
-                var transformedValue = _transform(value);
-                return (long) Math.Floor(transformedValue);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            private void Dispose(bool disposing)
-            {
-                if (!disposing) return;
-                _counter.Dispose();
-            }
         }
     }
 }

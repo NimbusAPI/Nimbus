@@ -92,9 +92,19 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
     <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
     <Compile Include="Infrastructure\Heartbeat\IHeartbeat.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\MessagesReceived.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\MessagesSent.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\PerformanceCounterBase.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\PerProcessCpuUsage.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\PerProcessRamUsage.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\SystemPerformanceCounterWrapper.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
     <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
@@ -235,6 +245,7 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.25.0\build\Fody.targets" Condition="Exists('..\packages\Fody.1.25.0\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
