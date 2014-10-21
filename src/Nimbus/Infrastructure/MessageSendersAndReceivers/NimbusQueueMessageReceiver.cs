@@ -44,11 +44,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 await Task.WhenAny(receiveTask, cancellationTask);
 
                 if (cancellationTask.IsCompleted)
-                {
-                    DiscardMessageReceiver();
                     return new BrokeredMessage[0];
-                }
-
+                
                 var messages = await receiveTask;
                 return messages.ToArray();
             }
