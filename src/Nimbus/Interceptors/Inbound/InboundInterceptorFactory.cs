@@ -58,11 +58,20 @@ namespace Nimbus.Interceptors.Inbound
         {
             var messageType = message.GetType();
 
-            var method = handler.GetType().GetMethods()
+            var implicitImplementations = handler.GetType().GetMethods()
                                 .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
                                 .Where(m => m.GetParameters().Count() == 1)
-                                .Where(m => m.GetParameters().First().ParameterType == messageType)
-                                .Single();
+                                .Where(m => m.GetParameters().First().ParameterType == messageType);
+
+            var explicitImplementations = handler.GetType().GetInterfaces()
+                    .SelectMany(@interface => @interface.GetMethods())
+                    .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
+                    .Where(m => m.GetParameters().Count() == 1)
+                    .Where(m => m.GetParameters().First().ParameterType == messageType);
+
+            var methods = implicitImplementations.Concat(explicitImplementations);
+
+            var method = methods.Single();
 
             var methodHierarchy = new[] {method}.DepthFirst(m => new[] {m.GetBaseDefinition()}.NotNull()).ToArray();
 
