@@ -8,6 +8,7 @@ using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common;
 using NUnit.Framework;

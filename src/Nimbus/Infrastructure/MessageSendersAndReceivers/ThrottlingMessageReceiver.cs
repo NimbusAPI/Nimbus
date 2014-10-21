@@ -32,7 +32,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             try
             {
-
                 if (_running) return;
                 _running = true;
 
@@ -51,10 +50,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task Stop()
         {
+            await _startStopSemaphore.WaitAsync();
+
             try
             {
-                await _startStopSemaphore.WaitAsync();
-
                 if (!_running) return;
                 _running = false;
 
@@ -88,7 +87,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 try
                 {
-                    var messages = await FetchBatch(_throttle.CurrentCount, cancellationTask);
+                    int workerThreads;
+                    int completionPortThreads;
+                    ThreadPool.GetMinThreads(out workerThreads, out completionPortThreads);
+                    var batchSize = Math.Min(_throttle.CurrentCount, completionPortThreads);
+                    var messages = await FetchBatch(batchSize, cancellationTask);
                     if (!_running) return;
                     if (messages.None()) continue;
 

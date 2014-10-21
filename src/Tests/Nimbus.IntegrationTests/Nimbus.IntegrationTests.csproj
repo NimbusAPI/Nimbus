@@ -45,6 +45,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serilog.1.4.9\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serilog.1.4.9\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly, Version=1.1.1.1, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
@@ -154,19 +162,6 @@
     <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
     <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
     <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
-    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeChildScope.cs" />
-    <Compile Include="Tests\ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
-    <Compile Include="Tests\ThroughputTests\EventHandlers\FakeHandler.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\BarCommand.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\BarEvent.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\BazEvent.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\BazCommand.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\FooCommand.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\FooRequest.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\QuxCommand.cs" />
-    <Compile Include="Tests\ThroughputTests\MessageContracts\QuxEvent.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaMulticast.cs" />
@@ -177,16 +172,9 @@
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
-    <Compile Include="Tests\ThroughputTests\ThroughputSpecificationForBus.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaMulticast.cs" />
-    <Compile Include="Tests\ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestOnTheBus.cs" />
@@ -203,6 +191,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.FileSystem\Nimbus.LargeMessages.FileSystem.csproj">
       <Project>{7FEB8D9E-1451-4132-8E3B-30D8E7F84126}</Project>
       <Name>Nimbus.LargeMessages.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
+      <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
+      <Name>Nimbus.Logger.Serilog</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>

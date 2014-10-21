@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.LongRunningTasks;
+using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
@@ -20,6 +24,9 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
+        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
+        private readonly INimbusTaskFactory _taskFactory;
+        private readonly IPropertyInjector _propertyInjector;
 
         public CommandMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -27,7 +34,10 @@ namespace Nimbus.Infrastructure.Commands
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
             ILogger logger,
-            IReadOnlyDictionary<Type, Type[]> handlerMap)
+            IReadOnlyDictionary<Type, Type[]> handlerMap,
+            DefaultMessageLockDurationSetting defaultMessageLockDuration,
+            INimbusTaskFactory taskFactory,
+            IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -35,6 +45,9 @@ namespace Nimbus.Infrastructure.Commands
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _handlerMap = handlerMap;
+            _defaultMessageLockDuration = defaultMessageLockDuration;
+            _taskFactory = taskFactory;
+            _propertyInjector = propertyInjector;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -52,6 +65,7 @@ namespace Nimbus.Infrastructure.Commands
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = scope.Resolve<IHandleCommand<TBusCommand>>(handlerType.FullName);
+                _propertyInjector.Inject(handler);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
 
                 Exception exception;
@@ -59,22 +73,32 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     foreach (var interceptor in interceptors)
                     {
-                        _logger.Debug("Executing OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.MessageId,
-                                      message.CorrelationId);
+                        _logger.Debug(
+                            "Executing OnCommandHandlerExecuting on {InterceptorType} for message [MessageType:{MessageType}, MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
                         await interceptor.OnCommandHandlerExecuting(busCommand, message);
-                        _logger.Debug("Executed OnCommandHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.MessageId,
-                                      message.CorrelationId);
+                        _logger.Debug(
+                            "Executed OnCommandHandlerExecuting on {InterceptorType} for message [MessageType:{MessageType}, MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
+                            interceptor.GetType().FullName,
+                            message.SafelyGetBodyTypeNameOrDefault(),
+                            message.MessageId,
+                            message.CorrelationId);
                     }
 
-                    var handlerTask = handler.Handle(busCommand);
-                    var wrapper = new LongLivedTaskWrapper(handlerTask, handler as ILongRunningTask, message, _clock);
-                    await wrapper.AwaitCompletion();
+                    var handlerTask = _taskFactory.StartNew(async () => await handler.Handle(busCommand), TaskContext.Handle).Unwrap();
+                    var longRunningTask = handler as ILongRunningTask;
+                    if (longRunningTask != null)
+                    {
+                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, message, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        await wrapper.AwaitCompletion();
+                    }
+                    else
+                    {
+                        await handlerTask;
+                    }
 
                     foreach (var interceptor in interceptors.Reverse())
                     {

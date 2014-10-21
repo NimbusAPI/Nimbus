@@ -13,7 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private MessageSender _messageSender;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
-            : base(logger)
+            : base()
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
@@ -29,9 +29,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 await messageSender.SendBatchAsync(toSend);
             }
-            catch (Exception exc)
+            catch (Exception)
             {
-                if (exc.IsTransientFault()) throw;
                 DiscardMessageSender();
                 throw;
             }
@@ -55,6 +54,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             try
             {
+                _logger.Info("Discarding message sender for {QueuePath}", _queuePath);
                 messageSender.Close();
             }
             catch (Exception exc)

@@ -5,100 +5,67 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal abstract class BatchingMessageSender : INimbusMessageSender
     {
         private const int _maxConcurrentFlushTasks = 10;
+        private const int _maximumBatchSize = 100;
 
-        private readonly ILogger _logger;
         private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
         private bool _disposed;
 
-        private readonly object _enqueuingMutex = new object();
+        private readonly object _mutex = new object();
         private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(_maxConcurrentFlushTasks, _maxConcurrentFlushTasks);
 
-        private Task _pendingFlushTask;
-
-        protected BatchingMessageSender(ILogger logger)
-        {
-            _logger = logger;
-        }
+        private Task _lazyFlushTask;
 
         protected abstract Task SendBatch(BrokeredMessage[] messages);
 
-        public async Task Send(BrokeredMessage message)
+        public Task Send(BrokeredMessage message)
         {
-            Task taskToAwait;
-            lock (_enqueuingMutex)
+            lock (_mutex)
             {
                 _outboundQueue.Add(message);
-                taskToAwait = GetOrCreateNextFlushTask();
-            }
 
-            await taskToAwait;
-        }
-
-        private Task GetOrCreateNextFlushTask()
-        {
-            lock (_enqueuingMutex)
-            {
-                if (_pendingFlushTask == null)
+                if (_outboundQueue.Count >= _maximumBatchSize)
                 {
-                    _pendingFlushTask = FlushMessages();
+                    return DoBatchSendNow();
                 }
 
-                return _pendingFlushTask;
+                if (_lazyFlushTask == null)
+                {
+                    _lazyFlushTask = FlushMessagesLazily();
+                }
+                return _lazyFlushTask;
             }
         }
 
-        private async Task FlushMessages()
+        private async Task FlushMessagesLazily()
         {
             if (_disposed) return;
 
+            await Task.Delay(TimeSpan.FromMilliseconds(100)); // sleep *after* we grab a semaphore to allow messages to be batched
+            _lazyFlushTask = null;
+            await DoBatchSendNow();
+        }
+
+        private async Task DoBatchSendNow()
+        {
+            await _sendingSemaphore.WaitAsync();
+
             try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(10));
-                await _sendingSemaphore.WaitAsync();
-
                 BrokeredMessage[] toSend;
-                lock (_enqueuingMutex)
+                lock (_mutex)
                 {
-                    toSend = _outboundQueue.ToArray();
-                    _outboundQueue.Clear();
-                    _pendingFlushTask = null;
+                    toSend = _outboundQueue.Take(_maximumBatchSize).ToArray();
+                    _outboundQueue.RemoveRange(0, toSend.Length);
                 }
                 if (toSend.None()) return;
 
-                for (var retries = 0; retries < 3; retries++)
-                {
-                    try
-                    {
-                        await SendBatch(toSend);
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex.IsTransientFault())
-                        {
-                            _logger.Warn("Going to retry after {0} was thrown sending batch: {1}", ex.GetType().Name, ex.Message);
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-
-                    toSend = toSend
-                        .Select(m => m.Clone())
-                        .ToArray();
-
-                    await Task.Delay(TimeSpan.FromSeconds(retries*2));
-                }
-
-                throw new BusException("Retry count exceeded while sending message batch.");
+                await SendBatch(toSend);
             }
             finally
             {

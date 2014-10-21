@@ -11,11 +11,14 @@ using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Logger;
+using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.Infrastructure.TaskScheduling;
+using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
@@ -34,10 +37,10 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         protected override async Task Given(AllDependencyResolversTestContext context)
         {
-
             await base.Given(context);
 
             var clock = new SystemClock();
+            var logger = new ConsoleLogger();
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
@@ -61,7 +64,10 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                               Subject,
                                                               new NullInboundInterceptorFactory(),
                                                               new NullLogger(),
-                                                              handlerMap);
+                                                              handlerMap,
+                                                              new DefaultMessageLockDurationSetting(),
+                                                              new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
+                                                              Substitute.For<IPropertyInjector>());
         }
 
         protected override async Task When()

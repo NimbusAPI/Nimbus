@@ -7,6 +7,7 @@ using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;

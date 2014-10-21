@@ -7,7 +7,9 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
@@ -48,7 +50,7 @@ namespace Nimbus.Configuration
                 () =>
                 {
                     var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    messagingFactory.PrefetchCount = 20;
+                    messagingFactory.PrefetchCount = container.Resolve<ConcurrentHandlerLimitSetting>();
                     return messagingFactory;
                 },
                 mf => mf.IsBorked(),
@@ -70,7 +72,8 @@ namespace Nimbus.Configuration
                 container.Resolve<CommandMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
-                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
+                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll(),
+                container.Resolve<INimbusTaskFactory>());
 
             logger.Debug("Message pumps are all created.");
 
@@ -80,9 +83,14 @@ namespace Nimbus.Configuration
                               container.Resolve<IMulticastRequestSender>(),
                               container.Resolve<IEventSender>(),
                               messagePumps,
-                              container.Resolve<DeadLetterQueues>());
+                              container.Resolve<DeadLetterQueues>(),
+                              container.Resolve<INimbusTaskFactory>());
 
-            bus.Starting += delegate { container.Resolve<AzureQueueManager>().WarmUp(); };
+            bus.Starting += delegate
+                            {
+                                container.Resolve<AzureQueueManager>().WarmUp();
+                                container.Resolve<PropertyInjector>().Bus = bus;
+                            };
             bus.Disposing += delegate { container.Dispose(); };
 
             logger.Info("Bus built. Job done!");

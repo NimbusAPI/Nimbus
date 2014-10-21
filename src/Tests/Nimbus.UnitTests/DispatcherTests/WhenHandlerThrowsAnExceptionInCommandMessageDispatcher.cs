@@ -1,6 +1,4 @@
 ﻿using System;
-using Nimbus.DependencyResolution;
-using Nimbus.Exceptions;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;

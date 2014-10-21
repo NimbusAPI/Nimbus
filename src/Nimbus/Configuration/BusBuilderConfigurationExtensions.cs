@@ -89,10 +89,20 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithMaximumThreadPoolThreads(this BusBuilderConfiguration configuration, int maximumThreadPoolThreads)
+        {
+            configuration.MaximumThreadPoolThreads = new MaximumThreadPoolThreadsSetting {Value = maximumThreadPoolThreads};
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithMinimumThreadPoolThreads(this BusBuilderConfiguration configuration, int minimumThreadPoolThreads)
+        {
+            configuration.MinimumThreadPoolThreads = new MinimumThreadPoolThreadsSetting {Value = minimumThreadPoolThreads};
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithMaxDeliveryAttempts(this BusBuilderConfiguration configuration, int maxDeliveryAttempts)
         {
-            if (maxDeliveryAttempts < 1) throw new ArgumentOutOfRangeException("maxDeliveryAttempts", "You must attempt to deliver a message at least once.");
-
             configuration.MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = maxDeliveryAttempts};
             return configuration;
         }
@@ -108,6 +118,7 @@ namespace Nimbus.Configuration
             configuration.GlobalInboundInterceptorTypes = new GlobalInboundInterceptorTypesSetting {Value = interceptorTypes};
             return configuration;
         }
+
         public static BusBuilderConfiguration WithGlobalOutboundInterceptorTypes(this BusBuilderConfiguration configuration, params Type[] interceptorTypes)
         {
             configuration.GlobalOutboundInterceptorTypes = new GlobalOutboundInterceptorTypesSetting {Value = interceptorTypes};

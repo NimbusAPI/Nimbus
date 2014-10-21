@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Tests.Common;
 using NUnit.Framework;

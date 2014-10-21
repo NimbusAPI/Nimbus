@@ -9,6 +9,7 @@ using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;

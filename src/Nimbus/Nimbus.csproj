@@ -11,6 +11,7 @@
     <AssemblyName>Nimbus</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>95852eb7</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +42,10 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="NullGuard">
+      <HintPath>..\packages\NullGuard.Fody.1.2.0.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -79,12 +84,16 @@
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
+    <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\DeflateCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
+    <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
+    <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
@@ -98,6 +107,10 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\MessagingExceptionExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Routing\SingleQueueAndTopicPerMessageTypeRouter.cs" />
+    <Compile Include="Bus.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\INimbusTaskFactory.cs" />
+    <Compile Include="Configuration\Settings\MaximumThreadPoolThreadsSetting.cs" />
+    <Compile Include="Configuration\Settings\MinimumThreadPoolThreadsSetting.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
@@ -108,7 +121,7 @@
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\LongLivedTaskWrapperBase.cs" />
+    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />
@@ -164,12 +177,14 @@
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskFactory.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskScheduler.cs" />
+    <Compile Include="Logging\StructuredLoggingNormalizer.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
-    <Compile Include="Logger\ConsoleLogger.cs" />
-    <Compile Include="Logger\NullLogger.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\NullLogger.cs" />
     <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
-    <Compile Include="Bus.cs" />
     <Compile Include="Configuration\BusBuilder.cs" />
     <Compile Include="Configuration\BusBuilderConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
@@ -187,12 +202,15 @@
     <Compile Include="Infrastructure\RequestResponse\BusRequestSender.cs" />
     <Compile Include="Infrastructure\MessagePump.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelator.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\AzureQueueManager.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\DataContractSerializer.cs" />
     <Compile Include="Configuration\MessagePumpTypes.cs" />
+    <Compile Include="Infrastructure\TaskScheduling\TaskContext.cs" />
+    <Compile Include="Properties\NullGuard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -209,8 +227,19 @@
       <Name>Nimbus.MessageContracts</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.1.25.0\build\Fody.targets" Condition="Exists('..\packages\Fody.1.25.0\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.1.25.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.25.0\build\Fody.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,9 +75,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           }
                                           else
                                           {
-                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                              brokeredMessage = new BrokeredMessage(messageBodyBytes);
                                           }
-
                                           brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
@@ -128,34 +126,25 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return compressedBytes;
         }
 
-        public Task<object> GetBody(BrokeredMessage message)
+        public async Task<object> GetBody(BrokeredMessage message)
         {
             var bodyType = GetBodyType(message);
 
-            return Task.Run(async () =>
-                                  {
-                                      byte[] bodyBytes;
+            byte[] bodyBytes;
 
-                                      object blobId;
-                                      if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
-                                      {
-                                          bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
-                                      }
-                                      else
-                                      {
-                                          // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
-                                          using (var dataStream = message.GetBody<Stream>())
-                                          using (var memoryStream = new MemoryStream())
-                                          {
-                                              dataStream.CopyTo(memoryStream);
-                                              bodyBytes = memoryStream.ToArray();
-                                          }
-                                      }
+            object blobId;
+            if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
+            {
+                bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
+            }
+            else
+            {
+                bodyBytes = message.GetBody<byte[]>();
+            }
 
-                                      var decompressedBytes = _compressor.Decompress(bodyBytes);
-                                      var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), bodyType);
-                                      return deserialized;
-                                  });
+            var decompressedBytes = _compressor.Decompress(bodyBytes);
+            var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), bodyType);
+            return deserialized;
         }
 
         public Type GetBodyType(BrokeredMessage message)

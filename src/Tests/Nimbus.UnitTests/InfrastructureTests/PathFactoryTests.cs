@@ -1,4 +1,5 @@
 ﻿using Nimbus.Infrastructure;
+using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
@@ -37,7 +38,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         {
             var pathName = PathFactory.QueuePathFor(typeof (MyCommand<string>));
 
-            var expected = "q.nimbus.unittests.mycommand.1-string";
+            var expected = "q.nimbus.unittests.infrastructuretests.messagecontracts.mycommand.1-string";
 
             pathName.ShouldBe(expected);
         }

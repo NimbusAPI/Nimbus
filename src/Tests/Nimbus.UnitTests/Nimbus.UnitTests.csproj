@@ -85,6 +85,8 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="BrokeredMessageFactoryTests\GivenAMessageBrokerFactory.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCloningABrokeredMessage.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />
     <Compile Include="CompressionTests\WhenUsingDeflateCompressor.cs" />
     <Compile Include="CompressionTests\WhenUsingGzipCompressor.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
     <Compile Include="InterceptorTests\WhenBuildingABusWithAutofacAndInterceptors.cs" />
+    <Compile Include="LoggingTests\TemplateNormalization\WhenNormalizingStructuredLogTemplates.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
@@ -187,6 +190,7 @@
     <Compile Include="ThenAttribute.cs" />
     <Compile Include="DispatcherTests\WhenExtractingAHandlerMethodForAMulticastRequest.cs" />
     <Compile Include="DispatcherTests\WhenExtractingADispatchMethodForARequest.cs" />
+    <Compile Include="ParameterCheckingTests\FodyShouldThrowAnArgumentNullException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -233,7 +237,9 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TaskSchedulerTests\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

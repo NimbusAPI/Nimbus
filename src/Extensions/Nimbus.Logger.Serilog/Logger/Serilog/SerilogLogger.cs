@@ -36,7 +36,7 @@ namespace Nimbus.Logger.Serilog
 
         public void Error(Exception exc, string format, params object[] args)
         {
-            Log.Error(exc, format, args);
+            _logger.Error(exc, format, args);
         }
     }
 }

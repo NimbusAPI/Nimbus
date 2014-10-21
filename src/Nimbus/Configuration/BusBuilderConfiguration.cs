@@ -8,7 +8,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.Logger;
+using Nimbus.Logging;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Routing;
 
@@ -32,10 +32,13 @@ namespace Nimbus.Configuration
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
-        internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
+
+        internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
+        internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; }
+        internal MinimumThreadPoolThreadsSetting MinimumThreadPoolThreads { get; set; }
 
         internal BusBuilderConfiguration()
         {
