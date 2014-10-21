@@ -6,8 +6,6 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -15,7 +13,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds * 1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         private const int _expectedTotalCallCount = 11; // 5 interceptors * 2 + 1 handler
@@ -27,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 
             var testFixtureType = GetType();
             var typeProvider = new TestHarnessTypeProvider(new[] {testFixtureType.Assembly}, new[] {testFixtureType.Namespace});
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)

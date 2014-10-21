@@ -5,8 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.Azure.Configuration;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -23,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected override async Task<Bus> Given()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
             var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
                                                                   .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
                                                                   .WithLogger(logger)

@@ -5,8 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests
@@ -22,7 +20,7 @@ namespace Nimbus.IntegrationTests
 
         public async Task<Bus> CreateAndStart()
         {
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
             //var logger = new NullLogger();
 
             // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
@@ -33,15 +31,15 @@ namespace Nimbus.IntegrationTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                      .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                      .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                      .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start(MessagePumpTypes.All);
 

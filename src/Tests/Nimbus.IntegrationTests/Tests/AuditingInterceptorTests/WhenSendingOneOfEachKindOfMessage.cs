@@ -4,11 +4,8 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -17,7 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 {
     [TestFixture]
-    [Timeout(5 * 1000)]
+    [Timeout(5*1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
         private object[] _allAuditedMessages;
@@ -31,7 +28,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
             var auditEventType = typeof (AuditEvent);
             var typeProvider = new TestHarnessTypeProvider(new[] {testFixtureType.Assembly, outboundAuditingInterceptorType.Assembly},
                                                            new[] {testFixtureType.Namespace, outboundAuditingInterceptorType.Namespace, auditEventType.Namespace});
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
 
             var dependencyResolver = new DependencyResolver(typeProvider);
 

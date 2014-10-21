@@ -6,8 +6,6 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -27,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
 
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
                                                                         .WithStorageDirectory(_largeMessageBodyTempPath)

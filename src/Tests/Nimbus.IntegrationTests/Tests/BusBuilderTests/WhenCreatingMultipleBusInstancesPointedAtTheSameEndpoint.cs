@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -50,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             // deleting queues and topics is slow.
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
 
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
 
             var busBuilder = new BusBuilder().Configure()
                                              .WithNames("IntegrationTestHarness", Environment.MachineName)
@@ -78,7 +76,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       // deleting queues and topics is slow.
                                       var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
-                                      var logger = new ConsoleLogger();
+                                      var logger = TestHarnessLoggerFactory.Create();
 
                                       var bus = new BusBuilder().Configure()
                                                                 .WithNames("IntegrationTestHarness", Environment.MachineName)

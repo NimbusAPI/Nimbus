@@ -5,12 +5,10 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Logger.Serilog;
 using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
-using Serilog;
 using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands
@@ -22,13 +20,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
 
         protected override async Task<Bus> Given()
         {
-            var log = new LoggerConfiguration()
-                .Enrich.WithThreadId()
-                .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Debug()
-                .CreateLogger();
-
-            var logger = new SerilogLogger(log);
+            var logger = TestHarnessLoggerFactory.Create();
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
@@ -47,7 +39,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
                                           dc.RemoveAllExistingNamespaceElementsOnStartup(
                                               "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
-            await bus.Start(MessagePumpTypes.All);
+            await bus.Start();
 
             return bus;
         }

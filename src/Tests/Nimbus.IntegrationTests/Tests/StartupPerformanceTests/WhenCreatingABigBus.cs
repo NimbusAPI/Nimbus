@@ -8,7 +8,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Logger;
 using Nimbus.Logging;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
@@ -43,7 +42,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
             var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
 
             var firstBus = new BusBuilder().Configure()

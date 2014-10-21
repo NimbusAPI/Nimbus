@@ -5,12 +5,10 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Logger.Serilog;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
-using Serilog;
 using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
@@ -26,13 +24,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
         protected override async Task<Bus> Given()
         {
-            var log = new LoggerConfiguration()
-                .Enrich.WithThreadId()
-                .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Debug()
-                .CreateLogger();
-
-            var logger = new SerilogLogger(log);
+            var logger = TestHarnessLoggerFactory.Create();
             //var logger = new NullLogger();
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
@@ -59,7 +51,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
         protected override async Task When()
         {
-            Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof(DoThingCCommand).Name);
+            Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof (DoThingCCommand).Name);
 
             var tasks = Enumerable.Range(0, NumberOfDoThingACommands)
                                   .AsParallel()

@@ -6,12 +6,10 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Logger.Serilog;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
-using Serilog;
 using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync
@@ -27,12 +25,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task<Bus> Given()
         {
-            var log = new LoggerConfiguration()
-                .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Debug()
-                .CreateLogger();
-
-            _logger = new SerilogLogger(log);
+            _logger = TestHarnessLoggerFactory.Create();
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 

@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.LargeMessages.Azure.Infrastructure;
-using Nimbus.Logger;
-using Nimbus.Logging;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -24,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         protected override async Task<AzureBlobStorageLargeMessageBodyStore> Given()
         {
-            var logger = new ConsoleLogger();
+            var logger = TestHarnessLoggerFactory.Create();
             return new AzureBlobStorageLargeMessageBodyStore(
                 new AzureStorageAccountConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString},
                 new AutoCreateBlobStorageContainerNameSetting(),
