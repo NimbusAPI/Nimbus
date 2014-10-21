@@ -107,6 +107,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
+        {
+            configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithLogger(this BusBuilderConfiguration configuration, ILogger logger)
         {
             configuration.Logger = logger;

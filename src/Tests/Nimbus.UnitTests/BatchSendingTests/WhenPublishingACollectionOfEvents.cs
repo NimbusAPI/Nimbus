@@ -4,6 +4,7 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts;
@@ -30,7 +31,15 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var deadLetterQueues = Substitute.For<IDeadLetterQueues>();
             var taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger);
 
-            var bus = new Bus(logger, commandSender, requestSender, multicastRequestSender, _eventSender, messagePumpsManager, deadLetterQueues, taskFactory);
+            var bus = new Bus(logger,
+                              commandSender,
+                              requestSender,
+                              multicastRequestSender,
+                              _eventSender,
+                              messagePumpsManager,
+                              deadLetterQueues,
+                              taskFactory,
+                              Substitute.For<IHeartbeat>());
             return Task.FromResult(bus);
         }
 

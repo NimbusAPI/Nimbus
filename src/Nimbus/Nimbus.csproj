@@ -80,6 +80,7 @@
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalInboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
+    <Compile Include="Configuration\Settings\HeartbeatInterval.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
+    <Compile Include="Infrastructure\Heartbeat\IHeartbeat.cs" />
     <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />

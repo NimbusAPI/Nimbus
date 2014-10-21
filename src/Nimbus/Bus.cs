@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts;
@@ -21,6 +22,7 @@ namespace Nimbus
         private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
         private readonly INimbusTaskFactory _taskFactory;
+        private readonly IHeartbeat _heartbeat;
 
         private readonly object _mutex = new object();
         private bool _isRunning;
@@ -32,7 +34,8 @@ namespace Nimbus
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
                      IDeadLetterQueues deadLetterQueues,
-                     INimbusTaskFactory taskFactory)
+                     INimbusTaskFactory taskFactory,
+                     IHeartbeat heartbeat)
         {
             _logger = logger;
             _commandSender = commandSender;
@@ -41,7 +44,11 @@ namespace Nimbus
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
             _taskFactory = taskFactory;
+            _heartbeat = heartbeat;
             _messagePumpsManager = messagePumpsManager;
+
+            Started += delegate { _heartbeat.Start(); };
+            Stopping += delegate { _heartbeat.Stop(); };
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
@@ -88,6 +95,9 @@ namespace Nimbus
         }
 
         public EventHandler<EventArgs> Starting;
+        public EventHandler<EventArgs> Started;
+        public EventHandler<EventArgs> Stopping;
+        public EventHandler<EventArgs> Stopped;
 
         public async Task Start(MessagePumpTypes messagePumpTypes = MessagePumpTypes.Default)
         {
@@ -101,8 +111,8 @@ namespace Nimbus
 
             try
             {
-                var handler = Starting;
-                if (handler != null) handler(this, EventArgs.Empty);
+                var startingHandler = Starting;
+                if (startingHandler != null) startingHandler(this, EventArgs.Empty);
 
                 await _messagePumpsManager.Start(messagePumpTypes);
             }
@@ -112,10 +122,11 @@ namespace Nimbus
                 throw new BusException("Failed to start bus", aex);
             }
 
+            var startedHandler = Started;
+            if (startedHandler != null) startedHandler(this, EventArgs.Empty);
+
             _logger.Info("Bus started.");
         }
-
-        public EventHandler<EventArgs> Stopping;
 
         public async Task Stop(MessagePumpTypes messagePumpTypes = MessagePumpTypes.All)
         {
@@ -129,8 +140,8 @@ namespace Nimbus
 
             try
             {
-                var handler = Stopping;
-                if (handler != null) handler(this, EventArgs.Empty);
+                var stoppingHandler = Stopping;
+                if (stoppingHandler != null) stoppingHandler(this, EventArgs.Empty);
 
                 await _messagePumpsManager.Stop(messagePumpTypes);
             }
@@ -138,6 +149,9 @@ namespace Nimbus
             {
                 throw new BusException("Failed to stop bus", aex);
             }
+
+            var stoppedHandler = Stopped;
+            if (stoppedHandler != null) stoppedHandler(this, EventArgs.Empty);
 
             _logger.Info("Bus stopped.");
         }
