@@ -66,6 +66,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 if (toSend.None()) return;
 
                 await SendBatch(toSend);
+                GlobalMessageCounters.IncrementSentMessageCount(toSend.Length);
             }
             finally
             {

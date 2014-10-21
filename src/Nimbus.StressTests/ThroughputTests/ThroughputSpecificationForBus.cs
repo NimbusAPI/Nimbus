@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.Logger.Serilog;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.StressTests.ThroughputTests.Infrastructure;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
-using Serilog;
 using Shouldly;
 
 namespace Nimbus.StressTests.ThroughputTests
@@ -46,12 +44,7 @@ namespace Nimbus.StressTests.ThroughputTests
             _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
             _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
-            var log = new LoggerConfiguration()
-                .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Debug()
-                .CreateLogger();
-
-            _logger = new SerilogLogger(log);
+            _logger = TestHarnessLoggerFactory.Create();
             //_logger = new NullLogger();
 
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()

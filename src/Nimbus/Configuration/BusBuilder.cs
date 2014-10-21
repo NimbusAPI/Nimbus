@@ -7,6 +7,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.TaskScheduling;
@@ -84,7 +85,8 @@ namespace Nimbus.Configuration
                               container.Resolve<IEventSender>(),
                               messagePumps,
                               container.Resolve<DeadLetterQueues>(),
-                              container.Resolve<INimbusTaskFactory>());
+                              container.Resolve<INimbusTaskFactory>(),
+                              container.Resolve<IHeartbeat>());
 
             bus.Starting += delegate
                             {

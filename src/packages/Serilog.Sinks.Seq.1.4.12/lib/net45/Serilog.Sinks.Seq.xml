@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.Seq</name>
+    </assembly>
+    <members>
+        <member name="M:Serilog.Sinks.Seq.HttpLogShipper.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Serilog.Sinks.Seq.HttpLogShipper.Dispose(System.Boolean)">
+            <summary>
+            Free resources held by the sink.
+            </summary>
+            <param name="disposing">If true, called because the object is being disposed; if false,
+            the object is being disposed from the finalizer.</param>
+        </member>
+        <member name="P:Serilog.Sinks.Seq.HttpLogShipper.MinimumAcceptedLevel">
+            <summary>
+            Get the last "minimum level" indicated by the Seq server, if any.
+            </summary>
+        </member>
+        <member name="T:Serilog.SeqLoggerConfigurationExtensions">
+            <summary>
+            Extends Serilog configuration to write events to Seq.
+            </summary>
+        </member>
+        <member name="M:Serilog.SeqLoggerConfigurationExtensions.Seq(Serilog.Configuration.LoggerSinkConfiguration,System.String,Serilog.Events.LogEventLevel,System.Int32,System.Nullable{System.TimeSpan},System.String,System.String,System.Nullable{System.Int64})">
+            <summary>
+            Adds a sink that writes log events to a http://getseq.net Seq event server.
+            </summary>
+            <param name="loggerSinkConfiguration">The logger configuration.</param>
+            <param name="serverUrl">The base URL of the Seq server that log events will be written to.</param>
+            <param name="restrictedToMinimumLevel">The minimum log event level required 
+            in order to write an event to the sink.</param>
+            <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="bufferBaseFilename">Path for a set of files that will be used to buffer events until they
+            can be successfully transmitted across the network. Individual files will be created using the
+            pattern <paramref name="bufferBaseFilename"/>-{Date}.json.</param>
+            <param name="apiKey">A Seq <i>API key</i> that authenticates the client to the Seq server.</param>
+            <param name="bufferFileSizeLimitBytes">The maximum size, in bytes, to which the buffer
+            log file for a specific date will be allowed to grow. By default no limit will be applied.</param>
+            <returns>Logger configuration, allowing configuration to continue.</returns>
+            <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
+        </member>
+    </members>
+</doc>

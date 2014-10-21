@@ -30,6 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Serilog">
+      <HintPath>..\..\packages\Serilog.1.4.9\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx">
+      <HintPath>..\..\packages\Serilog.1.4.9\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Sinks.Seq">
+      <HintPath>..\..\packages\Serilog.Sinks.Seq.1.4.12\lib\net45\Serilog.Sinks.Seq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,10 +56,15 @@
     <Compile Include="NullInboundInterceptorFactory.cs" />
     <Compile Include="NullOutboundInterceptorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerilogLoggerFactory.cs" />
     <Compile Include="TestHarnessTypeProvider.cs" />
     <Compile Include="ThreadExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
+      <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
+      <Name>Nimbus.Logger.Serilog</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
@@ -63,6 +77,9 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

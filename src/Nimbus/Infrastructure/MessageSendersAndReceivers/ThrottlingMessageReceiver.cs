@@ -95,6 +95,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     if (!_running) return;
                     if (messages.None()) continue;
 
+                    GlobalMessageCounters.IncrementReceivedMessageCount(messages.Length);
+
                     var tasks = messages
                         .Select(m => Task.Run(async () =>
                                                     {
