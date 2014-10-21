@@ -58,20 +58,26 @@ namespace Nimbus.Interceptors.Inbound
         {
             var messageType = message.GetType();
 
-            var implicitImplementations = handler.GetType().GetMethods()
-                                .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
-                                .Where(m => m.GetParameters().Count() == 1)
-                                .Where(m => m.GetParameters().First().ParameterType == messageType);
+            var implicitImplementations = handler.GetType()
+                                                 .GetMethods()
+                                                 .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
+                                                 .Where(m => m.GetParameters().Count() == 1)
+                                                 .Where(m => m.GetParameters().First().ParameterType == messageType)
+                                                 .ToArray();
 
-            var explicitImplementations = handler.GetType().GetInterfaces()
-                    .SelectMany(@interface => @interface.GetMethods())
-                    .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
-                    .Where(m => m.GetParameters().Count() == 1)
-                    .Where(m => m.GetParameters().First().ParameterType == messageType);
+            var explicitImplementations = handler.GetType()
+                                                 .GetInterfaces()
+                                                 .SelectMany(@interface => @interface.GetMethods())
+                                                 .Where(m => string.Compare(m.Name, "Handle", StringComparison.OrdinalIgnoreCase) == 0)
+                                                 .Where(m => m.GetParameters().Count() == 1)
+                                                 .Where(m => m.GetParameters().First().ParameterType == messageType)
+                                                 .ToArray();
 
-            var methods = implicitImplementations.Concat(explicitImplementations);
+            var methods = implicitImplementations.Concat(explicitImplementations).ToArray();
 
-            var method = methods.Single();
+            // This will take the method on the concrete type if there is one (so that we can traverse the inheritance
+            // graph), otherwise it will take the explicit interface method.
+            var method = methods.First();
 
             var methodHierarchy = new[] {method}.DepthFirst(m => new[] {m.GetBaseDefinition()}.NotNull()).ToArray();
 
