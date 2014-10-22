@@ -68,6 +68,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.StressTests", "Tests\Nimbus.StressTests\Nimbus.StressTests.csproj", "{5CAED275-3485-449A-9EFC-6127B9257D82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "Extensions\Nimbus.Ninject\Nimbus.Ninject.csproj", "{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.StressTests", "Nimbus.StressTests\Nimbus.StressTests.csproj", "{5CAED275-3485-449A-9EFC-6127B9257D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "Nimbus.Ninject\Nimbus.Ninject.csproj", "{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
