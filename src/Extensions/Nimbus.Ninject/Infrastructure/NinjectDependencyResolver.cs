@@ -15,7 +15,7 @@ namespace Nimbus.Ninject.Infrastructure
                 throw new ArgumentNullException("kernel");
             }
 
-            this._kernel = kernel;
+            _kernel = kernel;
         }
 
         ~NinjectDependencyResolver()

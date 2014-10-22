@@ -2,6 +2,7 @@
 using Ninject;
 
 // ReSharper disable once CheckNamespace
+
 namespace Nimbus.Configuration
 {
     public static class NinjectBusBuilderConfigurationExtensions

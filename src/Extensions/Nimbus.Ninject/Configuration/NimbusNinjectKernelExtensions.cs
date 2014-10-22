@@ -2,11 +2,10 @@
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Ninject.Infrastructure;
+using Ninject.Syntax;
 
 namespace Nimbus.Ninject.Configuration
 {
-    using global::Ninject.Syntax;
-
     public static class NimbusNinjectKernelExtensions
     {
         public static IBindingRoot RegisterNimbus(this IBindingRoot kernel, ITypeProvider typeProvider)
