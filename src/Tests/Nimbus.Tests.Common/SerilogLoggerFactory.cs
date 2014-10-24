@@ -14,6 +14,7 @@ namespace Nimbus.Tests.Common
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
+
             var logger = new SerilogLogger(log);
             return logger;
         }
