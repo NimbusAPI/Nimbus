@@ -27,6 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = TestHarnessLoggerFactory.Create();
 
+            logger.Debug("Starting disk storage large message test at {0}", _largeMessageBodyTempPath);
             
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
                                                                         .WithStorageDirectory(_largeMessageBodyTempPath)
@@ -46,6 +47,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start();
+            logger.Debug("Bus started");
             return bus;
         }
 
