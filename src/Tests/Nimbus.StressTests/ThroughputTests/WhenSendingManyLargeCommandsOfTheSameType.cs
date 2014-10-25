@@ -17,7 +17,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected override int ExpectedMessagesPerSecond
         {
-            get { return 100; }
+            get { return 50; }
         }
 
         public override IEnumerable<Task> SendMessages(IBus bus)

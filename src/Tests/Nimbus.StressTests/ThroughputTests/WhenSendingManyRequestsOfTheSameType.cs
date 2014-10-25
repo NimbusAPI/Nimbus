@@ -11,7 +11,7 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         protected override int ExpectedMessagesPerSecond
         {
-            get { return 200; }
+            get { return 50; }
         }
 
         protected override int NumMessagesToSend
