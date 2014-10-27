@@ -22,12 +22,10 @@ namespace Nimbus.Ninject.Configuration
         {
             typeProvider.AllHandlerTypes()
                         .ToList()
-                        .ForEach(
-                            handlerType =>
-                            handlerType.GetInterfaces()
-                                       .Where(typeProvider.IsClosedGenericHandlerInterface)
-                                       .ToList()
-                                       .ForEach(interfaceType => kernel.Bind(interfaceType).To(handlerType).InTransientScope()));
+                        .ForEach(t => kernel.Bind(t)
+                                            .To(t)
+                                            .InTransientScope())
+                ;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Nimbus.Interceptors.Inbound
                 .Union(classLevelInterceptors)
                 .Union(methodLevelInterceptors)
                 .DistinctBy(t => t.FullName)
-                .Select(t => (IInboundInterceptor) scope.Resolve(t, t.FullName))
+                .Select(t => (IInboundInterceptor) scope.Resolve(t))
                 .OrderByDescending(i => i.Priority)
                 .ThenBy(i => i.GetType().FullName)
                 .ToArray();

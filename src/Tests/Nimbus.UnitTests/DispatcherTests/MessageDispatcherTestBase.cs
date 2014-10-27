@@ -59,7 +59,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
             _taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger);
-            scope.Resolve<IHandleRequest<TRequest, TResponse>>(Arg.Any<string>()).Returns(new TRequestHandler());
+            scope.Resolve<TRequestHandler>().Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
@@ -88,7 +88,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
-            scope.Resolve<IHandleCommand<TCommand>>(Arg.Any<string>()).Returns(new TCommandHandler());
+            scope.Resolve<TCommandHandler>().Returns(new TCommandHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
@@ -114,7 +114,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
-            scope.Resolve<IHandleMulticastEvent<TEvent>>(Arg.Any<string>()).Returns(new TEventMessageHandler());
+            scope.Resolve<TEventMessageHandler>().Returns(new TEventMessageHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())

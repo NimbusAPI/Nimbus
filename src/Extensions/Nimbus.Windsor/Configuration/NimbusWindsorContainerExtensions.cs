@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
@@ -24,27 +21,10 @@ namespace Nimbus.Windsor.Configuration
             container.Register(
                 Classes.From(typeProvider.AllHandlerTypes())
                        .Where(t => true)
-                       .WithServiceSelect((t, bt) => SelectHandlerInterfaces(t, typeProvider))
-                       .Configure(ConfigureComponent)
                        .LifestyleScoped()
                 );
 
             return container;
-        }
-
-        private static IEnumerable<Type> SelectHandlerInterfaces(Type type, ITypeProvider typeProvider)
-        {
-            var handlerInterfaces = type
-                .GetInterfaces()
-                .Where(typeProvider.IsClosedGenericHandlerInterface)
-                .ToArray();
-
-            return handlerInterfaces;
-        }
-
-        private static void ConfigureComponent(ComponentRegistration componentRegistration)
-        {
-            componentRegistration.Named(componentRegistration.Implementation.FullName);
         }
     }
 }

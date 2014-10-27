@@ -1,11 +1,9 @@
-using System;
-using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 
 namespace Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories
 {
-    public interface IDependencyResolverFactory : IDisposable
+    public interface IDependencyResolverFactory
     {
-        Task<IDependencyResolver> Create(ITypeProvider typeProvider);
+        IDependencyResolver Create(ITypeProvider typeProvider);
     }
 }

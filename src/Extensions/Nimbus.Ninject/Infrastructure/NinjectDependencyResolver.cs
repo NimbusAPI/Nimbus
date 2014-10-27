@@ -10,17 +10,7 @@ namespace Nimbus.Ninject.Infrastructure
 
         public NinjectDependencyResolver(IKernel kernel)
         {
-            if (kernel == null)
-            {
-                throw new ArgumentNullException("kernel");
-            }
-
             _kernel = kernel;
-        }
-
-        ~NinjectDependencyResolver()
-        {
-            Dispose(false);
         }
 
         public IDependencyResolverScope CreateChildScope()
@@ -31,6 +21,7 @@ namespace Nimbus.Ninject.Infrastructure
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

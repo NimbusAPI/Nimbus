@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure.DependencyResolution;
 
@@ -6,13 +5,13 @@ namespace Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure.Dependency
 {
     public class DefaultDependencyResolverFactory : IDependencyResolverFactory
     {
-        public void Dispose()
-        {
-        }
-
-        public async Task<IDependencyResolver> Create(ITypeProvider typeProvider)
+        public IDependencyResolver Create(ITypeProvider typeProvider)
         {
             return new DependencyResolver(typeProvider);
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

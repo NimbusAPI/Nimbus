@@ -8,24 +8,13 @@ namespace Nimbus.Ninject.Infrastructure
     public class NinjectDependencyResolverScope : IDependencyResolverScope
     {
         private readonly IKernel _kernel;
-
-        private IActivationBlock _activationBlock;
+        private readonly IActivationBlock _activationBlock;
+        private bool _disposed;
 
         public NinjectDependencyResolverScope(IKernel kernel)
         {
-            if (kernel == null)
-            {
-                throw new ArgumentNullException("kernel");
-            }
-
             _kernel = kernel;
-
-            _activationBlock = _kernel.BeginBlock();
-        }
-
-        ~NinjectDependencyResolverScope()
-        {
-            Dispose(false);
+            _activationBlock = kernel.BeginBlock();
         }
 
         public IDependencyResolverScope CreateChildScope()
@@ -33,36 +22,29 @@ namespace Nimbus.Ninject.Infrastructure
             return new NinjectDependencyResolverScope(_kernel);
         }
 
-        public void Dispose()
+        public TComponent Resolve<TComponent>()
         {
-            Dispose(true);
-        }
-
-        public TComponent Resolve<TComponent>(string componentName)
-        {
-            return _kernel.Get<TComponent>(componentName);
+            return _activationBlock.Get<TComponent>();
         }
 
         public object Resolve(Type componentType)
         {
-            return _kernel.Get(componentType);
+            return _activationBlock.Get(componentType);
         }
 
-        public object Resolve(Type componentType, string componentName)
+        public void Dispose()
         {
-            return _kernel.Get(componentType, componentName);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (_activationBlock != null)
-                {
-                    _activationBlock.Dispose();
-                    _activationBlock = null;
-                }
-            }
+            if (_disposed) return;
+            if (!disposing) return;
+            _disposed = true;
+
+            _activationBlock.Dispose();
         }
     }
 }

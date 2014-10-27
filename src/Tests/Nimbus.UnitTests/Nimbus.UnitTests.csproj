@@ -49,6 +49,9 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
     <Reference Include="NSubstitute">
       <HintPath>..\..\packages\NSubstitute.1.7.1.0\lib\NET40\NSubstitute.dll</HintPath>
     </Reference>
@@ -84,7 +87,7 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEvents.cs" />
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
-    <Compile Include="BrokeredMessageFactoryTests\GivenAMessageBrokerFactory.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
     <Compile Include="BrokeredMessageFactoryTests\WhenCloningABrokeredMessage.cs" />
     <Compile Include="BrokeredMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />
@@ -106,11 +109,14 @@
     <Compile Include="Conventions\CoreHandlerInterfaces.cs" />
     <Compile Include="Conventions\CoreInfrastructureInterfaces.cs" />
     <Compile Include="Conventions\NimbusCode.cs" />
-    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\Handlers\CombinedFooBarHandler.cs" />
-    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\MessageContracts\BarCommand.cs" />
-    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\MessageContracts\FooCommand.cs" />
-    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingAutofac.cs" />
-    <Compile Include="DependencyResolverTests\ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingWindsor.cs" />
+    <Compile Include="ContainerRegistrationTests\Handlers\HandlerThatHandlesMultipleCommandTypes.cs" />
+    <Compile Include="ContainerRegistrationTests\MessageContracts\BarCommand.cs" />
+    <Compile Include="ContainerRegistrationTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingAutofac.cs" />
+    <Compile Include="ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingWindsor.cs" />
+    <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\NinjectDependencyResolverFactory.cs" />
+    <Compile Include="DependencyResolverTests\TestInfrastructure\TestHarnessDependencyResolversFactory.cs" />
+    <Compile Include="DependencyResolverTests\DisposableComponents\WhenResolvingDisposableComponentsFromADependencyResolver.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyCommandHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyEventHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\EmptyRequestHandler.cs" />
@@ -134,14 +140,13 @@
     <Compile Include="DispatcherTests\WhenInboundInterceptorThrowsExceptionOnRequestHandlerExecuting.cs" />
     <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
-    <Compile Include="InterceptorTests\WhenBuildingABusWithAutofacAndInterceptors.cs" />
+    <Compile Include="InterceptorTests\WhenRegisteringInterceptorsWithAutofac.cs" />
     <Compile Include="LoggingTests\TemplateNormalization\WhenNormalizingStructuredLogTemplates.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />
     <Compile Include="DependencyResolverTests\DisposableComponents\Handlers\DisposableHandler.cs" />
     <Compile Include="DependencyResolverTests\DisposableComponents\MessageContracts\NullCommand.cs" />
-    <Compile Include="DependencyResolverTests\DisposableComponents\WhenResolvingADisposableHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\BrokerTestCommandHandler.cs" />
     <Compile Include="DispatcherTests\Handlers\SlowCommandHandler.cs" />
     <Compile Include="DispatcherTests\MessageContracts\FooCommand.cs" />
@@ -152,31 +157,21 @@
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEscapingTestMessages.cs" />
     <Compile Include="InfrastructureTests\PathFactoryTests.cs" />
-    <Compile Include="DependencyResolverTests\CompetingEventHandlerResolutionTests\Handlers\FirstFooEventHandler.cs" />
-    <Compile Include="DependencyResolverTests\CompetingEventHandlerResolutionTests\Handlers\SecondFooEventHandler.cs" />
-    <Compile Include="DependencyResolverTests\CompetingEventHandlerResolutionTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="DependencyResolverTests\CompetingEventHandlerResolutionTests\WhenResolvingHandlersForAnEventWithTwoHandlers.cs" />
-    <Compile Include="DependencyResolverTests\MulticastEventHandlerResolutionTests\Handlers\FirstFooEventHandler.cs" />
-    <Compile Include="DependencyResolverTests\MulticastEventHandlerResolutionTests\Handlers\SecondFooEventHandler.cs" />
-    <Compile Include="DependencyResolverTests\MulticastEventHandlerResolutionTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="DependencyResolverTests\MulticastEventHandlerResolutionTests\WhenResolvingHandlersForAnEventWithTwoHandlers.cs" />
-    <Compile Include="DependencyResolverTests\MulticastRequestResponseHandlerResolutionTests\Handlers\FirstFooRequestHandler.cs" />
-    <Compile Include="DependencyResolverTests\MulticastRequestResponseHandlerResolutionTests\Handlers\SecondFooRequestHandler.cs" />
-    <Compile Include="DependencyResolverTests\MulticastRequestResponseHandlerResolutionTests\MessageContracts\FooRequest.cs" />
-    <Compile Include="DependencyResolverTests\MulticastRequestResponseHandlerResolutionTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="DependencyResolverTests\MulticastRequestResponseHandlerResolutionTests\WhenResolvingHandlersForAMulticastRequestWithTwoHandlers.cs" />
-    <Compile Include="DependencyResolverTests\RequestResponseHandlerResolutionTests\Handlers\FooRequestHandler.cs" />
-    <Compile Include="DependencyResolverTests\RequestResponseHandlerResolutionTests\MessageContracts\FooRequest.cs" />
-    <Compile Include="DependencyResolverTests\RequestResponseHandlerResolutionTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="DependencyResolverTests\RequestResponseHandlerResolutionTests\WhenResolvingAHandlersForASimpleRequest.cs" />
-    <Compile Include="DependencyResolverTests\CommandHandlerResolutionTests\Handlers\BrokerTestCommandHandler.cs" />
-    <Compile Include="DependencyResolverTests\CommandHandlerResolutionTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\FirstFooEventHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\SecondFooEventHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\MessageContracts\FooEvent.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\FirstFooRequestHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\SecondFooRequestHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\MessageContracts\FooRequest.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\MessageContracts\FooResponse.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\FooRequestHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Handlers\BrokerTestCommandHandler.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\MessageContracts\FooCommand.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\AutofacDependencyResolverFactory.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\DefaultDependencyResolverFactory.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\IDependencyResolverFactory.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\WindsorDependencyResolverFactory.cs" />
-    <Compile Include="DependencyResolverTests\TestInfrastructure\TestForAllDependencyResolvers.cs" />
-    <Compile Include="DependencyResolverTests\CommandHandlerResolutionTests\WhenResolvingAHandlerForASimpleCommand.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\WhenResolvingComponentsFromADependencyResolver.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingASingleResponse.cs" />
     <Compile Include="MulticastRequestResponseTests\GivenAWrapperWithTwoResponses.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingAThreeResponses.cs" />
@@ -200,6 +195,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">
       <Project>{90DD5B3B-4EFB-484D-A20B-39CB95F66C2E}</Project>
       <Name>Nimbus.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Ninject\Nimbus.Ninject.csproj">
+      <Project>{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}</Project>
+      <Name>Nimbus.Ninject</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Windsor\Nimbus.Windsor.csproj">
       <Project>{7FCF3124-24EC-40CA-95FD-E30315D0DDE2}</Project>
@@ -239,6 +238,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TaskSchedulerTests\" />
+    <Folder Include="TypeProviderTests\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

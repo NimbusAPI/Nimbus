@@ -36,67 +36,23 @@ namespace Nimbus.Infrastructure.DependencyResolution
             object registeredInstance;
             if (_registeredInstances.TryGetValue(componentType, out registeredInstance)) return registeredInstance;
 
-            var component = ComponentsOfType(componentType)
-                .Select(CreateInstance)
-                .FirstOrDefault();
-
-            if (component == null)
-                throw new BusException("There is no component of type {0} available to the {1}.".FormatWith(componentType.FullName, GetType().Name));
-
+            var component = CreateInstance(componentType);
             Track(component);
 
             return component;
         }
 
-        public TComponent Resolve<TComponent>(string componentName)
-        {
-            var componentType = typeof (TComponent);
-            return (TComponent) Resolve(componentType, componentName);
-        }
-
-        public object Resolve(Type componentType, string componentName)
-        {
-            object registeredInstance;
-            if (_registeredInstances.TryGetValue(componentType, out registeredInstance))
-            {
-                if (string.CompareOrdinal(registeredInstance.GetType().FullName, componentName) == 0)
-                {
-                    return registeredInstance;
-                }
-            }
-
-            var component = ComponentsOfType(componentType)
-                .Where(t => string.CompareOrdinal(t.FullName, componentName) == 0)
-                .Select(CreateInstance)
-                .FirstOrDefault();
-
-            if (component == null)
-                throw new BusException("There is no component of type {0} and name {1} available to the {2}.".FormatWith(componentType.FullName, componentName, GetType().Name));
-
-            Track(component);
-
-            return component;
-        }
-
-        private IEnumerable<Type> ComponentsOfType(Type componentType)
-        {
-            //FIXME doesn't handle contravariance yet
-            return _componentTypes
-                .Where(componentType.IsAssignableFrom)
-                .Where(t => t.IsInstantiable());
-        }
-
-        private object CreateInstance(Type implementingType)
+        private object CreateInstance(Type componentType)
         {
             try
             {
-                var args = implementingType.GetConstructors()
-                                           .Single()
-                                           .GetParameters()
-                                           .Select(p => Resolve(p.ParameterType))
-                                           .ToArray();
+                var args = componentType.GetConstructors()
+                                        .Single()
+                                        .GetParameters()
+                                        .Select(p => Resolve(p.ParameterType))
+                                        .ToArray();
 
-                var result = Activator.CreateInstance(implementingType, args);
+                var result = Activator.CreateInstance(componentType, args);
                 return result;
             }
             catch (Exception exc)
