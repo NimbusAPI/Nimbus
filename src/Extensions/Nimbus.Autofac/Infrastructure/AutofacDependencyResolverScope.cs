@@ -18,19 +18,14 @@ namespace Nimbus.Autofac.Infrastructure
             return new AutofacDependencyResolverScope(_lifetimeScope.BeginLifetimeScope());
         }
 
-        public TComponent Resolve<TComponent>(string componentName)
+        public TComponent Resolve<TComponent>()
         {
-            return _lifetimeScope.ResolveNamed<TComponent>(componentName);
+            return _lifetimeScope.Resolve<TComponent>();
         }
 
         public object Resolve(Type componentType)
         {
             return _lifetimeScope.Resolve(componentType);
-        }
-
-        public object Resolve(Type componentType, string componentName)
-        {
-            return _lifetimeScope.ResolveNamed(componentName, componentType);
         }
 
         public void Dispose()

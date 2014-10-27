@@ -75,7 +75,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = scope.Resolve<IHandleRequest<TBusRequest, TBusResponse>>(handlerType.FullName);
+                var handler = (IHandleRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest);
 
                 try

@@ -14,17 +14,12 @@ namespace Nimbus.Tests.Common
         {
         }
 
-        public TComponent Resolve<TComponent>(string componentName)
+        public TComponent Resolve<TComponent>()
         {
             throw new NotImplementedException();
         }
 
         public object Resolve(Type componentType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object Resolve(Type componentType, string componentName)
         {
             throw new NotImplementedException();
         }

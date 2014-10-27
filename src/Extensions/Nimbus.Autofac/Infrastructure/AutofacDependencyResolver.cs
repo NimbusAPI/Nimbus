@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Nimbus.DependencyResolution;
 
 namespace Nimbus.Autofac.Infrastructure
@@ -20,6 +21,7 @@ namespace Nimbus.Autofac.Infrastructure
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

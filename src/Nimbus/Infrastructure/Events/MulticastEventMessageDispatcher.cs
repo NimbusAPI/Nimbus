@@ -30,7 +30,7 @@ namespace Nimbus.Infrastructure.Events
 
         protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType)
         {
-            var handler = scope.Resolve<IHandleMulticastEvent<TBusEvent>>(handlerType.FullName);
+            var handler = (IHandleMulticastEvent<TBusEvent>)scope.Resolve(handlerType);
             _propertyInjector.Inject(handler);
             return handler;
         }
