@@ -1,5 +1,4 @@
 ﻿using System;
-using Serilog;
 using ISerilogLogger = Serilog.ILogger;
 
 namespace Nimbus.Logger.Serilog
@@ -10,7 +9,6 @@ namespace Nimbus.Logger.Serilog
 
         public SerilogLogger(ISerilogLogger logger)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
         }
 

@@ -17,9 +17,6 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
 
         public async Task Upload(string storageKey, byte[] bytes)
         {
-            if (storageKey == null) throw new ArgumentNullException("storageKey");
-            if (bytes == null) throw new ArgumentNullException("bytes");
-
             var uri = _uriFormatter.FormatUri(storageKey);
             _logger.Debug("Writing blob {0} to {1}", storageKey, uri);
 
@@ -28,13 +25,15 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
             {
                 await requestStream.WriteAsync(bytes, 0, bytes.Length);
             }
-            using (request.GetResponse()) { } // throws if there was an error
+
+            // throws if there was an error
+            using (request.GetResponse())
+            {
+            }
         }
 
         public async Task Delete(string storageKey)
         {
-            if (storageKey == null) throw new ArgumentNullException("storageKey");
-
             var uri = _uriFormatter.FormatUri(storageKey);
             _logger.Debug("Deleting blob {0} from {1}", storageKey, uri);
             using (var webClient = new WebClient())
@@ -56,9 +55,6 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
 
         private WebRequest BuildWebRequest(Uri uri, byte[] content)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
-            if (content == null) throw new ArgumentNullException("content");
-
             var request = WebRequest.Create(uri);
             request.Method = "PUT";
             request.Headers.Add("x-ms-blob-type", "BlockBlob");
