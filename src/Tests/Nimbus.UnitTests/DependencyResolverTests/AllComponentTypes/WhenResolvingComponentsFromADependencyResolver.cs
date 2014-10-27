@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
@@ -43,7 +44,7 @@ namespace Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes
 
                 var dependencyResolvers = TestHarnessDependencyResolversFactory.GetAllDependencyResolvers(typeProvider);
 
-                var typesToResolve = typeProvider.AllHandlerTypes();
+                var typesToResolve = typeProvider.AllResolvableTypes();
 
                 // ReSharper disable LoopCanBeConvertedToQuery
                 foreach (var dependencyResolver in dependencyResolvers)

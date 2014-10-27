@@ -6,6 +6,11 @@ namespace Nimbus.Extensions
 {
     public static class TypeProviderExtensions
     {
+        public static Type[] AllResolvableTypes(this ITypeProvider typeProvider)
+        {
+            return typeProvider.AllHandlerTypes().Union(typeProvider.InterceptorTypes).ToArray();
+        }
+
         public static Type[] AllHandlerTypes(this ITypeProvider typeProvider)
         {
             return new Type[0]

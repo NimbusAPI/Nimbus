@@ -114,6 +114,8 @@
     <Compile Include="ContainerRegistrationTests\MessageContracts\FooCommand.cs" />
     <Compile Include="ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingAutofac.cs" />
     <Compile Include="ContainerRegistrationTests\WhenRegisteringHandlerTypesUsingWindsor.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Interceptors\SomeInboundInterceptor.cs" />
+    <Compile Include="DependencyResolverTests\AllComponentTypes\Interceptors\SomeOutboundInterceptor.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\DependencyResolverFactories\NinjectDependencyResolverFactory.cs" />
     <Compile Include="DependencyResolverTests\TestInfrastructure\TestHarnessDependencyResolversFactory.cs" />
     <Compile Include="DependencyResolverTests\DisposableComponents\WhenResolvingDisposableComponentsFromADependencyResolver.cs" />

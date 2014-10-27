@@ -19,7 +19,7 @@ namespace Nimbus.Windsor.Configuration
                 );
 
             container.Register(
-                Classes.From(typeProvider.AllHandlerTypes())
+                Classes.From(typeProvider.AllResolvableTypes())
                        .Where(t => true)
                        .LifestyleScoped()
                 );

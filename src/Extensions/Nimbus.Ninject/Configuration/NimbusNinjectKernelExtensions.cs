@@ -10,22 +10,21 @@ namespace Nimbus.Ninject.Configuration
     {
         public static IBindingRoot RegisterNimbus(this IBindingRoot kernel, ITypeProvider typeProvider)
         {
-            kernel.Bind<IDependencyResolver>().To<NinjectDependencyResolver>().InSingletonScope();
-            kernel.Bind<ITypeProvider>().ToConstant(typeProvider).InSingletonScope();
+            kernel.Bind<IDependencyResolver>()
+                  .To<NinjectDependencyResolver>()
+                  .InSingletonScope();
 
-            BindAllHandlerInterfaces(kernel, typeProvider);
+            kernel.Bind<ITypeProvider>()
+                  .ToConstant(typeProvider)
+                  .InSingletonScope();
 
-            return kernel;
-        }
-
-        private static void BindAllHandlerInterfaces(IBindingRoot kernel, ITypeProvider typeProvider)
-        {
-            typeProvider.AllHandlerTypes()
+            typeProvider.AllResolvableTypes()
                         .ToList()
                         .ForEach(t => kernel.Bind(t)
                                             .To(t)
-                                            .InTransientScope())
-                ;
+                                            .InTransientScope());
+
+            return kernel;
         }
     }
 }

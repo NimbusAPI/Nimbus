@@ -12,18 +12,6 @@ namespace Nimbus.Configuration
     {
         public static ContainerBuilder RegisterNimbus(this ContainerBuilder builder, ITypeProvider typeProvider)
         {
-            typeProvider.AllHandlerTypes()
-                        .Do(t => builder.RegisterType(t)
-                                        .AsSelf()
-                                        .InstancePerLifetimeScope())
-                        .Done();
-
-            typeProvider.InterceptorTypes
-                        .Do(t => builder.RegisterType(t)
-                                        .AsSelf()
-                                        .InstancePerLifetimeScope())
-                        .Done();
-
             builder.RegisterInstance(typeProvider)
                    .As<ITypeProvider>()
                    .SingleInstance();
@@ -31,6 +19,12 @@ namespace Nimbus.Configuration
             builder.RegisterType<AutofacDependencyResolver>()
                    .As<IDependencyResolver>()
                    .SingleInstance();
+
+            typeProvider.AllResolvableTypes()
+                        .Do(t => builder.RegisterType(t)
+                                        .AsSelf()
+                                        .InstancePerLifetimeScope())
+                        .Done();
 
             return builder;
         }
