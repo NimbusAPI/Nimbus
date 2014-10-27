@@ -91,8 +91,6 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
         public Task<BrokeredMessage> CreateSuccessfulResponse(object responseContent, BrokeredMessage originalRequest)
         {
-            if (originalRequest == null) throw new ArgumentNullException("originalRequest");
-
             return Task.Run(async () =>
                                   {
                                       var responseMessage = (await Create(responseContent)).WithReplyToRequestId(originalRequest.MessageId);
@@ -104,8 +102,6 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
         public Task<BrokeredMessage> CreateFailedResponse(BrokeredMessage originalRequest, Exception exception)
         {
-            if (originalRequest == null) throw new ArgumentNullException("originalRequest");
-
             return Task.Run(async () =>
                                   {
                                       var responseMessage = (await Create()).WithReplyToRequestId(originalRequest.MessageId);
@@ -118,8 +114,6 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
         private byte[] BuildBodyBytes(object serializableObject)
         {
-            if (serializableObject == null) throw new ArgumentNullException("serializableObject");
-
             var serialized = _serializer.Serialize(serializableObject);
             var serializedBytes = Encoding.UTF8.GetBytes(serialized);
             var compressedBytes = _compressor.Compress(serializedBytes);
