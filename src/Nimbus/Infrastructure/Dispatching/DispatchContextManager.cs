@@ -83,7 +83,6 @@ namespace Nimbus.Infrastructure.Dispatching
 
             public DispatchContextWrapper(DispatchContextManager owner, string dispatchContextId)
             {
-                if (owner == null) throw new ArgumentNullException("owner");
                 _owner = owner;
                 _dispatchContextId = dispatchContextId;
             }
