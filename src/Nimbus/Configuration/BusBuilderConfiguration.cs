@@ -33,6 +33,9 @@ namespace Nimbus.Configuration
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
         internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
+        internal SubscriptionDefaultMessageTimeToLiveSetting SubscriptionDefaultMessageTimeToLive { get; set; }
+        internal SubscriptionAutoDeleteOnIdleSetting SubscriptionAutoDeleteOnIdle { get; set; }
+        internal EnableDeadLetteringOnMessageExpirationSetting EnableDeadLetteringOnMessageExpiration { get; set; }
         internal HeartbeatIntervalSetting HeartbeatInterval { get; set; }
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
