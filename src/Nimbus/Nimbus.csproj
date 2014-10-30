@@ -78,10 +78,13 @@
     <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
+    <Compile Include="Configuration\Settings\EnableDeadLetteringOnMessageExpirationSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalInboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\HeartbeatInterval.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
+    <Compile Include="Configuration\Settings\SubscriptionAutoDeleteOnIdleSetting.cs" />
+    <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
