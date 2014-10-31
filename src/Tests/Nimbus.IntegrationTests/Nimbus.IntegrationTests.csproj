@@ -146,10 +146,12 @@
     <Compile Include="TestForBus.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\FirstCommandHandler.cs" />
+    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\ThirdCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\Interceptors\TestInterceptor.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\FirstCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\SecondCommand.cs" />
-    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenDispatchingACommandOnTheBusAndSendingASecondCommand.cs" />
+    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\ThirdCommand.cs" />
+    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenSendingACascadeOfCommands.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />

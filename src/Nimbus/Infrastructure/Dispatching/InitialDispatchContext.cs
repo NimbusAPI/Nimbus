@@ -1,8 +1,8 @@
 namespace Nimbus.Infrastructure.Dispatching
 {
-    internal class NullDispatchContext : IDispatchContext
+    internal class InitialDispatchContext : IDispatchContext
     {
-        public string MessageId { get { return null; } }
+        public string ResultOfMessageId { get { return null; } }
         public string DispatchId { get { return null; } }
         public string CorrelationId { get { return null; } }
     }

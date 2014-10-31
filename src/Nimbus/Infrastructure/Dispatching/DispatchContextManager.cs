@@ -7,28 +7,29 @@ namespace Nimbus.Infrastructure.Dispatching
 {
     internal class DispatchContextManager : IDispatchContextManager
     {
-        private static readonly string CurrentDispatchIdDataSlotName = typeof(DispatchContext).FullName;
-        private readonly ThreadSafeDictionary<string, DispatchContext> _store = new ThreadSafeDictionary<string, DispatchContext>();
+        private static readonly string _currentDispatchIdDataSlotName = typeof(SubsequentDispatchContext).FullName;
+
+        private readonly ThreadSafeDictionary<string, SubsequentDispatchContext> _store = new ThreadSafeDictionary<string, SubsequentDispatchContext>();
 
         public IDispatchContext GetCurrentDispatchContext()
         {
             // Try to get the current DispatchContext if there is one, or happily return a new NullDispatchContext
             var currentDispatchContextId = GetCurrentDispatchContextId();
-            if (currentDispatchContextId == null) return new NullDispatchContext();
+            if (currentDispatchContextId == null) return new InitialDispatchContext();
 
-            DispatchContext dispatchContext;
+            SubsequentDispatchContext dispatchContext;
             return (_store.TryGetValue(currentDispatchContextId, out dispatchContext))
                 ? (IDispatchContext) dispatchContext
-                : new NullDispatchContext();
+                : new InitialDispatchContext();
         }
 
         public IDisposable StartNewDispatchContext(IDispatchContext dispatchContext)
         {
             AssertCanStartDispatch(dispatchContext);
             
-            if (!_store.TryAdd(dispatchContext.DispatchId, (DispatchContext) dispatchContext))
+            if (!_store.TryAdd(dispatchContext.DispatchId, (SubsequentDispatchContext) dispatchContext))
                 throw new InvalidOperationException("Cannot add duplicate {0} {1} to the {0} store."
-                                                        .FormatWith(typeof(DispatchContext).Name, dispatchContext.DispatchId));
+                                                        .FormatWith(typeof(SubsequentDispatchContext).Name, dispatchContext.DispatchId));
 
             SetCurrentDispatchId(dispatchContext.DispatchId);
 
@@ -44,7 +45,7 @@ namespace Nimbus.Infrastructure.Dispatching
 
             ClearCurrentDispatchId();
 
-            DispatchContext removed;
+            SubsequentDispatchContext removed;
             _store.TryRemove(dispatchContextId, out removed);
         }
 
@@ -56,24 +57,24 @@ namespace Nimbus.Infrastructure.Dispatching
                 throw new InvalidOperationException("Dispatch {0} is already in progress in this Logical CallContext. Did you forget to Dispose it?"
                                                         .FormatWith(currentDispatchId));
             
-            if (dispatchContext is NullDispatchContext)
+            if (dispatchContext is InitialDispatchContext)
                 throw new InvalidOperationException("Don't start a Dispatch with a {0}, use a new {1} instead."
-                                                        .FormatWith(typeof(NullDispatchContext).Name, typeof(DispatchContext).Name));
+                                                        .FormatWith(typeof(InitialDispatchContext).Name, typeof(SubsequentDispatchContext).Name));
         }
 
         private static void ClearCurrentDispatchId()
         {
-            CallContext.LogicalSetData(CurrentDispatchIdDataSlotName, null);
+            CallContext.LogicalSetData(_currentDispatchIdDataSlotName, null);
         }
 
         private static void SetCurrentDispatchId(string dispatchId)
         {
-            CallContext.LogicalSetData(CurrentDispatchIdDataSlotName, dispatchId);
+            CallContext.LogicalSetData(_currentDispatchIdDataSlotName, dispatchId);
         }
 
         private static string GetCurrentDispatchContextId()
         {
-            return CallContext.LogicalGetData(CurrentDispatchIdDataSlotName) as string;
+            return CallContext.LogicalGetData(_currentDispatchIdDataSlotName) as string;
         }
 
         private sealed class DispatchContextWrapper : IDisposable

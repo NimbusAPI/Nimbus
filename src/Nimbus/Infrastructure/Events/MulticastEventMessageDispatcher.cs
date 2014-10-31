@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
@@ -28,10 +29,10 @@ namespace Nimbus.Infrastructure.Events
             _propertyInjector = propertyInjector;
         }
 
-        protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType)
+        protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, BrokeredMessage brokeredMessage)
         {
             var handler = (IHandleMulticastEvent<TBusEvent>)scope.Resolve(handlerType);
-            _propertyInjector.Inject(handler);
+            _propertyInjector.Inject(handler, brokeredMessage);
             return handler;
         }
 

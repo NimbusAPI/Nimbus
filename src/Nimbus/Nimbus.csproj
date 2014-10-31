@@ -108,11 +108,10 @@
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
-    <Compile Include="Infrastructure\Dispatching\DispatchContext.cs" />
+    <Compile Include="Infrastructure\Dispatching\SubsequentDispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
-    <Compile Include="Infrastructure\Dispatching\IDispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\IDispatchContextManager.cs" />
-    <Compile Include="Infrastructure\Dispatching\NullDispatchContext.cs" />
+    <Compile Include="Infrastructure\Dispatching\InitialDispatchContext.cs" />
     <Compile Include="Infrastructure\HandlerMapper.cs" />
     <Compile Include="Infrastructure\IHandlerMapper.cs" />
     <Compile Include="Infrastructure\IMessageDispatcherFactory.cs" />
