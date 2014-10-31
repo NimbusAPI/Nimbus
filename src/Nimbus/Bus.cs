@@ -47,8 +47,8 @@ namespace Nimbus
             _heartbeat = heartbeat;
             _messagePumpsManager = messagePumpsManager;
 
-            Started += delegate { _heartbeat.Start(); };
-            Stopping += delegate { _heartbeat.Stop(); };
+            Started += async delegate { await _heartbeat.Start(); };
+            Stopping += async delegate { await _heartbeat.Stop(); };
         }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
