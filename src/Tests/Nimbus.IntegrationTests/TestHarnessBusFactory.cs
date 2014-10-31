@@ -35,6 +35,7 @@ namespace Nimbus.IntegrationTests
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithHeartbeatInterval(TimeSpan.MaxValue)
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
