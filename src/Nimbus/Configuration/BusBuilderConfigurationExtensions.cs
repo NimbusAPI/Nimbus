@@ -107,6 +107,24 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithSubscriptionDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
+        {
+            configuration.SubscriptionDefaultMessageTimeToLive = new SubscriptionDefaultMessageTimeToLiveSetting { Value = timeToLive };
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithSubscriptionAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
+        {
+            configuration.SubscriptionAutoDeleteOnIdle = new SubscriptionAutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
+        {
+            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
         {
             configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };

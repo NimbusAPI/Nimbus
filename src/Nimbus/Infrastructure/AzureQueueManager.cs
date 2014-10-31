@@ -17,6 +17,9 @@ namespace Nimbus.Infrastructure
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
+        private readonly SubscriptionDefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
+        private readonly SubscriptionAutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly ILogger _logger;
         private readonly IRouter _router;
 
@@ -34,7 +37,10 @@ namespace Nimbus.Infrastructure
                                  ILogger logger,
                                  IRouter router,
                                  DefaultMessageLockDurationSetting defaultMessageLockDuration,
-            ITypeProvider typeProvider)
+                                 ITypeProvider typeProvider,
+                                 SubscriptionDefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
+                                 SubscriptionAutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -43,6 +49,9 @@ namespace Nimbus.Infrastructure
             _router = router;
             _defaultMessageLockDuration = defaultMessageLockDuration;
             _typeProvider = typeProvider;
+            _defaultMessageTimeToLive = defaultMessageTimeToLive;
+            _autoDeleteOnIdle = autoDeleteOnIdle;
+            _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -66,13 +75,13 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        public  Task<MessageSender> CreateMessageSender(string queuePath)
+        public Task<MessageSender> CreateMessageSender(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return  _messagingFactory().CreateMessageSenderAsync(queuePath);
+            return _messagingFactory().CreateMessageSenderAsync(queuePath);
         }
 
-        public  Task<MessageReceiver> CreateMessageReceiver(string queuePath)
+        public Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
             EnsureQueueExists(queuePath);
             return _messagingFactory().CreateMessageReceiverAsync(queuePath);
@@ -229,12 +238,12 @@ namespace Nimbus.Infrastructure
                 var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
                                               {
                                                   MaxDeliveryCount = _maxDeliveryAttempts,
-                                                  DefaultMessageTimeToLive = TimeSpan.MaxValue,
-                                                  EnableDeadLetteringOnMessageExpiration = true,
+                                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                                  EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
                                                   EnableBatchedOperations = true,
                                                   LockDuration = _defaultMessageLockDuration,
                                                   RequiresSession = false,
-                                                  AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                                  AutoDeleteOnIdle = _autoDeleteOnIdle,
                                               };
 
                 try
