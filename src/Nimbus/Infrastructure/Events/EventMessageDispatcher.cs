@@ -12,7 +12,6 @@ using Nimbus.Infrastructure.LongRunningTasks;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
-using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.Events
 {
@@ -56,14 +55,17 @@ namespace Nimbus.Infrastructure.Events
             await (Task) Dispatch((dynamic) busEvent, message, handlerType);
         }
 
-        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType) where TBusEvent : IBusEvent;
-        protected abstract Task DispatchToHandleMethod<TBusEvent>(TBusEvent busEvent, object handler) where TBusEvent : IBusEvent;
+        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, BrokeredMessage brokeredMessage)
+            where TBusEvent : IBusEvent;
+
+        protected abstract Task DispatchToHandleMethod<TBusEvent>(TBusEvent busEvent, object handler)
+            where TBusEvent : IBusEvent;
 
         private async Task Dispatch<TBusEvent>(TBusEvent busEvent, BrokeredMessage message, Type handlerType) where TBusEvent : IBusEvent
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = CreateHandlerFromScope(scope, busEvent, handlerType);
+                var handler = CreateHandlerFromScope(scope, busEvent, handlerType, message);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busEvent);
 
                 Exception exception;

@@ -48,7 +48,6 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         {
             return Task.Run(async () =>
                                   {
-                                      var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
                                       BrokeredMessage brokeredMessage;
                                       if (serializableObject == null)
                                       {
@@ -70,7 +69,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           {
                                               brokeredMessage = new BrokeredMessage();
                                               var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
-                                              brokeredMessage.Properties.Add(MessagePropertyKeys.LargeBodyBlobIdentifier, blobIdentifier);
+                                              brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                               //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
                                           else
@@ -80,10 +79,10 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
-                                      brokeredMessage.ReplyTo = _replyQueueName;
-
-                                      // Use the CorrelationId for the current dispatch, otherwise start a new CorrelationId using the message we're sending
+                                      var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
+                                      brokeredMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
                                       brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId ?? brokeredMessage.MessageId;
+                                      brokeredMessage.ReplyTo = _replyQueueName;
 
                                       return brokeredMessage;
                                   });

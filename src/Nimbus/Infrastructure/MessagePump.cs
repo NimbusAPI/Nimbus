@@ -90,7 +90,7 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     LogInfo("Dispatching", message);
-                    using (_dispatchContextManager.StartNewDispatchContext(new DispatchContext(message)))
+                    using (_dispatchContextManager.StartNewDispatchContext(new SubsequentDispatchContext(message)))
                     {
                         await _taskFactory.StartNew(() => _messageDispatcher.Dispatch(message), TaskContext.Dispatch).Unwrap();
                     }
