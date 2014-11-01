@@ -50,6 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 
             dependencyResolver.Register(bus, typeof (IBus));
             dependencyResolver.Register(new SystemClock(), typeof (IClock));
+            dependencyResolver.Register(new Func<DateTimeOffset>(() => DateTimeOffset.UtcNow), typeof (Func<DateTimeOffset>));
 
             await bus.Start();
 
