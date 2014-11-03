@@ -17,6 +17,7 @@ namespace Nimbus.Infrastructure.Heartbeat
     {
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
         private readonly IEventSender _eventSender;
+        private readonly ILogger _logger;
         private readonly IClock _clock;
 
         private readonly List<PerformanceCounterBase> _performanceCounters = new List<PerformanceCounterBase>();
@@ -37,10 +38,11 @@ namespace Nimbus.Infrastructure.Heartbeat
         private Timer _collectTimer;
         private bool _isRunning;
 
-        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender)
+        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender, ILogger logger)
         {
             _heartbeatInterval = heartbeatInterval;
             _eventSender = eventSender;
+            _logger = logger;
             _clock = clock;
         }
 
@@ -84,9 +86,10 @@ namespace Nimbus.Infrastructure.Heartbeat
                     var counter = (PerformanceCounterBase) Activator.CreateInstance(counterType);
                     _performanceCounters.Add(counter);
                 }
-                catch (UnauthorizedAccessException)
+                catch (Exception exc)
                 {
                     // We're not running with admin privileges? Oh, well. No performance counter for you.
+                    _logger.Warn("Could not create performance counter {PerformanceCounter}: {Message}", counterType.FullName, exc.ToString());
                 }
             }
 
