@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.DependencyResolution
@@ -10,17 +12,17 @@ namespace Nimbus.Infrastructure.DependencyResolution
     public class DependencyResolverScope : TrackingScope, IDependencyResolverScope
     {
         private readonly Type[] _componentTypes;
-        private readonly IDictionary<Type, object> _registeredInstances;
+        private readonly IDictionary<Type, object> _scopedInstances;
 
-        public DependencyResolverScope(Type[] componentTypes, IDictionary<Type, object> registeredInstances)
+        public DependencyResolverScope(Type[] componentTypes, IReadOnlyDictionary<Type, object> parentScopedInstances)
         {
             _componentTypes = componentTypes;
-            _registeredInstances = registeredInstances;
+            _scopedInstances = parentScopedInstances.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         public IDependencyResolverScope CreateChildScope()
         {
-            var childScope = new DependencyResolverScope(_componentTypes, _registeredInstances);
+            var childScope = new DependencyResolverScope(_componentTypes, new ReadOnlyDictionary<Type, object>(_scopedInstances));
             Track(childScope);
             return childScope;
         }
@@ -33,8 +35,8 @@ namespace Nimbus.Infrastructure.DependencyResolution
 
         public object Resolve(Type componentType)
         {
-            object registeredInstance;
-            if (_registeredInstances.TryGetValue(componentType, out registeredInstance)) return registeredInstance;
+            object scopedInstance;
+            if (_scopedInstances.TryGetValue(componentType, out scopedInstance)) return scopedInstance;
 
             var component = CreateInstance(componentType);
             Track(component);
@@ -46,19 +48,13 @@ namespace Nimbus.Infrastructure.DependencyResolution
         {
             try
             {
-                var args = componentType.GetConstructors()
-                                        .Single()
-                                        .GetParameters()
-                                        .Select(p => Resolve(p.ParameterType))
-                                        .ToArray();
-
-                var result = Activator.CreateInstance(componentType, args);
+                var result = Activator.CreateInstance(componentType);
                 return result;
             }
             catch (Exception exc)
             {
                 var message = (
-                                  "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters) or with dependencies supplied directly via {0}.Register(...). " +
+                                  "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters). " +
                                   "If you'd like to use constructor injection on your handlers, have a look at the examples provided in the README about how to wire things up via an IoC container."
                               ).FormatWith(GetType().Name);
 

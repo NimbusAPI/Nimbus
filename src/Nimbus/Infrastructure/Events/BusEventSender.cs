@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
-using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
@@ -40,31 +42,43 @@ namespace Nimbus.Infrastructure.Events
 
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
-            var message = await _brokeredMessageFactory.Create(busEvent);
+            var brokeredMessage = await _brokeredMessageFactory.Create(busEvent);
             var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                foreach (var interceptor in interceptors)
+                Exception exception;
+
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+                try
                 {
-                    await interceptor.OnEventPublishing(busEvent, message);
+                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage);
+
+                    var topicSender = _messagingFactory.GetTopicSender(topicPath);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnEventPublishing(busEvent, brokeredMessage);
+                    }
+                    await topicSender.Send(brokeredMessage);
+                    foreach (var interceptor in interceptors.Reverse())
+                    {
+                        await interceptor.OnEventPublished(busEvent, brokeredMessage);
+                    }
+                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage);
+
+                    return;
                 }
+                catch (Exception exc)
+                {
+                    exception = exc;
+                }
+
+                foreach (var interceptor in interceptors.Reverse())
+                {
+                    await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
+                }
+                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, exception);
             }
-
-            var topicSender = _messagingFactory.GetTopicSender(topicPath);
-
-            _logger.Debug("Publishing event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          topicPath,
-                          message.MessageId,
-                          message.CorrelationId);
-            await topicSender.Send(message);
-            _logger.Info("Published event {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         topicPath,
-                         message.MessageId,
-                         message.CorrelationId);
         }
     }
 }

@@ -37,21 +37,27 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        public async Task ThreeBrokeredMessagesShouldHaveBeenObserved()
+        public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved()
         {
-            _brokeredMessages.Count().ShouldBe(3);
+            _brokeredMessages.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task ThreeDispatchContextsShouldHaveBeenObserved()
+        public async Task WeShouldObserveOneDispatchContextPerMessage()
         {
-            _dispatchContexts.Count().ShouldBe(3);
+            _dispatchContexts.Count().ShouldBe(_numExpectedMessages);
+        }
+
+        [Test]
+        public async Task AllParentMessageIdsShouldBeDifferent()
+        {
+            _dispatchContexts.GroupBy(x => x.ResultOfMessageId).Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
         public async Task TheCorrelationIdsShouldAllBeTheSame()
         {
-            _dispatchContexts.GroupBy(x => x).Count().ShouldBe(1);
+            _dispatchContexts.GroupBy(x => x.CorrelationId).Count().ShouldBe(1);
         }
 
         [Test]

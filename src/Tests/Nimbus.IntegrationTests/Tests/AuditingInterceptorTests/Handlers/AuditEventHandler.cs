@@ -10,6 +10,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.Handlers
         public async Task Handle(AuditEvent busEvent)
         {
             MethodCallCounter.RecordCall<AuditEventHandler>(h => h.Handle(busEvent));
+            TestHarnessLoggerFactory.Create().Debug("Received audit message {@AuditMessage}", busEvent);
         }
     }
 }

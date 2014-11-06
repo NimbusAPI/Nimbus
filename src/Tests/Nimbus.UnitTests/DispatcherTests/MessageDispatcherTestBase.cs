@@ -1,4 +1,5 @@
 using System;
+using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
@@ -62,7 +63,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TRequestHandler>().Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
                                      .Returns(new[] {interceptor});
 
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
@@ -91,7 +92,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TCommandHandler>().Returns(new TCommandHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
                                      .Returns(new[] {interceptor});
 
             return new CommandMessageDispatcher(
@@ -117,7 +118,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TEventMessageHandler>().Returns(new TEventMessageHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
                                      .Returns(new[] {interceptor});
 
             return new MulticastEventMessageDispatcher(

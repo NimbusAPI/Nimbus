@@ -6,7 +6,7 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers
 {
-    public class FirstCommandHandler : IHandleCommand<FirstCommand>, IRequireBus, IRequireDispatchContext
+    public class FirstCommandHandler : IHandleCommand<FirstCommand>, IRequireBus
     {
         public IBus Bus { get; set; }
         public IDispatchContext DispatchContext { get; set; }

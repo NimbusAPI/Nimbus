@@ -95,6 +95,7 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
     <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
     <Compile Include="Infrastructure\Heartbeat\IHeartbeat.cs" />
@@ -194,11 +195,11 @@
     <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
     <Compile Include="Infrastructure\TaskScheduling\NimbusTaskFactory.cs" />
     <Compile Include="Infrastructure\TaskScheduling\NimbusTaskScheduler.cs" />
-    <Compile Include="Logging\StructuredLoggingNormalizer.cs" />
+    <Compile Include="Infrastructure\Logging\StructuredLoggingNormalizer.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
-    <Compile Include="Logging\ConsoleLogger.cs" />
-    <Compile Include="Logging\NullLogger.cs" />
+    <Compile Include="Infrastructure\Logging\ConsoleLogger.cs" />
+    <Compile Include="Infrastructure\Logging\NullLogger.cs" />
     <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="Configuration\BusBuilder.cs" />
     <Compile Include="Configuration\BusBuilderConfiguration.cs" />

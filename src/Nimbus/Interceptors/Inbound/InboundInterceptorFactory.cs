@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.PropertyInjection;
 
 namespace Nimbus.Interceptors.Inbound
 {
     internal class InboundInterceptorFactory : IInboundInterceptorFactory
     {
         private readonly GlobalInboundInterceptorTypesSetting _globalInboundInterceptorTypes;
+        private readonly IPropertyInjector _propertyInjector;
 
-        public InboundInterceptorFactory(GlobalInboundInterceptorTypesSetting globalInboundInterceptorTypes)
+        public InboundInterceptorFactory(GlobalInboundInterceptorTypesSetting globalInboundInterceptorTypes, IPropertyInjector propertyInjector)
         {
             _globalInboundInterceptorTypes = globalInboundInterceptorTypes;
+            _propertyInjector = propertyInjector;
         }
 
-        public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message)
+        public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message, BrokeredMessage brokeredMessage)
         {
             var globalInterceptors = GetGlobalInterceptorTypes();
             var classLevelInterceptors = GetClassLevelInterceptorTypes(handler);
@@ -29,6 +33,7 @@ namespace Nimbus.Interceptors.Inbound
                 .Union(methodLevelInterceptors)
                 .DistinctBy(t => t.FullName)
                 .Select(t => (IInboundInterceptor) scope.Resolve(t))
+                .Do(interceptor => _propertyInjector.Inject(interceptor, brokeredMessage))
                 .OrderByDescending(i => i.Priority)
                 .ThenBy(i => i.GetType().FullName)
                 .ToArray();

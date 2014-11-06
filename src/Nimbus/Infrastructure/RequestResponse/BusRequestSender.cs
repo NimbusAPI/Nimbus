@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
@@ -61,51 +64,55 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
 
-            var message = (await _brokeredMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForQueue(queuePath)
                 ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(message.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                foreach (var interceptor in interceptors)
+                Exception exception;
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+
+                try
                 {
-                    await interceptor.OnRequestSending(busRequest, message);
+                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
+
+                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnRequestSending(busRequest, brokeredMessage);
+                    }
+                    await sender.Send(brokeredMessage);
+                    foreach (var interceptor in interceptors.Reverse())
+                    {
+                        await interceptor.OnRequestSent(busRequest, brokeredMessage);
+                    }
+                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+
+                    _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage);
+                    var response = await responseCorrelationWrapper.WaitForResponse(timeout);
+                    _logger.LogDispatchAction("Received response to", queuePath, brokeredMessage);
+
+                    return response;
                 }
+                catch (Exception exc)
+                {
+                    exception = exc;
+                }
+
+                foreach (var interceptor in interceptors.Reverse())
+                {
+                    await interceptor.OnRequestSendingError(busRequest, brokeredMessage, exception);
+                }
+                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+
+                ExceptionDispatchInfo.Capture(exception).Throw();
+                return default(TResponse);
             }
-
-            var sender = _messagingFactory.GetQueueSender(queuePath);
-
-            _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
-            await sender.Send(message);
-            _logger.Info("Sent request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         queuePath,
-                         message.MessageId,
-                         message.CorrelationId);
-
-            _logger.Debug("Waiting for response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
-            var response = await responseCorrelationWrapper.WaitForResponse(timeout);
-            _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         queuePath,
-                         message.MessageId,
-                         message.CorrelationId,
-                         response.GetType().FullName);
-
-            return response;
         }
     }
 }

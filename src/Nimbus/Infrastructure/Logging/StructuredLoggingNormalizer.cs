@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using Nimbus.Extensions;
 
-namespace Nimbus.Logging
+namespace Nimbus.Infrastructure.Logging
 {
     internal static class StructuredLoggingNormalizer
     {

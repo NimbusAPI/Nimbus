@@ -14,9 +14,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 {
     [TestFixture]
-    [Timeout(5*1000)]
+    [Timeout(_timeoutSeconds * 1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
+        private const int _timeoutSeconds = 5;
+
         private object[] _allAuditedMessages;
 
         protected override async Task<IBus> Given()
@@ -48,9 +50,6 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                                               "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
 
-            dependencyResolver.Register(bus, typeof (IBus));
-            dependencyResolver.Register(new SystemClock(), typeof (IClock));
-
             await bus.Start();
 
             return bus;
@@ -66,7 +65,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                 Subject.Publish(new SomeEvent())
                 );
 
-            await TimeSpan.FromSeconds(2).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
+            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
             MethodCallCounter.Stop();
 
             _allAuditedMessages = MethodCallCounter.AllReceivedMessages

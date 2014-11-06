@@ -77,6 +77,7 @@ namespace Nimbus.Infrastructure.Heartbeat
 
         public async Task Start()
         {
+            if (_heartbeatInterval.Value == TimeSpan.MaxValue) return;
             if (_isRunning) return;
 
             foreach (var counterType in _performanceCounterTypes.Value)
@@ -107,12 +108,12 @@ namespace Nimbus.Infrastructure.Heartbeat
             _heartbeatTimer.Elapsed += OnHeartbeatTimerElapsed;
             _heartbeatTimer.Start();
 
-            if (_heartbeatInterval.Value < TimeSpan.MaxValue) await Beat();
             _isRunning = true;
         }
 
         public async Task Stop()
         {
+            if (_heartbeatInterval.Value == TimeSpan.MaxValue) return;
             if (!_isRunning) return;
 
             _collectTimer.Stop();
