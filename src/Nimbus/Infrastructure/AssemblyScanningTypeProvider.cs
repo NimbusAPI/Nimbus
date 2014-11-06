@@ -6,6 +6,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Interceptors;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -15,7 +16,7 @@ namespace Nimbus.Infrastructure
 {
     public class AssemblyScanningTypeProvider : ITypeProvider, IValidatableConfigurationSetting
     {
-        private readonly Assembly[] _controlMessageAssemblies = {typeof (AuditEvent).Assembly};
+        private readonly Assembly[] _nimbusAssemblies = {typeof (AuditEvent).Assembly, typeof(Bus).Assembly, typeof(IBus).Assembly};
 
         private readonly Assembly[] _assemblies;
         private readonly ThreadSafeLazy<Type[]> _allInstantiableTypesInScannedAssemblies;
@@ -41,7 +42,7 @@ namespace Nimbus.Infrastructure
         {
             _assemblies = new Assembly[0]
                 .Union(assemblies)
-                .Union(_controlMessageAssemblies)
+                .Union(_nimbusAssemblies)
                 .ToArray();
 
             _allInstantiableTypesInScannedAssemblies = new ThreadSafeLazy<Type[]>(ScanAssembliesForInterestingTypes);
