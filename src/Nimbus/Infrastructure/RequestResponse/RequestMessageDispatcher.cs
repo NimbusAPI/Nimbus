@@ -112,7 +112,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                         .DestinedForQueue(replyQueueName);
 
                     var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
-                    foreach (var interceptor in outboundInterceptors)
+                    foreach (var interceptor in outboundInterceptors.Reverse())
                     {
                         _logger.Debug("Executing OnResponseSending on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
@@ -135,6 +135,24 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   brokeredMessage.MessageId,
                                   brokeredMessage.CorrelationId);
                     await replyQueueClient.Send(responseMessage);
+
+                    foreach (var interceptor in outboundInterceptors.Reverse())
+                    {
+                        _logger.Debug("Executing OnResponseSent on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                                      interceptor.GetType().FullName,
+                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      brokeredMessage.MessageId,
+                                      brokeredMessage.CorrelationId);
+
+                        await interceptor.OnResponseSent(response, responseMessage);
+
+                        _logger.Debug("Executed OnResponseSent on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
+                                      interceptor.GetType().FullName,
+                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      brokeredMessage.MessageId,
+                                      brokeredMessage.CorrelationId);
+                    }
+
                     _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                                  brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
                                  replyQueueName,

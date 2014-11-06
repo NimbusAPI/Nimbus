@@ -11,7 +11,7 @@ namespace Nimbus.Infrastructure.Logging
         internal static void LogDispatchAction(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message)
         {
             var metadata = MessageMetadata.Create(message);
-            logger.Debug("{DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} (@{MessageMetadata})",
+            logger.Debug("{DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} ({@MessageMetadata})",
                          dispatchAction,
                          metadata.ShortMessageTypeName,
                          metadata.MessageId,
@@ -23,7 +23,7 @@ namespace Nimbus.Infrastructure.Logging
         {
             var metadata = MessageMetadata.Create(message);
             logger.Error(exception,
-                         "Error {DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} (@{MessageMetadata})",
+                         "Error {DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} ({@MessageMetadata})",
                          dispatchAction,
                          metadata.ShortMessageTypeName,
                          metadata.MessageId,
@@ -41,10 +41,10 @@ namespace Nimbus.Infrastructure.Logging
             public static MessageMetadata Create(BrokeredMessage message)
             {
                 var typeFullName = message.SafelyGetBodyTypeNameOrDefault();
-                var typeName = typeFullName == null
+                var shortMessageTypeName = typeFullName == null
                                    ? null
                                    : typeFullName.Split('.').Last();
-                return new MessageMetadata(Guid.Parse(message.MessageId), Guid.Parse(message.CorrelationId), typeName, typeFullName);
+                return new MessageMetadata(Guid.Parse(message.MessageId), Guid.Parse(message.CorrelationId), shortMessageTypeName, typeFullName);
             }
 
             private MessageMetadata(Guid messageId, Guid correlationId, string shortMessageTypeName, string messageType)

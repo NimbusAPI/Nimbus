@@ -116,17 +116,23 @@ namespace Nimbus.Infrastructure.RequestResponse
                             ;
 
                         var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
-                        foreach (var interceptor in outboundInterceptors)
-                        {
-                            await interceptor.OnMulticastResponseSending(response, brokeredMessage);
-                        }
-
                         _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                                       responseMessage.SafelyGetBodyTypeNameOrDefault(),
                                       replyQueueName,
                                       brokeredMessage.MessageId,
                                       brokeredMessage.CorrelationId);
+                        foreach (var interceptor in outboundInterceptors)
+                        {
+                            await interceptor.OnMulticastResponseSending(response, brokeredMessage);
+                        }
+
                         await replyQueueClient.Send(responseMessage);
+
+                        foreach (var interceptor in outboundInterceptors.Reverse())
+                        {
+                            await interceptor.OnMulticastResponseSent(response, brokeredMessage);
+                        }
+
                         _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
                                      replyQueueName,

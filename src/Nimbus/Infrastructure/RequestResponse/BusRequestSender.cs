@@ -87,10 +87,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                         await interceptor.OnRequestSending(busRequest, brokeredMessage);
                     }
                     await sender.Send(brokeredMessage);
-                    foreach (var interceptor in interceptors)
+                    foreach (var interceptor in interceptors.Reverse())
                     {
                         await interceptor.OnRequestSent(busRequest, brokeredMessage);
-                    } _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+                    }
+                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
 
                     _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage);
                     var response = await responseCorrelationWrapper.WaitForResponse(timeout);

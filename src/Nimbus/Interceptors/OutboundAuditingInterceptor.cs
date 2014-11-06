@@ -15,45 +15,54 @@ namespace Nimbus.Interceptors
         public override async Task OnCommandSent<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
         {
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busCommand, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busCommand.GetType().FullName, busCommand, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnRequestSent<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
         {
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busRequest, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busRequest.GetType().FullName, busRequest, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
         {
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busResponse, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busResponse.GetType().FullName, busResponse, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnMulticastRequestSent<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
         {
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busRequest, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busRequest.GetType().FullName, busRequest, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnMulticastResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
         {
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busResponse, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busResponse.GetType().FullName, busResponse, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
+        }
+
+        public override async Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
+        {
+            // Quis custodiet ipsos custodes? ;)
+            var auditEvent = busEvent as AuditEvent;
+            if (auditEvent == null) return;
+
+            brokeredMessage.Properties["AuditedMessageType"] = auditEvent.MessageType;
         }
 
         public override async Task OnEventPublished<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
         {
             // Quis custodiet ipsos custodes? ;)
-            if (typeof (TBusEvent) == typeof (AuditEvent)) return;
+            if (busEvent is AuditEvent) return;
 
             var timestamp = Clock.UtcNow;
-            var auditEvent = new AuditEvent(busEvent, brokeredMessage.Properties, timestamp);
+            var auditEvent = new AuditEvent(busEvent.GetType().FullName, busEvent, brokeredMessage.Properties, timestamp);
             await Bus.Publish(auditEvent);
         }
     }
