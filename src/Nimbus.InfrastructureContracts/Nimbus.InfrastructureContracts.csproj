@@ -55,7 +55,6 @@
     <Compile Include="Handlers\IHandleMulticastRequest.cs" />
     <Compile Include="Handlers\ILongRunningTask.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="IClock.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />
@@ -70,7 +69,7 @@
     <Compile Include="PropertyInjection\IRequireMessageProperties.cs" />
     <Compile Include="PropertyInjection\IRequireBrokeredMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />
-    <Compile Include="PropertyInjection\IRequireClock.cs" />
+    <Compile Include="PropertyInjection\IRequireDateTime.cs" />
     <Compile Include="PropertyInjection\IRequireDispatchContext.cs" />
     <Compile Include="PropertyInjection\IRequireLargeMessageBodyStore.cs" />
     <Compile Include="Routing\IRouter.cs" />
