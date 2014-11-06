@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.PropertyInjection;
@@ -8,13 +9,15 @@ namespace Nimbus.Infrastructure.PropertyInjection
     {
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IClock _clock;
+        private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 
         public IBus Bus { get; set; }
 
-        public PropertyInjector(IDispatchContextManager dispatchContextManager, IClock clock)
+        public PropertyInjector(IDispatchContextManager dispatchContextManager, IClock clock, ILargeMessageBodyStore largeMessageBodyStore)
         {
             _dispatchContextManager = dispatchContextManager;
             _clock = clock;
+            _largeMessageBodyStore = largeMessageBodyStore;
         }
 
         public void Inject(object handlerOrInterceptor, BrokeredMessage brokeredMessage)
@@ -41,6 +44,22 @@ namespace Nimbus.Infrastructure.PropertyInjection
             if (requireClock != null)
             {
                 requireClock.Clock = _clock;
+            }
+
+            var requireLargeMessageBodyStore = handlerOrInterceptor as IRequireLargeMessageBodyStore;
+            if (requireLargeMessageBodyStore != null)
+            {
+                requireLargeMessageBodyStore.LargeMessageBodyStore = _largeMessageBodyStore;
+            }
+
+            var requireMessageProperties = handlerOrInterceptor as IRequireMessageProperties;
+            if (requireMessageProperties != null)
+            {
+                var properties = brokeredMessage.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                properties[MessagePropertyKeys.MessageId] = brokeredMessage.MessageId;
+                properties[MessagePropertyKeys.CorrelationId] = brokeredMessage.CorrelationId;
+
+                requireMessageProperties.MessageProperties = properties;
             }
         }
     }

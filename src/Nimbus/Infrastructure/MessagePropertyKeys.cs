@@ -2,6 +2,8 @@
 {
     public static class MessagePropertyKeys
     {
+        public const string MessageId = "MessageId";
+        public const string CorrelationId = "CorrelationId";
         public const string RequestTimeoutInMilliseconds = "RequestTimeoutInMilliseconds";
         public const string RequestSuccessful = "RequestSuccessful";
         public const string ExceptionMessage = "ExceptionMessage";

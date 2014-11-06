@@ -2,17 +2,13 @@
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.PropertyInjection;
 
 namespace Nimbus.Interceptors
 {
-    public class LargeMessageBodyCleanupInterceptor : InboundInterceptor
+    public class LargeMessageBodyCleanupInterceptor : InboundInterceptor, IRequireLargeMessageBodyStore
     {
-        private readonly ILargeMessageBodyStore _largeMessageBodyStore;
-
-        public LargeMessageBodyCleanupInterceptor(ILargeMessageBodyStore largeMessageBodyStore)
-        {
-            _largeMessageBodyStore = largeMessageBodyStore;
-        }
+        public ILargeMessageBodyStore LargeMessageBodyStore { get; set; }
 
         public override int Priority
         {
@@ -30,7 +26,7 @@ namespace Nimbus.Interceptors
             if (!brokeredMessage.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobIdObject)) return;
 
             var blobId = (string) blobIdObject;
-            await _largeMessageBodyStore.Delete(blobId);
+            await LargeMessageBodyStore.Delete(blobId);
         }
     }
 }

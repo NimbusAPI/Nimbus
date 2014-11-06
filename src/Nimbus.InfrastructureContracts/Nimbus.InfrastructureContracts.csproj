@@ -67,10 +67,12 @@
     <Compile Include="IDispatchContext.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
+    <Compile Include="PropertyInjection\IRequireMessageProperties.cs" />
     <Compile Include="PropertyInjection\IRequireBrokeredMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />
     <Compile Include="PropertyInjection\IRequireClock.cs" />
     <Compile Include="PropertyInjection\IRequireDispatchContext.cs" />
+    <Compile Include="PropertyInjection\IRequireLargeMessageBodyStore.cs" />
     <Compile Include="Routing\IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
