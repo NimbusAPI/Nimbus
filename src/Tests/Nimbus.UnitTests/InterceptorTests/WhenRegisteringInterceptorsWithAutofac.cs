@@ -1,8 +1,11 @@
 ﻿using System.Linq;
 using Autofac;
+using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
+using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Interceptors.Outbound;
 using NSubstitute;
 using NUnit.Framework;
@@ -36,8 +39,13 @@ namespace Nimbus.UnitTests.InterceptorTests
                                          {
                                              Value = interceptorTypes
                                          };
-                var outboundInterceptorFactory = new OutboundInterceptorFactory(interceptorSetting);
-                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope);
+                var outboundInterceptorFactory = new OutboundInterceptorFactory(interceptorSetting,
+                                                                                new PropertyInjector(Substitute.For<IClock>(),
+                                                                                                     Substitute.For<IDispatchContextManager>(),
+                                                                                                     Substitute.For<ILargeMessageBodyStore>()));
+
+                var dummyBrokeredMessage = new BrokeredMessage();
+                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyBrokeredMessage);
 
                 interceptors.Count().ShouldBe(1);
             }

@@ -66,7 +66,7 @@ namespace Nimbus.Infrastructure.Commands
             {
                 var handler = (IHandleCommand<TBusCommand>)scope.Resolve(handlerType);
                 _propertyInjector.Inject(handler, message);
-                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand);
+                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand, message);
 
                 Exception exception;
                 try

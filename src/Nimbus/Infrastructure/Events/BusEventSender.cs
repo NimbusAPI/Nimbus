@@ -42,29 +42,29 @@ namespace Nimbus.Infrastructure.Events
 
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
-            var message = await _brokeredMessageFactory.Create(busEvent);
+            var brokeredMessage = await _brokeredMessageFactory.Create(busEvent);
             var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
 
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Publishing", topicPath, message);
+                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage);
 
                     var topicSender = _messagingFactory.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
                     {
-                        await interceptor.OnEventPublishing(busEvent, message);
+                        await interceptor.OnEventPublishing(busEvent, brokeredMessage);
                     }
-                    await topicSender.Send(message);
+                    await topicSender.Send(brokeredMessage);
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnEventPublished(busEvent, message);
+                        await interceptor.OnEventPublished(busEvent, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Published", topicPath, message);
+                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage);
 
                     return;
                 }
@@ -75,9 +75,9 @@ namespace Nimbus.Infrastructure.Events
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    await interceptor.OnEventPublishingError(busEvent, message, exception);
+                    await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("publishing", topicPath, message, exception);
+                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, exception);
             }
         }
     }

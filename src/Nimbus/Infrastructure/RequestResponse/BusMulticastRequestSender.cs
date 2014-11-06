@@ -54,38 +54,38 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
 
-            var message = (await _brokeredMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForTopic(topicPath)
                 ;
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(message.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
 
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", topicPath, message);
+                    _logger.LogDispatchAction("Sending", topicPath, brokeredMessage);
 
                     var sender = _messagingFactory.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
                     {
-                        await interceptor.OnMulticastRequestSending(busRequest, message);
+                        await interceptor.OnMulticastRequestSending(busRequest, brokeredMessage);
                     }
-                    await sender.Send(message);
+                    await sender.Send(brokeredMessage);
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnMulticastRequestSent(busRequest, message);
+                        await interceptor.OnMulticastRequestSent(busRequest, brokeredMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", topicPath, message);
+                    _logger.LogDispatchAction("Sent", topicPath, brokeredMessage);
 
-                    _logger.LogDispatchAction("Waiting for response to", topicPath, message);
+                    _logger.LogDispatchAction("Waiting for response to", topicPath, brokeredMessage);
                     var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-                    _logger.LogDispatchAction("Received response to", topicPath, message);
+                    _logger.LogDispatchAction("Received response to", topicPath, brokeredMessage);
 
                     return response;
                 }
@@ -96,9 +96,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    await interceptor.OnMulticastRequestSendingError(busRequest, message, exception);
+                    await interceptor.OnMulticastRequestSendingError(busRequest, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("sending", topicPath, message, exception);
+                _logger.LogDispatchError("sending", topicPath, brokeredMessage, exception);
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return null;
