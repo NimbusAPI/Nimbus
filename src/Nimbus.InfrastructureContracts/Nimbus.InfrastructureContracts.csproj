@@ -69,6 +69,7 @@
     <Compile Include="ILargeMessageBodyStore.cs" />
     <Compile Include="PropertyInjection\IRequireBrokeredMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />
+    <Compile Include="PropertyInjection\IRequireClock.cs" />
     <Compile Include="PropertyInjection\IRequireDispatchContext.cs" />
     <Compile Include="Routing\IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />

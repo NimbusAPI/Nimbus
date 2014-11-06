@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
@@ -63,26 +66,38 @@ namespace Nimbus.Infrastructure.Commands
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
+                Exception exception;
+
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                foreach (var interceptor in interceptors)
+                try
                 {
-                    await interceptor.OnCommandSending(busCommand, message);
+                    _logger.LogDispatchAction("Sending", queuePath, message);
+
+                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnCommandSending(busCommand, message);
+                    }
+                    await sender.Send(message);
+                    foreach (var interceptor in interceptors.Reverse())
+                    {
+                        await interceptor.OnCommandSent(busCommand, message);
+                    }
+
+                    _logger.LogDispatchAction("Sent", queuePath, message);
+                    return;
                 }
+                catch (Exception exc)
+                {
+                    exception = exc;
+                }
+
+                foreach (var interceptor in interceptors.Reverse())
+                {
+                    await interceptor.OnCommandSendingError(busCommand, message, exception);
+                }
+                _logger.LogDispatchError("sending", queuePath, message, exception);
             }
-
-            var sender = _messagingFactory.GetQueueSender(queuePath);
-
-            _logger.Debug("Sending command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
-            await sender.Send(message);
-            _logger.Debug("Sent command {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
         }
     }
 }

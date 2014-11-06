@@ -7,8 +7,8 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.Logging;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Routing;
 

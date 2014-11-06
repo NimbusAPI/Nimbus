@@ -1,4 +1,4 @@
-﻿using Nimbus.Logging;
+﻿using Nimbus.Infrastructure.Logging;
 using NUnit.Framework;
 using Shouldly;
 

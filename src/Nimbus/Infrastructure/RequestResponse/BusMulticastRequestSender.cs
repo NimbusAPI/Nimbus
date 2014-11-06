@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
@@ -60,41 +63,46 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
+                Exception exception;
+
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                foreach (var interceptor in interceptors)
+                try
                 {
-                    await interceptor.OnMulticastRequestSending(busRequest, message);
+                    _logger.LogDispatchAction("Sending", topicPath, message);
+
+                    var sender = _messagingFactory.GetTopicSender(topicPath);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnMulticastRequestSending(busRequest, message);
+                    }
+                    await sender.Send(message);
+                    foreach (var interceptor in interceptors.Reverse())
+                    {
+                        await interceptor.OnMulticastRequestSent(busRequest, message);
+                    }
+
+                    _logger.LogDispatchAction("Sent", topicPath, message);
+
+                    _logger.LogDispatchAction("Waiting for response to", topicPath, message);
+                    var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
+                    _logger.LogDispatchAction("Received response to", topicPath, message);
+
+                    return response;
                 }
+                catch (Exception exc)
+                {
+                    exception = exc;
+                }
+
+                foreach (var interceptor in interceptors.Reverse())
+                {
+                    await interceptor.OnMulticastRequestSendingError(busRequest, message, exception);
+                }
+                _logger.LogDispatchError("sending", topicPath, message, exception);
+
+                ExceptionDispatchInfo.Capture(exception).Throw();
+                return null;
             }
-
-            var sender = _messagingFactory.GetTopicSender(topicPath);
-
-            _logger.Debug("Sending multicast request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          topicPath,
-                          message.MessageId,
-                          message.CorrelationId);
-            await sender.Send(message);
-            _logger.Info("Sent multicast request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         topicPath,
-                         message.MessageId,
-                         message.CorrelationId);
-
-            _logger.Debug("Waiting for multicast response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          topicPath,
-                          message.MessageId,
-                          message.CorrelationId);
-            var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-            _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         topicPath,
-                         message.MessageId,
-                         message.CorrelationId,
-                         response.GetType().FullName);
-
-            return response;
         }
     }
 }

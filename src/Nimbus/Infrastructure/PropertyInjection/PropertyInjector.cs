@@ -7,12 +7,14 @@ namespace Nimbus.Infrastructure.PropertyInjection
     internal class PropertyInjector : IPropertyInjector
     {
         private readonly IDispatchContextManager _dispatchContextManager;
+        private readonly IClock _clock;
 
         public IBus Bus { get; set; }
 
-        public PropertyInjector(IDispatchContextManager dispatchContextManager)
+        public PropertyInjector(IDispatchContextManager dispatchContextManager, IClock clock)
         {
             _dispatchContextManager = dispatchContextManager;
+            _clock = clock;
         }
 
         public void Inject(object handlerOrInterceptor, BrokeredMessage brokeredMessage)
@@ -33,6 +35,12 @@ namespace Nimbus.Infrastructure.PropertyInjection
             if (requireBrokeredMessage != null)
             {
                 requireBrokeredMessage.BrokeredMessage = brokeredMessage;
+            }
+
+            var requireClock = handlerOrInterceptor as IRequireClock;
+            if (requireClock != null)
+            {
+                requireClock.Clock = _clock;
             }
         }
     }

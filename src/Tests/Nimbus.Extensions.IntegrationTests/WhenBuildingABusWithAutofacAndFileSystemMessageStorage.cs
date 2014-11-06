@@ -3,8 +3,8 @@ using System.IO;
 using Autofac;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.Logging;
 using NUnit.Framework;
 
 namespace Nimbus.Extensions.IntegrationTests

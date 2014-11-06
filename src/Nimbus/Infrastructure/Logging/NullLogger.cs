@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Logging
+namespace Nimbus.Infrastructure.Logging
 {
     public class NullLogger : ILogger
     {

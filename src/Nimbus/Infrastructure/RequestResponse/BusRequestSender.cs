@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Routing;
@@ -71,41 +74,44 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
+                Exception exception;
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope);
-                foreach (var interceptor in interceptors)
+
+                try
                 {
-                    await interceptor.OnRequestSending(busRequest, message);
+                    _logger.LogDispatchAction("Sending", queuePath, message);
+
+                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnRequestSending(busRequest, message);
+                    }
+                    await sender.Send(message);
+                    foreach (var interceptor in interceptors)
+                    {
+                        await interceptor.OnRequestSent(busRequest, message);
+                    } _logger.LogDispatchAction("Sent", queuePath, message);
+
+                    _logger.LogDispatchAction("Waiting for response to", queuePath, message);
+                    var response = await responseCorrelationWrapper.WaitForResponse(timeout);
+                    _logger.LogDispatchAction("Received response to", queuePath, message);
+
+                    return response;
                 }
+                catch (Exception exc)
+                {
+                    exception = exc;
+                }
+
+                foreach (var interceptor in interceptors.Reverse())
+                {
+                    await interceptor.OnRequestSendingError(busRequest, message, exception);
+                }
+                _logger.LogDispatchError("sending", queuePath, message, exception);
+
+                ExceptionDispatchInfo.Capture(exception).Throw();
+                return default(TResponse);
             }
-
-            var sender = _messagingFactory.GetQueueSender(queuePath);
-
-            _logger.Debug("Sending request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
-            await sender.Send(message);
-            _logger.Info("Sent request {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         queuePath,
-                         message.MessageId,
-                         message.CorrelationId);
-
-            _logger.Debug("Waiting for response to {0} from {1} [MessageId:{2}, CorrelationId:{3}]",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          queuePath,
-                          message.MessageId,
-                          message.CorrelationId);
-            var response = await responseCorrelationWrapper.WaitForResponse(timeout);
-            _logger.Info("Received response to {0} from {1} [MessageId:{2}, CorrelationId:{3}] in the form of {4}",
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         queuePath,
-                         message.MessageId,
-                         message.CorrelationId,
-                         response.GetType().FullName);
-
-            return response;
         }
     }
 }
