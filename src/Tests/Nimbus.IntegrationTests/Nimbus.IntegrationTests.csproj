@@ -144,6 +144,9 @@
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowTwoResponders.cs" />
     <Compile Include="TestForBus.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\FirstCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\ThirdCommandHandler.cs" />
