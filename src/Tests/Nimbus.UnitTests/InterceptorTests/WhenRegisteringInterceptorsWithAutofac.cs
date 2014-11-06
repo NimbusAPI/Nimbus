@@ -4,6 +4,7 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Interceptors.Outbound;

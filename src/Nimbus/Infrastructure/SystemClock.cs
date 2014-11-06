@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure
 {
-    public class SystemClock : IClock
+    internal class SystemClock : IClock
     {
         public DateTimeOffset UtcNow
         {

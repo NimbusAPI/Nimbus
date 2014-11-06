@@ -40,10 +40,10 @@ namespace Nimbus.Infrastructure.PropertyInjection
                 requireBrokeredMessage.BrokeredMessage = brokeredMessage;
             }
 
-            var requireClock = handlerOrInterceptor as IRequireClock;
-            if (requireClock != null)
+            var requireDateTime = handlerOrInterceptor as IRequireDateTime;
+            if (requireDateTime != null)
             {
-                requireClock.Clock = _clock;
+                requireDateTime.UtcNow= _clock.UtcNow;
             }
 
             var requireLargeMessageBodyStore = handlerOrInterceptor as IRequireLargeMessageBodyStore;
