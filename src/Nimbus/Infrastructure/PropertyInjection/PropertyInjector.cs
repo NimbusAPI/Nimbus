@@ -7,16 +7,16 @@ namespace Nimbus.Infrastructure.PropertyInjection
 {
     internal class PropertyInjector : IPropertyInjector
     {
-        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IClock _clock;
+        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 
         public IBus Bus { get; set; }
 
-        public PropertyInjector(IDispatchContextManager dispatchContextManager, IClock clock, ILargeMessageBodyStore largeMessageBodyStore)
+        public PropertyInjector(IClock clock, IDispatchContextManager dispatchContextManager, ILargeMessageBodyStore largeMessageBodyStore)
         {
-            _dispatchContextManager = dispatchContextManager;
             _clock = clock;
+            _dispatchContextManager = dispatchContextManager;
             _largeMessageBodyStore = largeMessageBodyStore;
         }
 

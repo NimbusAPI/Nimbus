@@ -8,7 +8,7 @@ namespace Nimbus.Infrastructure.Logging
 {
     internal static class MessageLoggingExtensions
     {
-        public static void LogDispatchAction(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message)
+        internal static void LogDispatchAction(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message)
         {
             var metadata = MessageMetadata.Create(message);
             logger.Debug("{DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} (@{MessageMetadata})",
@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure.Logging
                          metadata);
         }
 
-        public static void LogDispatchError(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message, Exception exception)
+        internal static void LogDispatchError(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message, Exception exception)
         {
             var metadata = MessageMetadata.Create(message);
             logger.Error(exception,
