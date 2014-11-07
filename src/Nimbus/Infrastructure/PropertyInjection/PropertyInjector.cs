@@ -43,7 +43,7 @@ namespace Nimbus.Infrastructure.PropertyInjection
             var requireDateTime = handlerOrInterceptor as IRequireDateTime;
             if (requireDateTime != null)
             {
-                requireDateTime.UtcNow= _clock.UtcNow;
+                requireDateTime.UtcNow = () => _clock.UtcNow;
             }
 
             var requireLargeMessageBodyStore = handlerOrInterceptor as IRequireLargeMessageBodyStore;

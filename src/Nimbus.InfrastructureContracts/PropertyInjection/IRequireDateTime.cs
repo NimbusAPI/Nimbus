@@ -4,6 +4,6 @@ namespace Nimbus.PropertyInjection
 {
     public interface IRequireDateTime
     {
-        DateTimeOffset UtcNow { get; set; }
+        Func<DateTimeOffset> UtcNow { get; set; }
     }
 }
