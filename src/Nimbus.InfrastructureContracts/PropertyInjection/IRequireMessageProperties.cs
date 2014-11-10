@@ -4,6 +4,6 @@ namespace Nimbus.PropertyInjection
 {
     public interface IRequireMessageProperties
     {
-        Dictionary<string, object> MessageProperties { get; set; }
+        IDictionary<string, object> MessageProperties { get; set; }
     }
 }

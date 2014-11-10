@@ -9,13 +9,13 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandler
 {
     public class SomeOtherCommandHandler : IHandleCommand<SomeOtherCommand>, IRequireDispatchContext, IRequireMessageProperties
     {
-        private static Dictionary<string, object> _receivedMessageProperties;
+        private static IDictionary<string, object> _receivedMessageProperties;
         private static IDispatchContext _receivedDispatchContext;
 
         public IDispatchContext DispatchContext { get; set; }
-        public Dictionary<string, object> MessageProperties { get; set; }
+        public IDictionary<string, object> MessageProperties { get; set; }
 
-        public static Dictionary<string, object> ReceivedMessageProperties
+        public static IDictionary<string, object> ReceivedMessageProperties
         {
             get { return _receivedMessageProperties; }
         }

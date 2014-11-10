@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.PropertyInjection;
 
@@ -55,10 +56,7 @@ namespace Nimbus.Infrastructure.PropertyInjection
             var requireMessageProperties = handlerOrInterceptor as IRequireMessageProperties;
             if (requireMessageProperties != null)
             {
-                var properties = brokeredMessage.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                properties[MessagePropertyKeys.MessageId] = brokeredMessage.MessageId;
-                properties[MessagePropertyKeys.CorrelationId] = brokeredMessage.CorrelationId;
-
+                var properties = brokeredMessage.ExtractProperties();
                 requireMessageProperties.MessageProperties = properties;
             }
         }

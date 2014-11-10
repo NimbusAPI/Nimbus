@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 
@@ -75,6 +77,14 @@ namespace Nimbus.Extensions
             var requestTimeoutInMilliseconds = (int) message.Properties[MessagePropertyKeys.RequestTimeoutInMilliseconds];
             var timeout = TimeSpan.FromMilliseconds(requestTimeoutInMilliseconds);
             return timeout;
+        }
+
+        internal static IDictionary<string, object> ExtractProperties(this BrokeredMessage brokeredMessage)
+        {
+            var properties = brokeredMessage.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            properties[MessagePropertyKeys.MessageId] = brokeredMessage.MessageId;
+            properties[MessagePropertyKeys.CorrelationId] = brokeredMessage.CorrelationId;
+            return properties;
         }
     }
 }
