@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Extensions;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.ControlMessages;
@@ -15,36 +16,31 @@ namespace Nimbus.Interceptors
 
         public override async Task OnCommandSent<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
         {
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busCommand.GetType().FullName, busCommand, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busCommand, brokeredMessage);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnRequestSent<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
         {
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busRequest.GetType().FullName, busRequest, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busRequest, brokeredMessage);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
         {
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busResponse.GetType().FullName, busResponse, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busResponse, brokeredMessage);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnMulticastRequestSent<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
         {
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busRequest.GetType().FullName, busRequest, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busRequest, brokeredMessage);
             await Bus.Publish(auditEvent);
         }
 
         public override async Task OnMulticastResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
         {
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busResponse.GetType().FullName, busResponse, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busResponse, brokeredMessage);
             await Bus.Publish(auditEvent);
         }
 
@@ -62,9 +58,15 @@ namespace Nimbus.Interceptors
             // Quis custodiet ipsos custodes? ;)
             if (busEvent is AuditEvent) return;
 
-            var timestamp = UtcNow();
-            var auditEvent = new AuditEvent(busEvent.GetType().FullName, busEvent, brokeredMessage.Properties, timestamp);
+            var auditEvent = CreateAuditEvent(busEvent, brokeredMessage);
             await Bus.Publish(auditEvent);
+        }
+
+        private AuditEvent CreateAuditEvent(object message, BrokeredMessage brokeredMessage)
+        {
+            var timestamp = UtcNow();
+            var auditEvent = new AuditEvent(message.GetType().FullName, message, brokeredMessage.ExtractProperties(), timestamp);
+            return auditEvent;
         }
     }
 }
