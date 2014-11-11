@@ -33,7 +33,8 @@ namespace Nimbus.Configuration
             RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
-	        PathFactory.SetMasterPrefix(configuration.MasterPrefix);
+			if(configuration.MasterPrefix != null && !string.IsNullOrEmpty(configuration.MasterPrefix.Value))
+		        PathFactory.SetMasterPrefix(configuration.MasterPrefix);
 
             var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
                 container.Resolve<ServerConnectionCountSetting>(),
