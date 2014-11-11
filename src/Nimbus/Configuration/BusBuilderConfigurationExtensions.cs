@@ -41,6 +41,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+	    public static BusBuilderConfiguration WithMasterPrefix(this BusBuilderConfiguration configuration, string masterPrefix)
+	    {
+		    configuration.MasterPrefix = new MasterPrefixSetting {Value = masterPrefix};
+		    return configuration;
+	    }
+
         public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
             configuration.TypeProvider = typeProvider;

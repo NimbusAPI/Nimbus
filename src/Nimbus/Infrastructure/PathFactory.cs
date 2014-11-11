@@ -10,42 +10,66 @@ namespace Nimbus.Infrastructure
         private const string _topicPrefix = "t";
         private const string _instanceInputQueuePrefix = "inputqueue";
 
+		private static string _masterPrefix = "";
+	    private static string _prefixedQueuePrefix = _queuePrefix;
+	    private static string _prefixedTopicPrefix = _topicPrefix;
+	    private static string _prefixedInstanceInputQueuePrefix = _instanceInputQueuePrefix;
+
         // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
         private const string _queueCharacterWhitelist = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 
+	    public static void SetMasterPrefix(string masterPrefix)
+	    {
+		    _masterPrefix = masterPrefix;
+
+		    if (string.IsNullOrEmpty(_masterPrefix))
+		    {
+			    _masterPrefix = "";
+			    _prefixedQueuePrefix = _queuePrefix;
+			    _prefixedTopicPrefix = _topicPrefix;
+			    _prefixedInstanceInputQueuePrefix = _instanceInputQueuePrefix;
+		    }
+		    else
+		    {
+				_prefixedQueuePrefix = _masterPrefix + "." + _queuePrefix;
+				_prefixedTopicPrefix = _masterPrefix + "." + _topicPrefix;
+				_prefixedInstanceInputQueuePrefix = _masterPrefix + "." + _instanceInputQueuePrefix;
+			}
+		}
+
         public static string InputQueuePathFor(string applicationName, string instanceName)
         {
-            return Sanitize(string.Format("{0}.{1}.{2}", _instanceInputQueuePrefix, applicationName, instanceName));
+			return Sanitize(string.Format("{0}.{1}.{2}", _prefixedInstanceInputQueuePrefix, applicationName, instanceName));
         }
 
         public static string QueuePathFor(Type type)
         {
-            return Sanitize(_queuePrefix + "." + StripGenericQualification(type));
+			return Sanitize(_prefixedQueuePrefix + "." + StripGenericQualification(type));
         }
 
         public static string TopicPathFor(Type type)
         {
-            return Sanitize(_topicPrefix + "." + StripGenericQualification(type));
+			return Sanitize(_prefixedTopicPrefix + "." + StripGenericQualification(type));
         }
 
         public static string SubscriptionNameFor(string applicationName)
         {
-            return Shorten(Sanitize(applicationName), 50);
+			return Shorten(Sanitize(string.Join(".", new[] { _masterPrefix, applicationName })), 50);
         }
 
         public static string SubscriptionNameFor(string applicationName, string instanceName)
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName})), 50);
+			return Shorten(Sanitize(string.Join(".", new[] { _masterPrefix, applicationName, instanceName })), 50);
         }
 
         public static string SubscriptionNameFor(string applicationName, Type handlerType)
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, handlerType.Name})), 50);
+			return Shorten(Sanitize(string.Join(".", new[] { _masterPrefix, applicationName, handlerType.Name })), 50);
         }
 
         public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name})), 50);
+			return Shorten(Sanitize(string.Join(".", new[] { _masterPrefix, applicationName, instanceName, handlerType.Name })), 50);
         }
 
         private static string StripGenericQualification(Type type)
@@ -59,7 +83,10 @@ namespace Nimbus.Infrastructure
 
         private static string Sanitize(string path)
         {
-            path = string.Join("", path.ToLower().ToCharArray().Select(SanitiseCharacter));
+	        var pathArray = path.StartsWith(".") 
+				? path.Substring(1).ToLower().ToCharArray() 
+				: path.ToLower().ToCharArray();
+			path = string.Join("", pathArray.Select(SanitiseCharacter));
             return path;
         }
 

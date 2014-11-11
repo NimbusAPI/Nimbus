@@ -142,6 +142,7 @@
     <Compile Include="DispatcherTests\WhenInboundInterceptorThrowsExceptionOnRequestHandlerExecuting.cs" />
     <Compile Include="InfrastructureTests\Handlers\MyLongNamedHandler.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
+    <Compile Include="InfrastructureTests\PathFactoryWithMasterPrefixTests.cs" />
     <Compile Include="InterceptorTests\WhenRegisteringInterceptorsWithAutofac.cs" />
     <Compile Include="LoggingTests\TemplateNormalization\WhenNormalizingStructuredLogTemplates.cs" />
     <Compile Include="StringExtensions.cs" />

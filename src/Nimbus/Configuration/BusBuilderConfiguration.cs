@@ -5,6 +5,7 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Logging;
@@ -28,6 +29,7 @@ namespace Nimbus.Configuration
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
+		internal MasterPrefixSetting MasterPrefix { get; set; }
         internal ConnectionStringSetting ConnectionString { get; set; }
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
@@ -48,7 +50,7 @@ namespace Nimbus.Configuration
         {
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
-            Router = new DestinationPerMessageTypeRouter();
+			Router = new DestinationPerMessageTypeRouter();
 
             Logger = new NullLogger();
             Compressor = new NullCompressor();
@@ -57,6 +59,7 @@ namespace Nimbus.Configuration
         public Bus Build()
         {
             AssertConfigurationIsValid();
+
             return BusBuilder.Build(this);
         }
 
