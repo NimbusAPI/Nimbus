@@ -17,8 +17,8 @@ namespace Nimbus.Infrastructure
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
-        private readonly SubscriptionDefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
-        private readonly SubscriptionAutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
+        private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly ILogger _logger;
         private readonly IRouter _router;
@@ -38,8 +38,8 @@ namespace Nimbus.Infrastructure
                                  IRouter router,
                                  DefaultMessageLockDurationSetting defaultMessageLockDuration,
                                  ITypeProvider typeProvider,
-                                 SubscriptionDefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
-                                 SubscriptionAutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
+                                 AutoDeleteOnIdleSetting autoDeleteOnIdle,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
         {
             _namespaceManager = namespaceManager;
@@ -297,7 +297,7 @@ namespace Nimbus.Infrastructure
                                            RequiresDuplicateDetection = false,
                                            RequiresSession = false,
                                            SupportOrdering = false,
-                                           AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                           AutoDeleteOnIdle = _autoDeleteOnIdle,
                                        };
 
                 // We don't check for queue existence here because that introduces a race condition with any other bus participant that's

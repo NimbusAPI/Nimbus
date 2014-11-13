@@ -107,15 +107,15 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithSubscriptionDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
+        public static BusBuilderConfiguration WithDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
         {
-            configuration.SubscriptionDefaultMessageTimeToLive = new SubscriptionDefaultMessageTimeToLiveSetting { Value = timeToLive };
+            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting { Value = timeToLive };
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithSubscriptionAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
+        public static BusBuilderConfiguration WithAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
         {
-            configuration.SubscriptionAutoDeleteOnIdle = new SubscriptionAutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
+            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
             return configuration;
         }
 

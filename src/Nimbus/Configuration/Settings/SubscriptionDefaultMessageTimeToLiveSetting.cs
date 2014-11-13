@@ -2,7 +2,7 @@ using System;
 
 namespace Nimbus.Configuration.Settings
 {
-    public class SubscriptionDefaultMessageTimeToLiveSetting : Setting<TimeSpan>
+    public class DefaultMessageTimeToLiveSetting : Setting<TimeSpan>
     {
         public override TimeSpan Default
         {
