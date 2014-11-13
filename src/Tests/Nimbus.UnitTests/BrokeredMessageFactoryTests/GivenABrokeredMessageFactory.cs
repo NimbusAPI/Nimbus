@@ -24,7 +24,8 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
 
             ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"});
 
-            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                              new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
                                               ReplyQueueNameSetting,
                                               _clock,

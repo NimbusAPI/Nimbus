@@ -46,7 +46,8 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
-            _brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            _brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                 new MaxLargeMessageSizeSetting(),
                                                                  new MaxSmallMessageSizeSetting(),
                                                                  replyQueueNameSetting,
                                                                  clock,
