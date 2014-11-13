@@ -13,6 +13,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
+        private readonly DefaultMessageTimeToLiveSetting _timeToLive;
         private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
         private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
         private readonly ReplyQueueNameSetting _replyQueueName;
@@ -23,7 +24,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly ISerializer _serializer;
         private readonly ITypeProvider _typeProvider;
 
-        public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
+        public BrokeredMessageFactory(DefaultMessageTimeToLiveSetting timeToLive,
+                                      MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       ReplyQueueNameSetting replyQueueName,
                                       IClock clock,
@@ -33,6 +35,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       ISerializer serializer,
                                       ITypeProvider typeProvider)
         {
+            _timeToLive = timeToLive;
             _maxLargeMessageSize = maxLargeMessageSize;
             _maxSmallMessageSize = maxSmallMessageSize;
             _replyQueueName = replyQueueName;
@@ -68,9 +71,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               brokeredMessage = new BrokeredMessage();
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.Add(_timeToLive.Value));
                                               brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
-                                              //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
                                           else
                                           {
