@@ -134,7 +134,13 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             }
             else
             {
-                bodyBytes = message.GetBody<byte[]>();
+                // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
+                using (var dataStream = message.GetBody<Stream>())
+                using (var memoryStream = new MemoryStream())
+                {
+                    dataStream.CopyTo(memoryStream);
+                    bodyBytes = memoryStream.ToArray();
+                }
             }
 
             var decompressedBytes = _compressor.Decompress(bodyBytes);
