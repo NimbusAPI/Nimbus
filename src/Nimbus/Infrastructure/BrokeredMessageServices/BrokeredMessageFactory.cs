@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,12 +72,13 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               brokeredMessage = new BrokeredMessage();
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.Add(_timeToLive.Value));
+                                              var blobIdentifier =
+                                                  await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.Add(_timeToLive.Value));
                                               brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                           }
                                           else
                                           {
-                                              brokeredMessage = new BrokeredMessage(messageBodyBytes);
+                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
                                           }
                                           brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
