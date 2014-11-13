@@ -87,6 +87,7 @@
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
+    <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
     <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />

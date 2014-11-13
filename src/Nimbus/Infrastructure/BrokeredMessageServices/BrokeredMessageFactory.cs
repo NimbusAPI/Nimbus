@@ -72,8 +72,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               brokeredMessage = new BrokeredMessage();
-                                              var blobIdentifier =
-                                                  await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.Add(_timeToLive.Value));
+                                              var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, expiresAfter);
                                               brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                           }
                                           else
