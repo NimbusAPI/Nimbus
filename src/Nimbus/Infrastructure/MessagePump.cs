@@ -81,7 +81,11 @@ namespace Nimbus.Infrastructure
         {
             // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
             // bail - it will already have been picked up by someone else.
-            if (message.LockedUntilUtc <= _clock.UtcNow) return;
+            if (message.LockedUntilUtc <= _clock.UtcNow)
+            {
+                _logger.Debug("Lock for message {MessageId} appears to have already expired so we're not dispatching it. Watch out for clock drift between your service bus server and {MachineName}!", message.MessageId, Environment.MachineName);
+                return;
+            }
 
             try
             {
