@@ -69,6 +69,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.StressTests", "Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "Extensions\Nimbus.Ninject\Nimbus.Ninject.csproj", "{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Jil", "Extensions\Nimbus.Serializers.Jil\Nimbus.Serializers.Jil.csproj", "{D44379EF-FA31-4177-BAF1-36BA83A361CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.NetJSON", "Extensions\Nimbus.Serializers.NetJSON\Nimbus.Serializers.NetJSON.csproj", "{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +183,14 @@ Global
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D44379EF-FA31-4177-BAF1-36BA83A361CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D44379EF-FA31-4177-BAF1-36BA83A361CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D44379EF-FA31-4177-BAF1-36BA83A361CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D44379EF-FA31-4177-BAF1-36BA83A361CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,5 +220,7 @@ Global
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{5CAED275-3485-449A-9EFC-6127B9257D82} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{D44379EF-FA31-4177-BAF1-36BA83A361CE} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{19F1AFF8-C563-48A7-AD3F-F7EEC27BE787} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 	EndGlobalSection
 EndGlobal
