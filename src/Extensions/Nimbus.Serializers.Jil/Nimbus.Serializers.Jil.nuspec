@@ -13,7 +13,7 @@
     <tags>azure servicebus jil json</tags>
     <projectUrl>http://nimbusapi.github.io/</projectUrl>
     <dependencies>
-      <dependency id="Jil" version="[2.6.0,]" />
+      <dependency id="Jil" version="[2.7.0,]" />
     </dependencies>
   </metadata>
 </package>
