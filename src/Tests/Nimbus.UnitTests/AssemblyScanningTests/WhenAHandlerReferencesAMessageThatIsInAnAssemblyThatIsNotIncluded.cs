@@ -12,7 +12,7 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
         public void ValidationShouldFail()
         {
             var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (CommandWhoseAssemblyShouldNotBeIncludedHandler).Assembly);
-            assemblyScanningTypeProvider.Validate().ShouldNotBeEmpty();
+            assemblyScanningTypeProvider.ValidateSelf().ShouldNotBeEmpty();
         }
     }
 }

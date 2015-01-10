@@ -129,6 +129,7 @@
     <Compile Include="Infrastructure\TaskScheduling\INimbusTaskFactory.cs" />
     <Compile Include="Configuration\Settings\MaximumThreadPoolThreadsSetting.cs" />
     <Compile Include="Configuration\Settings\MinimumThreadPoolThreadsSetting.cs" />
+    <Compile Include="Infrastructure\TypeProviderValidator.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
@@ -174,7 +175,7 @@
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderDebuggingConfigurationExtensions.cs" />
-    <Compile Include="Infrastructure\PathFactory.cs" />
+    <Compile Include="Infrastructure\PathGenerator.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessageDispatcher.cs" />

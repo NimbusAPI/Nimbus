@@ -37,7 +37,8 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
-                new InstanceNameSetting {Value = "TestInstance"});
+                new InstanceNameSetting { Value = "TestInstance" },
+                new PathGenerator());
             var brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                                     new MaxLargeMessageSizeSetting(),
                                                                     new MaxSmallMessageSizeSetting(),
@@ -59,6 +60,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                       logger,
                                                       messagingFactory,
                                                       outboundInterceptorFactory,
+                                                      new PathGenerator(),
                                                       router);
             return Task.FromResult(busCommandSender);
         }

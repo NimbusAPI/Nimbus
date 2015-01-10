@@ -13,7 +13,8 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
         public void ValidationShouldFail()
         {
             var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(Assembly.GetAssembly(typeof (DuplicateMessageType)));
-            assemblyScanningTypeProvider.Validate().ShouldNotBeEmpty();
+            var typeProviderValidator = new TypeProviderValidator(new PathGenerator(), assemblyScanningTypeProvider);
+            typeProviderValidator.Validate().ShouldNotBeEmpty();
         }
     }
 }

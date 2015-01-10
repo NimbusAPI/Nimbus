@@ -42,7 +42,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
-                new InstanceNameSetting {Value = "TestInstance"});
+                new InstanceNameSetting { Value = "TestInstance" },
+                new PathGenerator());
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 

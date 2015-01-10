@@ -20,6 +20,13 @@ namespace Nimbus
         IEnumerable<Type> MulticastRequestTypes { get; }
         IEnumerable<Type> MulticastResponseTypes { get; }
 
-        IEnumerable<Type> InterceptorTypes { get; } 
+        IEnumerable<Type> InterceptorTypes { get; }
+
+        /// <summary>
+        /// Provide any validation steps that require internal members.
+        /// This will be linked up with the full validation.
+        /// </summary>
+        /// <returns>Error messages for any discovered problems.</returns>
+        IEnumerable<string> ValidateSelf();
     }
 }

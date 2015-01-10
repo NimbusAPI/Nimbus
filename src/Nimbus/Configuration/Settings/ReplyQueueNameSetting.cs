@@ -1,12 +1,15 @@
-﻿using Nimbus.Infrastructure;
+﻿using Nimbus.Routing;
 
 namespace Nimbus.Configuration.Settings
 {
     public class ReplyQueueNameSetting : Setting<string>
     {
-        public ReplyQueueNameSetting(ApplicationNameSetting applicationName, InstanceNameSetting instanceName)
+        public ReplyQueueNameSetting(
+            ApplicationNameSetting applicationName, 
+            InstanceNameSetting instanceName, 
+            IPathGenerator pathGenerator)
         {
-            Value = PathFactory.InputQueuePathFor(applicationName, instanceName);
+            Value = pathGenerator.InputQueuePathFor(applicationName, instanceName);
         }
     }
 }

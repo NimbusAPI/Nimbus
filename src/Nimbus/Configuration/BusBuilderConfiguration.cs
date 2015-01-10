@@ -5,6 +5,7 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Logging;
@@ -22,6 +23,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
         internal IRouter Router { get; set; }
+        internal IPathGenerator PathGenerator { get; set; }
 
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
@@ -49,6 +51,7 @@ namespace Nimbus.Configuration
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
             Router = new DestinationPerMessageTypeRouter();
+            PathGenerator = new PathGenerator();
 
             Logger = new NullLogger();
             Compressor = new NullCompressor();
@@ -70,7 +73,12 @@ namespace Nimbus.Configuration
             var validatableComponents = GetType().GetProperties()
                                                  .Select(p => p.GetValue(this))
                                                  .OfType<IValidatableConfigurationSetting>()
-                                                 .ToArray();
+                                                 .ToList();
+
+            if (TypeProvider != null)
+            {
+                validatableComponents.Add(new TypeProviderValidator(PathGenerator, TypeProvider));
+            }
 
             var validationErrors = validatableComponents
                 .SelectMany(c => c.Validate())

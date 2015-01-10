@@ -1,49 +1,52 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Nimbus.Routing;
 
-namespace Nimbus.Infrastructure
+namespace PingPong.PathGenerator
 {
-    public static class PathFactory
+    public class CustomPathGenerator : IPathGenerator
     {
-        private const string _queuePrefix = "q";
-        private const string _topicPrefix = "t";
+        // I've just stuck epic on the front to show it working...
+
+        private const string _queuePrefix = "epic-q";
+        private const string _topicPrefix = "epic-t";
         private const string _instanceInputQueuePrefix = "inputqueue";
 
         // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
         private const string _queueCharacterWhitelist = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 
-        public static string InputQueuePathFor(string applicationName, string instanceName)
+        public string InputQueuePathFor(string applicationName, string instanceName)
         {
             return Sanitize(string.Format("{0}.{1}.{2}", _instanceInputQueuePrefix, applicationName, instanceName));
         }
 
-        public static string QueuePathFor(Type type)
+        public string QueuePathFor(Type type)
         {
             return Sanitize(_queuePrefix + "." + StripGenericQualification(type));
         }
 
-        public static string TopicPathFor(Type type)
+        public string TopicPathFor(Type type)
         {
             return Sanitize(_topicPrefix + "." + StripGenericQualification(type));
         }
 
-        public static string SubscriptionNameFor(string applicationName)
+        public string SubscriptionNameFor(string applicationName)
         {
             return Shorten(Sanitize(applicationName), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName)
+        public string SubscriptionNameFor(string applicationName, string instanceName)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName})), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, Type handlerType)
+        public string SubscriptionNameFor(string applicationName, Type handlerType)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, handlerType.Name})), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
+        public string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name})), 50);
         }

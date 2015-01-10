@@ -13,6 +13,7 @@ namespace Nimbus.Infrastructure.Events
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
+        private readonly IPathGenerator _pathGenerator;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
@@ -25,10 +26,12 @@ namespace Nimbus.Infrastructure.Events
                               ILogger logger,
                               INimbusMessagingFactory messagingFactory,
                               IOutboundInterceptorFactory outboundInterceptorFactory,
+                              IPathGenerator pathGenerator,
                               IRouter router)
         {
             _messagingFactory = messagingFactory;
             _router = router;
+            _pathGenerator = pathGenerator;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _brokeredMessageFactory = brokeredMessageFactory;
@@ -43,7 +46,7 @@ namespace Nimbus.Infrastructure.Events
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
             var brokeredMessage = await _brokeredMessageFactory.Create(busEvent);
-            var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
+            var topicPath = _router.Route(eventType, QueueOrTopic.Topic, _pathGenerator);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
