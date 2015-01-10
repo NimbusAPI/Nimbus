@@ -19,6 +19,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
+        private readonly IPathFactory _pathFactory;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
@@ -28,13 +29,15 @@ namespace Nimbus.Infrastructure.Commands
                                 ILogger logger,
                                 INimbusMessagingFactory messagingFactory,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
-                                IRouter router)
+                                IRouter router,
+                                IPathFactory pathFactory)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _router = router;
+            _pathFactory = pathFactory;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
@@ -61,7 +64,7 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, BrokeredMessage brokeredMessage) where TBusCommand : IBusCommand
         {
-            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
             brokeredMessage.DestinedForQueue(queuePath);
 
             using (var scope = _dependencyResolver.CreateChildScope())

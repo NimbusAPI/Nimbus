@@ -18,6 +18,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IRouter _router;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
+        private readonly IPathFactory _pathFactory;
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
@@ -32,12 +33,14 @@ namespace Nimbus.Infrastructure.RequestResponse
                                          INimbusMessagingFactory messagingFactory,
                                          IOutboundInterceptorFactory outboundInterceptorFactory,
                                          IRouter router,
-                                         RequestResponseCorrelator requestResponseCorrelator)
+                                         RequestResponseCorrelator requestResponseCorrelator,
+                                         IPathFactory pathFactory)
         {
             _messagingFactory = messagingFactory;
             _router = router;
             _brokeredMessageFactory = brokeredMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
+            _pathFactory = pathFactory;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _clock = clock;
@@ -52,7 +55,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = busRequest.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
-            var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
+            var topicPath = _router.Route(requestType, QueueOrTopic.Topic, _pathFactory);
 
             var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)

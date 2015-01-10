@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
+        private readonly IPathFactory _pathFactory;
         private readonly ILogger _logger;
         private readonly IRouter _router;
 
@@ -40,7 +41,8 @@ namespace Nimbus.Infrastructure
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
-                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
+                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+                                 IPathFactory pathFactory)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -52,6 +54,7 @@ namespace Nimbus.Infrastructure
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _pathFactory = pathFactory;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -151,7 +154,7 @@ namespace Nimbus.Infrastructure
 
         private bool WeHaveAHandler(string topicPath)
         {
-            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
+            var paths = _typeProvider.AllTypesHandledViaTopics().Select(_pathFactory.TopicPathFor);
             return paths.Contains(topicPath);
         }
 
@@ -273,7 +276,7 @@ namespace Nimbus.Infrastructure
 
         private void EnsureQueueExists(Type commandType)
         {
-            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
             EnsureQueueExists(queuePath);
         }
 
@@ -324,7 +327,7 @@ namespace Nimbus.Infrastructure
 
         private string GetDeadLetterQueueName(Type messageContractType)
         {
-            var queuePath = _router.Route(messageContractType, QueueOrTopic.Queue);
+            var queuePath = _router.Route(messageContractType, QueueOrTopic.Queue, _pathFactory);
             var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
             return deadLetterQueueName;
         }

@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
+        private readonly IPathFactory _pathFactory;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly INimbusTaskFactory _taskFactory;
@@ -32,7 +33,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                           INimbusMessagingFactory messagingFactory,
                                           INimbusTaskFactory taskFactory,
                                           IRouter router,
-                                          ITypeProvider typeProvider)
+                                          ITypeProvider typeProvider,
+                                          IPathFactory pathFactory)
         {
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
@@ -40,6 +42,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
+            _pathFactory = pathFactory;
             _taskFactory = taskFactory;
             _messagingFactory = messagingFactory;
             _router = router;
@@ -53,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             // Create a single connection to each request queue determined by routing
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue)})
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue, _pathFactory)})
                 .GroupBy(b => b.QueuePath)
                 .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
 

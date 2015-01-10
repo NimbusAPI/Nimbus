@@ -21,6 +21,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly INimbusTaskFactory _taskFactory;
         private readonly IRouter _router;
         private readonly ITypeProvider _typeProvider;
+        private readonly IPathFactory _pathFactory;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -32,7 +33,8 @@ namespace Nimbus.Infrastructure.Commands
                                           INimbusMessagingFactory messagingFactory,
                                           INimbusTaskFactory taskFactory,
                                           IRouter router,
-                                          ITypeProvider typeProvider)
+                                          ITypeProvider typeProvider,
+                                          IPathFactory pathFactory)
         {
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
@@ -42,6 +44,7 @@ namespace Nimbus.Infrastructure.Commands
             _messagingFactory = messagingFactory;
             _router = router;
             _typeProvider = typeProvider;
+            _pathFactory = pathFactory;
             _taskFactory = taskFactory;
         }
 
@@ -53,7 +56,7 @@ namespace Nimbus.Infrastructure.Commands
             // Create a single connection to each command queue determined by routing
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue)})
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue, _pathFactory)})
                 .GroupBy(b => b.QueuePath)
                 .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
 
