@@ -13,7 +13,7 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
         public void ValidationShouldFail()
         {
             var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
-            var typeProviderValidator = new TypeProviderValidator(assemblyScanningTypeProvider);
+            var typeProviderValidator = new TypeProviderValidator(assemblyScanningTypeProvider, new PathFactory());
             typeProviderValidator.Validate().ShouldNotBeEmpty();
         }
 
@@ -21,7 +21,7 @@ namespace Nimbus.UnitTests.AssemblyScanningTests
         public void TheMessageShouldMentionTheOffendingTypeByName()
         {
             var assemblyScanningTypeProvider = new AssemblyScanningTypeProvider(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).Assembly);
-            var typeProviderValidator = new TypeProviderValidator(assemblyScanningTypeProvider);
+            var typeProviderValidator = new TypeProviderValidator(assemblyScanningTypeProvider, new PathFactory());
             var validationErrors = typeProviderValidator.Validate().ToArray();
 
             validationErrors.ShouldContain(e => e.Contains(typeof (UnserializableCommandWhoseAssemblyShouldNotBeIncluded).FullName));

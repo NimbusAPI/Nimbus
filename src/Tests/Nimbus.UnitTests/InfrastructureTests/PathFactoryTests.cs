@@ -1,4 +1,6 @@
-﻿using Nimbus.Infrastructure;
+﻿using System.IO;
+using Nimbus.Infrastructure;
+using Nimbus.UnitTests.BatchSendingTests;
 using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -8,17 +10,25 @@ namespace Nimbus.UnitTests.InfrastructureTests
     [TestFixture]
     public class PathFactoryTests
     {
+        private PathFactory _pathFactory;
+
+        [SetUp]
+        public void Setup()
+        {
+            _pathFactory = new PathFactory();
+        }
+
         [Test]
         public void WhenCreatingAQueueForANestedType_WeShouldStripOutPlusSigns()
         {
-            var pathName = PathFactory.TopicPathFor(typeof (MyEscapingTestMessages.EscapingTestMessage));
+            var pathName = _pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
             pathName.ShouldNotContain("+");
         }
 
         [Test]
         public void WhenCreatingAQueue_WeShouldConvertToLowerCase()
         {
-            var pathName = PathFactory.TopicPathFor(typeof (MyEscapingTestMessages.EscapingTestMessage));
+            var pathName = _pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
 
             var expectedName = "t." +
                                typeof (MyEscapingTestMessages.EscapingTestMessage).FullName.Replace("+", ".").ToLower();
@@ -29,14 +39,14 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldStripOutBackticks()
         {
-            var pathName = PathFactory.QueuePathFor(typeof (MyCommand<string>));
+            var pathName = _pathFactory.QueuePathFor(typeof(MyCommand<string>));
             pathName.ShouldNotContain("`");
         }
 
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldShortenTheGenericTypeArgumentName()
         {
-            var pathName = PathFactory.QueuePathFor(typeof (MyCommand<string>));
+            var pathName = _pathFactory.QueuePathFor(typeof(MyCommand<string>));
 
             var expected = "q.nimbus.unittests.infrastructuretests.messagecontracts.mycommand.1-string";
 
@@ -46,7 +56,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingASubscriptionForATypeWeHaveAMaximumLengthOf50()
         {
-            var pathName = PathFactory.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof (MyEventWithALongName));
+            var pathName = _pathFactory.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof(MyEventWithALongName));
             pathName.Length.ShouldBe(50);
         }
     }
