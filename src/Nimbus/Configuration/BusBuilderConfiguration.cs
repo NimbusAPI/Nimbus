@@ -5,6 +5,7 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Logging;
@@ -70,7 +71,12 @@ namespace Nimbus.Configuration
             var validatableComponents = GetType().GetProperties()
                                                  .Select(p => p.GetValue(this))
                                                  .OfType<IValidatableConfigurationSetting>()
-                                                 .ToArray();
+                                                 .ToList();
+
+            if (TypeProvider != null)
+            {
+                validatableComponents.Add(new TypeProviderValidator(TypeProvider));
+            }
 
             var validationErrors = validatableComponents
                 .SelectMany(c => c.Validate())
