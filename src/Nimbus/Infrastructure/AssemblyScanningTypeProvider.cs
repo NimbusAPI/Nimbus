@@ -14,7 +14,7 @@ using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Infrastructure
 {
-    public class AssemblyScanningTypeProvider : ITypeProvider, IValidatableConfigurationSetting
+    public class AssemblyScanningTypeProvider : ITypeProvider
     {
         private readonly Assembly[] _nimbusAssemblies = {typeof (AuditEvent).Assembly, typeof(Bus).Assembly, typeof(IBus).Assembly};
 
@@ -236,43 +236,7 @@ namespace Nimbus.Infrastructure
             return types;
         }
 
-        public IEnumerable<string> Validate()
-        {
-            var validationErrors = new string[0]
-                .Union(CheckForIndirectlyReferencedAssemblies())
-                .Union(CheckForDuplicateQueueNames())
-                .Union(CheckForNonSerializableMessageTypes())
-                .ToArray();
-
-            return validationErrors;
-        }
-
-        private IEnumerable<string> CheckForNonSerializableMessageTypes()
-        {
-            var validationErrors = this.AllMessageContractTypes()
-                                       .Where(mt => !mt.IsSerializable())
-                                       .Select(mt => "The message contract type {0} is not serializable.".FormatWith(mt.FullName))
-                                       .ToArray();
-
-            return validationErrors;
-        }
-
-        private IEnumerable<string> CheckForDuplicateQueueNames()
-        {
-            var duplicateQueues = this.AllMessageContractTypes()
-                                      .Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t))
-                                      .GroupBy(tuple => tuple.Item1)
-                                      .Where(tuple => tuple.Count() > 1)
-                                      .ToArray();
-
-            var validationErrors = duplicateQueues
-                .Select(tuple => "Some message types ({0}) would result in a duplicate queue name of {1}".FormatWith(string.Join(", ", tuple), tuple.Key))
-                .ToArray();
-
-            return validationErrors;
-        }
-
-        private IEnumerable<string> CheckForIndirectlyReferencedAssemblies()
+        public IEnumerable<string> ValidateSelf()
         {
             var genericParameterTypes = this.AllClosedGenericHandlerInterfaces()
                                             .SelectMany(ht => ht.GetGenericArguments())
