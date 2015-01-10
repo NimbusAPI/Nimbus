@@ -155,5 +155,12 @@ namespace Nimbus.Configuration
             debugConfiguration(configuration.Debugging);
             return configuration;
         }
+
+        public static BusBuilderConfiguration WithPathGenerator(this BusBuilderConfiguration configuration,
+                                                              IPathGenerator pathGenerator)
+        {
+            configuration.PathGenerator = pathGenerator;
+            return configuration;
+        }
     }
 }

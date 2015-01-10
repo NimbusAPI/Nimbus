@@ -36,7 +36,7 @@ namespace Nimbus.UnitTests.CompressionTests
             return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                               new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
-                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}, new PathFactory()),
+                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}, new PathGenerator()),
                                               Substitute.For<IClock>(),
                                               compressor,
                                               new DispatchContextManager(),

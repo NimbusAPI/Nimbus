@@ -22,7 +22,7 @@ namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
             _clock = Substitute.For<IClock>();
             _serializer = Substitute.For<ISerializer>();
 
-            ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"}, new PathFactory());
+            ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"}, new PathGenerator());
 
             return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                               new MaxLargeMessageSizeSetting(),

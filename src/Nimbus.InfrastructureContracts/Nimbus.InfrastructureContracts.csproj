@@ -66,7 +66,7 @@
     <Compile Include="IDispatchContext.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
-    <Compile Include="Routing\IPathFactory.cs" />
+    <Compile Include="Routing\IPathGenerator.cs" />
     <Compile Include="PropertyInjection\IRequireMessageProperties.cs" />
     <Compile Include="PropertyInjection\IRequireBrokeredMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />

@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
-        private readonly IPathFactory _pathFactory;
+        private readonly IPathGenerator _pathGenerator;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly INimbusTaskFactory _taskFactory;
@@ -34,9 +34,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                    IMessageDispatcherFactory messageDispatcherFactory,
                                                    INimbusMessagingFactory messagingFactory,
                                                    INimbusTaskFactory taskFactory,
+                                                   IPathGenerator pathGenerator,
                                                    IRouter router,
-                                                   ITypeProvider typeProvider,
-                                                   IPathFactory pathFactory)
+                                                   ITypeProvider typeProvider)
         {
             _applicationName = applicationName;
             _clock = clock;
@@ -47,7 +47,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _messagingFactory = messagingFactory;
             _router = router;
             _typeProvider = typeProvider;
-            _pathFactory = pathFactory;
+            _pathGenerator = pathGenerator;
             _taskFactory = taskFactory;
         }
 
@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             // Events are routed to Topics and we'll create a competing subscription for the logical endpoint
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic, _pathFactory)})
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic, _pathGenerator)})
                 .GroupBy(b => b.TopicPath)
                 .Select(g => new
                              {
@@ -77,7 +77,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 foreach (var handlerType in binding.HandlerTypes)
                 {
                     var messageType = binding.MessageTypes.Single();
-                    var subscriptionName = _pathFactory.SubscriptionNameFor(_applicationName, handlerType);
+                    var subscriptionName = _pathGenerator.SubscriptionNameFor(_applicationName, handlerType);
 
                     _logger.Debug("Creating message pump for multicast request subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
                     var messageReceiver = _messagingFactory.GetTopicReceiver(binding.TopicPath, subscriptionName);

@@ -10,25 +10,25 @@ namespace Nimbus.UnitTests.InfrastructureTests
     [TestFixture]
     public class PathFactoryTests
     {
-        private PathFactory _pathFactory;
+        private PathGenerator _pathGenerator;
 
         [SetUp]
         public void Setup()
         {
-            _pathFactory = new PathFactory();
+            _pathGenerator = new PathGenerator();
         }
 
         [Test]
         public void WhenCreatingAQueueForANestedType_WeShouldStripOutPlusSigns()
         {
-            var pathName = _pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
+            var pathName = _pathGenerator.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
             pathName.ShouldNotContain("+");
         }
 
         [Test]
         public void WhenCreatingAQueue_WeShouldConvertToLowerCase()
         {
-            var pathName = _pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
+            var pathName = _pathGenerator.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
 
             var expectedName = "t." +
                                typeof (MyEscapingTestMessages.EscapingTestMessage).FullName.Replace("+", ".").ToLower();
@@ -39,14 +39,14 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldStripOutBackticks()
         {
-            var pathName = _pathFactory.QueuePathFor(typeof(MyCommand<string>));
+            var pathName = _pathGenerator.QueuePathFor(typeof(MyCommand<string>));
             pathName.ShouldNotContain("`");
         }
 
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldShortenTheGenericTypeArgumentName()
         {
-            var pathName = _pathFactory.QueuePathFor(typeof(MyCommand<string>));
+            var pathName = _pathGenerator.QueuePathFor(typeof(MyCommand<string>));
 
             var expected = "q.nimbus.unittests.infrastructuretests.messagecontracts.mycommand.1-string";
 
@@ -56,7 +56,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingASubscriptionForATypeWeHaveAMaximumLengthOf50()
         {
-            var pathName = _pathFactory.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof(MyEventWithALongName));
+            var pathName = _pathGenerator.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof(MyEventWithALongName));
             pathName.Length.ShouldBe(50);
         }
     }

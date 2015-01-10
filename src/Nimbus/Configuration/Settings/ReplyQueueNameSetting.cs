@@ -7,9 +7,9 @@ namespace Nimbus.Configuration.Settings
         public ReplyQueueNameSetting(
             ApplicationNameSetting applicationName, 
             InstanceNameSetting instanceName, 
-            IPathFactory pathFactory)
+            IPathGenerator pathGenerator)
         {
-            Value = pathFactory.InputQueuePathFor(applicationName, instanceName);
+            Value = pathGenerator.InputQueuePathFor(applicationName, instanceName);
         }
     }
 }

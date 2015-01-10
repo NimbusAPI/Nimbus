@@ -23,7 +23,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
         internal IRouter Router { get; set; }
-        internal IPathFactory PathFactory { get; set; }
+        internal IPathGenerator PathGenerator { get; set; }
 
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
@@ -51,7 +51,7 @@ namespace Nimbus.Configuration
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
             Router = new DestinationPerMessageTypeRouter();
-            PathFactory = new PathFactory();
+            PathGenerator = new PathGenerator();
 
             Logger = new NullLogger();
             Compressor = new NullCompressor();
@@ -77,7 +77,7 @@ namespace Nimbus.Configuration
 
             if (TypeProvider != null)
             {
-                validatableComponents.Add(new TypeProviderValidator(TypeProvider, PathFactory));
+                validatableComponents.Add(new TypeProviderValidator(PathGenerator, TypeProvider));
             }
 
             var validationErrors = validatableComponents

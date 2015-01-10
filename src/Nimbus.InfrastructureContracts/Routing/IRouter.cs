@@ -4,6 +4,6 @@ namespace Nimbus.Routing
 {
     public interface IRouter
     {
-        string Route(Type messageType, QueueOrTopic queueOrTopic, IPathFactory pathFactory);
+        string Route(Type messageType, QueueOrTopic queueOrTopic, IPathGenerator pathGenerator);
     }
 }

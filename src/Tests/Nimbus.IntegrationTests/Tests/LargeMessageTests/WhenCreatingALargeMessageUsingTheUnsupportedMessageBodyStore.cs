@@ -24,7 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                               new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting {Value = 64*1024},
-                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}, new PathFactory()),
+                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}, new PathGenerator()),
                                               new SystemClock(),
                                               new NullCompressor(),
                                               new DispatchContextManager(),

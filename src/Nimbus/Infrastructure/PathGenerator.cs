@@ -5,7 +5,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure
 {
-    public class PathFactory : IPathFactory
+    public class PathGenerator : IPathGenerator
     {
         private const string _queuePrefix = "q";
         private const string _topicPrefix = "t";

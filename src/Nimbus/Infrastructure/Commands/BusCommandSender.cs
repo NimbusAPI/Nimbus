@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -19,7 +18,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
-        private readonly IPathFactory _pathFactory;
+        private readonly IPathGenerator _pathGenerator;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
@@ -29,15 +28,15 @@ namespace Nimbus.Infrastructure.Commands
                                 ILogger logger,
                                 INimbusMessagingFactory messagingFactory,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
-                                IRouter router,
-                                IPathFactory pathFactory)
+                                IPathGenerator pathGenerator,
+                                IRouter router)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _router = router;
-            _pathFactory = pathFactory;
+            _pathGenerator = pathGenerator;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
@@ -64,7 +63,7 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, BrokeredMessage brokeredMessage) where TBusCommand : IBusCommand
         {
-            var queuePath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue, _pathGenerator);
             brokeredMessage.DestinedForQueue(queuePath);
 
             using (var scope = _dependencyResolver.CreateChildScope())

@@ -10,12 +10,12 @@ namespace Nimbus.Infrastructure
     public class TypeProviderValidator : IValidatableConfigurationSetting
     {
         private readonly ITypeProvider _provider;
-        private readonly IPathFactory _pathFactory;
+        private readonly IPathGenerator _pathGenerator;
 
-        public TypeProviderValidator(ITypeProvider provider, IPathFactory pathFactory)
+        public TypeProviderValidator(IPathGenerator pathGenerator, ITypeProvider provider)
         {
             _provider = provider;
-            _pathFactory = pathFactory;
+            _pathGenerator = pathGenerator;
         }
 
         public IEnumerable<string> Validate()
@@ -42,7 +42,7 @@ namespace Nimbus.Infrastructure
         private IEnumerable<string> CheckForDuplicateQueueNames()
         {
             var duplicateQueues = _provider.AllMessageContractTypes()
-                                      .Select(t => new Tuple<string, Type>(_pathFactory.QueuePathFor(t), t))
+                                      .Select(t => new Tuple<string, Type>(_pathGenerator.QueuePathFor(t), t))
                                       .GroupBy(tuple => tuple.Item1)
                                       .Where(tuple => tuple.Count() > 1)
                                       .ToArray();

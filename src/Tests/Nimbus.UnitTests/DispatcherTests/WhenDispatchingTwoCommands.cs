@@ -43,7 +43,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting { Value = "TestInstance" },
-                new PathFactory());
+                new PathGenerator());
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 

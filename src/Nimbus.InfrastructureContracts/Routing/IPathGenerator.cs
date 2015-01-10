@@ -2,7 +2,7 @@ using System;
 
 namespace Nimbus.Routing
 {
-    public interface IPathFactory
+    public interface IPathGenerator
     {
         string InputQueuePathFor(string applicationName, string instanceName);
         string QueuePathFor(Type type);

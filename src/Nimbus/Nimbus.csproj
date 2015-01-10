@@ -175,7 +175,7 @@
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
     <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderDebuggingConfigurationExtensions.cs" />
-    <Compile Include="Infrastructure\PathFactory.cs" />
+    <Compile Include="Infrastructure\PathGenerator.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessageDispatcher.cs" />
