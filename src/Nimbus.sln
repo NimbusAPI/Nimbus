@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csproj", "{1B793C01-E824-4449-B93D-277626B1791F}"
 EndProject
@@ -68,6 +68,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.StressTests", "Tests\Nimbus.StressTests\Nimbus.StressTests.csproj", "{5CAED275-3485-449A-9EFC-6127B9257D82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "Extensions\Nimbus.Ninject\Nimbus.Ninject.csproj", "{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Unity", "Samples\PingPong.Unity\PingPong.Unity.csproj", "{6D2241CF-7760-42AC-8EC4-E2CB36390BDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Unity", "Extensions\Nimbus.Unity\Nimbus.Unity.csproj", "{C50BF581-4721-4447-8E8E-5263FB83A9A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,6 +183,14 @@ Global
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50BF581-4721-4447-8E8E-5263FB83A9A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50BF581-4721-4447-8E8E-5263FB83A9A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50BF581-4721-4447-8E8E-5263FB83A9A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50BF581-4721-4447-8E8E-5263FB83A9A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,5 +220,7 @@ Global
 		{14AA0204-59C2-488D-BF5E-205CCA59E99D} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{5CAED275-3485-449A-9EFC-6127B9257D82} = {0942FED4-86C1-468A-85DE-98B88DF22384}
 		{9C0550B4-F516-45E4-9BE2-48B8B02BDB50} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD} = {3A9D386C-12D5-4A21-9292-60C0C5B3A7C2}
+		{C50BF581-4721-4447-8E8E-5263FB83A9A6} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 	EndGlobalSection
 EndGlobal
