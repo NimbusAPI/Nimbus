@@ -109,6 +109,7 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\SystemPerformanceCounterWrapper.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
+    <Compile Include="Infrastructure\Logging\TraceLogger.cs" />
     <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
