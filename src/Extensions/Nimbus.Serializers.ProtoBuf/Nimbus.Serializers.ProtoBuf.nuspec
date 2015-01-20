@@ -3,7 +3,7 @@
   <metadata>
     <id>Nimbus.Serializers.Protobuf</id>
     <version>$version$</version>
-    <title>Nimbus.Serializers.Json</title>
+    <title>Nimbus.Serializers.Protobuf</title>
     <authors>Ben Gale</authors>
     <owners>Ben Gale</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
