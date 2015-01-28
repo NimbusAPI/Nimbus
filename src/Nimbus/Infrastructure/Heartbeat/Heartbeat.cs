@@ -40,7 +40,12 @@ namespace Nimbus.Infrastructure.Heartbeat
         private Timer _collectTimer;
         private bool _isRunning;
 
-        public Heartbeat(ApplicationNameSetting applicationName, HeartbeatIntervalSetting heartbeatInterval, InstanceNameSetting instanceName, IClock clock, IEventSender eventSender, ILogger logger)
+        public Heartbeat(ApplicationNameSetting applicationName,
+                         HeartbeatIntervalSetting heartbeatInterval,
+                         InstanceNameSetting instanceName,
+                         IClock clock,
+                         IEventSender eventSender,
+                         ILogger logger)
         {
             _applicationName = applicationName;
             _heartbeatInterval = heartbeatInterval;
@@ -100,14 +105,14 @@ namespace Nimbus.Infrastructure.Heartbeat
 
             _collectTimer = new Timer(TimeSpan.FromSeconds(5).TotalMilliseconds)
                             {
-                                AutoReset = true,
+                                AutoReset = true
                             };
             _collectTimer.Elapsed += OnCollectTimerElapsed;
             _collectTimer.Start();
 
             _heartbeatTimer = new Timer(_heartbeatInterval.Value.TotalMilliseconds)
                               {
-                                  AutoReset = true,
+                                  AutoReset = true
                               };
             _heartbeatTimer.Elapsed += OnHeartbeatTimerElapsed;
             _heartbeatTimer.Start();
@@ -163,7 +168,7 @@ namespace Nimbus.Infrastructure.Heartbeat
                                      WorkingSet64 = process.WorkingSet64,
                                      PeakWorkingSet64 = process.PeakWorkingSet64,
                                      VirtualMemorySize64 = process.VirtualMemorySize64,
-                                     PerformanceCounters = performanceCounterHistory,
+                                     PerformanceCounters = performanceCounterHistory
                                  };
 
             return heartbeatEvent;
