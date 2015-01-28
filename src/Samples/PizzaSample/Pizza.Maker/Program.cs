@@ -56,7 +56,6 @@ namespace Pizza.Maker
                                  .WithNames("Maker", Environment.MachineName)
                                  .WithTypesFrom(typeProvider)
                                  .WithAutofacDefaults(componentContext)
-                                 .WithHeartbeatInterval(TimeSpan.FromSeconds(1))
                                  .Build())
                    .As<IBus>()
                    .AutoActivate()
