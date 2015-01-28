@@ -8,6 +8,12 @@ using Nimbus.PropertyInjection;
 
 namespace Nimbus.ControlMessageHandlers
 {
+    /// <summary>
+    /// IMPORTANT: This check is, by its very nature, non-deterministic. If there are multiple nodes with the same (erroneous) identification
+    /// competing to handle messages then EVEN MULTICAST EVENTS will only go to one of those nodes. If that happens to be the node that
+    /// published the HeartbeatEvent in the first place then we'll have no way of knowing that there's anything wrong. Any errors that we
+    /// do manage to log may well be sporadic.
+    /// </summary>
     public class CheckForDuplicateInstancesHandler : IHandleMulticastEvent<HeartbeatEvent>,
                                                      IRequireLogger,
                                                      IRequireSetting<ApplicationNameSetting>,
