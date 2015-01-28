@@ -31,7 +31,17 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MulticastRequestMessageDispatcher(DefaultMessageLockDurationSetting defaultMessageLockDuration, IBrokeredMessageFactory brokeredMessageFactory, IClock clock, IDependencyResolver dependencyResolver, IInboundInterceptorFactory inboundInterceptorFactory, ILogger logger, INimbusMessagingFactory messagingFactory, INimbusTaskFactory taskFactory, IOutboundInterceptorFactory outboundInterceptorFactory, IPropertyInjector propertyInjector, IReadOnlyDictionary<Type, Type[]> handlerMap)
+        public MulticastRequestMessageDispatcher(DefaultMessageLockDurationSetting defaultMessageLockDuration,
+                                                 IBrokeredMessageFactory brokeredMessageFactory,
+                                                 IClock clock,
+                                                 IDependencyResolver dependencyResolver,
+                                                 IInboundInterceptorFactory inboundInterceptorFactory,
+                                                 ILogger logger,
+                                                 INimbusMessagingFactory messagingFactory,
+                                                 INimbusTaskFactory taskFactory,
+                                                 IOutboundInterceptorFactory outboundInterceptorFactory,
+                                                 IPropertyInjector propertyInjector,
+                                                 IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
