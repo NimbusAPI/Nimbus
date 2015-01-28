@@ -18,6 +18,8 @@ namespace Nimbus.Infrastructure.Heartbeat
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
         private readonly IEventSender _eventSender;
         private readonly ILogger _logger;
+        private readonly ApplicationNameSetting _applicationName;
+        private readonly InstanceNameSetting _instanceName;
         private readonly IClock _clock;
 
         private readonly List<PerformanceCounterBase> _performanceCounters = new List<PerformanceCounterBase>();
@@ -38,9 +40,11 @@ namespace Nimbus.Infrastructure.Heartbeat
         private Timer _collectTimer;
         private bool _isRunning;
 
-        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender, ILogger logger)
+        public Heartbeat(ApplicationNameSetting applicationName, HeartbeatIntervalSetting heartbeatInterval, InstanceNameSetting instanceName, IClock clock, IEventSender eventSender, ILogger logger)
         {
+            _applicationName = applicationName;
             _heartbeatInterval = heartbeatInterval;
+            _instanceName = instanceName;
             _eventSender = eventSender;
             _logger = logger;
             _clock = clock;
@@ -145,6 +149,8 @@ namespace Nimbus.Infrastructure.Heartbeat
 
             var heartbeatEvent = new HeartbeatEvent
                                  {
+                                     ApplicationName = _applicationName,
+                                     InstanceName = _instanceName,
                                      Timestamp = _clock.UtcNow,
                                      ProcessId = process.Id,
                                      ProcessName = process.ProcessName,

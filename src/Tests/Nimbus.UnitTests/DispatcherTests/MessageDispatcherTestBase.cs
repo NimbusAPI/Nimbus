@@ -56,6 +56,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             var messagingFactory = Substitute.For<INimbusMessagingFactory>();
             var clock = Substitute.For<IClock>();
+            var propertyInjector = Substitute.For<IPropertyInjector>();
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
@@ -74,6 +75,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                 dependencyResolver,
                 inboundInterceptorFactory,
                 outboundInterceptorFactory,
+                propertyInjector,
                 logger,
                 messagingFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),

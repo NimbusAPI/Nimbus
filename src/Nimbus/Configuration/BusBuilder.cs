@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
@@ -32,6 +35,7 @@ namespace Nimbus.Configuration
             RegisterPropertiesFromConfigurationObject(container, configuration);
             RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
+            RegisterSettingsFromConfigurationObjects(container, configuration, configuration.LargeMessageStorageConfiguration, configuration.Debugging);
 
             var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
                 container.Resolve<ServerConnectionCountSetting>(),
@@ -102,13 +106,34 @@ namespace Nimbus.Configuration
 
         private static void RegisterPropertiesFromConfigurationObject(PoorMansIoC container, object configuration)
         {
-            foreach (var prop in configuration.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
-            {
-                var value = prop.GetValue(configuration);
-                if (value == null) continue;
+            var propertyValues = ExtractPropertyValuesFromConfigurationObject(configuration)
+                .NotNull()
+                .ToArray();
 
-                container.Register(value);
-            }
+            // register individually
+            propertyValues
+                .Do(container.Register)
+                .Done();
+        }
+
+        private static void RegisterSettingsFromConfigurationObjects(PoorMansIoC container, params object[] configurations)
+        {
+            var settings = configurations
+                .SelectMany(ExtractPropertyValuesFromConfigurationObject)
+                .NotNull()
+                .OfType<IConfigurationSetting>()
+                .ToArray();
+            // register settings as a unified collection so that we can take dependencies on all of them at once. PoorMan'sIoC
+            // doesn't support dependencies of Thing[].
+            container.Register(settings);
+        }
+
+        private static IEnumerable<object> ExtractPropertyValuesFromConfigurationObject(object configuration)
+        {
+            return configuration.GetType()
+                                .GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                                .Select(p => p.GetValue(configuration))
+                ;
         }
     }
 }

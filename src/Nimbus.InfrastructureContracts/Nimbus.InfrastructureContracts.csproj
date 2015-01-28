@@ -56,6 +56,7 @@
     <Compile Include="Handlers\ILongRunningTask.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="ICompressor.cs" />
+    <Compile Include="IConfigurationSetting.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="IDeadLetterQueues.cs" />
     <Compile Include="Handlers\IHandleCommand.cs" />
@@ -66,12 +67,14 @@
     <Compile Include="IDispatchContext.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
+    <Compile Include="PropertyInjection\IRequireLogger.cs" />
     <Compile Include="PropertyInjection\IRequireMessageProperties.cs" />
     <Compile Include="PropertyInjection\IRequireBrokeredMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />
     <Compile Include="PropertyInjection\IRequireDateTime.cs" />
     <Compile Include="PropertyInjection\IRequireDispatchContext.cs" />
     <Compile Include="PropertyInjection\IRequireLargeMessageBodyStore.cs" />
+    <Compile Include="PropertyInjection\IRequireSetting.cs" />
     <Compile Include="Routing\IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

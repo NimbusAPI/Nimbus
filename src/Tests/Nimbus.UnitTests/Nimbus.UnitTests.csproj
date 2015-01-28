@@ -143,6 +143,7 @@
     <Compile Include="InfrastructureTests\MessageContracts\MyEventWithALongName.cs" />
     <Compile Include="InterceptorTests\WhenRegisteringInterceptorsWithAutofac.cs" />
     <Compile Include="LoggingTests\TemplateNormalization\WhenNormalizingStructuredLogTemplates.cs" />
+    <Compile Include="PropertyInjectionTests\WhenInjectingConfigurationSettingsIntoAHandler.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="DelayedSendingTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DelayedSendingTests\WhenSendingACommandThatIsDelayedByAnHour.cs" />

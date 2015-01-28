@@ -4,6 +4,8 @@ namespace Nimbus.MessageContracts.ControlMessages
 {
     public class HeartbeatEvent : IBusEvent
     {
+        public string ApplicationName { get; set; }
+        public string InstanceName { get; set; }
         public DateTimeOffset Timestamp { get; set; }
         public int ProcessId { get; set; }
         public string ProcessName { get; set; }

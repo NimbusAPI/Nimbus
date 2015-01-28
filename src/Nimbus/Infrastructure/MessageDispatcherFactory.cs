@@ -103,6 +103,7 @@ namespace Nimbus.Infrastructure
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _outboundInterceptorFactory,
+                                                    _propertyInjector,
                                                     _logger,
                                                     _messagingFactory,
                                                     handlerMap,
@@ -112,16 +113,17 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
             {
-                return new MulticastRequestMessageDispatcher(_brokeredMessageFactory,
+                return new MulticastRequestMessageDispatcher(_defaultMessageLockDuration,
+                                                             _brokeredMessageFactory,
                                                              _clock,
                                                              _dependencyResolver,
                                                              _inboundInterceptorFactory,
                                                              _logger,
                                                              _messagingFactory,
+                                                             _taskFactory,
                                                              _outboundInterceptorFactory,
-                                                             handlerMap,
-                                                             _defaultMessageLockDuration,
-                                                             _taskFactory);
+                                                             _propertyInjector,
+                                                             handlerMap);
             }
 
             throw new NotSupportedException("There is no dispatcher for the handler type {0}.".FormatWith(openGenericHandlerType.FullName));

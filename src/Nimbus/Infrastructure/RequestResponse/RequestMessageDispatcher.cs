@@ -9,6 +9,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.LongRunningTasks;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -23,6 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
+        private readonly IPropertyInjector _propertyInjector;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
@@ -35,6 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
             IOutboundInterceptorFactory outboundInterceptorFactory,
+            IPropertyInjector propertyInjector,
             ILogger logger,
             INimbusMessagingFactory messagingFactory,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
@@ -46,6 +49,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
+            _propertyInjector = propertyInjector;
             _logger = logger;
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
@@ -76,6 +80,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = (IHandleRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
+                _propertyInjector.Inject(handler, brokeredMessage);
+
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, brokeredMessage);
 
                 try

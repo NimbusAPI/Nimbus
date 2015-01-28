@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    public abstract class Setting<T>: IValidatableConfigurationSetting
+    public abstract class Setting<T> : IValidatableConfigurationSetting, IConfigurationSetting
     {
         public T Value { get; set; }
 

@@ -43,7 +43,9 @@ namespace Nimbus.UnitTests.InterceptorTests
                 var outboundInterceptorFactory = new OutboundInterceptorFactory(interceptorSetting,
                                                                                 new PropertyInjector(Substitute.For<IClock>(),
                                                                                                      Substitute.For<IDispatchContextManager>(),
-                                                                                                     Substitute.For<ILargeMessageBodyStore>()));
+                                                                                                     Substitute.For<ILargeMessageBodyStore>(),
+                                                                                                     Substitute.For<ILogger>(),
+                                                                                                     new IConfigurationSetting[0]));
 
                 var dummyBrokeredMessage = new BrokeredMessage();
                 var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyBrokeredMessage);
