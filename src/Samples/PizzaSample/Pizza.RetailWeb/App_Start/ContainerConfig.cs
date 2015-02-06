@@ -6,12 +6,19 @@ namespace Pizza.RetailWeb
 {
     public static class ContainerConfig
     {
+        private static IContainer _container;
+
         public static void Configure()
         {
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyModules(typeof (ContainerConfig).Assembly);
-            var container = builder.Build();
-            DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+            _container = builder.Build();
+            DependencyResolver.SetResolver(new AutofacDependencyResolver(_container));
+        }
+
+        public static void Teardown()
+        {
+            _container.Dispose();
         }
     }
 }
