@@ -42,6 +42,7 @@ namespace Nimbus.Configuration
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
         internal FetchExistingQueuesTimeoutSetting FetchExistingQueuesTimeout { get; set; }
         internal FetchExistingTopicsTimeoutSetting FetchExistingTopicsTimeoutSetting { get; set; }
+        internal WarmUpAzureQueueManagerDuringStartupSetting WarmUpAzureQueueManagerDuringStartup { get; set; }
 
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; }

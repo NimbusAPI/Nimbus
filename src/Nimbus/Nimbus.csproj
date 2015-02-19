@@ -88,6 +88,7 @@
     <Compile Include="Configuration\Settings\SubscriptionAutoDeleteOnIdleSetting.cs" />
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
     <Compile Include="Configuration\Settings\TopicAutoDeleteOnIdleSetting.cs" />
+    <Compile Include="Configuration\Settings\WarmUpAzureQueueManagerDuringStartupSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />

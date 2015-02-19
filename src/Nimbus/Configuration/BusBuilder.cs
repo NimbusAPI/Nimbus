@@ -90,7 +90,10 @@ namespace Nimbus.Configuration
 
             bus.Starting += delegate
                             {
-                                container.Resolve<AzureQueueManager>().WarmUp();
+                                if (configuration.WarmUpAzureQueueManagerDuringStartup)
+                                {
+                                    container.Resolve<AzureQueueManager>().WarmUp();
+                                }
                                 container.Resolve<PropertyInjector>().Bus = bus;
                             };
             bus.Disposing += delegate { container.Dispose(); };

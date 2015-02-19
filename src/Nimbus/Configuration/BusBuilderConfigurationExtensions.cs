@@ -119,6 +119,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithWarmUpAzureQueueManagerDuringStartup(this BusBuilderConfiguration configuration, bool warmUpQueueManagerDuringStartup)
+        {
+            configuration.WarmUpAzureQueueManagerDuringStartup = new WarmUpAzureQueueManagerDuringStartupSetting { Value = warmUpQueueManagerDuringStartup };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithTopicAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan topicAutoDeleteOnIdle)
         {
             configuration.TopicAutoDeleteOnIdle = new TopicAutoDeleteOnIdleSetting { Value = topicAutoDeleteOnIdle };
