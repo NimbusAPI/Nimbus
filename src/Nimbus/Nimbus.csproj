@@ -79,6 +79,8 @@
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
     <Compile Include="Configuration\Settings\EnableDeadLetteringOnMessageExpirationSetting.cs" />
+    <Compile Include="Configuration\Settings\FetchExistingQueuesTimeoutSetting.cs" />
+    <Compile Include="Configuration\Settings\FetchExistingTopicsTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalInboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\HeartbeatInterval.cs" />

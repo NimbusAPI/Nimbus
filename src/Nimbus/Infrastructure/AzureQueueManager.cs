@@ -21,6 +21,8 @@ namespace Nimbus.Infrastructure
         private readonly TopicAutoDeleteOnIdleSetting _topicAutoDeleteOnIdle;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
+        private readonly FetchExistingTopicsTimeoutSetting _fetchExistingTopicsTimeout;
+        private readonly FetchExistingQueuesTimeoutSetting _fetchExistingQueuesTimeout;
         private readonly ILogger _logger;
         private readonly IRouter _router;
 
@@ -42,7 +44,7 @@ namespace Nimbus.Infrastructure
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration, 
-                                 TopicAutoDeleteOnIdleSetting topicAutoDeleteOnIdle)
+                                 TopicAutoDeleteOnIdleSetting topicAutoDeleteOnIdle, FetchExistingTopicsTimeoutSetting fetchExistingTopicsTimeout, FetchExistingQueuesTimeoutSetting fetchExistingQueuesTimeout)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -55,6 +57,8 @@ namespace Nimbus.Infrastructure
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
             _topicAutoDeleteOnIdle = topicAutoDeleteOnIdle;
+            _fetchExistingTopicsTimeout = fetchExistingTopicsTimeout;
+            _fetchExistingQueuesTimeout = fetchExistingQueuesTimeout;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -125,7 +129,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing topics...");
 
             var topicsAsync = _namespaceManager().GetTopicsAsync();
-            if (!topicsAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+            if (!topicsAsync.Wait(_fetchExistingTopicsTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
             var topics = topicsAsync.Result;
             var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
@@ -176,7 +180,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("Fetching existing queues...");
 
             var queuesAsync = _namespaceManager().GetQueuesAsync();
-            if (!queuesAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+            if (!queuesAsync.Wait(_fetchExistingQueuesTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
             var queues = queuesAsync.Result;
             var queuePaths = queues.Select(q => q.Path)

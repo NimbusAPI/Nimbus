@@ -40,6 +40,8 @@ namespace Nimbus.Configuration
         internal HeartbeatIntervalSetting HeartbeatInterval { get; set; }
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
+        internal FetchExistingQueuesTimeoutSetting FetchExistingQueuesTimeout { get; set; }
+        internal FetchExistingTopicsTimeoutSetting FetchExistingTopicsTimeoutSetting { get; set; }
 
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; }

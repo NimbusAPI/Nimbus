@@ -125,6 +125,18 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithFetchExistingTopicsTimeout(this BusBuilderConfiguration configuration, TimeSpan fetchExistingTopicsTimeout)
+        {
+            configuration.FetchExistingTopicsTimeoutSetting = new FetchExistingTopicsTimeoutSetting { Value = fetchExistingTopicsTimeout };
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithFetchExistingQueuesTimeout(this BusBuilderConfiguration configuration, TimeSpan fetchExistingQueuesTimeout)
+        {
+            configuration.FetchExistingQueuesTimeout = new FetchExistingQueuesTimeoutSetting { Value = fetchExistingQueuesTimeout };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
             configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };
