@@ -35,6 +35,7 @@ namespace Nimbus.Configuration
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
         internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; }
         internal AutoDeleteOnIdleSetting AutoDeleteOnIdle { get; set; }
+        internal TopicAutoDeleteOnIdleSetting TopicAutoDeleteOnIdle { get; set; }
         internal EnableDeadLetteringOnMessageExpirationSetting EnableDeadLetteringOnMessageExpiration { get; set; }
         internal HeartbeatIntervalSetting HeartbeatInterval { get; set; }
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }

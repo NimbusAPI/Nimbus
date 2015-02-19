@@ -119,6 +119,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithTopicAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan topicAutoDeleteOnIdle)
+        {
+            configuration.TopicAutoDeleteOnIdle = new TopicAutoDeleteOnIdleSetting { Value = topicAutoDeleteOnIdle };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
             configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };

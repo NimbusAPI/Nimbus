@@ -18,6 +18,7 @@ namespace Nimbus.Infrastructure
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
+        private readonly TopicAutoDeleteOnIdleSetting _topicAutoDeleteOnIdle;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly ILogger _logger;
@@ -40,7 +41,8 @@ namespace Nimbus.Infrastructure
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
-                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
+                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration, 
+                                 TopicAutoDeleteOnIdleSetting topicAutoDeleteOnIdle)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -52,6 +54,7 @@ namespace Nimbus.Infrastructure
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _topicAutoDeleteOnIdle = topicAutoDeleteOnIdle;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -197,7 +200,7 @@ namespace Nimbus.Infrastructure
                                            EnableBatchedOperations = true,
                                            RequiresDuplicateDetection = false,
                                            SupportOrdering = false,
-                                           AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                           AutoDeleteOnIdle = _topicAutoDeleteOnIdle,
                                        };
 
                 // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
