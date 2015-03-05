@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Unity", "Extensions\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.ProtoBuf", "Extensions\Nimbus.Serializers.ProtoBuf\Nimbus.Serializers.ProtoBuf.csproj", "{B4162AA1-5F41-4FFD-90FB-4D7093955F6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.SampleApp", "Samples\Nimbus.SampleApp\Nimbus.SampleApp.csproj", "{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,10 @@ Global
 		{B4162AA1-5F41-4FFD-90FB-4D7093955F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4162AA1-5F41-4FFD-90FB-4D7093955F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4162AA1-5F41-4FFD-90FB-4D7093955F6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -229,5 +235,6 @@ Global
 		{6D2241CF-7760-42AC-8EC4-E2CB36390BDD} = {3A9D386C-12D5-4A21-9292-60C0C5B3A7C2}
 		{C50BF581-4721-4447-8E8E-5263FB83A9A6} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{B4162AA1-5F41-4FFD-90FB-4D7093955F6D} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{B5B600ED-C9DB-4C6D-BD24-AD1BA3B4F5A8} = {3A9D386C-12D5-4A21-9292-60C0C5B3A7C2}
 	EndGlobalSection
 EndGlobal
