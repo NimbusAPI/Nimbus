@@ -97,6 +97,7 @@
     <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
+    <Compile Include="Configuration\IPathFactoryProvider.cs" />
     <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
     <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Infrastructure\TaskScheduling\INimbusTaskFactory.cs" />
     <Compile Include="Configuration\Settings\MaximumThreadPoolThreadsSetting.cs" />
     <Compile Include="Configuration\Settings\MinimumThreadPoolThreadsSetting.cs" />
+    <Compile Include="Configuration\TypeConventionPathFactoryProvider.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
