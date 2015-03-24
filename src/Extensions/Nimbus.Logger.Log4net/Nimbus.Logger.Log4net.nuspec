@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nimbus.Logger.Log4net</id>
+    <version>$version$</version>
+    <title>Nimbus.Logger.Serilog</title>
+    <authors>Mustafa Arif</authors>
+    <owners>Damian Maclennan</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Nimbus log that writes to Log4net.</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>azure servicebus log4net</tags>
+    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <dependencies>
+      <dependency id="Log4net" />
+    </dependencies>
+  </metadata>
+</package>
