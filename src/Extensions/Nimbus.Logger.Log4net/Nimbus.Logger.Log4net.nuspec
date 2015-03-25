@@ -3,7 +3,7 @@
   <metadata>
     <id>Nimbus.Logger.Log4net</id>
     <version>$version$</version>
-    <title>Nimbus.Logger.Serilog</title>
+    <title>Nimbus.Logger.Log4Net</title>
     <authors>Mustafa Arif</authors>
     <owners>Damian Maclennan</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
