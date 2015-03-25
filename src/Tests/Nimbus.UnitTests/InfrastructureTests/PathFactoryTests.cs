@@ -49,5 +49,12 @@ namespace Nimbus.UnitTests.InfrastructureTests
             var pathName = PathFactory.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof (MyEventWithALongName));
             pathName.Length.ShouldBe(50);
         }
+
+        [Test]
+        public void WhenCreatingASubscriptionForATypeASpaceShouldBeConvertedToTheSanitizeCharacter()
+        {
+            var pathName = PathFactory.SubscriptionNameFor("My App", "App server", typeof(MyEventWithALongName));
+            pathName.ShouldBe("my.app.app.server.myeventwithalongname");
+        }
     }
 }
