@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
+using NullGuard;
 
 namespace Nimbus.Extensions
 {
@@ -44,6 +45,12 @@ namespace Nimbus.Extensions
         internal static BrokeredMessage WithReplyTo(this BrokeredMessage message, string replyTo)
         {
             message.ReplyTo = replyTo;
+            return message;
+        }
+
+        internal static BrokeredMessage WithSessionId(this BrokeredMessage message, [AllowNull] string sessionId)
+        {
+            message.SessionId = sessionId;
             return message;
         }
 

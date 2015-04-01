@@ -89,6 +89,10 @@
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="BrokeredMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
     <Compile Include="BrokeredMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingAFailedResponseToARequestWithReplyToSessionIdNotSet.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingAFailedResponseToARequestWithReplyToSessionIdSet.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingASuccesfulResponseToARequestWithReplyToSessionIdSet.cs" />
+    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingASuccesfulResponseToARequestWithReplyToSessionIdNotSet.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />
     <Compile Include="CompressionTests\WhenUsingDeflateCompressor.cs" />
     <Compile Include="CompressionTests\WhenUsingGzipCompressor.cs" />
