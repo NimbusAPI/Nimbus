@@ -100,9 +100,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     var tasks = messages
                         .Select(m => Task.Run(async () =>
                                                     {
+                                                        await _throttle.WaitAsync(_cancellationTokenSource.Token);
                                                         try
                                                         {
-                                                            await _throttle.WaitAsync(_cancellationTokenSource.Token);
                                                             await callback(m);
                                                         }
                                                         finally
