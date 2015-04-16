@@ -8,11 +8,6 @@ namespace Nimbus.Infrastructure.Logging
     {
         private static readonly Regex _regex = new Regex(@"{\S+?}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-        public static string NormalizeToStringFormat(this string format)
-        {
-            return Normalize(format);
-        }
-
         /// <summary>
         ///     Normalizes a log format string containing named placeholders (e.g. Message: {MessageId}) to a string containing
         ///     only
