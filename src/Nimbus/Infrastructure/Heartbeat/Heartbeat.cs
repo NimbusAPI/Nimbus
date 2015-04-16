@@ -89,21 +89,23 @@ namespace Nimbus.Infrastructure.Heartbeat
                 }
                 catch (Exception exc)
                 {
-                    // We're not running with admin privileges? Oh, well. No performance counter for you.
-                    _logger.Warn("Could not create performance counter {PerformanceCounter}: {Message}", counterType.FullName, exc.ToString());
+                    _logger.Warn(
+                        "Could not create performance counter {PerformanceCounter}: {Message}. This might occur because the current process is not running with suffucient privileges.",
+                        counterType.FullName,
+                        exc.ToString());
                 }
             }
 
             _collectTimer = new Timer(TimeSpan.FromSeconds(5).TotalMilliseconds)
                             {
-                                AutoReset = true,
+                                AutoReset = true
                             };
             _collectTimer.Elapsed += OnCollectTimerElapsed;
             _collectTimer.Start();
 
             _heartbeatTimer = new Timer(_heartbeatInterval.Value.TotalMilliseconds)
                               {
-                                  AutoReset = true,
+                                  AutoReset = true
                               };
             _heartbeatTimer.Elapsed += OnHeartbeatTimerElapsed;
             _heartbeatTimer.Start();
@@ -116,13 +118,23 @@ namespace Nimbus.Infrastructure.Heartbeat
             if (_heartbeatInterval.Value == TimeSpan.MaxValue) return;
             if (!_isRunning) return;
 
-            _collectTimer.Stop();
-            _collectTimer.Dispose();
+            var collectTimer = _collectTimer;
             _collectTimer = null;
 
-            _heartbeatTimer.Stop();
-            _heartbeatTimer.Dispose();
+            if (collectTimer != null)
+            {
+                collectTimer.Stop();
+                collectTimer.Dispose();
+            }
+
+            var heartbeatTimer = _heartbeatTimer;
             _heartbeatTimer = null;
+
+            if (heartbeatTimer != null)
+            {
+                heartbeatTimer.Stop();
+                heartbeatTimer.Dispose();
+            }
 
             _performanceCounters
                 .AsParallel()
@@ -157,7 +169,7 @@ namespace Nimbus.Infrastructure.Heartbeat
                                      WorkingSet64 = process.WorkingSet64,
                                      PeakWorkingSet64 = process.PeakWorkingSet64,
                                      VirtualMemorySize64 = process.VirtualMemorySize64,
-                                     PerformanceCounters = performanceCounterHistory,
+                                     PerformanceCounters = performanceCounterHistory
                                  };
 
             return heartbeatEvent;
