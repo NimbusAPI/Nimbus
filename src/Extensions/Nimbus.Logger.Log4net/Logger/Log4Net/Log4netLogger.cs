@@ -14,29 +14,40 @@ namespace Nimbus.Logger.Log4net
 
         public void Debug(string format, params object[] args)
         {
-            _log.DebugFormat(format, args);
+            if (args.Length > 0)
+                _log.DebugFormat(format, args);
+            else
+                _log.Debug(format);
         }
 
         public void Info(string format, params object[] args)
         {
-            _log.InfoFormat(format, args);
+            if (args.Length > 0)
+                _log.InfoFormat(format, args);
+            else
+                _log.Info(format);
         }
 
         public void Warn(string format, params object[] args)
         {
-            _log.WarnFormat(format, args);
+            if (args.Length > 0)
+                _log.WarnFormat(format, args);
+            else
+                _log.Warn(format);
         }
 
         public void Error(string format, params object[] args)
         {
-            _log.ErrorFormat(format, args);
+            if (args.Length > 0)
+                _log.ErrorFormat(format, args);
+            else
+                _log.Error(format);
         }
 
         public void Error(Exception exc, string format, params object[] args)
         {
-            var message = String.Format(format, args);
+            var message = (args.Length) > 0 ? String.Format(format, args) : format;
             _log.Error(message, exc);
         }
-
     }
 }
