@@ -1,5 +1,6 @@
 ﻿using System;
 using log4net;
+using Nimbus.Infrastructure.Logging;
 
 namespace Nimbus.Logger.Log4net
 {
@@ -15,7 +16,7 @@ namespace Nimbus.Logger.Log4net
         public void Debug(string format, params object[] args)
         {
             if (args.Length > 0)
-                _log.DebugFormat(format, args);
+                _log.DebugFormat(format.NormalizeToStringFormat(), args);
             else
                 _log.Debug(format);
         }
@@ -23,7 +24,7 @@ namespace Nimbus.Logger.Log4net
         public void Info(string format, params object[] args)
         {
             if (args.Length > 0)
-                _log.InfoFormat(format, args);
+                _log.InfoFormat(format.NormalizeToStringFormat(), args);
             else
                 _log.Info(format);
         }
@@ -31,7 +32,7 @@ namespace Nimbus.Logger.Log4net
         public void Warn(string format, params object[] args)
         {
             if (args.Length > 0)
-                _log.WarnFormat(format, args);
+                _log.WarnFormat(format.NormalizeToStringFormat(), args);
             else
                 _log.Warn(format);
         }
@@ -39,14 +40,14 @@ namespace Nimbus.Logger.Log4net
         public void Error(string format, params object[] args)
         {
             if (args.Length > 0)
-                _log.ErrorFormat(format, args);
+                _log.ErrorFormat(format.NormalizeToStringFormat(), args);
             else
                 _log.Error(format);
         }
 
         public void Error(Exception exc, string format, params object[] args)
         {
-            var message = (args.Length) > 0 ? String.Format(format, args) : format;
+            var message = (args.Length) > 0 ? String.Format(format.NormalizeToStringFormat(), args) : format;
             _log.Error(message, exc);
         }
     }

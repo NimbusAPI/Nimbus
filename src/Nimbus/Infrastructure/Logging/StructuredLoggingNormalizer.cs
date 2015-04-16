@@ -4,11 +4,11 @@ using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.Logging
 {
-    internal static class StructuredLoggingNormalizer
+    public static class StructuredLoggingNormalizer
     {
         private static readonly Regex _regex = new Regex(@"{\S+?}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-        internal static string NormalizeToStringFormat(this string format)
+        public static string NormalizeToStringFormat(this string format)
         {
             return Normalize(format);
         }
