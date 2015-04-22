@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Nimbus.Configuration.Settings
 {
-    public class SubscriptionAutoDeleteOnIdleSetting : Setting<TimeSpan>
+    public class AutoDeleteOnIdleSetting : Setting<TimeSpan>
     {
         public override TimeSpan Default
         {
-            get { return TimeSpan.FromDays(367); }
+            get { return TimeSpan.FromDays(4); }
         }
 
         public override IEnumerable<string> Validate()

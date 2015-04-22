@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
@@ -12,7 +11,6 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
@@ -35,17 +33,18 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetTopicSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            var brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                    new MaxLargeMessageSizeSetting(),
                                                                     new MaxSmallMessageSizeSetting(),
                                                                     replyQueueNameSetting,
                                                                     clock,
                                                                     new NullCompressor(),
-                                                                    new DispatchContextManager(), 
+                                                                    new DispatchContextManager(),
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     serializer,
                                                                     typeProvider);
@@ -54,7 +53,13 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var router = new DestinationPerMessageTypeRouter();
             var dependencyResolver = new NullDependencyResolver();
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
-            var busCommandSender = new BusEventSender(brokeredMessageFactory, dependencyResolver, knownMessageTypeVerifier, logger, messagingFactory, outboundInterceptorFactory, router);
+            var busCommandSender = new BusEventSender(brokeredMessageFactory,
+                                                      dependencyResolver,
+                                                      knownMessageTypeVerifier,
+                                                      logger,
+                                                      messagingFactory,
+                                                      outboundInterceptorFactory,
+                                                      router);
             return Task.FromResult(busCommandSender);
         }
 

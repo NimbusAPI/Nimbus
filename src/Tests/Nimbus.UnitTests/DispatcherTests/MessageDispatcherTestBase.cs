@@ -1,4 +1,3 @@
-using System;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
@@ -38,7 +37,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             TypeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);
-            BrokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            BrokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                new MaxLargeMessageSizeSetting(),
                                                                 new MaxSmallMessageSizeSetting(),
                                                                 replyQueueNameSetting,
                                                                 clock,

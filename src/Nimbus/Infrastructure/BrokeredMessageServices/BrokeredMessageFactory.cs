@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
+        private readonly DefaultMessageTimeToLiveSetting _timeToLive;
         private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
         private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
         private readonly ReplyQueueNameSetting _replyQueueName;
@@ -23,7 +25,8 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly ISerializer _serializer;
         private readonly ITypeProvider _typeProvider;
 
-        public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
+        public BrokeredMessageFactory(DefaultMessageTimeToLiveSetting timeToLive,
+                                      MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       ReplyQueueNameSetting replyQueueName,
                                       IClock clock,
@@ -33,6 +36,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                       ISerializer serializer,
                                       ITypeProvider typeProvider)
         {
+            _timeToLive = timeToLive;
             _maxLargeMessageSize = maxLargeMessageSize;
             _maxSmallMessageSize = maxSmallMessageSize;
             _replyQueueName = replyQueueName;
@@ -68,13 +72,13 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
                                               brokeredMessage = new BrokeredMessage();
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, _clock.UtcNow.AddDays(367));
+                                              var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, expiresAfter);
                                               brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
-                                              //FIXME source this timeout from somewhere more sensible.  -andrewh 8/4/2014
                                           }
                                           else
                                           {
-                                              brokeredMessage = new BrokeredMessage(messageBodyBytes);
+                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
                                           }
                                           brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
@@ -132,7 +136,13 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             }
             else
             {
-                bodyBytes = message.GetBody<byte[]>();
+                // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
+                using (var dataStream = message.GetBody<Stream>())
+                using (var memoryStream = new MemoryStream())
+                {
+                    dataStream.CopyTo(memoryStream);
+                    bodyBytes = memoryStream.ToArray();
+                }
             }
 
             var decompressedBytes = _compressor.Decompress(bodyBytes);

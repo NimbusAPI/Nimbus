@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Nimbus.Infrastructure;
 
 namespace Nimbus.Serializers.Json
 {
@@ -10,7 +9,7 @@ namespace Nimbus.Serializers.Json
         private readonly JsonSerializerSettings _settings;
 
         public JsonSerializer()
-            : this(null, Formatting.None)
+            : this(new JsonSerializerSettings(), Formatting.None)
         {
         }
 

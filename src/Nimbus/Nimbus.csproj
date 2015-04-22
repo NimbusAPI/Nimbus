@@ -88,6 +88,7 @@
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
+    <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
     <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\SystemPerformanceCounterWrapper.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
+    <Compile Include="Infrastructure\Logging\TraceLogger.cs" />
     <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />

@@ -33,17 +33,18 @@ namespace Nimbus.UnitTests.BatchSendingTests
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            var brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                    new MaxLargeMessageSizeSetting(),
                                                                     new MaxSmallMessageSizeSetting(),
                                                                     replyQueueNameSetting,
                                                                     clock,
                                                                     new NullCompressor(),
-                                                                    new DispatchContextManager(), 
+                                                                    new DispatchContextManager(),
                                                                     new UnsupportedLargeMessageBodyStore(),
                                                                     serializer,
                                                                     typeProvider);
@@ -53,7 +54,13 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var dependencyResolver = new NullDependencyResolver();
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
 
-            var busCommandSender = new BusCommandSender(brokeredMessageFactory, dependencyResolver, knownMessageTypeVerifier, logger, messagingFactory, outboundInterceptorFactory, router);
+            var busCommandSender = new BusCommandSender(brokeredMessageFactory,
+                                                        dependencyResolver,
+                                                        knownMessageTypeVerifier,
+                                                        logger,
+                                                        messagingFactory,
+                                                        outboundInterceptorFactory,
+                                                        router);
             return Task.FromResult(busCommandSender);
         }
 

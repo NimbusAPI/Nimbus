@@ -31,14 +31,15 @@ namespace Nimbus.UnitTests.CompressionTests
 
         private BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
-            var typeProvider = new TestHarnessTypeProvider(new[] { GetType().Assembly }, new[] { GetType().Namespace });
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
-            return new BrokeredMessageFactory(new MaxLargeMessageSizeSetting(),
+            return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                              new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
                                               Substitute.For<IClock>(),
                                               compressor,
-                                              new DispatchContextManager(), 
+                                              new DispatchContextManager(),
                                               new UnsupportedLargeMessageBodyStore(),
                                               serializer,
                                               typeProvider);
