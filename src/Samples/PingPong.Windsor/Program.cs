@@ -81,7 +81,7 @@ namespace PingPong.Windsor
                 .LifestyleSingleton()
             );
 				Bus bus = (Bus)container.Resolve<IBus>();
-				bus.Start();
+				bus.Start().Wait();
         }
     }
 }
