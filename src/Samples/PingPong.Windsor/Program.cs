@@ -79,8 +79,9 @@ namespace PingPong.Windsor
                     .WithDeflateCompressor()
                     .Build())
                 .LifestyleSingleton()
-                .StartUsingMethod("Start")
-                );
+            );
+            Bus bus = (Bus)container.Resolve<IBus>();
+            bus.Start().Wait();
         }
     }
 }
