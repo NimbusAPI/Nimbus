@@ -244,7 +244,7 @@ namespace Nimbus.Infrastructure
                                                   LockDuration = _defaultMessageLockDuration,
                                                   RequiresSession = false,
                                                   AutoDeleteOnIdle = _autoDeleteOnIdle,
-                                              };
+															 };
 
                 try
                 {
@@ -298,7 +298,8 @@ namespace Nimbus.Infrastructure
                                            RequiresSession = false,
                                            SupportOrdering = false,
                                            AutoDeleteOnIdle = _autoDeleteOnIdle,
-                                       };
+														 EnablePartitioning = true,
+													};
 
                 // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
                 // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
