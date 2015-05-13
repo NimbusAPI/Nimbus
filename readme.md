@@ -21,16 +21,24 @@ There are 2 main branches in the Anubus repo
 The -anubus- branch, cloned from -master-, will be the one where all the forward versioned Azure Service Bus changes are implemented. 
 
 The -master- branch will be our local mirror of Nimbus/master. i.e. If there are bug fixes or features pushed to Nimbus/master, we will pull them down into Anubus/master, and then into Anubus/anubus.
+
 e.g. Nimbus/master -> Anubus/master -> Anubus/anubus
 
 If we want to make any changes or bug fixes to Nimbus proper, we will do this in Anubus/master, and then submit a pull request to Nimbus for merging our changes upstream.
+
 i.e. Nimbus/master <- Anubus/master
 
 Anubus/anubus should never be merged upstream into Anubus/master.
+
 i.e. Anubus/master |< Anubus/anubus
 
 So at a high level, the commit flow would look like this:
+
 Nimbus/master <-> Anubus/master -> Anubus/anubus
+
+To pull the latest version of Nimbus/master into Anubus/master, do the following:
+* check out Anubus/master
+* git pull https://github.com/NimbusAPI/Nimbus.git master
 
 
 # Nimbus
