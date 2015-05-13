@@ -10,10 +10,10 @@ However, this prevents Nimbus from using awesome new features that have been rol
 Thus, Anubus is for those who are willing to sacrifice running on Windows Service Bus for getting at the latest features on Azure Service Bus.
 For those still wanting the single development story on both environments, stick to Nimbus.
 
-# Going forward.
+## Going forward.
 The intention is to keep Anubus as closely aligned as possible to Nimbus, only bringing in changes to support new Azure Service Bus features as and when they are needed.
 
-## Branches
+### Branches
 There are 2 main branches in the Anubus repo
 * master
 * anubus
@@ -24,8 +24,13 @@ The -master- branch will be our local mirror of Nimbus/master. i.e. If there are
 e.g. Nimbus/master -> Anubus/master -> Anubus/anubus
 
 If we want to make any changes or bug fixes to Nimbus proper, we will do this in Anubus/master, and then submit a pull request to Nimbus for merging our changes upstream.
+i.e. Nimbus/master <- Anubus/master
 
 Anubus/anubus should never be merged upstream into Anubus/master.
+i.e. Anubus/master |< Anubus/anubus
+
+So at a high level, the commit flow would look like this:
+Nimbus/master <-> Anubus/master -> Anubus/anubus
 
 
 # Nimbus
