@@ -2,8 +2,11 @@
 
 Anubus is Nimbus, but just rolled forward to support the latest Azure Service Bus client.
 Since the Windows Service Bus, and it's client API, is only released when Windows Server is released, it lags far behind the Azure Service Bus and client API that is released much more often.
+
 I completely understand why the Nimbus guys have chosen to support only the Azure Service Bus client that is compatible with the latest version of Windows Service Bus. They want a single developer story for developing against both Azure Service Bus and Windows Service bus (same code will run on both environments without modification).
+
 However, this prevents Nimbus from using awesome new features that have been rolled out on Azure Service Bus, such as partitioned queues and topics, etc.
+
 Thus, Anubus is for those who are willing to sacrifice running on Windows Service Bus for getting at the latest features on Azure Service Bus.
 For those still wanting the single development story on both environments, stick to Nimbus.
 
