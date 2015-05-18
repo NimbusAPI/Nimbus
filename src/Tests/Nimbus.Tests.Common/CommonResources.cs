@@ -28,21 +28,37 @@ namespace Nimbus.Tests.Common
         private static string LocalFilesystemServiceBusConnectionString()
         {
             // this file can (and usually does) have passwords in it so it's important to have it NOT under source control anywhere
-            const string filename = @"C:\Temp\NimbusConnectionString.txt";
+			  const string envVariable = "NIMBUS_TESTS_ASB_CONNECTION_STRING";
+			  const string filename = @"C:\Temp\NimbusConnectionString.txt";
+			  string connectionString = null;
 
-            if (!File.Exists(filename))
-                throw new Exception("Could not find the file {0} containing the Azure Service Bus connection string to use for integration testing".FormatWith(filename));
+				// First try get the connection string from the env variable, then from the text file.
+				connectionString = Environment.GetEnvironmentVariable(envVariable);
+				if (string.IsNullOrEmpty(connectionString))
+					if (File.Exists(filename))
+						connectionString = File.ReadAllText(filename).Trim();
 
-            return File.ReadAllText(filename).Trim();
+				if (string.IsNullOrEmpty(connectionString))
+					throw new Exception("Could not find either the environment variable with name {0}, nor file {1} containing the Azure Service Bus connection string to use for integration testing".FormatWith(envVariable, filename));
+
+				return connectionString;
         }
 
         private static string FetchBlobStorageConnectionString()
         {
-            const string filename = @"C:\Temp\NimbusBlobStorageConnectionString.txt";
-            if (!File.Exists(filename))
-                throw new Exception("Could not find the file {0} containing the Azure Blob Storage connection string to use for integration testing".FormatWith(filename));
+			  const string envVariable = "NIMBUS_TESTS_ABS_CONNECTION_STRING" ;
+			  const string filename = @"C:\Temp\NimbusBlobStorageConnectionString.txt";
 
-            return File.ReadAllText(filename).Trim();
+				// First try get the connection string from the env variable, then from the text file.
+				string connectionString = Environment.GetEnvironmentVariable(envVariable);
+				if (string.IsNullOrEmpty(connectionString))
+					if (File.Exists(filename))
+						connectionString = File.ReadAllText(filename).Trim();
+
+				if (string.IsNullOrEmpty(connectionString))
+                throw new Exception("Could not find the environment variable with name {0}, nor the file {1} containing the Azure Blob Storage connection string to use for integration testing".FormatWith(envVariable, filename));
+
+				return connectionString;
         }
     }
 }
