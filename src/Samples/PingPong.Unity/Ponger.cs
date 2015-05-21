@@ -7,7 +7,7 @@ namespace PingPong.Unity
     {
         public async Task<Pong> Handle(Ping request)
         {
-            return new Pong {Message = request.Message};
+			  return await Task.FromResult(new Pong { Message = request.Message });
         }
     }
 }

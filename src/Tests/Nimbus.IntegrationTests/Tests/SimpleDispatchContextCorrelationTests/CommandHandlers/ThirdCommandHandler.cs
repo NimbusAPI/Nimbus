@@ -5,7 +5,8 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers
 {
-    public class ThirdCommandHandler : IHandleCommand<ThirdCommand>
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+	public class ThirdCommandHandler : IHandleCommand<ThirdCommand>
     {
         public async Task Handle(ThirdCommand busCommand)
         {

@@ -58,6 +58,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
         public async Task NoMessagesShouldHaveLocksExpire()
         {
             MethodCallCounter.AllReceivedMessages.OfType<NoOpCommand>().Count().ShouldBe(SmashTheBusCommandHandler.NumCommandsSent);
-        }
+				await Task.Yield();
+		  }
     }
 }
