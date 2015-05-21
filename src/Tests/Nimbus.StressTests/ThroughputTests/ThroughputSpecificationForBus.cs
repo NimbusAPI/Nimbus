@@ -96,13 +96,13 @@ namespace Nimbus.StressTests.ThroughputTests
         public abstract IEnumerable<Task> SendMessages(IBus bus);
 
         [Test]
-        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
+        public void TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
             _fakeHandler.ActualNumMessagesReceived.ShouldBe(_fakeHandler.ExpectedNumMessagesReceived);
         }
 
         [Test]
-        public async Task WeShouldGetAcceptableThroughput()
+        public void WeShouldGetAcceptableThroughput()
         {
             _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
         }

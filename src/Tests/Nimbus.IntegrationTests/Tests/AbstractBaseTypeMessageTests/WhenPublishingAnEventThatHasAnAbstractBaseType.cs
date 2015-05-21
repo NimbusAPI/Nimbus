@@ -20,22 +20,26 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeConcreteEventTypeCompetingHandler>(mb => mb.Handle(null))
                              .Count()
                              .ShouldBe(1);
         }
-
-        [Test]
-        public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  
+		 [Test]
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeConcreteEventTypeMulticastHandler>(mb => mb.Handle(null))
                              .Count()
                              .ShouldBe(1);
         }
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
 
-        [Test]
+		 [Test]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
             MethodCallCounter.AllReceivedMessages
