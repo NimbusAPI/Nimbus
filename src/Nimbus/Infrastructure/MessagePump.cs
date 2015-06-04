@@ -134,6 +134,7 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     LogDebug("Abandoning", message);
+                    message.Properties[MessagePropertyKeys.DispatchAbandoned] = true;
                     await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
                     LogDebug("Abandoned", message);
                 }

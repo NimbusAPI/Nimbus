@@ -111,6 +111,13 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                     return;
                 }
 
+                object dispatchAbandoned;
+                if (message.Properties.TryGetValue(MessagePropertyKeys.DispatchAbandoned, out dispatchAbandoned) && dispatchAbandoned as bool? == true)
+                {
+                    //_logger.Debug("Long-running task wrapper awoke after message {0} had already been dispatched. Nothing to see here.", message.MessageId);
+                    return;
+                }
+
                 _logger.Info(
                     "Long-running handler {HandlerType} for message {MessageId} requires a lock renewal ({LockTimeRemaining} seconds remaining; {LockTimeRequired} required).",
                     longRunningHandler.GetType().FullName,
