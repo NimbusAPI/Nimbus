@@ -60,19 +60,12 @@ namespace Nimbus.Infrastructure
 
         public void WarmUp()
         {
-            try
-            {
-                // ReSharper disable UnusedVariable
-                var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
-                var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
-                // ReSharper restore UnusedVariable
+            // ReSharper disable UnusedVariable
+            var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
+            var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
+            // ReSharper restore UnusedVariable
 
-                Task.WaitAll(task0, task1);
-            }
-            catch (Exception exc)
-            {
-                throw new BusException("Azure queue manager failed to start", exc);
-            }
+            Task.WaitAll(task0, task1);
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)

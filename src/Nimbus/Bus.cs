@@ -116,10 +116,15 @@ namespace Nimbus
 
                 await _messagePumpsManager.Start(messagePumpTypes);
             }
-            catch (Exception aex)
+            catch (AggregateException aex)
             {
                 _logger.Error(aex, "Failed to start bus.");
                 throw new BusException("Failed to start bus", aex);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to start bus.");
+                throw new BusException("Failed to stop bus", ex);
             }
 
             var startedHandler = Started;
@@ -145,9 +150,13 @@ namespace Nimbus
 
                 await _messagePumpsManager.Stop(messagePumpTypes);
             }
-            catch (Exception aex)
+            catch (AggregateException aex)
             {
                 throw new BusException("Failed to stop bus", aex);
+            }
+            catch (Exception ex)
+            {
+                throw new BusException("Failed to stop bus", ex);
             }
 
             var stoppedHandler = Stopped;
