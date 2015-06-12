@@ -48,7 +48,7 @@ namespace Pizza.Maker
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly(),
                                                                 typeof (OrderPizzaCommand).Assembly,
                                                                 typeof (NewOrderRecieved).Assembly);
-
+            
             builder.RegisterNimbus(typeProvider);
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
@@ -56,6 +56,7 @@ namespace Pizza.Maker
                                  .WithNames("Maker", Environment.MachineName)
                                  .WithTypesFrom(typeProvider)
                                  .WithAutofacDefaults(componentContext)
+                                 .WithAzureManageClaim(true)
                                  .Build())
                    .As<IBus>()
                    .AutoActivate()

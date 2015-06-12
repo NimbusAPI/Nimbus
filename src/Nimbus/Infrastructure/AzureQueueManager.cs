@@ -28,6 +28,7 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly ITypeProvider _typeProvider;
+        private readonly HasAzureManageClaimSetting _hasAzureManageClaim;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
 
@@ -40,7 +41,8 @@ namespace Nimbus.Infrastructure
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
-                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
+                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+                                 HasAzureManageClaimSetting hasAzureManageClaim)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -52,6 +54,7 @@ namespace Nimbus.Infrastructure
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _hasAzureManageClaim = hasAzureManageClaim;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -60,6 +63,12 @@ namespace Nimbus.Infrastructure
 
         public void WarmUp()
         {
+            if (!_hasAzureManageClaim)
+            {
+                _logger.Debug("No Azure Manage claim, skipping warmup...");
+                return;
+            }
+
             // ReSharper disable UnusedVariable
             var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
             var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
@@ -76,12 +85,40 @@ namespace Nimbus.Infrastructure
 
         public Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
+            if (!_hasAzureManageClaim)
+            {
+                try
+                {
+                    _namespaceManager().GetQueue(queuePath);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Queue={0} doesn't exist. Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                                      queuePath), ex);
+                }
+            }
+
             EnsureQueueExists(queuePath);
             return _messagingFactory().CreateMessageReceiverAsync(queuePath);
         }
 
         public Task<TopicClient> CreateTopicSender(string topicPath)
         {
+            if (!_hasAzureManageClaim)
+            {
+                try
+                {
+                    _namespaceManager().GetTopic(topicPath);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Topic={0} doesn't exist.Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                                      topicPath), ex);
+                }
+            }
+
             return Task.Run(() =>
             {
                 EnsureTopicExists(topicPath);
@@ -91,6 +128,21 @@ namespace Nimbus.Infrastructure
 
         public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
+            if (!_hasAzureManageClaim)
+            {
+                try
+                {
+                    _namespaceManager().GetSubscription(topicPath, subscriptionName);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Subscription={0} for topic={1} doesn't exist.Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                                      subscriptionName,
+                                      topicPath), ex);
+                }
+            }
+
             return Task.Run(() =>
             {
                 EnsureSubscriptionExists(topicPath, subscriptionName);
@@ -112,6 +164,13 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingTopics()
         {
+            if (!_hasAzureManageClaim)
+            {
+                _logger.Debug("No Azure Manage claim, skipping topics fetch...");
+                return new ConcurrentBag<string>();
+            }
+
+
             _logger.Debug("Fetching existing topics...");
 
             var topicsAsync = _namespaceManager().GetTopicsAsync();
@@ -125,6 +184,12 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
         {
+            if (!_hasAzureManageClaim)
+            {
+                _logger.Debug("No Azure Manage claim, skipping subscription fetch...");
+                return new ConcurrentBag<string>();
+            }
+
             _logger.Debug("Fetching existing subscriptions...");
 
             var subscriptionTasks = _knownTopics.Value
@@ -163,6 +228,12 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
+            if (!_hasAzureManageClaim)
+            {
+                _logger.Debug("No Azure Manage claim, skipping queues fetch...");
+                return new ConcurrentBag<string>();
+            }
+
             _logger.Debug("Fetching existing queues...");
 
             var queuesAsync = _namespaceManager().GetQueuesAsync();

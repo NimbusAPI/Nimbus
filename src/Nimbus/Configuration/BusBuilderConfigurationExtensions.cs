@@ -109,25 +109,25 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
         {
-            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting { Value = timeToLive };
+            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting {Value = timeToLive};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
         {
-            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
+            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting {Value = autoDeleteOnIdle};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
-            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };
+            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting {Value = enableDeadLettering};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
         {
-            configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };
+            configuration.HeartbeatInterval = new HeartbeatIntervalSetting {Value = heartbeatInterval};
             return configuration;
         }
 
@@ -153,6 +153,12 @@ namespace Nimbus.Configuration
                                                                Func<BusBuilderDebuggingConfiguration, BusBuilderDebuggingConfiguration> debugConfiguration)
         {
             debugConfiguration(configuration.Debugging);
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithAzureManageClaim(this BusBuilderConfiguration configuration, bool hasAzureManageClaim)
+        {
+            configuration.DefaultAutoSpinUpQueuesAndTopics = new HasAzureManageClaimSetting() { Value = hasAzureManageClaim };
             return configuration;
         }
     }
