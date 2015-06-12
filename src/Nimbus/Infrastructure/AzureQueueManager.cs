@@ -94,7 +94,7 @@ namespace Nimbus.Infrastructure
                 catch (Exception ex)
                 {
                     throw new BusException(
-                        string.Format("Queue={0} doesn't exist. Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                        string.Format("Queue={0} doesn't exist. Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
                                       queuePath), ex);
                 }
             }
@@ -114,7 +114,7 @@ namespace Nimbus.Infrastructure
                 catch (Exception ex)
                 {
                     throw new BusException(
-                        string.Format("Topic={0} doesn't exist.Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                        string.Format("Topic={0} doesn't exist.Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
                                       topicPath), ex);
                 }
             }
@@ -137,7 +137,7 @@ namespace Nimbus.Infrastructure
                 catch (Exception ex)
                 {
                     throw new BusException(
-                        string.Format("Subscription={0} for topic={1} doesn't exist.Azure Manage claim needed or queue, topics and subscriptions will have to be manually created.",
+                        string.Format("Subscription={0} for topic={1} doesn't exist.Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
                                       subscriptionName,
                                       topicPath), ex);
                 }
