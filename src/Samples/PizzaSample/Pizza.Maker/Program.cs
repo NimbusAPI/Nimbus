@@ -56,7 +56,7 @@ namespace Pizza.Maker
                                  .WithNames("Maker", Environment.MachineName)
                                  .WithTypesFrom(typeProvider)
                                  .WithAutofacDefaults(componentContext)
-                                 .WithAzureManageClaim(true)
+                                 .SupressQueueAndTopicCreation(true)
                                  .Build())
                    .As<IBus>()
                    .AutoActivate()

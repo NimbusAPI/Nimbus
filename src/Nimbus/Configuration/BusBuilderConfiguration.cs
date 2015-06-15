@@ -43,7 +43,7 @@ namespace Nimbus.Configuration
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
         internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; }
         internal MinimumThreadPoolThreadsSetting MinimumThreadPoolThreads { get; set; }
-        internal HasAzureManageClaimSetting DefaultAutoSpinUpQueuesAndTopics { get; set; }
+        internal SuppressQueuesAndTopicCreationSetting SupressQueueAndTopicCreation { get; set; }
 
         internal BusBuilderConfiguration()
         {

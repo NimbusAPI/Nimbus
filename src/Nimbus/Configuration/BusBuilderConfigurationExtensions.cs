@@ -156,9 +156,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithAzureManageClaim(this BusBuilderConfiguration configuration, bool hasAzureManageClaim)
+        public static BusBuilderConfiguration SupressQueueAndTopicCreation(this BusBuilderConfiguration configuration, bool suppressQueueAndTopicCreation)
         {
-            configuration.DefaultAutoSpinUpQueuesAndTopics = new HasAzureManageClaimSetting() { Value = hasAzureManageClaim };
+            configuration.SupressQueueAndTopicCreation = new SuppressQueuesAndTopicCreationSetting() { Value = suppressQueueAndTopicCreation };
             return configuration;
         }
     }

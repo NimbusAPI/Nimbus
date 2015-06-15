@@ -28,7 +28,7 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly ITypeProvider _typeProvider;
-        private readonly HasAzureManageClaimSetting _hasAzureManageClaim;
+        private readonly SuppressQueuesAndTopicCreationSetting _suppressQueuesAndTopicCreationSetting;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
 
@@ -42,7 +42,7 @@ namespace Nimbus.Infrastructure
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
-                                 HasAzureManageClaimSetting hasAzureManageClaim)
+                                 SuppressQueuesAndTopicCreationSetting suppressQueuesAndTopicCreationSetting)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -54,7 +54,7 @@ namespace Nimbus.Infrastructure
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
-            _hasAzureManageClaim = hasAzureManageClaim;
+            _suppressQueuesAndTopicCreationSetting = suppressQueuesAndTopicCreationSetting;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
@@ -63,9 +63,9 @@ namespace Nimbus.Infrastructure
 
         public void WarmUp()
         {
-            if (!_hasAzureManageClaim)
+            if (_suppressQueuesAndTopicCreationSetting)
             {
-                _logger.Debug("No Azure Manage claim, skipping warmup...");
+                _logger.Warn("WARNING : Creation of queues, topic and subscriptions is suppressed!");
                 return;
             }
 
@@ -85,40 +85,12 @@ namespace Nimbus.Infrastructure
 
         public Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
-            if (!_hasAzureManageClaim)
-            {
-                try
-                {
-                    _namespaceManager().GetQueue(queuePath);
-                }
-                catch (Exception ex)
-                {
-                    throw new BusException(
-                        string.Format("Queue={0} doesn't exist. Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
-                                      queuePath), ex);
-                }
-            }
-
             EnsureQueueExists(queuePath);
             return _messagingFactory().CreateMessageReceiverAsync(queuePath);
         }
 
         public Task<TopicClient> CreateTopicSender(string topicPath)
         {
-            if (!_hasAzureManageClaim)
-            {
-                try
-                {
-                    _namespaceManager().GetTopic(topicPath);
-                }
-                catch (Exception ex)
-                {
-                    throw new BusException(
-                        string.Format("Topic={0} doesn't exist.Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
-                                      topicPath), ex);
-                }
-            }
-
             return Task.Run(() =>
             {
                 EnsureTopicExists(topicPath);
@@ -128,21 +100,6 @@ namespace Nimbus.Infrastructure
 
         public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
-            if (!_hasAzureManageClaim)
-            {
-                try
-                {
-                    _namespaceManager().GetSubscription(topicPath, subscriptionName);
-                }
-                catch (Exception ex)
-                {
-                    throw new BusException(
-                        string.Format("Subscription={0} for topic={1} doesn't exist.Azure Manage claim is needed otherwise queue, topics and subscriptions will have to be manually created.",
-                                      subscriptionName,
-                                      topicPath), ex);
-                }
-            }
-
             return Task.Run(() =>
             {
                 EnsureSubscriptionExists(topicPath, subscriptionName);
@@ -164,12 +121,11 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingTopics()
         {
-            if (!_hasAzureManageClaim)
+            if (_suppressQueuesAndTopicCreationSetting)
             {
-                _logger.Debug("No Azure Manage claim, skipping topics fetch...");
+                _logger.Debug("Creation of queues, topic and subscriptions is suppressed, skipping topics fetch...");
                 return new ConcurrentBag<string>();
             }
-
 
             _logger.Debug("Fetching existing topics...");
 
@@ -184,9 +140,9 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
         {
-            if (!_hasAzureManageClaim)
+            if (_suppressQueuesAndTopicCreationSetting)
             {
-                _logger.Debug("No Azure Manage claim, skipping subscription fetch...");
+                _logger.Debug("Creation of queues, topic and subscriptions is suppressed, skipping subscription fetch...");
                 return new ConcurrentBag<string>();
             }
 
@@ -228,9 +184,9 @@ namespace Nimbus.Infrastructure
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
-            if (!_hasAzureManageClaim)
+            if (_suppressQueuesAndTopicCreationSetting)
             {
-                _logger.Debug("No Azure Manage claim, skipping queues fetch...");
+                _logger.Debug("Creation of queues, topic and subscriptions is suppressed, skipping queues fetch...");
                 return new ConcurrentBag<string>();
             }
 
@@ -248,6 +204,20 @@ namespace Nimbus.Infrastructure
 
         private void EnsureTopicExists(string topicPath)
         {
+            if (_suppressQueuesAndTopicCreationSetting)
+            {
+                try
+                {
+                    _namespaceManager().GetTopic(topicPath);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Topic={0} doesn't exist. Creation of queues, topic and subscriptions is suppressed, they will have to be manually created.",
+                                      topicPath), ex);
+                }
+            }
+
             if (_knownTopics.Value.Contains(topicPath)) return;
             lock (LockFor(topicPath))
             {
@@ -288,6 +258,21 @@ namespace Nimbus.Infrastructure
 
         private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
         {
+            if (_suppressQueuesAndTopicCreationSetting)
+            {
+                try
+                {
+                    _namespaceManager().GetSubscription(topicPath, subscriptionName);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Subscription={0} for topic={1} doesn't exist.Creation of queues, topic and subscriptions is suppressed, they will have to be manually created.",
+                                      subscriptionName,
+                                      topicPath), ex);
+                }
+            }
+
             var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
 
             if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
@@ -343,6 +328,20 @@ namespace Nimbus.Infrastructure
 
         internal void EnsureQueueExists(string queuePath)
         {
+            if (_suppressQueuesAndTopicCreationSetting)
+            {
+                try
+                {
+                    _namespaceManager().GetQueue(queuePath);
+                }
+                catch (Exception ex)
+                {
+                    throw new BusException(
+                        string.Format("Queue={0} doesn't exist. Creation of queues, topic and subscriptions is suppressed, they will have to be manually created.",
+                                      queuePath), ex);
+                }
+            }
+
             if (_knownQueues.Value.Contains(queuePath)) return;
 
             lock (LockFor(queuePath))

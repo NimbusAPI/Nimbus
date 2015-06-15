@@ -1,10 +1,10 @@
 ﻿namespace Nimbus.Configuration.Settings
 {
-    public class HasAzureManageClaimSetting : Setting<bool>
+    public class SuppressQueuesAndTopicCreationSetting : Setting<bool>
     {
         public override bool Default
         {
-            get { return true; }
+            get { return false; }
         }
     }
 }
