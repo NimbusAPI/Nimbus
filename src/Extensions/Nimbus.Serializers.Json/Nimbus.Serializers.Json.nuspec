@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Nimbus.Serializers.Json</id>
+    <id>Anubus.Serializers.Json</id>
     <version>$version$</version>
-    <title>Nimbus.Serializers.Json</title>
+    <title>Anubus.Serializers.Json</title>
     <authors>Gert Jansen van Rensburg</authors>
     <owners>Damian Maclennan</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Nimbus serializer implemented with Newtonsoft.Json</description>
+    <description>Anubus serializer implemented with Newtonsoft.Json</description>
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
-    <copyright>Copyright 2014</copyright>
-    <tags>azure servicebus json.net</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <copyright>Copyright 2015</copyright>
+    <tags>azure servicebus json.net nimbus</tags>
+    <projectUrl>https://github.com/rebase42/Anubus/wiki</projectUrl>
     <dependencies>
       <dependency id="Newtonsoft.Json" />
     </dependencies>
