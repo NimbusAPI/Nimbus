@@ -1,5 +1,6 @@
 *.user
 *.suo
+*.DotSettings
 [Oo]bj
 [Bb]in
 _ReSharper.*
