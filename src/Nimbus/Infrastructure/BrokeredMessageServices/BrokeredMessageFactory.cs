@@ -80,7 +80,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                           {
                                               brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
                                           }
-                                          brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
+                                          brokeredMessage.Properties[MessagePropertyKeys.MessageType] = StripGenericQualification(serializableObject.GetType());
                                       }
 
                                       var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
@@ -153,12 +153,21 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         public Type GetBodyType(BrokeredMessage message)
         {
             var typeName = message.SafelyGetBodyTypeNameOrDefault();
-            var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();
+            var candidates = _typeProvider.AllMessageContractTypes().Where(t => StripGenericQualification(t) == typeName).ToArray();
             if (candidates.Any() == false)
                 throw new Exception("The type '{0}' was not discovered by the type provider and cannot be loaded.".FormatWith(typeName));
 
             // The TypeProvider should not provide a list of duplicates
             return candidates.Single();
+        }
+
+        private static string StripGenericQualification(Type type)
+        {
+            if (!type.IsGenericType) return type.FullName;
+
+            var genericArgs = type.GetGenericArguments().Select(arg => arg.Name);
+
+            return type.Namespace + "." + type.Name + "-" + string.Join("-", genericArgs);
         }
     }
 }
