@@ -53,6 +53,12 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var messages = await receiveTask;
                 return messages.ToArray();
             }
+            catch (MessagingEntityNotFoundException)
+            {
+                _queueManager.RemoveSubscription(_topicPath, _subscriptionName);
+                DiscardSubscriptionClient();
+                throw;
+            }
             catch (Exception exc)
             {
                 if (exc.IsTransientFault()) throw;
@@ -74,10 +80,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         {
             var subscriptionClient = _subscriptionClient;
             _subscriptionClient = null;
-
+            
             if (subscriptionClient == null) return;
             if (subscriptionClient.IsClosed) return;
-
+            
             subscriptionClient.Close();
         }
 

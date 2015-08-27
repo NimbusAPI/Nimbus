@@ -119,6 +119,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithAutoRecreateMessagingEntity(this BusBuilderConfiguration configuration, bool autoRecreate)
+        {
+            configuration.AutoRecreateMessagingEntitySetting = new AutoRecreateMessagingEntitySetting { Value = autoRecreate };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
             configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };

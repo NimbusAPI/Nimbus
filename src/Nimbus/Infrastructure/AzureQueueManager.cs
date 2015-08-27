@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
@@ -19,13 +20,14 @@ namespace Nimbus.Infrastructure
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly AutoRecreateMessagingEntitySetting _autoRecreateMessagingEntitySetting;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly ILogger _logger;
         private readonly IRouter _router;
 
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
+        private readonly ThreadSafeLazy<ConcurrentDictionary<string, object>> _knownTopics;
+        private readonly ThreadSafeLazy<ConcurrentDictionary<string, object>> _knownSubscriptions;
+        private readonly ThreadSafeLazy<ConcurrentDictionary<string, object>> _knownQueues;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly ITypeProvider _typeProvider;
 
@@ -40,6 +42,7 @@ namespace Nimbus.Infrastructure
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 AutoRecreateMessagingEntitySetting autoRecreateMessagingEntitySetting,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
         {
             _namespaceManager = namespaceManager;
@@ -51,11 +54,12 @@ namespace Nimbus.Infrastructure
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
+            _autoRecreateMessagingEntitySetting = autoRecreateMessagingEntitySetting;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
 
-            _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
-            _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
-            _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
+            _knownTopics = new ThreadSafeLazy<ConcurrentDictionary<string, object>>(FetchExistingTopics);
+            _knownSubscriptions = new ThreadSafeLazy<ConcurrentDictionary<string, object>>(FetchExistingSubscriptions);
+            _knownQueues = new ThreadSafeLazy<ConcurrentDictionary<string, object>>(FetchExistingQueues);
         }
 
         public void WarmUp()
@@ -117,7 +121,7 @@ namespace Nimbus.Infrastructure
             });
         }
 
-        private ConcurrentBag<string> FetchExistingTopics()
+        private ConcurrentDictionary<string, object> FetchExistingTopics()
         {
             _logger.Debug("Fetching existing topics...");
 
@@ -125,18 +129,18 @@ namespace Nimbus.Infrastructure
             if (!topicsAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
             var topics = topicsAsync.Result;
-            var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
+            var topicPaths = new ConcurrentDictionary<string, object>(topics.Select(t => new KeyValuePair<string, object>(t.Path,null)));
 
             return topicPaths;
         }
 
-        private ConcurrentBag<string> FetchExistingSubscriptions()
+        private ConcurrentDictionary<string, object> FetchExistingSubscriptions()
         {
             _logger.Debug("Fetching existing subscriptions...");
 
             var subscriptionTasks = _knownTopics.Value
-                                                .Where(WeHaveAHandler)
-                                                .Select(FetchExistingTopicSubscriptions)
+                                                .Where(x => WeHaveAHandler(x.Key))
+                                                .Select(x => FetchExistingTopicSubscriptions(x.Key))
                                                 .ToArray();
 
             Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
@@ -146,7 +150,7 @@ namespace Nimbus.Infrastructure
                 .OrderBy(k => k)
                 .ToArray();
 
-            return new ConcurrentBag<string>(subscriptionKeys);
+            return new ConcurrentDictionary<string, object>(subscriptionKeys.Select(t => new KeyValuePair<string, object>(t, null)));
         }
 
         private bool WeHaveAHandler(string topicPath)
@@ -168,7 +172,7 @@ namespace Nimbus.Infrastructure
                                   });
         }
 
-        private ConcurrentBag<string> FetchExistingQueues()
+        private ConcurrentDictionary<string, object> FetchExistingQueues()
         {
             _logger.Debug("Fetching existing queues...");
 
@@ -179,15 +183,15 @@ namespace Nimbus.Infrastructure
             var queuePaths = queues.Select(q => q.Path)
                                    .OrderBy(p => p)
                                    .ToArray();
-            return new ConcurrentBag<string>(queuePaths);
+            return new ConcurrentDictionary<string, object>(queuePaths.Select(s => new KeyValuePair<string, object>(s, null)));
         }
 
         private void EnsureTopicExists(string topicPath)
         {
-            if (_knownTopics.Value.Contains(topicPath)) return;
+            if (_knownTopics.Value.ContainsKey(topicPath)) return;
             lock (LockFor(topicPath))
             {
-                if (_knownTopics.Value.Contains(topicPath)) return;
+                if (_knownTopics.Value.ContainsKey(topicPath)) return;
 
                 _logger.Debug("Creating topic '{0}'", topicPath);
 
@@ -218,7 +222,21 @@ namespace Nimbus.Infrastructure
                     if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
                 }
 
-                _knownTopics.Value.Add(topicPath);
+                _knownTopics.Value.SafeAddKey(topicPath);
+            }
+        }
+
+        public void RemoveSubscription(string topicPath, string subscriptionName)
+        {
+            if (_autoRecreateMessagingEntitySetting.Value)
+            {
+                if (_knownTopics.Value.ContainsKey(topicPath))
+                    _knownTopics.Value.SafeRemoveKey(topicPath);
+
+                var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
+                if (_knownSubscriptions.Value.ContainsKey(subscriptionKey))
+                    _knownSubscriptions.Value.SafeRemoveKey(subscriptionKey);
+
             }
         }
 
@@ -226,10 +244,10 @@ namespace Nimbus.Infrastructure
         {
             var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
 
-            if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
+            if (_knownSubscriptions.Value.ContainsKey(subscriptionKey)) return;
             lock (LockFor(subscriptionKey))
             {
-                if (_knownSubscriptions.Value.Contains(subscriptionKey)) return;
+                if (_knownSubscriptions.Value.ContainsKey(subscriptionKey)) return;
 
                 EnsureTopicExists(topicPath);
 
@@ -262,7 +280,7 @@ namespace Nimbus.Infrastructure
                         throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
                 }
 
-                _knownSubscriptions.Value.Add(subscriptionKey);
+                _knownSubscriptions.Value.SafeAddKey(subscriptionKey);
             }
         }
 
@@ -279,11 +297,11 @@ namespace Nimbus.Infrastructure
 
         internal void EnsureQueueExists(string queuePath)
         {
-            if (_knownQueues.Value.Contains(queuePath)) return;
+            if (_knownQueues.Value.ContainsKey(queuePath)) return;
 
             lock (LockFor(queuePath))
             {
-                if (_knownQueues.Value.Contains(queuePath)) return;
+                if (_knownQueues.Value.ContainsKey(queuePath)) return;
 
                 _logger.Debug("Creating queue '{0}'", queuePath);
 
@@ -318,7 +336,16 @@ namespace Nimbus.Infrastructure
                     if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
                 }
 
-                _knownQueues.Value.Add(queuePath);
+                _knownQueues.Value.SafeAddKey(queuePath);
+            }
+        }
+
+        public void RemoveQueue(string queuePath)
+        {
+            if (_autoRecreateMessagingEntitySetting.Value)
+            {
+                if (_knownQueues.Value.ContainsKey(queuePath))
+                    _knownQueues.Value.SafeRemoveKey(queuePath);
             }
         }
 

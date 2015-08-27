@@ -12,5 +12,7 @@ namespace Nimbus.Infrastructure
         Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName);
 
         Task<QueueClient> CreateDeadLetterQueueClient<T>();
+        void RemoveSubscription(string topicPath, string subscriptionName);
+        void RemoveQueue(string queuePath);
     }
 }

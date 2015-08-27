@@ -47,6 +47,13 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var messages = await receiveTask;
                 return messages.ToArray();
             }
+            catch (MessagingEntityNotFoundException)
+            {
+                _queueManager.RemoveQueue(_queuePath);
+                DiscardMessageReceiver();
+                throw;
+            }
+
             catch (Exception exc)
             {
                 if (exc.IsTransientFault()) throw;
