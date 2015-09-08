@@ -13,7 +13,7 @@ using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Infrastructure.Heartbeat
 {
-    internal class Heartbeat : IHeartbeat, IDisposable
+    public class Heartbeat : IHeartbeat, IDisposable
     {
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
         private readonly IEventSender _eventSender;
@@ -191,6 +191,11 @@ namespace Nimbus.Infrastructure.Heartbeat
                                      PerformanceCounters = performanceCounterHistory
                                  };
 
+            return FormatHeartbeatEvent(heartbeatEvent);
+        }
+
+        protected virtual HeartbeatEvent FormatHeartbeatEvent(HeartbeatEvent heartbeatEvent)
+        {
             return heartbeatEvent;
         }
 

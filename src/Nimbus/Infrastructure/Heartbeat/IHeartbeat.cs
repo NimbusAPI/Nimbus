@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure.Heartbeat
 {
-    internal interface IHeartbeat
+    public interface IHeartbeat
     {
         Task Start();
         Task Stop();
