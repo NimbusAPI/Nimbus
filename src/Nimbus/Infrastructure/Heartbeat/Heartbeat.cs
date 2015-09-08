@@ -13,9 +13,10 @@ using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Infrastructure.Heartbeat
 {
-    public class Heartbeat : IHeartbeat, IDisposable
+    internal class Heartbeat : IHeartbeat, IDisposable
     {
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
+        private readonly HeartbeatTransformSetting _heartbeatTransform;
         private readonly IEventSender _eventSender;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -39,9 +40,11 @@ namespace Nimbus.Infrastructure.Heartbeat
         private bool _isRunning;
         private int _heartbeatExecuting;
 
-        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender, ILogger logger)
+        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, HeartbeatTransformSetting heartbeatTransform, IClock clock, IEventSender eventSender, ILogger logger)
         {
             _heartbeatInterval = heartbeatInterval;
+            _heartbeatTransform = heartbeatTransform;
+
             _eventSender = eventSender;
             _logger = logger;
             _clock = clock;
@@ -191,12 +194,7 @@ namespace Nimbus.Infrastructure.Heartbeat
                                      PerformanceCounters = performanceCounterHistory
                                  };
 
-            return FormatHeartbeatEvent(heartbeatEvent);
-        }
-
-        protected virtual HeartbeatEvent FormatHeartbeatEvent(HeartbeatEvent heartbeatEvent)
-        {
-            return heartbeatEvent;
+            return _heartbeatTransform.Value(heartbeatEvent);
         }
 
         public void Dispose()
