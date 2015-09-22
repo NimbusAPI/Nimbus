@@ -94,8 +94,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
     <Error Condition="!Exists('..\..\packages\NullGuard.Fody.1.4.4\build\dotnet\NullGuard.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NullGuard.Fody.1.4.4\build\dotnet\NullGuard.Fody.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets'))" />
   </Target>
   <Import Project="..\..\packages\NullGuard.Fody.1.4.4\build\dotnet\NullGuard.Fody.targets" Condition="Exists('..\..\packages\NullGuard.Fody.1.4.4\build\dotnet\NullGuard.Fody.targets')" />
+  <Import Project="..\..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets" Condition="Exists('..\..\packages\Virtuosity.Fody.1.19.10.0\build\dotnet\Virtuosity.Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
