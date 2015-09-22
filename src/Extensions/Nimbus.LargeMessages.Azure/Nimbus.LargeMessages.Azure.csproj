@@ -52,8 +52,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NullGuard, Version=1.4.4.0, Culture=neutral, PublicKeyToken=1958ac8092168428, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NullGuard.Fody.1.4.4\lib\dotnet\NullGuard.dll</HintPath>
@@ -105,6 +106,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Nimbus.LargeMessages.Azure.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
