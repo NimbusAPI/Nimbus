@@ -12,15 +12,14 @@
 
 Anubus drops Windows Service Bus compatibility and embraces the latest Azure Service Bus.</description>
     <releaseNotes>
-- Upgrades to Azure Service Bus client 2.6.6
-- Upgrades to Microsoft.WindowsAzure.ConfigurationManager 3.0.1
-- Creates queues and topics as partitioned.</releaseNotes>
+      - Upgrades to Azure Service Bus client 3.0.3
+      - Upgrades to Microsoft.WindowsAzure.ConfigurationManager 3.1.0</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>azure servicebus nimbus</tags>
     <projectUrl>https://github.com/rebase42/Anubus/wiki</projectUrl>
     <dependencies>
-      <dependency id="WindowsAzure.ServiceBus" version="2.6.6.0" />
-      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="3.0.1" />
+      <dependency id="WindowsAzure.ServiceBus" version="3.0.3" />
+      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="3.1.0" />
     </dependencies>
   </metadata>
 </package>
