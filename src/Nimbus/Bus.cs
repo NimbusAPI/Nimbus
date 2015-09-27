@@ -89,6 +89,11 @@ namespace Nimbus
             return _taskFactory.StartNew(() => _eventSender.Publish(busEvent), TaskContext.Send).Unwrap();
         }
 
+        public Task PublishAt<TBusEvent>(TBusEvent busEvent, DateTimeOffset deliveryTime) where TBusEvent : IBusEvent
+        {
+            return _taskFactory.StartNew(() => _eventSender.PublishAt(busEvent, deliveryTime), TaskContext.Send).Unwrap();
+        }
+
         public IDeadLetterQueues DeadLetterQueues
         {
             get { return _deadLetterQueues; }
