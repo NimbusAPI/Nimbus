@@ -5,6 +5,7 @@ using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Routing;
+using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Configuration
 {
@@ -128,6 +129,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
         {
             configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithHeartbeat(this BusBuilderConfiguration configuration, Func<HeartbeatEvent, HeartbeatEvent> heartbeatTransform)
+        {
+            configuration.HeartbeatTransform = new HeartbeatTransformSetting { Value = heartbeatTransform };
             return configuration;
         }
 
