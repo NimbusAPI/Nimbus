@@ -5,7 +5,8 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.Handlers
 {
-    public class AuditEventHandler : IHandleCompetingEvent<AuditEvent>
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+	public class AuditEventHandler : IHandleCompetingEvent<AuditEvent>
     {
         public async Task Handle(AuditEvent busEvent)
         {

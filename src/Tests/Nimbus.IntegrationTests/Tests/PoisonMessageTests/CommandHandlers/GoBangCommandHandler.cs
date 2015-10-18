@@ -6,7 +6,8 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers
 {
-    public class GoBangCommandHandler : IHandleCommand<GoBangCommand>
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+	public class GoBangCommandHandler : IHandleCommand<GoBangCommand>
     {
         public async Task Handle(GoBangCommand busCommand)
         {

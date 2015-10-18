@@ -31,7 +31,8 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandler
             _receivedDispatchContext = null;
         }
 
-        public async Task Handle(SomeOtherCommand busCommand)
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task Handle(SomeOtherCommand busCommand)
         {
             _receivedMessageProperties = MessageProperties;
             _receivedDispatchContext = DispatchContext;

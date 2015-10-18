@@ -69,6 +69,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
             Console.WriteLine("Messages received: {0}", numMessagesReceived);
 
             numMessagesReceived.ShouldBe(_numMessagesToSend);
-        }
+				await Task.Yield();
+		  }
     }
 }

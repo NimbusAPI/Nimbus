@@ -1,20 +1,25 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Nimbus</id>
+    <id>Anubus</id>
     <version>$version$</version>
-    <title>Nimbus</title>
-    <authors>Damian Maclennan and Andrew Harcourt</authors>
-    <owners>Damian Maclennan</owners>
+    <title>Anubus</title>
+    <authors>Jacques Bosch</authors>
+    <owners>Jacques Bosch</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Client library for Azure Service Bus</description>
-    <releaseNotes>Init.</releaseNotes>
+    <summary>Anubus is a .NET client library to add an easy to develop against experience against the Azure Service Bus. It is forked from Nimbus, and is freed from being held back by the Windows Service Bus compatibility requirement.</summary>
+    <description>Anubus is Nimbus, but just rolled forward to support the latest Azure Service Bus client. Since the Windows Service Bus, and it's client API, is only released when Windows Server is released, it lags far behind the Azure Service Bus and client API that is released much more often.
+
+Anubus drops Windows Service Bus compatibility and embraces the latest Azure Service Bus.</description>
+    <releaseNotes>
+      - Upgrades to Azure Service Bus client 3.0.3
+      - Upgrades to Microsoft.WindowsAzure.ConfigurationManager 3.1.0</releaseNotes>
     <copyright>Copyright 2013</copyright>
-    <tags>azure servicebus</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <tags>azure servicebus nimbus</tags>
+    <projectUrl>https://github.com/rebase42/Anubus/wiki</projectUrl>
     <dependencies>
-      <dependency id="WindowsAzure.ServiceBus" version="[2.1.3.0,2.1.4.0]" />
-      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.3]" />
+      <dependency id="WindowsAzure.ServiceBus" version="3.0.3" />
+      <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="3.1.0" />
     </dependencies>
   </metadata>
 </package>
