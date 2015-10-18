@@ -37,6 +37,7 @@ namespace Nimbus.Configuration
         internal AutoDeleteOnIdleSetting AutoDeleteOnIdle { get; set; }
         internal EnableDeadLetteringOnMessageExpirationSetting EnableDeadLetteringOnMessageExpiration { get; set; }
         internal HeartbeatIntervalSetting HeartbeatInterval { get; set; }
+        internal HeartbeatTransformSetting HeartbeatTransform { get; set; }
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
 

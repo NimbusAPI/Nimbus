@@ -29,7 +29,7 @@ namespace Nimbus.UnitTests.CompressionTests
         [Test]
         public void ThenTheOutputShouldBeALotSmaller()
         {
-            _compressed.Length.ShouldBeLessThan(_uncompressed.Length/1.5);
+            _compressed.Length.ShouldBeLessThan((int)(_uncompressed.Length/1.5));
         }
     }
 }

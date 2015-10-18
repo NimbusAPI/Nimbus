@@ -1,17 +1,16 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Nimbus.Windsor</id>
+    <id>Anubus.Windsor</id>
     <version>$version$</version>
-    <title>Nimbus.Windsor</title>
-    <authors>Damian Maclennan and Andrew Harcourt</authors>
-    <owners>Damian Maclennan</owners>
+    <title>Anubus.Windsor</title>
+    <authors>Jacques Bosch</authors>
+    <owners>Jacques Bosch</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Castle Windsor extensions for Nimbus.</description>
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>azure servicebus castle windsor</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
-
+    <projectUrl>https://github.com/rebase42/Anubus/wiki</projectUrl>
   </metadata>
 </package>

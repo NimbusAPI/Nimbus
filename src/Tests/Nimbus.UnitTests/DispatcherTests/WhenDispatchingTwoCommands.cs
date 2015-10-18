@@ -82,7 +82,8 @@ namespace Nimbus.UnitTests.DispatcherTests
         }
 
         [Test]
-        public async Task Command1ShouldBeDispatchedToTheCorrectHandler()
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task Command1ShouldBeDispatchedToTheCorrectHandler()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
                              .Select(c => c.Single())
@@ -90,9 +91,11 @@ namespace Nimbus.UnitTests.DispatcherTests
                              .Select(c => c.Id)
                              .ShouldContain(_id1);
         }
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
 
-        [Test]
-        public async Task Command2ShouldBeDispatchedToTheCorrectHandler()
+		  [Test]
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task Command2ShouldBeDispatchedToTheCorrectHandler()
         {
             MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null))
                              .Select(c => c.Single())
@@ -100,15 +103,18 @@ namespace Nimbus.UnitTests.DispatcherTests
                              .Select(c => c.Id)
                              .ShouldContain(_id2);
         }
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
 
-        [Test]
-        public async Task ATotalOfTwoCallsToHandleShouldBeReceived()
+		  [Test]
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+		  public async Task ATotalOfTwoCallsToHandleShouldBeReceived()
         {
             var calls = MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Handle(null));
             calls.Count().ShouldBe(_expectedCallCount);
         }
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
 
-        [Test]
+		  [Test]
         public async Task BothInstancesOfTheCommandHandlerShouldHaveBeenDisposed()
         {
             var calls = MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Dispose());

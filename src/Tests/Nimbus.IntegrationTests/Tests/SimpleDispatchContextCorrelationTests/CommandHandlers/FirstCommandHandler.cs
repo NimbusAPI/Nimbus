@@ -6,7 +6,8 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers
 {
-    public class FirstCommandHandler : IHandleCommand<FirstCommand>, IRequireBus
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+	public class FirstCommandHandler : IHandleCommand<FirstCommand>, IRequireBus
     {
         public IBus Bus { get; set; }
         public IDispatchContext DispatchContext { get; set; }

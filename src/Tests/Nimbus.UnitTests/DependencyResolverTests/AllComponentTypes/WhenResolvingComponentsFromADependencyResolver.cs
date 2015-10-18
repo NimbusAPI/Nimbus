@@ -22,7 +22,7 @@ namespace Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes
             using (var scope = dependencyResolver.CreateChildScope())
             {
                 var handler = scope.Resolve(componentType);
-                handler.ShouldBeTypeOf(componentType);
+                handler.ShouldBeOfType(componentType);
             }
         }
 

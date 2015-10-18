@@ -50,7 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         [Test]
         public async Task TheExceptionShouldBeARequestFailedException()
         {
-            _exception.ShouldBeTypeOf<RequestFailedException>();
+            _exception.ShouldBeOfType<RequestFailedException>();
         }
 
         [Test]
