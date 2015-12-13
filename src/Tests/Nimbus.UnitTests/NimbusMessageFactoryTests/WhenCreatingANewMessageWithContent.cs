@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
@@ -18,9 +19,15 @@ namespace Nimbus.UnitTests.NimbusMessageFactoryTests
         }
 
         [Test]
-        public void ThenTheCorrelationIdShouldBeTheMessageId()
+        public void TheCorrelationIdShouldNotBeEmpty()
         {
-            _message.CorrelationId.ShouldBe(_message.MessageId);
+            _message.CorrelationId.ShouldNotBe(Guid.Empty);
+        }
+
+        [Test]
+        public void TheCorrelationIdShouldNotBeTheMessageId()
+        {
+            _message.CorrelationId.ShouldNotBe(_message.MessageId);
         }
 
         [Test]
