@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -52,7 +54,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
             var busBuilder = new BusBuilder().Configure()
                                              .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                             .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                             .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                              .WithTypesFrom(typeProvider)
                                              .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                              .WithLogger(logger)
@@ -80,7 +82,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
                                       var bus = new BusBuilder().Configure()
                                                                 .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                                .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                                                .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                                                 .WithTypesFrom(typeProvider)
                                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                                 .WithLogger(logger)

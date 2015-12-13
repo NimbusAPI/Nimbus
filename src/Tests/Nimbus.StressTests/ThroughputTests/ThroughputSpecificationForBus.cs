@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.StressTests.ThroughputTests.Infrastructure;
 using Nimbus.Tests.Common;
@@ -55,7 +57,7 @@ namespace Nimbus.StressTests.ThroughputTests
             var bus = new BusBuilder().Configure()
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithLogger(_logger)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(_typeProvider)
                                       .WithDependencyResolver(_dependencyResolver)
                                       .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)

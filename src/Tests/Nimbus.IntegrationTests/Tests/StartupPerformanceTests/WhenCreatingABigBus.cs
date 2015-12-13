@@ -3,12 +3,14 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -24,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
         [SetUp]
         public void SetUp()
         {
-            _namespaceCleanser = new NamespaceCleanser(new ConnectionStringSetting {Value = CommonResources.ServiceBusConnectionString}, new NullLogger());
+            _namespaceCleanser = new NamespaceCleanser(new ConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureServiceBusConnectionString>()}, new NullLogger());
             _namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
         }
 
@@ -47,7 +49,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
             var firstBus = new BusBuilder().Configure()
                                            .WithNames("MyTestSuite", Environment.MachineName)
-                                           .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                           .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                            .WithTypesFrom(typeProvider)
                                            .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                            .WithServerConnectionCount(100)
@@ -80,7 +82,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
 
             var subsequentBus = new BusBuilder().Configure()
                                                 .WithNames("MyTestSuite", Environment.MachineName)
-                                                .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                                .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                                 .WithTypesFrom(typeProvider)
                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                 .WithLogger(logger)

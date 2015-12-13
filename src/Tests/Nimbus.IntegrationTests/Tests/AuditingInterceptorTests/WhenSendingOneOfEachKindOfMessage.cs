@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
@@ -36,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
+                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(dependencyResolver)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
