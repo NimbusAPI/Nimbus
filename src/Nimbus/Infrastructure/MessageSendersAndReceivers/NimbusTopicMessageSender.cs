@@ -5,7 +5,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusTopicMessageSender : BatchingMessageSender
+    internal class NimbusTopicMessageSender : INimbusMessageSender, IDisposable
     {
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
@@ -14,19 +14,18 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private TopicClient _topicClient;
 
         public NimbusTopicMessageSender(IQueueManager queueManager, string topicPath, ILogger logger)
-            : base()
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _logger = logger;
         }
 
-        protected override async Task SendBatch(NimbusMessage[] toSend)
+        public async Task Send(NimbusMessage message)
         {
+            NimbusMessage[] toSend = new NimbusMessage[] {message};
             var topicClient = GetTopicClient();
 
             var brokeredMessages = toSend.Select(BrokeredMessageFactory.BuildMessage);
-
 
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _topicPath, toSend.Length);
             try
@@ -67,16 +66,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            try
-            {
-                DiscardTopicClient();
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            DiscardTopicClient();
         }
     }
 }

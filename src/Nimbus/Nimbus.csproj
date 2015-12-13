@@ -150,7 +150,6 @@
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
     <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\BatchingMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\ThrottlingMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />

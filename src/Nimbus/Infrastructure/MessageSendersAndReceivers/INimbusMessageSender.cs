@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+﻿using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal interface INimbusMessageSender : IDisposable
+    internal interface INimbusMessageSender
     {
         Task Send(NimbusMessage message);
     }

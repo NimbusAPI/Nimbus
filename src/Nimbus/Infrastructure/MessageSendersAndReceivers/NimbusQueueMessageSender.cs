@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal class NimbusQueueMessageSender : BatchingMessageSender
+    internal class NimbusQueueMessageSender : INimbusMessageSender, IDisposable
     {
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
@@ -16,20 +14,18 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private MessageSender _messageSender;
 
         public NimbusQueueMessageSender(IQueueManager queueManager, string queuePath, ILogger logger)
-            : base()
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
             _logger = logger;
         }
 
-        protected override async Task SendBatch(NimbusMessage[] toSend)
+        public async Task Send(NimbusMessage message)
         {
+            NimbusMessage[] toSend = new NimbusMessage[] {message};
             var messageSender = GetMessageSender();
 
-
             var brokeredMessages = toSend.Select(BrokeredMessageFactory.BuildMessage);
-
 
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _queuePath, toSend.Length);
             try
@@ -42,9 +38,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 throw;
             }
         }
-
-
-
 
         private MessageSender GetMessageSender()
         {
@@ -73,16 +66,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
-            try
-            {
-                DiscardMessageSender();
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            DiscardMessageSender();
         }
     }
 }
