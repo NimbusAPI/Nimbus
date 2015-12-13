@@ -1,5 +1,4 @@
 using System;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.Dispatching
 {

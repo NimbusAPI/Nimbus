@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Annotations;
-using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.Logging
 {
