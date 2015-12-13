@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var requestId = Guid.Parse((string) message.Properties[MessagePropertyKeys.InReplyToRequestId]);
+            var requestId = (Guid) message.Properties[MessagePropertyKeys.InReplyToRequestId];
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
             if (responseCorrelationWrapper == null) return; //FIXME log
 
