@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NullGuard</name>
+    </assembly>
+    <members>
+        <member name="T:NullGuard.AllowNullAttribute">
+            <summary>
+            Prevents the injection of null checking.
+            </summary>
+        </member>
+        <member name="T:NullGuard.NullGuardAttribute">
+            <summary>
+            Allow specific categories of members to be targeted for injection. <seealso cref="T:NullGuard.ValidationFlags"/>
+            </summary>
+        </member>
+        <member name="M:NullGuard.NullGuardAttribute.#ctor(NullGuard.ValidationFlags)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NullGuard.NullGuardAttribute"/> with a <see cref="T:NullGuard.ValidationFlags"/>.
+            </summary>
+            <param name="flags">The <see cref="T:NullGuard.ValidationFlags"/> to use for the target this attribute is being applied to.</param>
+        </member>
+        <member name="T:NullGuard.ValidationFlags">
+            <summary>
+            Used by <see cref="T:NullGuard.NullGuardAttribute"/> to target specific categories of members.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.None">
+            <summary>
+            Don't process anything.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.Properties">
+            <summary>
+            Process properties.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.Arguments">
+            <summary>
+            Process arguments of methods.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.OutValues">
+            <summary>
+            Process out arguments of methods.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.ReturnValues">
+            <summary>
+            Process return values of members.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.NonPublic">
+            <summary>
+            Process non-public members.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.Methods">
+            <summary>
+            Process arguments, out arguments and return values of a method.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.AllPublicArguments">
+            <summary>
+            Process properties and arguments of public methods.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.AllPublic">
+            <summary>
+            Process public properties, and arguments, out arguments and return values of public methods.
+            </summary>
+        </member>
+        <member name="F:NullGuard.ValidationFlags.All">
+            <summary>
+            Process all properties, and arguments, out arguments and return values of all methods.
+            </summary>
+        </member>
+    </members>
+</doc>

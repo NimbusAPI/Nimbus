@@ -62,10 +62,11 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                 Subject.SendAt(new SomeCommandSentViaDelay(), DateTimeOffset.UtcNow),
                 Subject.Request(new SomeRequest()),
                 Subject.MulticastRequest(new SomeMulticastRequest(), TimeSpan.FromSeconds(1)),
-                Subject.Publish(new SomeEvent())
+                Subject.Publish(new SomeEvent()),
+                Subject.PublishAt(new SomeEventSentViaDelay(), DateTimeOffset.UtcNow)
                 );
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
+            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 8);
             MethodCallCounter.Stop();
 
             _allAuditedMessages = MethodCallCounter.AllReceivedMessages
@@ -117,15 +118,21 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         }
 
         [Test]
-        public async Task ThereShouldBeATotalOfSevenAuditRecords()
+        public async Task ThereShouldBeAnAuditRecordForSomeEventSentViaDelay()
         {
-            MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(7);
+            _allAuditedMessages.OfType<SomeEventSentViaDelay>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task ThereShouldBeATotalOfSevenRecordedHandlerCalls()
+        public async Task ThereShouldBeATotalOfEightAuditRecords()
         {
-            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
+            MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(8);
+        }
+
+        [Test]
+        public async Task ThereShouldBeATotalOfEightRecordedHandlerCalls()
+        {
+            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(8);
         }
     }
 }
