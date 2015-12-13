@@ -24,11 +24,11 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusMulticastRequestSender(INimbusMessageFactory nimbusMessageFactory,
-                                         IClock clock,
+        public BusMulticastRequestSender(IClock clock,
                                          IDependencyResolver dependencyResolver,
                                          IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                          ILogger logger,
+                                         INimbusMessageFactory nimbusMessageFactory,
                                          INimbusMessagingFactory messagingFactory,
                                          IOutboundInterceptorFactory outboundInterceptorFactory,
                                          IRouter router,

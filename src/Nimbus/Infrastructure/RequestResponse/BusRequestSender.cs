@@ -26,11 +26,11 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
         internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
-                                  INimbusMessageFactory nimbusMessageFactory,
                                   IClock clock,
                                   IDependencyResolver dependencyResolver,
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger,
+                                  INimbusMessageFactory nimbusMessageFactory,
                                   INimbusMessagingFactory messagingFactory,
                                   IOutboundInterceptorFactory outboundInterceptorFactory,
                                   IRouter router,

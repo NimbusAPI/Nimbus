@@ -20,10 +20,10 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusCommandSender(INimbusMessageFactory brokeredMessageFactory,
-                                IDependencyResolver dependencyResolver,
+        public BusCommandSender(IDependencyResolver dependencyResolver,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
+                                INimbusMessageFactory brokeredMessageFactory,
                                 INimbusMessagingFactory messagingFactory,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
                                 IRouter router)

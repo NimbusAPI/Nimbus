@@ -19,10 +19,10 @@ namespace Nimbus.Infrastructure.Events
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusEventSender(INimbusMessageFactory nimbusMessageFactory,
-                              IDependencyResolver dependencyResolver,
+        public BusEventSender(IDependencyResolver dependencyResolver,
                               IKnownMessageTypeVerifier knownMessageTypeVerifier,
                               ILogger logger,
+                              INimbusMessageFactory nimbusMessageFactory,
                               INimbusMessagingFactory messagingFactory,
                               IOutboundInterceptorFactory outboundInterceptorFactory,
                               IRouter router)

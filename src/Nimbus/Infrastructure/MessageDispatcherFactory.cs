@@ -28,11 +28,11 @@ namespace Nimbus.Infrastructure
         private readonly IPropertyInjector _propertyInjector;
 
         public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        INimbusMessageFactory nimbusMessageFactory,
                                         IClock clock,
                                         IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
+                                        INimbusMessageFactory nimbusMessageFactory,
                                         INimbusMessagingFactory messagingFactory,
                                         INimbusTaskFactory taskFactory,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,

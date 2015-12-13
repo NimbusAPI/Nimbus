@@ -54,13 +54,12 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var router = new DestinationPerMessageTypeRouter();
             var dependencyResolver = new NullDependencyResolver();
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
-            var busCommandSender = new BusEventSender(brokeredMessageFactory,
-                                                      dependencyResolver,
+            var busCommandSender = new BusEventSender(dependencyResolver,
                                                       knownMessageTypeVerifier,
                                                       logger,
+                                                      brokeredMessageFactory,
                                                       messagingFactory,
-                                                      outboundInterceptorFactory,
-                                                      router);
+                                                      outboundInterceptorFactory, router);
             return Task.FromResult(busCommandSender);
         }
 
