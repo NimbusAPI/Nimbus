@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.UnitTests.DispatcherTests.Handlers;

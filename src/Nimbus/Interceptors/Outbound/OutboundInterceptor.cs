@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts;
 

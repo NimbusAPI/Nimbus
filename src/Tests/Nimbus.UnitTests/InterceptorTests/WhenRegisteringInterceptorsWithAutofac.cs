@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Autofac;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;

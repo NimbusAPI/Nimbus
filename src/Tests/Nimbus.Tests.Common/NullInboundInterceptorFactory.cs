@@ -1,5 +1,4 @@
-﻿using Microsoft.ServiceBus.Messaging;
-using Nimbus.DependencyResolution;
+﻿using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 
