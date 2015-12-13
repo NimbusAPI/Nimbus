@@ -26,16 +26,15 @@ namespace Nimbus.Infrastructure
         private bool _started;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
 
-        public MessagePump(
-            MaxDeliveryAttemptSetting maxDeliveryAttempts,
-            IClock clock,
-            IDispatchContextManager dispatchContextManager,
-            ILogger logger,
-            IMessageDispatcher messageDispatcher,
-            INimbusMessageReceiver receiver,
-            IDeadLetterOffice deadLetterOffice,
-            IDelayedDeliveryService delayedDeliveryService,
-            IDeliveryRetryStrategy deliveryRetryStrategy)
+        public MessagePump(MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                           IClock clock,
+                           IDeadLetterOffice deadLetterOffice,
+                           IDelayedDeliveryService delayedDeliveryService,
+                           IDeliveryRetryStrategy deliveryRetryStrategy,
+                           IDispatchContextManager dispatchContextManager,
+                           ILogger logger,
+                           IMessageDispatcher messageDispatcher,
+                           INimbusMessageReceiver receiver)
         {
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _clock = clock;

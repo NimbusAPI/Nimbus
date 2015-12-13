@@ -27,18 +27,18 @@ namespace Nimbus.Infrastructure.Commands
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttemptSetting;
 
-        public CommandMessagePumpsFactory(IClock clock,
+        public CommandMessagePumpsFactory(MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
+                                          IClock clock,
+                                          IDeadLetterOffice deadLetterOffice,
+                                          IDelayedDeliveryService delayedDeliveryService,
+                                          IDeliveryRetryStrategy deliveryRetryStrategy,
                                           IDispatchContextManager dispatchContextManager,
                                           IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
                                           IRouter router,
-                                          ITypeProvider typeProvider,
-                                          MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
-                                          IDeadLetterOffice deadLetterOffice,
-                                          IDelayedDeliveryService delayedDeliveryService,
-                                          IDeliveryRetryStrategy deliveryRetryStrategy)
+                                          ITypeProvider typeProvider)
         {
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
@@ -77,13 +77,8 @@ namespace Nimbus.Infrastructure.Commands
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
                 var pump = new MessagePump(_maxDeliveryAttemptSetting,
                                            _clock,
-                                           _dispatchContextManager,
-                                           _logger,
-                                           _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                           messageReceiver,
                                            _deadLetterOffice,
-                                           _delayedDeliveryService,
-                                           _deliveryRetryStrategy);
+                                           _delayedDeliveryService, _deliveryRetryStrategy, _dispatchContextManager, _logger, _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap), messageReceiver);
                 _garbageMan.Add(pump);
 
                 yield return pump;

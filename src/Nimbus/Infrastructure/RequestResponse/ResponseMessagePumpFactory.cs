@@ -24,17 +24,17 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         internal ResponseMessagePumpFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                            MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
                                             ReplyQueueNameSetting replyQueueName,
                                             IBrokeredMessageFactory brokeredMessageFactory,
                                             IClock clock,
+                                            IDeadLetterOffice deadLetterOffice,
+                                            IDelayedDeliveryService delayedDeliveryService,
+                                            IDeliveryRetryStrategy deliveryRetryStrategy,
                                             IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher messageDispatcher,
-                                            MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
-                                            IDeadLetterOffice deadLetterOffice,
-                                            IDelayedDeliveryService delayedDeliveryService,
-                                            IDeliveryRetryStrategy deliveryRetryStrategy)
+                                            ResponseMessageDispatcher messageDispatcher)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;
@@ -57,13 +57,12 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var pump = new MessagePump(_maxDeliveryAttemptSetting,
                                        _clock,
-                                       _dispatchContextManager,
-                                       _logger,
-                                       _messageDispatcher,
-                                       receiver,
                                        _deadLetterOffice,
                                        _delayedDeliveryService,
-                                       _deliveryRetryStrategy);
+                                       _deliveryRetryStrategy,
+                                       _dispatchContextManager,
+                                       _logger,
+                                       _messageDispatcher, receiver);
             _garbageMan.Add(pump);
 
             return pump;
