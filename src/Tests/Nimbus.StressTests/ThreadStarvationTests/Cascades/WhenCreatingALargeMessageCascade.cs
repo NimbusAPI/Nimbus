@@ -64,7 +64,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
         }
 
         [Test]
-        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
+        public void TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
             MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(_expectedMessageCount);
         }

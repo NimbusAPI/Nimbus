@@ -5,7 +5,8 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers
 {
-    public class SomeConcreteRequestTypeHandler : IHandleRequest<SomeConcreteRequestType, SomeConcreteResponseType>
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed.
+	public class SomeConcreteRequestTypeHandler : IHandleRequest<SomeConcreteRequestType, SomeConcreteResponseType>
     {
         public async Task<SomeConcreteResponseType> Handle(SomeConcreteRequestType request)
         {

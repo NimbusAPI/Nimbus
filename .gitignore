@@ -2,7 +2,9 @@
 *.suo
 [Oo]bj
 [Bb]in
+TestResults
 _ReSharper.*
 [Ll]ogs
 *.ncrunchproject
 .gitignore
+.vs/

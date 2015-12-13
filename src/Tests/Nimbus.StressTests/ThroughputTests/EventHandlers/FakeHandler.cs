@@ -11,7 +11,8 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
     ///     This class needs to exist so that our bus knows to subscribe to these types of message. That's all. It's not
     ///     supposed to do anything.
     /// </summary>
-    public class FakeHandler : IHandleMulticastEvent<FooEvent>,
+#pragma warning disable 1998 // This async method lacks 'await' operators and will run synchronously.
+	public class FakeHandler : IHandleMulticastEvent<FooEvent>,
                                IHandleMulticastEvent<BarEvent>,
                                IHandleMulticastEvent<BazEvent>,
                                IHandleMulticastEvent<QuxEvent>,
