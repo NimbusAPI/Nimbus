@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.LongRunningTasks;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -28,7 +25,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public MulticastRequestMessageDispatcher(INimbusMessageFactory brokeredMessageFactory,
@@ -40,7 +36,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                  IOutboundInterceptorFactory outboundInterceptorFactory,
                                                  IReadOnlyDictionary<Type, Type[]> handlerMap,
                                                  DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                                 INimbusTaskFactory taskFactory,
                                                  IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
@@ -51,7 +46,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
             _propertyInjector = propertyInjector;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
@@ -78,7 +72,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = (IHandleMulticastRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
+                var handler = (IHandleMulticastRequest<TBusRequest, TBusResponse>) scope.Resolve(handlerType);
                 _propertyInjector.Inject(handler, nimbusMessage);
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, nimbusMessage);
 
@@ -99,22 +93,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 try
                 {
-                    var handlerTask = handler.Handle(busRequest);
-                    var longRunningTask = handlerTask as ILongRunningTask;
-                    TBusResponse response;
-                    if (longRunningTask != null)
-                    {
-                        var wrapperTask = new LongRunningTaskWrapper<TBusResponse>(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
-                        response = await wrapperTask.AwaitCompletion();
-                    }
-                    else
-                    {
-                        response = await handlerTask;
-                    }
+                    var response = await handler.Handle(busRequest);
 
-                    // ReSharper disable CompareNonConstrainedGenericWithNull
                     if (response != null)
-                        // ReSharper restore CompareNonConstrainedGenericWithNull
                     {
                         var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
                             .DestinedForQueue(replyQueueName)
@@ -222,7 +203,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var responseType = genericArguments[1];
 
             var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
-            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(requestType, responseType);
             return closedGenericMethod;
         }
     }

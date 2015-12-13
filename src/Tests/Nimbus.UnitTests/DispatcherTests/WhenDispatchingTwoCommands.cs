@@ -5,7 +5,6 @@ using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
@@ -15,7 +14,6 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Tests.Common;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -48,15 +46,15 @@ namespace Nimbus.UnitTests.DispatcherTests
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
             _nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                 new MaxLargeMessageSizeSetting(),
-                                                                 new MaxSmallMessageSizeSetting(),
-                                                                 replyQueueNameSetting,
-                                                                 clock,
-                                                                 new NullCompressor(),
-                                                                 new DispatchContextManager(),
-                                                                 new UnsupportedLargeMessageBodyStore(),
-                                                                 serializer,
-                                                                 typeProvider);
+                                                             new MaxLargeMessageSizeSetting(),
+                                                             new MaxSmallMessageSizeSetting(),
+                                                             replyQueueNameSetting,
+                                                             clock,
+                                                             new NullCompressor(),
+                                                             new DispatchContextManager(),
+                                                             new UnsupportedLargeMessageBodyStore(),
+                                                             serializer,
+                                                             typeProvider);
 
             return new CommandMessageDispatcher(_nimbusMessageFactory,
                                                 new SystemClock(),
@@ -65,7 +63,6 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                 new NullLogger(),
                                                 handlerMap,
                                                 new DefaultMessageLockDurationSetting(),
-                                                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                                                 Substitute.For<IPropertyInjector>());
         }
 

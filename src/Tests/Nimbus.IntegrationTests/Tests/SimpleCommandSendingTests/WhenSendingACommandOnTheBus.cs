@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
@@ -10,10 +9,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds * 1000)]
+    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingACommandOnTheBus : TestForBus
     {
         private const int _timeoutSeconds = 5;
+
         protected override async Task When()
         {
             var someCommand = new SomeCommand();

@@ -7,9 +7,7 @@ using Nimbus.Configuration;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.NimbusMessageServices;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using NUnit.Framework;
@@ -39,7 +37,7 @@ namespace Nimbus.UnitTests.Conventions
                                    .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null)
                                    .Where(t => !t.IsAssignableFrom(typeof (IDependencyResolver)))
                                    .Select(t => new TestCaseData(t)
-                                                    .SetName(t.FullName))
+                                               .SetName(t.FullName))
                                    .GetEnumerator();
             }
 
@@ -49,7 +47,6 @@ namespace Nimbus.UnitTests.Conventions
                 yield return typeof (InboundInterceptorFactory);
                 yield return typeof (OutboundInterceptorFactory);
                 yield return typeof (MessageDispatcherFactory);
-                yield return typeof (NimbusTaskFactory);
             }
 
             IEnumerator IEnumerable.GetEnumerator()

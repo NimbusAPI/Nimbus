@@ -5,7 +5,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Infrastructure.Events
@@ -20,17 +19,16 @@ namespace Nimbus.Infrastructure.Events
                                                IInboundInterceptorFactory inboundInterceptorFactory,
                                                IReadOnlyDictionary<Type, Type[]> handlerMap,
                                                DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                               INimbusTaskFactory taskFactory,
                                                IPropertyInjector propertyInjector,
                                                ILogger logger)
-            : base(nimbusMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, logger, defaultMessageLockDuration, taskFactory)
+            : base(nimbusMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, logger, defaultMessageLockDuration)
         {
             _propertyInjector = propertyInjector;
         }
 
         protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, NimbusMessage nimbusMessage)
         {
-            var handler = (IHandleCompetingEvent<TBusEvent>)scope.Resolve(handlerType);
+            var handler = (IHandleCompetingEvent<TBusEvent>) scope.Resolve(handlerType);
             _propertyInjector.Inject(handler, nimbusMessage);
             return handler;
         }

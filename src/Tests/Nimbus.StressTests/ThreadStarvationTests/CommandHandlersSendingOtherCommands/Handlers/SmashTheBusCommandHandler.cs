@@ -8,9 +8,9 @@ using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherComman
 
 namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers
 {
-    public class SmashTheBusCommandHandler: IHandleCommand<SmashTheBusCommand>, ILongRunningTask, IRequireBus
+    public class SmashTheBusCommandHandler : IHandleCommand<SmashTheBusCommand>, IRequireBus
     {
-        public static int NumCommandsSent = 0;
+        public static int NumCommandsSent;
         public static TimeSpan HammerTheBusFor = TimeSpan.FromSeconds(20);
 
         public IBus Bus { get; set; }
@@ -23,13 +23,11 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
             while (sw.Elapsed < HammerTheBusFor)
             {
                 var commands = Enumerable.Range(0, batchSize)
-                    .Select(i => new NoOpCommand())
-                    .ToArray();
+                                         .Select(i => new NoOpCommand())
+                                         .ToArray();
                 await Bus.SendAll(commands);
                 NumCommandsSent += batchSize;
             }
         }
-
-        public bool IsAlive { get { return true; } }
     }
 }

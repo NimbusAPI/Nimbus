@@ -10,7 +10,6 @@ using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
@@ -73,8 +72,7 @@ namespace Nimbus.Configuration
                 container.Resolve<CommandMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastRequestMessagePumpsFactory>().CreateAll(),
                 container.Resolve<MulticastEventMessagePumpsFactory>().CreateAll(),
-                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll(),
-                container.Resolve<INimbusTaskFactory>());
+                container.Resolve<CompetingEventMessagePumpsFactory>().CreateAll());
 
             logger.Debug("Message pumps are all created.");
 
@@ -85,7 +83,6 @@ namespace Nimbus.Configuration
                               container.Resolve<IEventSender>(),
                               messagePumps,
                               container.Resolve<DeadLetterQueues>(),
-                              container.Resolve<INimbusTaskFactory>(),
                               container.Resolve<IHeartbeat>());
 
             bus.Starting += delegate

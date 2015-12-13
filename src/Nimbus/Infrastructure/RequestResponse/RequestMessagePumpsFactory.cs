@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -22,7 +21,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ITypeProvider _typeProvider;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly INimbusTaskFactory _taskFactory;
 
         public RequestMessagePumpsFactory(IClock clock,
                                           IDispatchContextManager dispatchContextManager,
@@ -30,7 +28,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
-                                          INimbusTaskFactory taskFactory,
                                           IRouter router,
                                           ITypeProvider typeProvider)
         {
@@ -40,7 +37,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
-            _taskFactory = taskFactory;
             _messagingFactory = messagingFactory;
             _router = router;
         }
@@ -70,8 +66,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                            _dispatchContextManager,
                                            _logger,
                                            _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                           messageReceiver,
-                                           _taskFactory);
+                                           messageReceiver);
                 _garbageMan.Add(pump);
 
                 yield return pump;

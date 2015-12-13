@@ -7,9 +7,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.LongRunningTasks;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -27,7 +25,6 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public RequestMessageDispatcher(
@@ -40,7 +37,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             INimbusMessagingFactory messagingFactory,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
             DefaultMessageLockDurationSetting defaultMessageLockDuration,
-            INimbusTaskFactory taskFactory,
             IPropertyInjector propertyInjector)
         {
             _nimbusMessageFactory = nimbusMessageFactory;
@@ -52,7 +48,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _messagingFactory = messagingFactory;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
             _propertyInjector = propertyInjector;
         }
 
@@ -78,7 +73,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = (IHandleRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
+                var handler = (IHandleRequest<TBusRequest, TBusResponse>) scope.Resolve(handlerType);
                 _propertyInjector.Inject(handler, nimbusMessage);
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, nimbusMessage);
 
@@ -100,17 +95,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var handlerTask = handler.Handle(busRequest);
-                    var longRunningTask = handler as ILongRunningTask;
-                    TBusResponse response;
-                    if (longRunningTask != null)
-                    {
-                        var wrapperTask = new LongRunningTaskWrapper<TBusResponse>(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
-                        response = await wrapperTask.AwaitCompletion();
-                    }
-                    else
-                    {
-                        response = await handlerTask;
-                    }
+                    var response = await handlerTask;
 
                     var responseMessage = (await _nimbusMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
                         .DestinedForQueue(replyQueueName);
@@ -238,7 +223,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch",
                                                                                 BindingFlags.NonPublic | BindingFlags.Instance);
-            var closedGenericMethod = openGenericMethod.MakeGenericMethod(new[] {requestType, responseType});
+            var closedGenericMethod = openGenericMethod.MakeGenericMethod(requestType, responseType);
             return closedGenericMethod;
         }
     }

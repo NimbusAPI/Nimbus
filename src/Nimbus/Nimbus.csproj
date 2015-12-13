@@ -112,7 +112,6 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
     <Compile Include="Infrastructure\Logging\TraceLogger.cs" />
-    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
@@ -129,7 +128,6 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Routing\SingleQueueAndTopicPerMessageTypeRouter.cs" />
     <Compile Include="Bus.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\INimbusTaskFactory.cs" />
     <Compile Include="Configuration\Settings\MaximumThreadPoolThreadsSetting.cs" />
     <Compile Include="Configuration\Settings\MinimumThreadPoolThreadsSetting.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
@@ -142,7 +140,6 @@
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapperBase.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />
@@ -197,8 +194,6 @@
     <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskFactory.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskScheduler.cs" />
     <Compile Include="Infrastructure\Logging\StructuredLoggingNormalizer.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
     <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
@@ -229,7 +224,6 @@
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\NimbusMessageServices\Serialization\DataContractSerializer.cs" />
     <Compile Include="Configuration\MessagePumpTypes.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\TaskContext.cs" />
     <Compile Include="Properties\NullGuard.cs" />
   </ItemGroup>
   <ItemGroup>

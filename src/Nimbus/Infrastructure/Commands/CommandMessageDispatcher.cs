@@ -7,9 +7,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.LongRunningTasks;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
@@ -24,7 +22,6 @@ namespace Nimbus.Infrastructure.Commands
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public CommandMessageDispatcher(
@@ -35,7 +32,6 @@ namespace Nimbus.Infrastructure.Commands
             ILogger logger,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
             DefaultMessageLockDurationSetting defaultMessageLockDuration,
-            INimbusTaskFactory taskFactory,
             IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
@@ -45,7 +41,6 @@ namespace Nimbus.Infrastructure.Commands
             _logger = logger;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
             _propertyInjector = propertyInjector;
         }
 
@@ -63,7 +58,7 @@ namespace Nimbus.Infrastructure.Commands
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
-                var handler = (IHandleCommand<TBusCommand>)scope.Resolve(handlerType);
+                var handler = (IHandleCommand<TBusCommand>) scope.Resolve(handlerType);
                 _propertyInjector.Inject(handler, nimbusMessage);
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand, nimbusMessage);
 
@@ -87,17 +82,7 @@ namespace Nimbus.Infrastructure.Commands
                             nimbusMessage.CorrelationId);
                     }
 
-                    var handlerTask = _taskFactory.StartNew(async () => await handler.Handle(busCommand), TaskContext.Handle).Unwrap();
-                    var longRunningTask = handler as ILongRunningTask;
-                    if (longRunningTask != null)
-                    {
-                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
-                        await wrapper.AwaitCompletion();
-                    }
-                    else
-                    {
-                        await handlerTask;
-                    }
+                    await handler.Handle(busCommand);
 
                     foreach (var interceptor in interceptors.Reverse())
                     {

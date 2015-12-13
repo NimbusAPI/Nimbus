@@ -152,7 +152,6 @@
     <Compile Include="DispatcherTests\Handlers\SlowCommandHandler.cs" />
     <Compile Include="DispatcherTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DispatcherTests\MessageContracts\SlowCommand.cs" />
-    <Compile Include="DispatcherTests\WhenDispatchingACommandToALongRunningHandler.cs" />
     <Compile Include="DispatcherTests\WhenDispatchingTwoCommands.cs" />
     <Compile Include="GlobalTestTimeout.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />

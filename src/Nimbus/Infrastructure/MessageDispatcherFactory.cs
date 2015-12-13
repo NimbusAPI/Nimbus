@@ -8,7 +8,6 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 
@@ -24,7 +23,6 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
         public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
@@ -34,7 +32,6 @@ namespace Nimbus.Infrastructure
                                         ILogger logger,
                                         INimbusMessageFactory nimbusMessageFactory,
                                         INimbusMessagingFactory messagingFactory,
-                                        INimbusTaskFactory taskFactory,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
                                         IPropertyInjector propertyInjector)
         {
@@ -46,7 +43,6 @@ namespace Nimbus.Infrastructure
             _messagingFactory = messagingFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
             _propertyInjector = propertyInjector;
         }
 
@@ -66,7 +62,6 @@ namespace Nimbus.Infrastructure
                                                     _logger,
                                                     handlerMap,
                                                     _defaultMessageLockDuration,
-                                                    _taskFactory,
                                                     _propertyInjector);
             }
 
@@ -78,7 +73,6 @@ namespace Nimbus.Infrastructure
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
                                                            _defaultMessageLockDuration,
-                                                           _taskFactory,
                                                            _propertyInjector,
                                                            _logger);
             }
@@ -91,7 +85,6 @@ namespace Nimbus.Infrastructure
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
                                                            _defaultMessageLockDuration,
-                                                           _taskFactory,
                                                            _propertyInjector,
                                                            _logger);
             }
@@ -107,7 +100,6 @@ namespace Nimbus.Infrastructure
                                                     _messagingFactory,
                                                     handlerMap,
                                                     _defaultMessageLockDuration,
-                                                    _taskFactory,
                                                     _propertyInjector);
             }
 
@@ -122,7 +114,6 @@ namespace Nimbus.Infrastructure
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
                                                              _defaultMessageLockDuration,
-                                                             _taskFactory,
                                                              _propertyInjector);
             }
 

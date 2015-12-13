@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Commands
@@ -18,7 +17,6 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IHandlerMapper _handlerMapper;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IRouter _router;
         private readonly ITypeProvider _typeProvider;
 
@@ -30,7 +28,6 @@ namespace Nimbus.Infrastructure.Commands
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
-                                          INimbusTaskFactory taskFactory,
                                           IRouter router,
                                           ITypeProvider typeProvider)
         {
@@ -42,7 +39,6 @@ namespace Nimbus.Infrastructure.Commands
             _messagingFactory = messagingFactory;
             _router = router;
             _typeProvider = typeProvider;
-            _taskFactory = taskFactory;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -70,8 +66,7 @@ namespace Nimbus.Infrastructure.Commands
                                            _dispatchContextManager,
                                            _logger,
                                            _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                           messageReceiver,
-                                           _taskFactory);
+                                           messageReceiver);
                 _garbageMan.Add(pump);
 
                 yield return pump;

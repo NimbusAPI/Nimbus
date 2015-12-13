@@ -6,9 +6,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
-using Nimbus.Infrastructure.LongRunningTasks;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
@@ -23,7 +20,6 @@ namespace Nimbus.Infrastructure.Events
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
 
         protected EventMessageDispatcher(INimbusMessageFactory nimbusMessageFactory,
                                          IClock clock,
@@ -31,8 +27,7 @@ namespace Nimbus.Infrastructure.Events
                                          IReadOnlyDictionary<Type, Type[]> handlerMap,
                                          IInboundInterceptorFactory inboundInterceptorFactory,
                                          ILogger logger,
-                                         DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                         INimbusTaskFactory taskFactory)
+                                         DefaultMessageLockDurationSetting defaultMessageLockDuration)
         {
             _nimbusMessageFactory = nimbusMessageFactory;
             _clock = clock;
@@ -41,7 +36,6 @@ namespace Nimbus.Infrastructure.Events
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
         }
 
         public async Task Dispatch(NimbusMessage message)
@@ -87,17 +81,7 @@ namespace Nimbus.Infrastructure.Events
                                       nimbusMessage.CorrelationId);
                     }
 
-                    var handlerTask = DispatchToHandleMethod(busEvent, handler);
-                    var longRunningTask = handler as ILongRunningTask;
-                    if (longRunningTask != null)
-                    {
-                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
-                        await wrapper.AwaitCompletion();
-                    }
-                    else
-                    {
-                        await handlerTask;
-                    }
+                    await DispatchToHandleMethod(busEvent, handler);
 
                     foreach (var interceptor in interceptors.Reverse())
                     {

@@ -1,21 +1,17 @@
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
@@ -28,7 +24,6 @@ namespace Nimbus.UnitTests.DispatcherTests
         internal NimbusMessageFactory NimbusMessageFactory;
         internal TestHarnessTypeProvider TypeProvider;
         internal HandlerMapper HandlerMapper;
-        private INimbusTaskFactory _taskFactory;
 
         protected MessageDispatcherTestBase()
         {
@@ -40,15 +35,15 @@ namespace Nimbus.UnitTests.DispatcherTests
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);
             NimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                new MaxLargeMessageSizeSetting(),
-                                                                new MaxSmallMessageSizeSetting(),
-                                                                replyQueueNameSetting,
-                                                                clock,
-                                                                new NullCompressor(),
-                                                                new DispatchContextManager(),
-                                                                new UnsupportedLargeMessageBodyStore(),
-                                                                serializer,
-                                                                TypeProvider);
+                                                            new MaxLargeMessageSizeSetting(),
+                                                            new MaxSmallMessageSizeSetting(),
+                                                            replyQueueNameSetting,
+                                                            clock,
+                                                            new NullCompressor(),
+                                                            new DispatchContextManager(),
+                                                            new UnsupportedLargeMessageBodyStore(),
+                                                            serializer,
+                                                            TypeProvider);
         }
 
         internal RequestMessageDispatcher GetRequestMessageDispatcher<TRequest, TResponse, TRequestHandler>(IInboundInterceptor interceptor)
@@ -61,7 +56,6 @@ namespace Nimbus.UnitTests.DispatcherTests
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();
             var scope = Substitute.For<IDependencyResolverScope>();
-            _taskFactory = new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger);
             scope.Resolve<TRequestHandler>().Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
@@ -80,7 +74,6 @@ namespace Nimbus.UnitTests.DispatcherTests
                 messagingFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),
                 new DefaultMessageLockDurationSetting(),
-                _taskFactory,
                 Substitute.For<IPropertyInjector>());
         }
 
@@ -106,7 +99,6 @@ namespace Nimbus.UnitTests.DispatcherTests
                 logger,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)),
                 new DefaultMessageLockDurationSetting(),
-                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                 Substitute.For<IPropertyInjector>());
         }
 
@@ -131,7 +123,6 @@ namespace Nimbus.UnitTests.DispatcherTests
                 inboundInterceptorFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)),
                 new DefaultMessageLockDurationSetting(),
-                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                 Substitute.For<IPropertyInjector>(),
                 logger);
         }

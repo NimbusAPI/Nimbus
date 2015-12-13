@@ -7,7 +7,7 @@ using Nimbus.Tests.Common;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers
 {
-    public class CommandThatWillBlockTheThreadHandler : IHandleCommand<CommandThatWillBlockTheThread>, ILongRunningTask
+    public class CommandThatWillBlockTheThreadHandler : IHandleCommand<CommandThatWillBlockTheThread>
     {
         public static readonly TimeSpan SleepDuration = TimeSpan.FromSeconds(10);
 
@@ -15,11 +15,6 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
         {
             Thread.Sleep(SleepDuration); // deliberately block the handling thread
             MethodCallCounter.RecordCall<CommandThatWillBlockTheThreadHandler>(h => h.Handle(busCommand));
-        }
-
-        public bool IsAlive
-        {
-            get { return true; }
         }
     }
 }

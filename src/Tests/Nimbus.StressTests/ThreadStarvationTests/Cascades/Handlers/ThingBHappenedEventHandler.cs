@@ -6,7 +6,7 @@ using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers
 {
-    public class ThingBHappenedEventHandler : IHandleCompetingEvent<ThingBHappenedEvent>, IRequireBus, ILongRunningTask
+    public class ThingBHappenedEventHandler : IHandleCompetingEvent<ThingBHappenedEvent>, IRequireBus
     {
         public const int NumberOfDoThingCCommands = 11;
 
@@ -19,11 +19,6 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers
                                      .ToArray();
 
             await Bus.SendAll(commands);
-        }
-
-        public bool IsAlive
-        {
-            get { return true; }
         }
     }
 }

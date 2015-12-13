@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.TaskScheduling;
 
 namespace Nimbus.Configuration
 {
     internal class MessagePumpsManager : IMessagePumpsManager
     {
         private readonly IMessagePump _responseMessagePump;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IMessagePump[] _requestMessagePumps;
         private readonly IMessagePump[] _commandMessagePumps;
         private readonly IMessagePump[] _multicastEventMessagePumps;
@@ -23,8 +21,7 @@ namespace Nimbus.Configuration
                                    IEnumerable<IMessagePump> commandMessagePumps,
                                    IEnumerable<IMessagePump> multicastRequestMessagePumps,
                                    IEnumerable<IMessagePump> multicastEventMessagePumps,
-                                   IEnumerable<IMessagePump> competingEventMessagePumps,
-                                   INimbusTaskFactory taskFactory)
+                                   IEnumerable<IMessagePump> competingEventMessagePumps)
         {
             _responseMessagePump = responseMessagePump;
             _commandMessagePumps = commandMessagePumps.ToArray();
@@ -32,7 +29,6 @@ namespace Nimbus.Configuration
             _multicastRequestMessagePumps = multicastRequestMessagePumps.ToArray();
             _multicastEventMessagePumps = multicastEventMessagePumps.ToArray();
             _competingEventMessagePumps = competingEventMessagePumps.ToArray();
-            _taskFactory = taskFactory;
         }
 
         public async Task Start(MessagePumpTypes messagePumpTypes)
@@ -53,7 +49,7 @@ namespace Nimbus.Configuration
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
             await messagePumpsToWaitFor
-                .Select(pump => _taskFactory.StartNew(async () => await action(pump), TaskContext.ControlMessagePump).Unwrap())
+                .Select(action)
                 .WhenAll();
 
 #pragma warning disable 4014
@@ -65,7 +61,7 @@ namespace Nimbus.Configuration
                                await Task.Delay(100);
 
                                await messagePumpsToHandleInBackground
-                                   .Select(pump => _taskFactory.StartNew(async () => await action(pump), TaskContext.ControlMessagePump).Unwrap())
+                                   .Select(action)
                                    .WhenAll();
                            });
 #pragma warning restore 4014

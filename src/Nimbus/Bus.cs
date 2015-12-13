@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 
@@ -21,7 +21,6 @@ namespace Nimbus
         private readonly IEventSender _eventSender;
         private readonly IMessagePumpsManager _messagePumpsManager;
         private readonly IDeadLetterQueues _deadLetterQueues;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IHeartbeat _heartbeat;
 
         private readonly object _mutex = new object();
@@ -34,7 +33,6 @@ namespace Nimbus
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
                      IDeadLetterQueues deadLetterQueues,
-                     INimbusTaskFactory taskFactory,
                      IHeartbeat heartbeat)
         {
             _logger = logger;
@@ -43,7 +41,6 @@ namespace Nimbus
             _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
             _deadLetterQueues = deadLetterQueues;
-            _taskFactory = taskFactory;
             _heartbeat = heartbeat;
             _messagePumpsManager = messagePumpsManager;
 
@@ -53,40 +50,38 @@ namespace Nimbus
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            // We're explicitly invoking Task.Run in these facade methods to make sure that we break out of anyone else's
-            // synchronisation context and run this stuff only on thread pool threads.  -andrewh 24/1/2014
-            return _taskFactory.StartNew(() => _commandSender.Send(busCommand), TaskContext.Send).Unwrap();
+            return _commandSender.Send(busCommand).ConfigureAwaitFalse();
         }
 
         public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
         {
-            return _taskFactory.StartNew(() => _commandSender.SendAt(busCommand, deliveryTime), TaskContext.Send).Unwrap();
+            return _commandSender.SendAt(busCommand, deliveryTime).ConfigureAwaitFalse();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest), TaskContext.Send).Unwrap();
+            return _requestSender.SendRequest(busRequest).ConfigureAwaitFalse();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return _taskFactory.StartNew(() => _requestSender.SendRequest(busRequest, timeout), TaskContext.Send).Unwrap();
+            return _requestSender.SendRequest(busRequest, timeout).ConfigureAwaitFalse();
         }
 
         public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusMulticastRequest<TRequest, TResponse>
             where TResponse : IBusMulticastResponse
         {
-            return _taskFactory.StartNew(() => _multicastRequestSender.SendRequest(busRequest, timeout), TaskContext.Send).Unwrap();
+            return _multicastRequestSender.SendRequest(busRequest, timeout).ConfigureAwaitFalse();
         }
 
         public Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
-            return _taskFactory.StartNew(() => _eventSender.Publish(busEvent), TaskContext.Send).Unwrap();
+            return _eventSender.Publish(busEvent).ConfigureAwaitFalse();
         }
 
         public IDeadLetterQueues DeadLetterQueues

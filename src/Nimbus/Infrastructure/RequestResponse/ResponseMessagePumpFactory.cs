@@ -3,7 +3,6 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.TaskScheduling;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
@@ -11,7 +10,6 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly ILogger _logger;
         private readonly ResponseMessageDispatcher _messageDispatcher;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
@@ -25,7 +23,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IClock clock,
                                             IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
-                                            INimbusTaskFactory taskFactory,
                                             IQueueManager queueManager,
                                             ResponseMessageDispatcher messageDispatcher)
         {
@@ -36,7 +33,6 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _queueManager = queueManager;
             _messageDispatcher = messageDispatcher;
-            _taskFactory = taskFactory;
         }
 
         public IMessagePump Create()
@@ -44,7 +40,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
 
-            var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcher, receiver, _taskFactory);
+            var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcher, receiver);
             _garbageMan.Add(pump);
 
             return pump;
