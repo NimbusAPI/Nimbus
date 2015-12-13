@@ -6,3 +6,4 @@ _ReSharper.*
 [Ll]ogs
 *.ncrunchproject
 .gitignore
+.vs
