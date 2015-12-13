@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csproj", "{1B793C01-E824-4449-B93D-277626B1791F}"
 EndProject
@@ -76,6 +76,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.ProtoBuf", "Extensions\Nimbus.Serializers.ProtoBuf\Nimbus.Serializers.ProtoBuf.csproj", "{B4162AA1-5F41-4FFD-90FB-4D7093955F6D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Log4net", "Extensions\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj", "{81E5DC4D-127C-4E68-A50D-A149A211C5C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Transports", "Transports", "{8FEACE50-F3D9-43DA-A25D-CA230D9E41B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.WindowsServiceBus", "Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj", "{717C9174-B5F4-449C-A542-B8D7082A8D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +207,10 @@ Global
 		{81E5DC4D-127C-4E68-A50D-A149A211C5C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81E5DC4D-127C-4E68-A50D-A149A211C5C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81E5DC4D-127C-4E68-A50D-A149A211C5C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{717C9174-B5F4-449C-A542-B8D7082A8D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{717C9174-B5F4-449C-A542-B8D7082A8D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{717C9174-B5F4-449C-A542-B8D7082A8D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{717C9174-B5F4-449C-A542-B8D7082A8D5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -236,5 +244,6 @@ Global
 		{C50BF581-4721-4447-8E8E-5263FB83A9A6} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{B4162AA1-5F41-4FFD-90FB-4D7093955F6D} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{81E5DC4D-127C-4E68-A50D-A149A211C5C2} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{717C9174-B5F4-449C-A542-B8D7082A8D5D} = {8FEACE50-F3D9-43DA-A25D-CA230D9E41B6}
 	EndGlobalSection
 EndGlobal
