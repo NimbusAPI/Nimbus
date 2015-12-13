@@ -4,7 +4,9 @@ using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
+using Nimbus.DevelopmentStubs;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Logging;
@@ -22,6 +24,21 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; }
         internal IRouter Router { get; set; }
+
+        internal IDeadLetterOffice DeadLetterOffice
+        {
+            get { return new StubDeadLetterOffice(); }
+        }
+
+        internal IDelayedDeliveryService DelayedDeliveryService
+        {
+            get { return new StubDelayedDeliveryService(); }
+        }
+
+        internal IDeliveryRetryStrategy DeliveryRetryStrategy
+        {
+            get { return new StubDeliveryRetryStrategy(); }
+        }
 
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }

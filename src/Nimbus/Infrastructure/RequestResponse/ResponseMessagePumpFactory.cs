@@ -15,6 +15,10 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IQueueManager _queueManager;
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttemptSetting;
+        private readonly IDeadLetterOffice _deadLetterOffice;
+        private readonly IDelayedDeliveryService _delayedDeliveryService;
+        private readonly IDeliveryRetryStrategy _deliveryRetryStrategy;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
@@ -26,7 +30,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher messageDispatcher)
+                                            ResponseMessageDispatcher messageDispatcher,
+                                            MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
+                                            IDeadLetterOffice deadLetterOffice,
+                                            IDelayedDeliveryService delayedDeliveryService,
+                                            IDeliveryRetryStrategy deliveryRetryStrategy)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;
@@ -35,6 +43,10 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _queueManager = queueManager;
             _messageDispatcher = messageDispatcher;
+            _maxDeliveryAttemptSetting = maxDeliveryAttemptSetting;
+            _deadLetterOffice = deadLetterOffice;
+            _delayedDeliveryService = delayedDeliveryService;
+            _deliveryRetryStrategy = deliveryRetryStrategy;
             _brokeredMessageFactory = brokeredMessageFactory;
         }
 
@@ -43,7 +55,15 @@ namespace Nimbus.Infrastructure.RequestResponse
             var receiver = new NimbusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
 
-            var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcher, receiver);
+            var pump = new MessagePump(_maxDeliveryAttemptSetting,
+                                       _clock,
+                                       _dispatchContextManager,
+                                       _logger,
+                                       _messageDispatcher,
+                                       receiver,
+                                       _deadLetterOffice,
+                                       _delayedDeliveryService,
+                                       _deliveryRetryStrategy);
             _garbageMan.Add(pump);
 
             return pump;

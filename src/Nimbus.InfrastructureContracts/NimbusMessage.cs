@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure
 {
@@ -15,6 +14,7 @@ namespace Nimbus.Infrastructure
         {
             MessageId = Guid.NewGuid();
             Properties = new Dictionary<string, object>();
+            DeliveryAttempts = new List<DateTimeOffset>();
             ExpiresAfter = DateTimeOffset.UtcNow.AddMinutes(30); //FIXME awful hack.
         }
 
@@ -25,15 +25,11 @@ namespace Nimbus.Infrastructure
         public Guid MessageId { get; set; }
         public object Payload { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }
+        public ICollection<DateTimeOffset> DeliveryAttempts { get; set; }
 
-        [Obsolete("We'll be deleting this shortly.")]
-        public async Task CompleteAsync()
+        public void RecordDeliveryAttempt(DateTimeOffset deliveryAttemptTimestamp)
         {
-        }
-
-        [Obsolete("We'll be deleting this shortly.")]
-        public async Task AbandonAsync(Dictionary<string, object> exceptionDetailsAsProperties)
-        {
+            DeliveryAttempts.Add(deliveryAttemptTimestamp);
         }
     }
 }

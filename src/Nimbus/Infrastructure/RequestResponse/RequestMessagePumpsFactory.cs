@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.Dispatching;
@@ -19,8 +20,12 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
+        private readonly IDeadLetterOffice _deadLetterOffice;
+        private readonly IDelayedDeliveryService _delayedDeliveryService;
+        private readonly IDeliveryRetryStrategy _deliveryRetryStrategy;
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttemptSetting;
 
         public RequestMessagePumpsFactory(IClock clock,
                                           IDispatchContextManager dispatchContextManager,
@@ -29,7 +34,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusMessagingFactory messagingFactory,
                                           IRouter router,
-                                          ITypeProvider typeProvider)
+                                          ITypeProvider typeProvider,
+                                          MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
+                                          IDeadLetterOffice deadLetterOffice,
+                                          IDelayedDeliveryService delayedDeliveryService,
+                                          IDeliveryRetryStrategy deliveryRetryStrategy)
         {
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
@@ -37,6 +46,10 @@ namespace Nimbus.Infrastructure.RequestResponse
             _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
+            _maxDeliveryAttemptSetting = maxDeliveryAttemptSetting;
+            _deadLetterOffice = deadLetterOffice;
+            _delayedDeliveryService = delayedDeliveryService;
+            _deliveryRetryStrategy = deliveryRetryStrategy;
             _messagingFactory = messagingFactory;
             _router = router;
         }
@@ -62,11 +75,15 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
 
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
-                var pump = new MessagePump(_clock,
+                var pump = new MessagePump(_maxDeliveryAttemptSetting,
+                                           _clock,
                                            _dispatchContextManager,
                                            _logger,
                                            _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                           messageReceiver);
+                                           messageReceiver,
+                                           _deadLetterOffice,
+                                           _delayedDeliveryService,
+                                           _deliveryRetryStrategy);
                 _garbageMan.Add(pump);
 
                 yield return pump;
