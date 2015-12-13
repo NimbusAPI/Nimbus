@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -119,8 +118,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public async Task<object> GetBody(BrokeredMessage message)
         {
-            var bodyType = GetBodyType(message);
-
             byte[] bodyBytes;
 
             object blobId;
@@ -142,17 +139,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             var decompressedBytes = _compressor.Decompress(bodyBytes);
             var deserialized = _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), typeof (NimbusMessage));
             return deserialized;
-        }
-
-        public Type GetBodyType(BrokeredMessage message)
-        {
-            var typeName = message.SafelyGetBodyTypeNameOrDefault();
-            var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();
-            if (candidates.Any() == false)
-                throw new Exception("The type '{0}' was not discovered by the type provider and cannot be loaded.".FormatWith(typeName));
-
-            // The TypeProvider should not provide a list of duplicates
-            return candidates.Single();
         }
     }
 }
