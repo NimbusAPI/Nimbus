@@ -17,11 +17,16 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
 
-        public NimbusMessagingFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger, IQueueManager queueManager)
+        public NimbusMessagingFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                      IBrokeredMessageFactory brokeredMessageFactory,
+                                      ILogger logger,
+                                      IQueueManager queueManager)
         {
             _queueManager = queueManager;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
         }
@@ -49,28 +54,28 @@ namespace Nimbus.Infrastructure
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
         {
-            var sender = new NimbusQueueMessageSender(_queueManager, queuePath, _logger);
+            var sender = new NimbusQueueMessageSender(_brokeredMessageFactory, _queueManager, queuePath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, queuePath, _concurrentHandlerLimit, _logger);
+            var receiver = new NimbusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, queuePath, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }
 
         private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            var sender = new NimbusTopicMessageSender(_queueManager, topicPath, _logger);
+            var sender = new NimbusTopicMessageSender(_brokeredMessageFactory, _queueManager, topicPath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _logger);
+            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _brokeredMessageFactory, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

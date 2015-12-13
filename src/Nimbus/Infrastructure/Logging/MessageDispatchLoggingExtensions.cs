@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure.Logging
 
             public static MessageMetadata Create(NimbusMessage message)
             {
-                var typeFullName = message.SafelyGetBodyTypeNameOrDefault();
+                var typeFullName = message.Payload.GetType().FullName;
                 var shortMessageTypeName = typeFullName == null
                                    ? null
                                    : typeFullName.Split('.').Last();

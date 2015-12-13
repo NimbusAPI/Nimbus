@@ -53,7 +53,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var busRequest = await _nimbusMessageFactory.GetBody(message);
+            var busRequest = message.Payload;
             var messageType = busRequest.GetType();
 
             // There should only ever be a single request handler per message type

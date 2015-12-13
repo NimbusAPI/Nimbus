@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure.Events
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var busEvent = await _nimbusMessageFactory.GetBody(message);
+            var busEvent = message.Payload;
             var messageType = busEvent.GetType();
 
             // There should only ever be a single event handler associated with this dispatcher

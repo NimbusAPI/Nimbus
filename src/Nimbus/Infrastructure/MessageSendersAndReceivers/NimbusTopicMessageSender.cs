@@ -7,25 +7,27 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusTopicMessageSender : INimbusMessageSender, IDisposable
     {
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly ILogger _logger;
 
         private TopicClient _topicClient;
 
-        public NimbusTopicMessageSender(IQueueManager queueManager, string topicPath, ILogger logger)
+        public NimbusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager, string topicPath, ILogger logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _logger = logger;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public async Task Send(NimbusMessage message)
         {
-            NimbusMessage[] toSend = new NimbusMessage[] {message};
+            NimbusMessage[] toSend = {message};
             var topicClient = GetTopicClient();
 
-            var brokeredMessages = toSend.Select(BrokeredMessageFactory.BuildMessage);
+            var brokeredMessages = toSend.Select(_brokeredMessageFactory.BuildBrokeredMessage);
 
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _topicPath, toSend.Length);
             try

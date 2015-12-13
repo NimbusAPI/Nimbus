@@ -9,6 +9,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
@@ -18,12 +19,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                                                  string topicPath,
                                                  string subscriptionName,
                                                  ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                                 IBrokeredMessageFactory brokeredMessageFactory,
                                                  ILogger logger)
             : base(concurrentHandlerLimit, logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public override string ToString()
@@ -51,7 +54,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 if (cancellationTask.IsCompleted) return new NimbusMessage[0];
 
                 var messages = await receiveTask;
-                return messages.Select(BrokeredMessageFactory.BuildNimbusMessage).ToArray();
+                return messages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
             }
             catch (Exception exc)
             {

@@ -84,37 +84,37 @@ namespace Nimbus.Infrastructure
         public Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
             EnsureQueueExists(queuePath);
-            return _messagingFactory().CreateMessageReceiverAsync(queuePath);
+            return _messagingFactory().CreateMessageReceiverAsync(queuePath, ReceiveMode.ReceiveAndDelete);
         }
 
         public Task<TopicClient> CreateTopicSender(string topicPath)
         {
             return Task.Run(() =>
-            {
-                EnsureTopicExists(topicPath);
-                return _messagingFactory().CreateTopicClient(topicPath);
-            });
+                            {
+                                EnsureTopicExists(topicPath);
+                                return _messagingFactory().CreateTopicClient(topicPath);
+                            });
         }
 
         public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
         {
             return Task.Run(() =>
-            {
-                EnsureSubscriptionExists(topicPath, subscriptionName);
-                return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName);
-            });
+                            {
+                                EnsureSubscriptionExists(topicPath, subscriptionName);
+                                return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                            });
         }
 
         public Task<QueueClient> CreateDeadLetterQueueClient<T>()
         {
             return Task.Run(() =>
-            {
-                var messageContractType = typeof(T);
-                var queueName = GetDeadLetterQueueName(messageContractType);
+                            {
+                                var messageContractType = typeof (T);
+                                var queueName = GetDeadLetterQueueName(messageContractType);
 
-                EnsureQueueExists(messageContractType);
-                return _messagingFactory().CreateQueueClient(queueName);
-            });
+                                EnsureQueueExists(messageContractType);
+                                return _messagingFactory().CreateQueueClient(queueName);
+                            });
         }
 
         private ConcurrentBag<string> FetchExistingTopics()
@@ -197,7 +197,7 @@ namespace Nimbus.Infrastructure
                                            EnableBatchedOperations = true,
                                            RequiresDuplicateDetection = false,
                                            SupportOrdering = false,
-                                           AutoDeleteOnIdle = TimeSpan.FromDays(367),
+                                           AutoDeleteOnIdle = TimeSpan.FromDays(367)
                                        };
 
                 // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
@@ -243,7 +243,7 @@ namespace Nimbus.Infrastructure
                                                   EnableBatchedOperations = true,
                                                   LockDuration = _defaultMessageLockDuration,
                                                   RequiresSession = false,
-                                                  AutoDeleteOnIdle = _autoDeleteOnIdle,
+                                                  AutoDeleteOnIdle = _autoDeleteOnIdle
                                               };
 
                 try
@@ -297,7 +297,7 @@ namespace Nimbus.Infrastructure
                                            RequiresDuplicateDetection = false,
                                            RequiresSession = false,
                                            SupportOrdering = false,
-                                           AutoDeleteOnIdle = _autoDeleteOnIdle,
+                                           AutoDeleteOnIdle = _autoDeleteOnIdle
                                        };
 
                 // We don't check for queue existence here because that introduces a race condition with any other bus participant that's

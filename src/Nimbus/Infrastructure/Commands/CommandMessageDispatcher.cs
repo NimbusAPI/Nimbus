@@ -46,7 +46,7 @@ namespace Nimbus.Infrastructure.Commands
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var busCommand = await _brokeredMessageFactory.GetBody(message);
+            var busCommand = message.Payload;
             var messageType = busCommand.GetType();
 
             // There should only ever be a single command handler

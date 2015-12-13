@@ -12,9 +12,9 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class BusCommandSender : ICommandSender
     {
-        private readonly INimbusMessageFactory _brokeredMessageFactory;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
+        private readonly INimbusMessageFactory _brokeredMessageFactory;
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
         private readonly IDependencyResolver _dependencyResolver;

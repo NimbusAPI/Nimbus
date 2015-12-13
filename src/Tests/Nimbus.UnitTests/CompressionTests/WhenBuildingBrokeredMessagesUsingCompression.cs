@@ -1,12 +1,10 @@
 ﻿using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices;
@@ -36,15 +34,9 @@ namespace Nimbus.UnitTests.CompressionTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                              new MaxLargeMessageSizeSetting(),
-                                              new MaxSmallMessageSizeSetting(),
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
                                               Substitute.For<IClock>(),
-                                              compressor,
-                                              new DispatchContextManager(),
-                                              new UnsupportedLargeMessageBodyStore(),
-                                              serializer,
-                                              typeProvider);
+                                              new DispatchContextManager());
         }
 
         protected override async Task When()
@@ -56,7 +48,8 @@ namespace Nimbus.UnitTests.CompressionTests
         [Test]
         public void ThenTheMessageShouldBeSmaller()
         {
-            _compressedMessage.Size.ShouldBeLessThan(_uncompressedMessage.Size);
+            //_compressedMessage.Size.ShouldBeLessThan(_uncompressedMessage.Size);
+            Assert.Fail();
         }
 
         [DataContract]

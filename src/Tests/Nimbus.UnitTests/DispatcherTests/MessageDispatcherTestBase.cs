@@ -1,10 +1,7 @@
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
@@ -35,15 +32,9 @@ namespace Nimbus.UnitTests.DispatcherTests
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);
             NimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                            new MaxLargeMessageSizeSetting(),
-                                                            new MaxSmallMessageSizeSetting(),
                                                             replyQueueNameSetting,
                                                             clock,
-                                                            new NullCompressor(),
-                                                            new DispatchContextManager(),
-                                                            new UnsupportedLargeMessageBodyStore(),
-                                                            serializer,
-                                                            TypeProvider);
+                                                            new DispatchContextManager());
         }
 
         internal RequestMessageDispatcher GetRequestMessageDispatcher<TRequest, TResponse, TRequestHandler>(IInboundInterceptor interceptor)

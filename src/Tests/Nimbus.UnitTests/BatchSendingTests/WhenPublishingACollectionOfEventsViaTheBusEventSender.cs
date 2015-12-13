@@ -1,11 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
@@ -40,15 +37,9 @@ namespace Nimbus.UnitTests.BatchSendingTests
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
             var brokeredMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                    new MaxLargeMessageSizeSetting(),
-                                                                    new MaxSmallMessageSizeSetting(),
                                                                     replyQueueNameSetting,
                                                                     clock,
-                                                                    new NullCompressor(),
-                                                                    new DispatchContextManager(),
-                                                                    new UnsupportedLargeMessageBodyStore(),
-                                                                    serializer,
-                                                                    typeProvider);
+                                                                    new DispatchContextManager());
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();

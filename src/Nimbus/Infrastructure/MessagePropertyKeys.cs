@@ -2,6 +2,7 @@
 
 namespace Nimbus.Infrastructure
 {
+    [Obsolete("We should be able to do away with this entire class if we put strongly-typed properties onto NimbusMessage.")]
     public static class MessagePropertyKeys
     {
         public const string MessageId = "MessageId";
@@ -19,7 +20,6 @@ namespace Nimbus.Infrastructure
         public const string InReplyToRequestId = "InReplyToRequestId";
         public const string SentToQueue = "SentToQueue";
         public const string SentToTopic = "SentToTopic";
-        [Obsolete("We won't need this after we've moved to our own retry model.")]
         public const string DispatchComplete = "DispatchComplete";
         public const string PrecedingMessageId = "PrecedingMessageId";
     }

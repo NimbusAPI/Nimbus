@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.DependencyResolution;
@@ -46,15 +43,9 @@ namespace Nimbus.UnitTests.DispatcherTests
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
             _nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                             new MaxLargeMessageSizeSetting(),
-                                                             new MaxSmallMessageSizeSetting(),
                                                              replyQueueNameSetting,
                                                              clock,
-                                                             new NullCompressor(),
-                                                             new DispatchContextManager(),
-                                                             new UnsupportedLargeMessageBodyStore(),
-                                                             serializer,
-                                                             typeProvider);
+                                                             new DispatchContextManager());
 
             return new CommandMessageDispatcher(_nimbusMessageFactory,
                                                 new SystemClock(),

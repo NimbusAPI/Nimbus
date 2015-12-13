@@ -16,14 +16,14 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var requestId = Guid.Parse((string)message.Properties[MessagePropertyKeys.InReplyToRequestId]);
+            var requestId = Guid.Parse((string) message.Properties[MessagePropertyKeys.InReplyToRequestId]);
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
-            if (responseCorrelationWrapper == null) return;
+            if (responseCorrelationWrapper == null) return; //FIXME log
 
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];
             if (success)
             {
-                var response = await _nimbusMessageFactory.GetBody(message);
+                var response = message.Payload;
                 responseCorrelationWrapper.Reply(response);
             }
             else

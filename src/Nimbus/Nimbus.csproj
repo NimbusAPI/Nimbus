@@ -90,8 +90,10 @@
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
+    <Compile Include="Extensions\NimbusMessageExtensions.cs" />
     <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\BrokeredMessageFactory.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\IBrokeredMessageFactory.cs" />
     <Compile Include="Infrastructure\NimbusMessageServices\NimbusMessageFactory.cs" />
     <Compile Include="Infrastructure\NimbusMessageServices\Compression\DeflateCompressor.cs" />
     <Compile Include="Infrastructure\NimbusMessageServices\Compression\GzipCompressor.cs" />
@@ -139,7 +141,7 @@
     <Compile Include="Infrastructure\DependencyResolution\TrackingScope.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
+    <Compile Include="Infrastructure\INimbusMessageFactory.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
     <Compile Include="Configuration\GarbageMan.cs" />
     <Compile Include="Configuration\ICreateComponents.cs" />

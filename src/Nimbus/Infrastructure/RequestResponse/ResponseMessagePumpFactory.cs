@@ -11,6 +11,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ILogger _logger;
         private readonly ResponseMessageDispatcher _messageDispatcher;
         private readonly ReplyQueueNameSetting _replyQueueName;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IQueueManager _queueManager;
@@ -20,6 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal ResponseMessagePumpFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                             ReplyQueueNameSetting replyQueueName,
+                                            IBrokeredMessageFactory brokeredMessageFactory,
                                             IClock clock,
                                             IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
@@ -33,11 +35,12 @@ namespace Nimbus.Infrastructure.RequestResponse
             _logger = logger;
             _queueManager = queueManager;
             _messageDispatcher = messageDispatcher;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public IMessagePump Create()
         {
-            var receiver = new NimbusQueueMessageReceiver(_queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
+            var receiver = new NimbusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
 
             var pump = new MessagePump(_clock, _dispatchContextManager, _logger, _messageDispatcher, receiver);

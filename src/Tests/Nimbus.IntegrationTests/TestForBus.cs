@@ -14,23 +14,25 @@ namespace Nimbus.IntegrationTests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
-            Task.Run(async () =>
-                           {
-                               MethodCallCounter.Clear();
+            TestFixtureSetUpAsync().Wait();
+        }
 
-                               Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
-                               Console.WriteLine();
-                               Console.WriteLine();
+        private async Task TestFixtureSetUpAsync()
+        {
+            MethodCallCounter.Clear();
 
-                               await Given();
-                               Console.WriteLine();
-                               Console.WriteLine();
+            Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
+            Console.WriteLine();
+            Console.WriteLine();
 
-                               await When();
-                               MethodCallCounter.Stop();
-                               Console.WriteLine();
-                               Console.WriteLine();
-                           }).Wait();
+            await Given();
+            Console.WriteLine();
+            Console.WriteLine();
+
+            await When();
+            MethodCallCounter.Stop();
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         [TestFixtureTearDown]

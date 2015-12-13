@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -9,17 +8,23 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusQueueMessageReceiver : ThrottlingMessageReceiver
     {
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
 
         private volatile MessageReceiver _messageReceiver;
         private readonly object _mutex = new object();
 
-        public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
+        public NimbusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
+                                          IQueueManager queueManager,
+                                          string queuePath,
+                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                          ILogger logger)
             : base(concurrentHandlerLimit, logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public override string ToString()
@@ -44,9 +49,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 await Task.WhenAny(receiveTask, cancellationTask);
 
                 if (cancellationTask.IsCompleted) return new NimbusMessage[0];
-                
+
                 var messages = await receiveTask;
-                return messages.Select(BrokeredMessageFactory.BuildNimbusMessage).ToArray();
+                return messages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
             }
             catch (Exception exc)
             {
@@ -55,8 +60,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 throw;
             }
         }
-
-        
 
         private async Task<MessageReceiver> GetMessageReceiver()
         {

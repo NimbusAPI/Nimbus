@@ -6,36 +6,25 @@ namespace Nimbus.Infrastructure
 {
     public class NimbusMessage
     {
-        public NimbusMessage(byte[] payload) : this()
+        public NimbusMessage(object payload) : this()
         {
             Payload = payload;
         }
 
         public NimbusMessage()
         {
-            TimeToLive = TimeSpan.FromMinutes(30);
+            MessageId = Guid.NewGuid();
             Properties = new Dictionary<string, object>();
+            ExpiresAfter = DateTimeOffset.UtcNow.AddMinutes(30); //FIXME awful hack.
         }
 
         public Guid CorrelationId { get; set; }
         public string ReplyTo { get; set; }
-        public TimeSpan TimeToLive { get; set; }
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
         public IDictionary<string, object> Properties { get; set; }
         public Guid MessageId { get; set; }
-        public byte[] Payload { get; set; }
-
-        public DateTimeOffset LockedUntilUtc { get; set; }
-
-        public int Size
-        {
-            get { return Payload.Length; }
-        }
-
-        [Obsolete("We'll be deleting this shortly.")]
-        public async Task RenewLockAsync()
-        {
-        }
+        public object Payload { get; set; }
+        public DateTimeOffset ExpiresAfter { get; set; }
 
         [Obsolete("We'll be deleting this shortly.")]
         public async Task CompleteAsync()

@@ -52,7 +52,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var busRequest = await _brokeredMessageFactory.GetBody(message);
+            var busRequest = message.Payload;
             var messageType = busRequest.GetType();
 
             // There should only ever be a single multicast request handler associated with this dispatcher
