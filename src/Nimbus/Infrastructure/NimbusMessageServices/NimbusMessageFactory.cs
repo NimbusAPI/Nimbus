@@ -51,10 +51,10 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
         {
             return Task.Run(async () =>
                                   {
-                                      NimbusMessage NimbusMessage;
+                                      NimbusMessage nimbusMessage;
                                       if (serializableObject == null)
                                       {
-                                          NimbusMessage = new NimbusMessage();
+                                          nimbusMessage = new NimbusMessage();
                                       }
                                       else
                                       {
@@ -70,24 +70,24 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
 
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
-                                              NimbusMessage = new NimbusMessage();
+                                              nimbusMessage = new NimbusMessage();
                                               var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(NimbusMessage.MessageId, messageBodyBytes, expiresAfter);
-                                              NimbusMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(nimbusMessage.MessageId, messageBodyBytes, expiresAfter);
+                                              nimbusMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                           }
                                           else
                                           {
-                                              NimbusMessage = new NimbusMessage(messageBodyBytes);
+                                              nimbusMessage = new NimbusMessage(messageBodyBytes);
                                           }
-                                          NimbusMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
+                                          nimbusMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
                                       var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
-                                      NimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
-                                      NimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
-                                      NimbusMessage.ReplyTo = _replyQueueName;
+                                      nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
+                                      nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
+                                      nimbusMessage.ReplyTo = _replyQueueName;
 
-                                      return NimbusMessage;
+                                      return nimbusMessage;
                                   });
         }
 

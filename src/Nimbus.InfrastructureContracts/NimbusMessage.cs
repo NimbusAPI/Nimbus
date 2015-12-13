@@ -26,7 +26,11 @@ namespace Nimbus.Infrastructure
         public byte[] Payload { get; set; }
 
         public DateTimeOffset LockedUntilUtc { get; set; }
-        public int Size { get; set; }
+
+        public int Size
+        {
+            get { return Payload.Length; }
+        }
 
         [Obsolete("We'll be deleting this shortly.")]
         public async Task RenewLockAsync()
