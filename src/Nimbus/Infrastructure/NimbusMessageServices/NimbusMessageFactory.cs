@@ -33,7 +33,7 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
             nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
             nimbusMessage.ReplyTo = _replyQueueName;
             nimbusMessage.ExpiresAfter = expiresAfter;
-            nimbusMessage.Properties[MessagePropertyKeys.MessageType] = payload.GetType().FullName;
+            nimbusMessage.Properties[MessagePropertyKeys.MessageType] = nimbusMessage.SafelyGetBodyTypeNameOrDefault();
 
             return Task.FromResult(nimbusMessage);
         }

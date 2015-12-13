@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    public interface IBrokeredMessageFactory
+    internal interface IBrokeredMessageFactory
     {
         BrokeredMessage BuildBrokeredMessage(NimbusMessage message);
         NimbusMessage BuildNimbusMessage(BrokeredMessage message);

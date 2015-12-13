@@ -7,6 +7,7 @@ using Nimbus.Configuration;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -47,6 +48,7 @@ namespace Nimbus.UnitTests.Conventions
                 yield return typeof (InboundInterceptorFactory);
                 yield return typeof (OutboundInterceptorFactory);
                 yield return typeof (MessageDispatcherFactory);
+                yield return typeof (BrokeredMessageFactory);
             }
 
             IEnumerator IEnumerable.GetEnumerator()

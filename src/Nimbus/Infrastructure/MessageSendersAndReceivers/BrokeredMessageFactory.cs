@@ -22,14 +22,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly ITypeProvider _typeProvider;
         private readonly IClock _clock;
 
-        public BrokeredMessageFactory(ISerializer serializer,
-                                      MaxLargeMessageSizeSetting maxLargeMessageSize,
+        public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
+                                      IClock clock,
                                       ICompressor compressor,
                                       IDispatchContextManager dispatchContextManager,
                                       ILargeMessageBodyStore largeMessageBodyStore,
-                                      ITypeProvider typeProvider,
-                                      IClock clock)
+                                      ISerializer serializer,
+                                      ITypeProvider typeProvider)
         {
             _serializer = serializer;
             _maxLargeMessageSize = maxLargeMessageSize;

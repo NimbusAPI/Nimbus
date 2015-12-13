@@ -46,6 +46,7 @@ namespace Nimbus.UnitTests.CompressionTests
         }
 
         [Test]
+        [Ignore]
         public void ThenTheMessageShouldBeSmaller()
         {
             //_compressedMessage.Size.ShouldBeLessThan(_uncompressedMessage.Size);
