@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nimbus.Infrastructure
 {
@@ -14,7 +15,7 @@ namespace Nimbus.Infrastructure
         {
             MessageId = Guid.NewGuid();
             Properties = new Dictionary<string, object>();
-            DeliveryAttempts = new List<DateTimeOffset>();
+            DeliveryAttempts = new DateTimeOffset[0];
             ExpiresAfter = DateTimeOffset.UtcNow.AddMinutes(30); //FIXME awful hack.
         }
 
@@ -25,11 +26,16 @@ namespace Nimbus.Infrastructure
         public Guid MessageId { get; set; }
         public object Payload { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }
-        public ICollection<DateTimeOffset> DeliveryAttempts { get; set; }
+        public DateTimeOffset[] DeliveryAttempts { get; set; }
 
         public void RecordDeliveryAttempt(DateTimeOffset deliveryAttemptTimestamp)
         {
-            DeliveryAttempts.Add(deliveryAttemptTimestamp);
+            var updatedDeliveryAttempts = DeliveryAttempts
+                .Union(new[] {deliveryAttemptTimestamp})
+                .OrderBy(d => d)
+                .ToArray();
+
+            DeliveryAttempts = updatedDeliveryAttempts;
         }
     }
 }
