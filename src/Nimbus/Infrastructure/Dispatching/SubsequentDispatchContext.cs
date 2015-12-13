@@ -5,28 +5,28 @@ namespace Nimbus.Infrastructure.Dispatching
 {
     internal class SubsequentDispatchContext : IDispatchContext
     {
-        private readonly string _dispatchId;
-        private readonly string _correlationId;
-        private readonly string _resultOfMessageId;
+        private readonly Guid _dispatchId;
+        private readonly Guid _correlationId;
+        private readonly Guid _resultOfMessageId;
 
-        public SubsequentDispatchContext(BrokeredMessage brokeredMessage)
+        public SubsequentDispatchContext(NimbusMessage brokeredMessage)
         {
-            _dispatchId = Guid.NewGuid().ToString("N");
+            _dispatchId = Guid.NewGuid();
             _correlationId = brokeredMessage.CorrelationId;
             _resultOfMessageId = brokeredMessage.MessageId;
         }
 
-        public string DispatchId
+        public Guid DispatchId
         {
             get { return _dispatchId; }
         }
 
-        public string ResultOfMessageId
+        public Guid? ResultOfMessageId
         {
             get { return _resultOfMessageId; }
         }
 
-        public string CorrelationId
+        public Guid CorrelationId
         {
             get { return _correlationId; }
         }

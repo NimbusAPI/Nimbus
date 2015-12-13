@@ -10,6 +10,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
@@ -38,7 +39,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+            var brokeredMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                                     new MaxLargeMessageSizeSetting(),
                                                                     new MaxSmallMessageSizeSetting(),
                                                                     replyQueueNameSetting,

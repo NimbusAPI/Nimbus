@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure
 {
     internal class MessageDispatcherFactory : IMessageDispatcherFactory
     {
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
@@ -28,7 +28,7 @@ namespace Nimbus.Infrastructure
         private readonly IPropertyInjector _propertyInjector;
 
         public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        IBrokeredMessageFactory brokeredMessageFactory,
+                                        INimbusMessageFactory nimbusMessageFactory,
                                         IClock clock,
                                         IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
                                         IPropertyInjector propertyInjector)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _clock = clock;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure
         {
             if (openGenericHandlerType == typeof (IHandleCommand<>))
             {
-                return new CommandMessageDispatcher(_brokeredMessageFactory,
+                return new CommandMessageDispatcher(_nimbusMessageFactory,
                                                     _clock,
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
@@ -72,7 +72,7 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
             {
-                return new CompetingEventMessageDispatcher(_brokeredMessageFactory,
+                return new CompetingEventMessageDispatcher(_nimbusMessageFactory,
                                                            _clock,
                                                            _dependencyResolver,
                                                            _inboundInterceptorFactory,
@@ -85,7 +85,7 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
             {
-                return new MulticastEventMessageDispatcher(_brokeredMessageFactory,
+                return new MulticastEventMessageDispatcher(_nimbusMessageFactory,
                                                            _clock,
                                                            _dependencyResolver,
                                                            _inboundInterceptorFactory,
@@ -98,7 +98,7 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleRequest<,>))
             {
-                return new RequestMessageDispatcher(_brokeredMessageFactory,
+                return new RequestMessageDispatcher(_nimbusMessageFactory,
                                                     _clock,
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
@@ -113,7 +113,7 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
             {
-                return new MulticastRequestMessageDispatcher(_brokeredMessageFactory,
+                return new MulticastRequestMessageDispatcher(_nimbusMessageFactory,
                                                              _clock,
                                                              _dependencyResolver,
                                                              _inboundInterceptorFactory,

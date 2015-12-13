@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
@@ -20,14 +23,18 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _logger = logger;
         }
 
-        protected override async Task SendBatch(BrokeredMessage[] toSend)
+        protected override async Task SendBatch(NimbusMessage[] toSend)
         {
             var messageSender = GetMessageSender();
+
+
+            var brokeredMessages = toSend.Select(BrokeredMessageFactory.BuildMessage);
+
 
             _logger.Debug("Flushing outbound message queue {0} ({1} messages)", _queuePath, toSend.Length);
             try
             {
-                await messageSender.SendBatchAsync(toSend);
+                await messageSender.SendBatchAsync(brokeredMessages);
             }
             catch (Exception)
             {
@@ -35,6 +42,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 throw;
             }
         }
+
+
+
 
         private MessageSender GetMessageSender()
         {

@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -26,7 +26,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
         internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
-                                  IBrokeredMessageFactory brokeredMessageFactory,
+                                  INimbusMessageFactory nimbusMessageFactory,
                                   IClock clock,
                                   IDependencyResolver dependencyResolver,
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             _messagingFactory = messagingFactory;
             _router = router;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _dependencyResolver = dependencyResolver;
@@ -64,13 +64,13 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
 
-            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _nimbusMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForQueue(queuePath)
                 ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(brokeredMessage.MessageId, expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {

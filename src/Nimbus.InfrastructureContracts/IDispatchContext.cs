@@ -1,9 +1,11 @@
+using System;
+
 namespace Nimbus
 {
     public interface IDispatchContext
     {
-        string DispatchId { get; }
-        string ResultOfMessageId { get; }
-        string CorrelationId { get; }
+        Guid DispatchId { get; }
+        Guid? ResultOfMessageId { get; }
+        Guid CorrelationId { get; }
     }
 }

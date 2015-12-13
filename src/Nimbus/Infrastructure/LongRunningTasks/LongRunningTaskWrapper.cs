@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
     {
         public LongRunningTaskWrapper(Task<T> handlerTask,
                                       ILongRunningTask longRunningHandler,
-                                      BrokeredMessage message,
+                                      NimbusMessage message,
                                       IClock clock,
                                       ILogger logger,
                                       TimeSpan messageLockDuration,
@@ -30,7 +30,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
     {
         public LongRunningTaskWrapper(Task handlerTask,
                                       ILongRunningTask longRunningHandler,
-                                      BrokeredMessage message,
+                                      NimbusMessage message,
                                       IClock clock,
                                       ILogger logger,
                                       TimeSpan messageLockDuration,

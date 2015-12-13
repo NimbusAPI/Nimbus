@@ -36,10 +36,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             await GetSubscriptionClient();
         }
 
-        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
+        protected override async Task<NimbusMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
             if (batchSize < 1)
-                return new BrokeredMessage[0];
+                return new NimbusMessage[0];
 
             try
             {
@@ -48,10 +48,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var receiveTask = subscriptionClient.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
                 await Task.WhenAny(receiveTask, cancellationTask);
 
-                if (cancellationTask.IsCompleted) return new BrokeredMessage[0];
+                if (cancellationTask.IsCompleted) return new NimbusMessage[0];
 
                 var messages = await receiveTask;
-                return messages.ToArray();
+                return messages.Select(BrokeredMessageFactory.BuildNimbusMessage).ToArray();
             }
             catch (Exception exc)
             {

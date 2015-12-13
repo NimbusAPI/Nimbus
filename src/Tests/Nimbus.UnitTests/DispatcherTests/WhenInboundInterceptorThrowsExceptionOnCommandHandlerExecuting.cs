@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -20,13 +21,13 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             interceptor
-                .When(x => x.OnCommandHandlerExecuting(Arg.Any<EmptyCommand>(), Arg.Any<BrokeredMessage>()))
+                .When(x => x.OnCommandHandlerExecuting(Arg.Any<EmptyCommand>(), Arg.Any<NimbusMessage>()))
                 .Do(x =>
                 {
                     throw new Exception("Ruh roh");
                 });
             var dispatcher = GetCommandMessageDispatcher<EmptyCommand, EmptyCommandHandler>(interceptor);
-            var brokeredMessage = BrokeredMessageFactory.Create(new EmptyCommand()).Result;
+            var brokeredMessage = NimbusMessageFactory.Create(new EmptyCommand()).Result;
 
             try
             {

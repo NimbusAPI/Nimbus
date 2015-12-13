@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -14,7 +12,7 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class BusCommandSender : ICommandSender
     {
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _brokeredMessageFactory;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
         private readonly INimbusMessagingFactory _messagingFactory;
@@ -22,7 +20,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusCommandSender(IBrokeredMessageFactory brokeredMessageFactory,
+        public BusCommandSender(INimbusMessageFactory brokeredMessageFactory,
                                 IDependencyResolver dependencyResolver,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
@@ -59,7 +57,7 @@ namespace Nimbus.Infrastructure.Commands
             await Deliver(busCommand, commandType, message);
         }
 
-        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, BrokeredMessage brokeredMessage) where TBusCommand : IBusCommand
+        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, NimbusMessage brokeredMessage) where TBusCommand : IBusCommand
         {
             var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
             brokeredMessage.DestinedForQueue(queuePath);

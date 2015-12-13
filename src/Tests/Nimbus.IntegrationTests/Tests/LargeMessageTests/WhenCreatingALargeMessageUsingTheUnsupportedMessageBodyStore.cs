@@ -10,6 +10,8 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 
@@ -18,10 +20,10 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     [TestFixture]
     internal class WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore
     {
-        protected async Task<BrokeredMessageFactory> Given()
+        protected async Task<NimbusMessageFactory> Given()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+            return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                               new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting {Value = 64*1024},
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
@@ -33,7 +35,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                               typeProvider);
         }
 
-        private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)
+        private async Task<NimbusMessage> When(NimbusMessageFactory brokeredMessageFactory)
         {
             var bigFatObject = new string(Enumerable.Range(0, 256*1024).Select(i => '.').ToArray());
             return await brokeredMessageFactory.Create(bigFatObject);

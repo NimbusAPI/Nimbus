@@ -7,23 +7,25 @@ namespace Nimbus.PoisonMessages
     public class DeadLetterQueue : IDeadLetterQueue
     {
         private readonly IQueueManager _queueManager;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
 
-        internal DeadLetterQueue(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager)
+        internal DeadLetterQueue(INimbusMessageFactory nimbusMessageFactory, IQueueManager queueManager)
         {
             _queueManager = queueManager;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
         }
 
         public async Task<TBusMessageContract> Pop<TBusMessageContract>() where TBusMessageContract : class
         {
-            var queueClient = await _queueManager.CreateDeadLetterQueueClient<TBusMessageContract>();
+            //var queueClient = await _queueManager.CreateDeadLetterQueueClient<TBusMessageContract>();
 
-            var result = await queueClient.ReceiveAsync(TimeSpan.Zero);
-            if (result == null) return null;
+            //var result = await queueClient.ReceiveAsync(TimeSpan.Zero);
+            //if (result == null) return null;
 
-            await result.CompleteAsync();
-            return (TBusMessageContract) await _brokeredMessageFactory.GetBody(result);
+            //await result.CompleteAsync();
+            //return (TBusMessageContract) await _nimbusMessageFactory.GetBody(result);
+
+            throw new NotImplementedException();
         }
     }
 }

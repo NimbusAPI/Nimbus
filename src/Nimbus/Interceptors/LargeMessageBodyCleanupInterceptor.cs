@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.PropertyInjection;
@@ -15,15 +15,15 @@ namespace Nimbus.Interceptors
             get { return 0; }
         }
 
-        public override async Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand buscommand, BrokeredMessage brokeredMessage)
+        public override async Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand buscommand, NimbusMessage nimbusMessage)
         {
-            await DeleteAssociatedMessageBody(brokeredMessage);
+            await DeleteAssociatedMessageBody(nimbusMessage);
         }
 
-        private async Task DeleteAssociatedMessageBody(BrokeredMessage brokeredMessage)
+        private async Task DeleteAssociatedMessageBody(NimbusMessage nimbusMessage)
         {
             object blobIdObject;
-            if (!brokeredMessage.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobIdObject)) return;
+            if (!nimbusMessage.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobIdObject)) return;
 
             var blobId = (string) blobIdObject;
             await LargeMessageBodyStore.Delete(blobId);

@@ -8,6 +8,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.BrokeredMessageServices;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -44,7 +45,7 @@ namespace Nimbus.UnitTests.Conventions
 
             private IEnumerable<Type> GetExcludedTypes()
             {
-                yield return typeof (BrokeredMessageFactory);
+                yield return typeof (NimbusMessageFactory);
                 yield return typeof (InboundInterceptorFactory);
                 yield return typeof (OutboundInterceptorFactory);
                 yield return typeof (MessageDispatcherFactory);

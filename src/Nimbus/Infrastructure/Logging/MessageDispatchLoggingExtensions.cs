@@ -8,7 +8,7 @@ namespace Nimbus.Infrastructure.Logging
 {
     internal static class MessageLoggingExtensions
     {
-        internal static void LogDispatchAction(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message)
+        internal static void LogDispatchAction(this ILogger logger, string dispatchAction, string queueOrTopicPath, NimbusMessage message)
         {
             var metadata = MessageMetadata.Create(message);
             logger.Debug("{DispatchAction} {ShortMessageTypeName} ({MessageId}) to {QueueOrTopicPath} ({@MessageMetadata})",
@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure.Logging
                          metadata);
         }
 
-        internal static void LogDispatchError(this ILogger logger, string dispatchAction, string queueOrTopicPath, BrokeredMessage message, Exception exception)
+        internal static void LogDispatchError(this ILogger logger, string dispatchAction, string queueOrTopicPath, NimbusMessage message, Exception exception)
         {
             var metadata = MessageMetadata.Create(message);
             logger.Error(exception,
@@ -38,13 +38,13 @@ namespace Nimbus.Infrastructure.Logging
             private readonly string _shortMessageTypeName;
             private readonly string _messageType;
 
-            public static MessageMetadata Create(BrokeredMessage message)
+            public static MessageMetadata Create(NimbusMessage message)
             {
                 var typeFullName = message.SafelyGetBodyTypeNameOrDefault();
                 var shortMessageTypeName = typeFullName == null
                                    ? null
                                    : typeFullName.Split('.').Last();
-                return new MessageMetadata(Guid.Parse(message.MessageId), Guid.Parse(message.CorrelationId), shortMessageTypeName, typeFullName);
+                return new MessageMetadata(message.MessageId, message.CorrelationId, shortMessageTypeName, typeFullName);
             }
 
             private MessageMetadata(Guid messageId, Guid correlationId, string shortMessageTypeName, string messageType)

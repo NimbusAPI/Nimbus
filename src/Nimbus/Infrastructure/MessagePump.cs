@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -77,7 +76,7 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private async Task Dispatch(BrokeredMessage message)
+        private async Task Dispatch(NimbusMessage message)
         {
             // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
             // bail - it will already have been picked up by someone else.
@@ -110,16 +109,16 @@ namespace Nimbus.Infrastructure
 
                 catch (Exception exc)
                 {
-                    if (exc is MessageLockLostException || (exc.InnerException is MessageLockLostException))
-                    {
-                        _logger.Error(exc,
-                                      "Message completion failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.ReplyTo,
-                                      message.MessageId,
-                                      message.CorrelationId);
-                        return;
-                    }
+                    //if (exc is MessageLockLostException || (exc.InnerException is MessageLockLostException))
+                    //{
+                    //    _logger.Error(exc,
+                    //                  "Message completion failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
+                    //                  message.SafelyGetBodyTypeNameOrDefault(),
+                    //                  message.ReplyTo,
+                    //                  message.MessageId,
+                    //                  message.CorrelationId);
+                    //    return;
+                    //}
 
                     _logger.Error(exc,
                                   "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
@@ -153,7 +152,7 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private void LogDebug(string activity, BrokeredMessage message)
+        private void LogDebug(string activity, NimbusMessage message)
         {
             _logger.Debug("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                           activity,
@@ -163,7 +162,7 @@ namespace Nimbus.Infrastructure
                           message.CorrelationId);
         }
 
-        private void LogInfo(string activity, BrokeredMessage message)
+        private void LogInfo(string activity, NimbusMessage message)
         {
             _logger.Info("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                          activity,

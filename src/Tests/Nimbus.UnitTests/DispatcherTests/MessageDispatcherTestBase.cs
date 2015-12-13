@@ -11,6 +11,8 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.TaskScheduling;
@@ -23,7 +25,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 {
     public abstract class MessageDispatcherTestBase
     {
-        internal BrokeredMessageFactory BrokeredMessageFactory;
+        internal NimbusMessageFactory NimbusMessageFactory;
         internal TestHarnessTypeProvider TypeProvider;
         internal HandlerMapper HandlerMapper;
         private INimbusTaskFactory _taskFactory;
@@ -37,7 +39,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             TypeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);
-            BrokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+            NimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                                 new MaxLargeMessageSizeSetting(),
                                                                 new MaxSmallMessageSizeSetting(),
                                                                 replyQueueNameSetting,
@@ -63,13 +65,13 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TRequestHandler>().Returns(new TRequestHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<NimbusMessage>())
                                      .Returns(new[] {interceptor});
 
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
 
             return new RequestMessageDispatcher(
-                BrokeredMessageFactory,
+                NimbusMessageFactory,
                 clock,
                 dependencyResolver,
                 inboundInterceptorFactory,
@@ -93,11 +95,11 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TCommandHandler>().Returns(new TCommandHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<NimbusMessage>())
                                      .Returns(new[] {interceptor});
 
             return new CommandMessageDispatcher(
-                BrokeredMessageFactory,
+                NimbusMessageFactory,
                 clock,
                 dependencyResolver,
                 inboundInterceptorFactory,
@@ -119,11 +121,11 @@ namespace Nimbus.UnitTests.DispatcherTests
             scope.Resolve<TEventMessageHandler>().Returns(new TEventMessageHandler());
             dependencyResolver.CreateChildScope().Returns(scope);
             var inboundInterceptorFactory = Substitute.For<IInboundInterceptorFactory>();
-            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<BrokeredMessage>())
+            inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<NimbusMessage>())
                                      .Returns(new[] {interceptor});
 
             return new MulticastEventMessageDispatcher(
-                BrokeredMessageFactory,
+                NimbusMessageFactory,
                 clock,
                 dependencyResolver,
                 inboundInterceptorFactory,

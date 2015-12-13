@@ -45,8 +45,8 @@ namespace Nimbus.UnitTests.InterceptorTests
                                                                                                      Substitute.For<IDispatchContextManager>(),
                                                                                                      Substitute.For<ILargeMessageBodyStore>()));
 
-                var dummyBrokeredMessage = new BrokeredMessage();
-                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyBrokeredMessage);
+                var dummyNimbusMessage = new NimbusMessage();
+                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyNimbusMessage);
 
                 interceptors.Count().ShouldBe(1);
             }

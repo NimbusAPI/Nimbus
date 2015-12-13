@@ -9,7 +9,7 @@ namespace Nimbus.Infrastructure.Dispatching
     {
         private static readonly string _currentDispatchIdDataSlotName = typeof(SubsequentDispatchContext).FullName;
 
-        private readonly ThreadSafeDictionary<string, SubsequentDispatchContext> _store = new ThreadSafeDictionary<string, SubsequentDispatchContext>();
+        private readonly ThreadSafeDictionary<Guid, SubsequentDispatchContext> _store = new ThreadSafeDictionary<Guid, SubsequentDispatchContext>();
 
         public IDispatchContext GetCurrentDispatchContext()
         {
@@ -18,7 +18,7 @@ namespace Nimbus.Infrastructure.Dispatching
             if (currentDispatchContextId == null) return new InitialDispatchContext();
 
             SubsequentDispatchContext dispatchContext;
-            return (_store.TryGetValue(currentDispatchContextId, out dispatchContext))
+            return (_store.TryGetValue(currentDispatchContextId.Value, out dispatchContext))
                 ? (IDispatchContext) dispatchContext
                 : new InitialDispatchContext();
         }
@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.Dispatching
             return new DispatchContextWrapper(this, dispatchContext.DispatchId);
         }
 
-        private void CompleteDispatchContext(string dispatchContextId)
+        private void CompleteDispatchContext(Guid dispatchContextId)
         {
             var currentDispatchId = GetCurrentDispatchContextId();
             if (dispatchContextId != currentDispatchId)
@@ -67,22 +67,22 @@ namespace Nimbus.Infrastructure.Dispatching
             CallContext.LogicalSetData(_currentDispatchIdDataSlotName, null);
         }
 
-        private static void SetCurrentDispatchId(string dispatchId)
+        private static void SetCurrentDispatchId(Guid dispatchId)
         {
             CallContext.LogicalSetData(_currentDispatchIdDataSlotName, dispatchId);
         }
 
-        private static string GetCurrentDispatchContextId()
+        private static Guid? GetCurrentDispatchContextId()
         {
-            return CallContext.LogicalGetData(_currentDispatchIdDataSlotName) as string;
+            return CallContext.LogicalGetData(_currentDispatchIdDataSlotName) as Guid?;
         }
 
         private sealed class DispatchContextWrapper : IDisposable
         {
             private readonly DispatchContextManager _owner;
-            private readonly string _dispatchContextId;
+            private readonly Guid _dispatchContextId;
 
-            public DispatchContextWrapper(DispatchContextManager owner, string dispatchContextId)
+            public DispatchContextWrapper(DispatchContextManager owner, Guid dispatchContextId)
             {
                 _owner = owner;
                 _dispatchContextId = dispatchContextId;

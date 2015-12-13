@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors.Inbound
@@ -15,79 +16,79 @@ namespace Nimbus.Interceptors.Inbound
         }
 
 #pragma warning disable 1998
-        public virtual Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
+        public virtual Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
             where TBusCommand : IBusCommand
         {
             return CompletedTask;
         }
 
-        public virtual Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
+        public virtual Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
             where TBusCommand : IBusCommand
         {
             return CompletedTask;
         }
 
-        public virtual Task OnCommandHandlerError<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage, Exception exception)
+        public virtual Task OnCommandHandlerError<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage, Exception exception)
             where TBusCommand : IBusCommand
         {
             return CompletedTask;
         }
 
-        public virtual Task OnRequestHandlerExecuting<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        public virtual Task OnRequestHandlerExecuting<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnRequestHandlerSuccess<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        public virtual Task OnRequestHandlerSuccess<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnRequestHandlerError<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage, Exception exception)
+        public virtual Task OnRequestHandlerError<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage, Exception exception)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnMulticastRequestHandlerExecuting<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        public virtual Task OnMulticastRequestHandlerExecuting<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnMulticastRequestHandlerSuccess<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        public virtual Task OnMulticastRequestHandlerSuccess<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnMulticastRequestHandlerError<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage, Exception exception)
+        public virtual Task OnMulticastRequestHandlerError<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage, Exception exception)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
             return CompletedTask;
         }
 
-        public virtual Task OnEventHandlerExecuting<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
+        public virtual Task OnEventHandlerExecuting<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage)
             where TBusEvent : IBusEvent
         {
             return CompletedTask;
         }
 
-        public virtual Task OnEventHandlerSuccess<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
+        public virtual Task OnEventHandlerSuccess<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage)
             where TBusEvent : IBusEvent
         {
             return CompletedTask;
         }
 
-        public virtual Task OnEventHandlerError<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage, Exception exception)
+        public virtual Task OnEventHandlerError<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage, Exception exception)
             where TBusEvent : IBusEvent
         {
             return CompletedTask;

@@ -15,7 +15,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             var dispatcher = GetEventMessageDispatcher<ExceptingEvent, ExceptingEventHandler>(interceptor);
-            var brokeredMessage = BrokeredMessageFactory.Create(new ExceptingEvent()).Result;
+            var brokeredMessage = NimbusMessageFactory.Create(new ExceptingEvent()).Result;
 
             try
             {

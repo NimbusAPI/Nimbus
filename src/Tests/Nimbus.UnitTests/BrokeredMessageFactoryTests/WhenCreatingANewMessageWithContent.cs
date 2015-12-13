@@ -3,31 +3,21 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
 {
     [TestFixture]
-    internal class WhenCreatingANewMessageWithContent : GivenABrokeredMessageFactory
+    internal class WhenCreatingANewMessageWithContent : GivenANimbusMessageFactory
     {
-        private BrokeredMessage _message;
+        private NimbusMessage _message;
         protected override async Task When()
         {
             _message = await Subject.Create(new TestMessage());
         }
 
-        [Test]
-        public void ThenTheMessageIdShouldBeParsableToGuid()
-        {
-            Guid.ParseExact(_message.MessageId, "N");
-        }
-
-        [Test]
-        public void ThenTheCorrelationIdShouldBeParsableToGuid()
-        {
-            Guid.ParseExact(_message.CorrelationId, "N");
-        }
 
         [Test]
         public void ThenTheCorrelationIdShouldBeTheMessageId()

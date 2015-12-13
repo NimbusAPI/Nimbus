@@ -1,37 +1,36 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure
 {
-    internal interface IBrokeredMessageFactory
+    internal interface INimbusMessageFactory
     {
         /// <summary>
-        ///     Ensures consistent construction of <see cref="BrokeredMessage" />s
+        ///     Ensures consistent construction of <see cref="NimbusMessage" />s
         /// </summary>
         /// <param name="serializableObject"></param>
-        /// <returns>The newly minted <see cref="BrokeredMessage" /></returns>
-        Task<BrokeredMessage> Create(object serializableObject);
+        /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
+        Task<NimbusMessage> Create(object serializableObject);
 
         /// <summary>
-        ///     Creates a <see cref="BrokeredMessage" /> as successful response to the original request using the specified content
+        ///     Creates a <see cref="NimbusMessage" /> as successful response to the original request using the specified content
         ///     in the reply.
         /// </summary>
         /// <param name="responseContent">The content to be serialized into the message body.</param>
         /// <param name="originalRequest">The original request this response is for.</param>
-        /// <returns>The newly minted <see cref="BrokeredMessage" /></returns>
-        Task<BrokeredMessage> CreateSuccessfulResponse(object responseContent, BrokeredMessage originalRequest);
+        /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
+        Task<NimbusMessage> CreateSuccessfulResponse(object responseContent, NimbusMessage originalRequest);
 
         /// <summary>
-        ///     Creates a <see cref="BrokeredMessage" /> as failure response to the original request with an empty body but the
+        ///     Creates a <see cref="NimbusMessage" /> as failure response to the original request with an empty body but the
         ///     right headers to indicate what went wrong.
         /// </summary>
         /// <param name="originalRequest">The original request this response is for.</param>
         /// <param name="exception">The exception that caused the request to fail.</param>
-        /// <returns>The newly minted <see cref="BrokeredMessage" /></returns>
-        Task<BrokeredMessage> CreateFailedResponse(BrokeredMessage originalRequest, Exception exception);
+        /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
+        Task<NimbusMessage> CreateFailedResponse(NimbusMessage originalRequest, Exception exception);
 
-        Task<object> GetBody(BrokeredMessage message);
-        Type GetBodyType(BrokeredMessage message);
+        Task<object> GetBody(NimbusMessage message);
+        Type GetBodyType(NimbusMessage message);
     }
 }

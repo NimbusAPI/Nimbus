@@ -15,7 +15,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
     [Timeout(15*1000)]
     internal class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
     {
-        private string _id;
+        private Guid _id;
         private DateTimeOffset _expiresAfter;
         private byte[] _bytes;
         private string _storageKey;
@@ -31,7 +31,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         protected override async Task When()
         {
-            _id = Guid.NewGuid().ToString();
+            _id = Guid.NewGuid();
             _bytes = Encoding.UTF8.GetBytes(Enumerable.Range(0, 1024).Select(i => '.').ToArray());
             _expiresAfter = DateTimeOffset.UtcNow.AddDays(1);
 

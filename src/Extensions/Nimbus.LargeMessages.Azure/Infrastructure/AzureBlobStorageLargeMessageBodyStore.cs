@@ -34,7 +34,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure
             _container = new ThreadSafeLazy<CloudBlobContainer>(GetContainerReference);
         }
 
-        public async Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public async Task<string> Store(Guid id, byte[] bytes, DateTimeOffset expiresAfter)
         {
             var storageKey = DefaultStorageKeyGenerator.GenerateStorageKey(id, expiresAfter);
             var blobReference = _container.Value.GetBlockBlobReference(storageKey);

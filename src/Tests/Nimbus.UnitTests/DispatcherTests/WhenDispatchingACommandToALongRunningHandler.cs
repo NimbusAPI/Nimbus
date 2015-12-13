@@ -17,7 +17,7 @@ namespace Nimbus.UnitTests.DispatcherTests
     internal class WhenDispatchingACommandToALongRunningHandler : SpecificationForAsync<LongRunningTaskWrapper>
     {
         private SlowCommand _slowCommand;
-        private BrokeredMessage _brokeredMessage;
+        private NimbusMessage _brokeredMessage;
         private bool _renewLockCalled;
         private DateTimeOffset _lockedUntil;
 
@@ -32,7 +32,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             _slowCommand = new SlowCommand();
             _handler = new SlowCommandHandler();
-            _brokeredMessage = new BrokeredMessage(_slowCommand);
+            _brokeredMessage = new NimbusMessage();
             _clock = new SystemClock();
             _logger = new ConsoleLogger();
             _defaultMessageLockDuration = new DefaultMessageLockDurationSetting();

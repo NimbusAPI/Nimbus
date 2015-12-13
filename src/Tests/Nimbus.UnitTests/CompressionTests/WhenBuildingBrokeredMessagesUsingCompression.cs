@@ -8,6 +8,8 @@ using Nimbus.Infrastructure.BrokeredMessageServices;
 using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
 using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using NSubstitute;
@@ -17,23 +19,23 @@ using DataContractSerializer = Nimbus.Infrastructure.BrokeredMessageServices.Ser
 
 namespace Nimbus.UnitTests.CompressionTests
 {
-    internal class WhenBuildingBrokeredMessagesUsingCompression : SpecificationForAsync<BrokeredMessageFactory>
+    internal class WhenBuildingNimbusMessagesUsingCompression : SpecificationForAsync<NimbusMessageFactory>
     {
-        private BrokeredMessage _compressedMessage;
-        private BrokeredMessage _uncompressedMessage;
-        private BrokeredMessageFactory _defaultBrokeredMessageFactory;
+        private NimbusMessage _compressedMessage;
+        private NimbusMessage _uncompressedMessage;
+        private NimbusMessageFactory _defaultNimbusMessageFactory;
 
-        protected override async Task<BrokeredMessageFactory> Given()
+        protected override async Task<NimbusMessageFactory> Given()
         {
-            _defaultBrokeredMessageFactory = BuildBrokeredMessageFactory(new NullCompressor());
+            _defaultNimbusMessageFactory = BuildBrokeredMessageFactory(new NullCompressor());
             return BuildBrokeredMessageFactory(new DeflateCompressor());
         }
 
-        private BrokeredMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
+        private NimbusMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
-            return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+            return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                               new MaxLargeMessageSizeSetting(),
                                               new MaxSmallMessageSizeSetting(),
                                               new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
@@ -47,7 +49,7 @@ namespace Nimbus.UnitTests.CompressionTests
 
         protected override async Task When()
         {
-            _uncompressedMessage = await _defaultBrokeredMessageFactory.Create(new CommandToCompress());
+            _uncompressedMessage = await _defaultNimbusMessageFactory.Create(new CommandToCompress());
             _compressedMessage = await Subject.Create(new CommandToCompress());
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
@@ -20,7 +19,7 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
@@ -29,7 +28,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IPropertyInjector _propertyInjector;
 
         public CommandMessageDispatcher(
-            IBrokeredMessageFactory brokeredMessageFactory,
+            INimbusMessageFactory brokeredMessageFactory,
             IClock clock,
             IDependencyResolver dependencyResolver,
             IInboundInterceptorFactory inboundInterceptorFactory,
@@ -50,7 +49,7 @@ namespace Nimbus.Infrastructure.Commands
             _propertyInjector = propertyInjector;
         }
 
-        public async Task Dispatch(BrokeredMessage message)
+        public async Task Dispatch(NimbusMessage message)
         {
             var busCommand = await _brokeredMessageFactory.GetBody(message);
             var messageType = busCommand.GetType();
@@ -60,13 +59,13 @@ namespace Nimbus.Infrastructure.Commands
             await Dispatch((dynamic) busCommand, message, handlerType);
         }
 
-        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage, Type handlerType) where TBusCommand : IBusCommand
+        private async Task Dispatch<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage, Type handlerType) where TBusCommand : IBusCommand
         {
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = (IHandleCommand<TBusCommand>)scope.Resolve(handlerType);
-                _propertyInjector.Inject(handler, brokeredMessage);
-                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand, brokeredMessage);
+                _propertyInjector.Inject(handler, nimbusMessage);
+                var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busCommand, nimbusMessage);
 
                 Exception exception;
                 try
@@ -76,23 +75,23 @@ namespace Nimbus.Infrastructure.Commands
                         _logger.Debug(
                             "Executing OnCommandHandlerExecuting on {InterceptorType} for message [MessageType:{MessageType}, MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                             interceptor.GetType().FullName,
-                            brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                            brokeredMessage.MessageId,
-                            brokeredMessage.CorrelationId);
-                        await interceptor.OnCommandHandlerExecuting(busCommand, brokeredMessage);
+                            nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                            nimbusMessage.MessageId,
+                            nimbusMessage.CorrelationId);
+                        await interceptor.OnCommandHandlerExecuting(busCommand, nimbusMessage);
                         _logger.Debug(
                             "Executed OnCommandHandlerExecuting on {InterceptorType} for message [MessageType:{MessageType}, MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                             interceptor.GetType().FullName,
-                            brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                            brokeredMessage.MessageId,
-                            brokeredMessage.CorrelationId);
+                            nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                            nimbusMessage.MessageId,
+                            nimbusMessage.CorrelationId);
                     }
 
                     var handlerTask = _taskFactory.StartNew(async () => await handler.Handle(busCommand), TaskContext.Handle).Unwrap();
                     var longRunningTask = handler as ILongRunningTask;
                     if (longRunningTask != null)
                     {
-                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, brokeredMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        var wrapper = new LongRunningTaskWrapper(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
                         await wrapper.AwaitCompletion();
                     }
                     else
@@ -104,15 +103,15 @@ namespace Nimbus.Infrastructure.Commands
                     {
                         _logger.Debug("Executing OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
-                        await interceptor.OnCommandHandlerSuccess(busCommand, brokeredMessage);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
+                        await interceptor.OnCommandHandlerSuccess(busCommand, nimbusMessage);
                         _logger.Debug("Executed OnCommandHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
                     }
                     return;
                 }
@@ -125,21 +124,21 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     _logger.Debug("Executing OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
-                                  brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  brokeredMessage.MessageId,
-                                  brokeredMessage.CorrelationId);
-                    await interceptor.OnCommandHandlerError(busCommand, brokeredMessage, exception);
+                                  nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                  nimbusMessage.MessageId,
+                                  nimbusMessage.CorrelationId);
+                    await interceptor.OnCommandHandlerError(busCommand, nimbusMessage, exception);
                     _logger.Debug("Executed OnCommandHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
-                                  brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  brokeredMessage.MessageId,
-                                  brokeredMessage.CorrelationId);
+                                  nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                  nimbusMessage.MessageId,
+                                  nimbusMessage.CorrelationId);
                 }
 
                 _logger.Debug("Failed to Dispatch CommandMessage for message [MessageType:{0}, MessageId:{1}, CorrelationId:{2}]",
-                              brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                              brokeredMessage.MessageId,
-                              brokeredMessage.CorrelationId);
+                              nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                              nimbusMessage.MessageId,
+                              nimbusMessage.CorrelationId);
 
                 throw new DispatchFailedException("Failed to Dispatch CommandMessage", exception);
             }

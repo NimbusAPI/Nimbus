@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Nimbus.LargeMessages.Azure.Infrastructure.Http

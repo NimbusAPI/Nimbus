@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -31,9 +32,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             await GetMessageReceiver();
         }
 
-        protected override async Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask)
+        protected override async Task<NimbusMessage[]> FetchBatch(int batchSize, Task cancellationTask)
         {
-            if (batchSize < 1) return new BrokeredMessage[0];
+            if (batchSize < 1) return new NimbusMessage[0];
 
             try
             {
@@ -42,10 +43,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var receiveTask = messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
                 await Task.WhenAny(receiveTask, cancellationTask);
 
-                if (cancellationTask.IsCompleted) return new BrokeredMessage[0];
+                if (cancellationTask.IsCompleted) return new NimbusMessage[0];
                 
                 var messages = await receiveTask;
-                return messages.ToArray();
+                return messages.Select(BrokeredMessageFactory.BuildNimbusMessage).ToArray();
             }
             catch (Exception exc)
             {
@@ -54,6 +55,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 throw;
             }
         }
+
+        
 
         private async Task<MessageReceiver> GetMessageReceiver()
         {

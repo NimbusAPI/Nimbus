@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure;
 using Nimbus.MessageContracts;
 
 namespace Nimbus.Interceptors.Outbound
@@ -9,64 +9,64 @@ namespace Nimbus.Interceptors.Outbound
     {
         int Priority { get; }
 
-        Task OnCommandSending<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
+        Task OnCommandSending<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
             where TBusCommand : IBusCommand;
 
-        Task OnCommandSent<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage)
+        Task OnCommandSent<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
             where TBusCommand : IBusCommand;
 
-        Task OnCommandSendingError<TBusCommand>(TBusCommand busCommand, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnCommandSendingError<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage, Exception exception)
             where TBusCommand : IBusCommand;
 
-        Task OnRequestSending<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        Task OnRequestSending<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse;
 
-        Task OnRequestSent<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        Task OnRequestSent<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse;
 
-        Task OnRequestSendingError<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnRequestSendingError<TBusRequest, TBusResponse>(IBusRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage, Exception exception)
             where TBusRequest : IBusRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusResponse;
 
-        Task OnResponseSending<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+        Task OnResponseSending<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage)
             where TBusResponse : IBusResponse;
 
-        Task OnResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+        Task OnResponseSent<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage)
             where TBusResponse : IBusResponse;
 
-        Task OnResponseSendingError<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnResponseSendingError<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage, Exception exception)
             where TBusResponse : IBusResponse;
 
-        Task OnMulticastRequestSending<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        Task OnMulticastRequestSending<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnMulticastRequestSent<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage)
+        Task OnMulticastRequestSent<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnMulticastRequestSendingError<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnMulticastRequestSendingError<TBusRequest, TBusResponse>(IBusMulticastRequest<TBusRequest, TBusResponse> busRequest, NimbusMessage nimbusMessage, Exception exception)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnMulticastResponseSending<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+        Task OnMulticastResponseSending<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage)
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnMulticastResponseSent<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage)
+        Task OnMulticastResponseSent<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage)
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnMulticastResponseSendingError<TBusResponse>(TBusResponse busResponse, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnMulticastResponseSendingError<TBusResponse>(TBusResponse busResponse, NimbusMessage nimbusMessage, Exception exception)
             where TBusResponse : IBusMulticastResponse;
 
-        Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
+        Task OnEventPublishing<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage)
             where TBusEvent : IBusEvent;
 
-        Task OnEventPublished<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage)
+        Task OnEventPublished<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage)
             where TBusEvent : IBusEvent;
 
-        Task OnEventPublishingError<TBusEvent>(TBusEvent busEvent, BrokeredMessage brokeredMessage, Exception exception)
+        Task OnEventPublishingError<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage, Exception exception)
             where TBusEvent : IBusEvent;
     }
 }

@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         private const int _numExpectedMessages = 3;
 
         private IDispatchContext[] _dispatchContexts;
-        private BrokeredMessage[] _brokeredMessages;
+        private NimbusMessage[] _nimbusMessages;
 
         protected override async Task Given()
         {
@@ -33,13 +33,13 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _numExpectedMessages);
 
             _dispatchContexts = TestInterceptor.DispatchContexts.ToArray();
-            _brokeredMessages = TestInterceptor.BrokeredMessages.ToArray();
+            _nimbusMessages = TestInterceptor.NimbusMessages.ToArray();
         }
 
         [Test]
         public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved()
         {
-            _brokeredMessages.Count().ShouldBe(_numExpectedMessages);
+            _nimbusMessages.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
@@ -63,19 +63,19 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         [Test]
         public async Task TheThirdMessageShouldBeCausedByTheSecondMessage()
         {
-            _brokeredMessages[1].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_brokeredMessages[0].MessageId);
+            _nimbusMessages[1].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[0].MessageId);
         }
 
         [Test]
         public async Task TheSecondMessageShouldBeCausedByTheFirstMessage()
         {
-            _brokeredMessages[2].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_brokeredMessages[1].MessageId);
+            _nimbusMessages[2].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[1].MessageId);
         }
 
         [Test]
         public async Task TheFirstMessageShouldBeTheInitialMessage()
         {
-            _brokeredMessages[0].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(null);
+            _nimbusMessages[0].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(null);
         }
     }
 }

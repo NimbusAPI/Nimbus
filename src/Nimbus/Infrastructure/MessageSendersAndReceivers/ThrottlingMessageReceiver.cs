@@ -26,7 +26,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
-        public async Task Start(Func<BrokeredMessage, Task> callback)
+        public async Task Start(Func<NimbusMessage, Task> callback)
         {
             await _startStopSemaphore.WaitAsync();
 
@@ -79,9 +79,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected abstract Task WarmUp();
 
-        protected abstract Task<BrokeredMessage[]> FetchBatch(int batchSize, Task cancellationTask);
+        protected abstract Task<NimbusMessage[]> FetchBatch(int batchSize, Task cancellationTask);
 
-        private async Task Worker(Func<BrokeredMessage, Task> callback, Task cancellationTask)
+        private async Task Worker(Func<NimbusMessage, Task> callback, Task cancellationTask)
         {
             while (_running)
             {

@@ -3,16 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.MessageContracts.Exceptions;
 
-namespace Nimbus.Infrastructure.BrokeredMessageServices
+namespace Nimbus.Infrastructure.NimbusMessageServices
 {
-    internal class BrokeredMessageFactory : IBrokeredMessageFactory
+    internal class NimbusMessageFactory : INimbusMessageFactory
     {
         private readonly DefaultMessageTimeToLiveSetting _timeToLive;
         private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
@@ -25,7 +24,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
         private readonly ISerializer _serializer;
         private readonly ITypeProvider _typeProvider;
 
-        public BrokeredMessageFactory(DefaultMessageTimeToLiveSetting timeToLive,
+        public NimbusMessageFactory(DefaultMessageTimeToLiveSetting timeToLive,
                                       MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       ReplyQueueNameSetting replyQueueName,
@@ -48,14 +47,14 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             _typeProvider = typeProvider;
         }
 
-        public Task<BrokeredMessage> Create(object serializableObject = null)
+        public Task<NimbusMessage> Create(object serializableObject = null)
         {
             return Task.Run(async () =>
                                   {
-                                      BrokeredMessage brokeredMessage;
+                                      NimbusMessage NimbusMessage;
                                       if (serializableObject == null)
                                       {
-                                          brokeredMessage = new BrokeredMessage();
+                                          NimbusMessage = new NimbusMessage();
                                       }
                                       else
                                       {
@@ -71,28 +70,28 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
 
                                           if (messageBodyBytes.Length > _maxSmallMessageSize)
                                           {
-                                              brokeredMessage = new BrokeredMessage();
+                                              NimbusMessage = new NimbusMessage();
                                               var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(brokeredMessage.MessageId, messageBodyBytes, expiresAfter);
-                                              brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
+                                              var blobIdentifier = await _largeMessageBodyStore.Store(NimbusMessage.MessageId, messageBodyBytes, expiresAfter);
+                                              NimbusMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                           }
                                           else
                                           {
-                                              brokeredMessage = new BrokeredMessage(new MemoryStream(messageBodyBytes), true);
+                                              NimbusMessage = new NimbusMessage(messageBodyBytes);
                                           }
-                                          brokeredMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
+                                          NimbusMessage.Properties[MessagePropertyKeys.MessageType] = serializableObject.GetType().FullName;
                                       }
 
                                       var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
-                                      brokeredMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
-                                      brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId ?? brokeredMessage.MessageId;
-                                      brokeredMessage.ReplyTo = _replyQueueName;
+                                      NimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
+                                      NimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
+                                      NimbusMessage.ReplyTo = _replyQueueName;
 
-                                      return brokeredMessage;
+                                      return NimbusMessage;
                                   });
         }
 
-        public Task<BrokeredMessage> CreateSuccessfulResponse(object responseContent, BrokeredMessage originalRequest)
+        public Task<NimbusMessage> CreateSuccessfulResponse(object responseContent, NimbusMessage originalRequest)
         {
             return Task.Run(async () =>
                                   {
@@ -103,7 +102,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
                                   });
         }
 
-        public Task<BrokeredMessage> CreateFailedResponse(BrokeredMessage originalRequest, Exception exception)
+        public Task<NimbusMessage> CreateFailedResponse(NimbusMessage originalRequest, Exception exception)
         {
             return Task.Run(async () =>
                                   {
@@ -123,7 +122,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return compressedBytes;
         }
 
-        public async Task<object> GetBody(BrokeredMessage message)
+        public async Task<object> GetBody(NimbusMessage message)
         {
             var bodyType = GetBodyType(message);
 
@@ -136,13 +135,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             }
             else
             {
-                // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
-                using (var dataStream = message.GetBody<Stream>())
-                using (var memoryStream = new MemoryStream())
-                {
-                    dataStream.CopyTo(memoryStream);
-                    bodyBytes = memoryStream.ToArray();
-                }
+                bodyBytes = message.Payload;
             }
 
             var decompressedBytes = _compressor.Decompress(bodyBytes);
@@ -150,7 +143,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices
             return deserialized;
         }
 
-        public Type GetBodyType(BrokeredMessage message)
+        public Type GetBodyType(NimbusMessage message)
         {
             var typeName = message.SafelyGetBodyTypeNameOrDefault();
             var candidates = _typeProvider.AllMessageContractTypes().Where(t => t.FullName == typeName).ToArray();

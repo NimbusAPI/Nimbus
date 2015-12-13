@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly INimbusMessagingFactory _messagingFactory;
         private readonly IRouter _router;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
         private readonly ILogger _logger;
@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusMulticastRequestSender(IBrokeredMessageFactory brokeredMessageFactory,
+        public BusMulticastRequestSender(INimbusMessageFactory nimbusMessageFactory,
                                          IClock clock,
                                          IDependencyResolver dependencyResolver,
                                          IKnownMessageTypeVerifier knownMessageTypeVerifier,
@@ -36,7 +36,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             _messagingFactory = messagingFactory;
             _router = router;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
@@ -54,12 +54,12 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
 
-            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _nimbusMessageFactory.Create(busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForTopic(topicPath)
                 ;
             var expiresAfter = _clock.UtcNow.AddSafely(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(brokeredMessage.MessageId, expiresAfter);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {

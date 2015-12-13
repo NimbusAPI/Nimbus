@@ -6,6 +6,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal interface INimbusMessageSender : IDisposable
     {
-        Task Send(BrokeredMessage message);
+        Task Send(NimbusMessage message);
     }
 }

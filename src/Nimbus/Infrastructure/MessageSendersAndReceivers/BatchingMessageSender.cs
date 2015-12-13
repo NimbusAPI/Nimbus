@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
@@ -13,7 +12,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private const int _maxConcurrentFlushTasks = 10;
         private const int _maximumBatchSize = 100;
 
-        private readonly List<BrokeredMessage> _outboundQueue = new List<BrokeredMessage>();
+        private readonly List<NimbusMessage> _outboundQueue = new List<NimbusMessage>();
         private bool _disposed;
 
         private readonly object _mutex = new object();
@@ -21,9 +20,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         private Task _lazyFlushTask;
 
-        protected abstract Task SendBatch(BrokeredMessage[] messages);
+        protected abstract Task SendBatch(NimbusMessage[] messages);
 
-        public Task Send(BrokeredMessage message)
+        public Task Send(NimbusMessage message)
         {
             lock (_mutex)
             {
@@ -57,7 +56,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
             try
             {
-                BrokeredMessage[] toSend;
+                NimbusMessage[] toSend;
                 lock (_mutex)
                 {
                     toSend = _outboundQueue.Take(_maximumBatchSize).ToArray();

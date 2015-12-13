@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _brokeredMessageFactory;
         private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusTaskFactory _taskFactory;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MulticastRequestMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory,
+        public MulticastRequestMessageDispatcher(INimbusMessageFactory brokeredMessageFactory,
                                                  IClock clock,
                                                  IDependencyResolver dependencyResolver,
                                                  IInboundInterceptorFactory inboundInterceptorFactory,
@@ -56,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
 
-        public async Task Dispatch(BrokeredMessage message)
+        public async Task Dispatch(NimbusMessage message)
         {
             var busRequest = await _brokeredMessageFactory.GetBody(message);
             var messageType = busRequest.GetType();
@@ -68,33 +68,33 @@ namespace Nimbus.Infrastructure.RequestResponse
         }
 
         // ReSharper disable UnusedMember.Local
-        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, BrokeredMessage brokeredMessage, Type handlerType)
+        private async Task Dispatch<TBusRequest, TBusResponse>(TBusRequest busRequest, NimbusMessage nimbusMessage, Type handlerType)
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
-            var replyQueueName = brokeredMessage.ReplyTo;
+            var replyQueueName = nimbusMessage.ReplyTo;
             var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
 
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = (IHandleMulticastRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
-                _propertyInjector.Inject(handler, brokeredMessage);
-                var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, brokeredMessage);
+                _propertyInjector.Inject(handler, nimbusMessage);
+                var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, nimbusMessage);
 
                 foreach (var interceptor in inboundInterceptors)
                 {
                     _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
-                                  brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  brokeredMessage.MessageId,
-                                  brokeredMessage.CorrelationId);
-                    await interceptor.OnMulticastRequestHandlerExecuting(busRequest, brokeredMessage);
+                                  nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                  nimbusMessage.MessageId,
+                                  nimbusMessage.CorrelationId);
+                    await interceptor.OnMulticastRequestHandlerExecuting(busRequest, nimbusMessage);
                     _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                   interceptor.GetType().FullName,
-                                  brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  brokeredMessage.MessageId,
-                                  brokeredMessage.CorrelationId);
+                                  nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                  nimbusMessage.MessageId,
+                                  nimbusMessage.CorrelationId);
                 }
 
                 try
@@ -104,7 +104,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     TBusResponse response;
                     if (longRunningTask != null)
                     {
-                        var wrapperTask = new LongRunningTaskWrapper<TBusResponse>(handlerTask, longRunningTask, brokeredMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
+                        var wrapperTask = new LongRunningTaskWrapper<TBusResponse>(handlerTask, longRunningTask, nimbusMessage, _clock, _logger, _defaultMessageLockDuration, _taskFactory);
                         response = await wrapperTask.AwaitCompletion();
                     }
                     else
@@ -116,37 +116,37 @@ namespace Nimbus.Infrastructure.RequestResponse
                     if (response != null)
                         // ReSharper restore CompareNonConstrainedGenericWithNull
                     {
-                        var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, brokeredMessage))
+                        var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
                             .DestinedForQueue(replyQueueName)
                             ;
 
-                        var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+                        var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                         _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
                                       responseMessage.SafelyGetBodyTypeNameOrDefault(),
                                       replyQueueName,
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
                         foreach (var interceptor in outboundInterceptors)
                         {
-                            await interceptor.OnMulticastResponseSending(response, brokeredMessage);
+                            await interceptor.OnMulticastResponseSending(response, nimbusMessage);
                         }
 
                         await replyQueueClient.Send(responseMessage);
 
                         foreach (var interceptor in outboundInterceptors.Reverse())
                         {
-                            await interceptor.OnMulticastResponseSent(response, brokeredMessage);
+                            await interceptor.OnMulticastResponseSent(response, nimbusMessage);
                         }
 
                         _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                     brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
+                                     nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
                                      replyQueueName,
-                                     brokeredMessage.MessageId,
-                                     brokeredMessage.CorrelationId);
+                                     nimbusMessage.MessageId,
+                                     nimbusMessage.CorrelationId);
                     }
                     else
                     {
-                        _logger.Info("Handler declined to reply. [MessageId: {0}, CorrelationId: {1}]", brokeredMessage.MessageId, brokeredMessage.CorrelationId);
+                        _logger.Info("Handler declined to reply. [MessageId: {0}, CorrelationId: {1}]", nimbusMessage.MessageId, nimbusMessage.CorrelationId);
                     }
                 }
                 catch (Exception exc)
@@ -160,17 +160,17 @@ namespace Nimbus.Infrastructure.RequestResponse
                     {
                         _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
 
-                        await interceptor.OnMulticastRequestHandlerSuccess(busRequest, brokeredMessage);
+                        await interceptor.OnMulticastRequestHandlerSuccess(busRequest, nimbusMessage);
 
                         _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
                     }
                 }
                 else
@@ -179,32 +179,32 @@ namespace Nimbus.Infrastructure.RequestResponse
                     {
                         _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
 
-                        await interceptor.OnMulticastRequestHandlerError(busRequest, brokeredMessage, exception);
+                        await interceptor.OnMulticastRequestHandlerError(busRequest, nimbusMessage, exception);
 
                         _logger.Debug("Executed OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
                                       interceptor.GetType().FullName,
-                                      brokeredMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      brokeredMessage.MessageId,
-                                      brokeredMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
                     }
 
                     var failedResponseMessage =
-                        await _brokeredMessageFactory.CreateFailedResponse(brokeredMessage, exception);
+                        await _brokeredMessageFactory.CreateFailedResponse(nimbusMessage, exception);
 
                     _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                                  replyQueueName,
                                  exception.Message,
-                                 brokeredMessage.MessageId,
-                                 brokeredMessage.CorrelationId);
+                                 nimbusMessage.MessageId,
+                                 nimbusMessage.CorrelationId);
                     await replyQueueClient.Send(failedResponseMessage);
                     _logger.Info("Sent failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                                  replyQueueName,
-                                 brokeredMessage.MessageId,
-                                 brokeredMessage.CorrelationId);
+                                 nimbusMessage.MessageId,
+                                 nimbusMessage.CorrelationId);
                 }
             }
         }

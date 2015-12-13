@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.PropertyInjection;
 
 namespace Nimbus.Interceptors.Inbound
@@ -21,7 +21,7 @@ namespace Nimbus.Interceptors.Inbound
             _propertyInjector = propertyInjector;
         }
 
-        public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message, BrokeredMessage brokeredMessage)
+        public IInboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, object handler, object message, NimbusMessage nimbusMessage)
         {
             var globalInterceptors = GetGlobalInterceptorTypes();
             var classLevelInterceptors = GetClassLevelInterceptorTypes(handler);
@@ -33,7 +33,7 @@ namespace Nimbus.Interceptors.Inbound
                 .Union(methodLevelInterceptors)
                 .DistinctBy(t => t.FullName)
                 .Select(t => (IInboundInterceptor) scope.Resolve(t))
-                .Do(interceptor => _propertyInjector.Inject(interceptor, brokeredMessage))
+                .Do(interceptor => _propertyInjector.Inject(interceptor, nimbusMessage))
                 .OrderByDescending(i => i.Priority)
                 .ThenBy(i => i.GetType().FullName)
                 .ToArray();

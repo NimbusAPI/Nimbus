@@ -13,6 +13,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Tests.Common;
@@ -27,7 +28,7 @@ namespace Nimbus.UnitTests.DispatcherTests
     [TestFixture]
     internal class WhenDispatchingTwoCommands : SpecificationForAsync<CommandMessageDispatcher>
     {
-        private BrokeredMessageFactory _brokeredMessageFactory;
+        private NimbusMessageFactory _nimbusMessageFactory;
 
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
@@ -46,7 +47,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
-            _brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
+            _nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                                  new MaxLargeMessageSizeSetting(),
                                                                  new MaxSmallMessageSizeSetting(),
                                                                  replyQueueNameSetting,
@@ -57,7 +58,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                                  serializer,
                                                                  typeProvider);
 
-            return new CommandMessageDispatcher(_brokeredMessageFactory,
+            return new CommandMessageDispatcher(_nimbusMessageFactory,
                                                 new SystemClock(),
                                                 new DependencyResolver(typeProvider),
                                                 new NullInboundInterceptorFactory(),
@@ -75,8 +76,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
-            await Subject.Dispatch(await _brokeredMessageFactory.Create(command1));
-            await Subject.Dispatch(await _brokeredMessageFactory.Create(command2));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create(command1));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create(command2));
 
             MethodCallCounter.Stop();
         }

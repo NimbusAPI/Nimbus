@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.MessageContracts.Exceptions;
@@ -12,7 +11,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
     {
         protected readonly Task HandlerTask;
         private readonly ILongRunningTask _longRunningHandler;
-        private readonly BrokeredMessage _message;
+        private readonly NimbusMessage _message;
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly TimeSpan _messageLockDuration;
@@ -22,12 +21,12 @@ namespace Nimbus.Infrastructure.LongRunningTasks
 
         // BrokeredMessage is sealed and can't easily be mocked so we sub our our
         // invocation strategies for its properties/methods instead.  -andrewh 12/3/2014
-        internal static Func<BrokeredMessage, DateTimeOffset> LockedUntilUtcStrategy = m => m.LockedUntilUtc;
-        internal static Func<BrokeredMessage, Task> RenewLockStrategy = m => m.RenewLockAsync();
+        internal static Func<NimbusMessage, DateTimeOffset> LockedUntilUtcStrategy = m => m.LockedUntilUtc;
+        internal static Func<NimbusMessage, Task> RenewLockStrategy = m => m.RenewLockAsync();
 
         protected LongRunningTaskWrapperBase(Task handlerTask,
                                              ILongRunningTask longRunningHandler,
-                                             BrokeredMessage message,
+                                             NimbusMessage message,
                                              IClock clock,
                                              ILogger logger,
                                              INimbusTaskFactory taskFactory,
@@ -60,14 +59,14 @@ namespace Nimbus.Infrastructure.LongRunningTasks
             return firstTaskToComplete;
         }
 
-        private Task Watch(ILongRunningTask longRunningHandler, BrokeredMessage message)
+        private Task Watch(ILongRunningTask longRunningHandler, NimbusMessage message)
         {
             _logger.Debug("Starting long-running task wrapper for message {MessageId}", message.MessageId);
             var task = _taskFactory.StartNew(() => WatchHandlerTask(longRunningHandler, message), TaskContext.LongRunningTaskWatcher).Unwrap();
             return task;
         }
 
-        private async Task WatchHandlerTask(ILongRunningTask longRunningHandler, BrokeredMessage message)
+        private async Task WatchHandlerTask(ILongRunningTask longRunningHandler, NimbusMessage message)
         {
             _logger.Debug("Started long-running task wrapper for message {MessageId}", message.MessageId);
 

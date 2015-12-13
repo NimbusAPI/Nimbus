@@ -13,7 +13,7 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
             _httpClient = httpClient;
         }
 
-        public async Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public async Task<string> Store(Guid id, byte[] bytes, DateTimeOffset expiresAfter)
         {
             var storageKey = DefaultStorageKeyGenerator.GenerateStorageKey(id, expiresAfter);
             await _httpClient.Upload(storageKey, bytes);
