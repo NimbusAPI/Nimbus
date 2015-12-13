@@ -71,6 +71,7 @@
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />
+    <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />

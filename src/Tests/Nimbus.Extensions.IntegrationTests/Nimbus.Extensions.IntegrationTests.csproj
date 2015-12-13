@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestConfiguration.cs" />
     <Compile Include="WhenBuildingABusWithAutofacAndFileSystemMessageStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WhenBuildingABusWithNinjectAndFileSystemMessageStorage.cs" />
