@@ -1,23 +1,21 @@
-using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.BrokeredMessageFactoryTests
+namespace Nimbus.UnitTests.NimbusMessageFactoryTests
 {
     [TestFixture]
     internal class WhenCreatingANewMessageWithContent : GivenANimbusMessageFactory
     {
         private NimbusMessage _message;
+
         protected override async Task When()
         {
             _message = await Subject.Create(new TestMessage());
         }
-
 
         [Test]
         public void ThenTheCorrelationIdShouldBeTheMessageId()
