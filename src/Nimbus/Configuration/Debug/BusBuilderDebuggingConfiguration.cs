@@ -1,8 +1,14 @@
-﻿namespace Nimbus.Configuration.Debug
+﻿using Nimbus.Configuration.Debug.Settings;
+using Nimbus.Configuration.PoorMansIocContainer;
+
+namespace Nimbus.Configuration.Debug
 {
-    public class BusBuilderDebuggingConfiguration: INimbusConfiguration
+    public class BusBuilderDebuggingConfiguration : INimbusConfiguration
     {
-        internal bool RemoveAllExistingNamespaceElements { get; set; }
-        internal bool UseInProcessBus { get; set; }
+        internal RemoveAllExistingNamespaceElementsSetting RemoveAllExistingNamespaceElements { get; set; }
+
+        public void Register(PoorMansIoC container)
+        {
+        }
     }
 }

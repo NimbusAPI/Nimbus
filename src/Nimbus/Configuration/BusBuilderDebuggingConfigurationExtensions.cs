@@ -1,4 +1,5 @@
 ﻿using Nimbus.Configuration.Debug;
+using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Exceptions;
 
 namespace Nimbus.Configuration
@@ -20,7 +21,7 @@ namespace Nimbus.Configuration
         {
             if (confirmation != _confirmationMessage) throw new BusConfigurationException("RemoveAllExistingNamespaceElements", _requiresConfirmationMessage);
 
-            debuggingConfiguration.RemoveAllExistingNamespaceElements = true;
+            debuggingConfiguration.RemoveAllExistingNamespaceElements = new RemoveAllExistingNamespaceElementsSetting {Value = true};
             return debuggingConfiguration;
         }
     }

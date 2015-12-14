@@ -3,6 +3,7 @@ using System.Linq;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
+using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Extensions;
@@ -16,7 +17,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
-    public class BusBuilderConfiguration : INimbusConfiguration
+    public class BusBuilderConfiguration
     {
         internal ITypeProvider TypeProvider { get; set; }
         internal IDependencyResolver DependencyResolver { get; set; }
@@ -40,6 +41,7 @@ namespace Nimbus.Configuration
             get { return new StubDeliveryRetryStrategy(); }
         }
 
+        internal TransportConfiguration Transport { get; set; }
         internal BusBuilderDebuggingConfiguration Debugging { get; set; }
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
 

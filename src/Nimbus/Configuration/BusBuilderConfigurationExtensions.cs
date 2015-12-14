@@ -2,7 +2,9 @@
 using System.IO;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
+using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
 using Nimbus.Routing;
 
@@ -10,6 +12,12 @@ namespace Nimbus.Configuration
 {
     public static class BusBuilderConfigurationExtensions
     {
+        public static BusBuilderConfiguration WithTransport(this BusBuilderConfiguration configuration, TransportConfiguration transportConfiguration)
+        {
+            configuration.Transport = transportConfiguration;
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithConnectionString(this BusBuilderConfiguration configuration, string connectionString)
         {
             configuration.ConnectionString = new ConnectionStringSetting {Value = connectionString};
@@ -109,25 +117,25 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
         {
-            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting { Value = timeToLive };
+            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting {Value = timeToLive};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
         {
-            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
+            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting {Value = autoDeleteOnIdle};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
-            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };
+            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting {Value = enableDeadLettering};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
         {
-            configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };
+            configuration.HeartbeatInterval = new HeartbeatIntervalSetting {Value = heartbeatInterval};
             return configuration;
         }
 

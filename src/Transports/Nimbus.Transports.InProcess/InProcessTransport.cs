@@ -1,39 +1,43 @@
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess
 {
     internal class InProcessTransport : INimbusTransport
     {
         private readonly InProcessMessageStore _messageStore;
+        private readonly PoorMansIoC _container;
 
-        public InProcessTransport(InProcessMessageStore messageStore)
+        public InProcessTransport(InProcessMessageStore messageStore, PoorMansIoC container)
         {
             _messageStore = messageStore;
+            _container = container;
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
             var queue = _messageStore.GetQueue(queuePath);
-            return new InProcessQueueSender(queue);
+            return _container.ResolveWithOverrides<InProcessQueueSender>(queue);
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
         {
             var queue = _messageStore.GetQueue(queuePath);
-            return new InProcessQueueReceiver(queue);
+            return _container.ResolveWithOverrides<InProcessQueueReceiver>(queue);
         }
 
         public INimbusMessageSender GetTopicSender(string topicPath)
         {
             var topic = _messageStore.GetTopic(topicPath);
-            return new InProcessTopicSender(_messageStore, topic);
+            return _container.ResolveWithOverrides<InProcessTopicSender>(topic);
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
         {
             var subscriptionQueue = _messageStore.GetSubscriptionQueue(topicPath, subscriptionName);
-            return new InProcessQueueReceiver(subscriptionQueue);
+            return _container.ResolveWithOverrides<InProcessQueueReceiver>(subscriptionQueue);
         }
     }
 }

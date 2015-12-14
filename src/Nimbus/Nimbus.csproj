@@ -67,6 +67,7 @@
     <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentRegistration.cs" />
     <Compile Include="Configuration\IMessagePumpsManager.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
     <Compile Include="Configuration\Settings\SubscriptionAutoDeleteOnIdleSetting.cs" />
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
+    <Compile Include="Configuration\Transport\TransportConfiguration.cs" />
     <Compile Include="DevelopmentStubs\StubDeadLetterOffice.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
     <Compile Include="DevelopmentStubs\StubDelayedDeliveryService.cs" />

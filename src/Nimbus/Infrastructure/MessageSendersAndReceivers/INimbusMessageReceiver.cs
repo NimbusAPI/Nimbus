@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal interface INimbusMessageReceiver
+    public interface INimbusMessageReceiver
     {
         Task Start(Func<NimbusMessage, Task> callback);
         Task Stop();

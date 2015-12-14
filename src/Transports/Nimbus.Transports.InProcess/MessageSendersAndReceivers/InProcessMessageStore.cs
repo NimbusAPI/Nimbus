@@ -2,7 +2,7 @@
 using Nimbus.ConcurrentCollections;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.Transports.InProcess
+namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class InProcessMessageStore
     {

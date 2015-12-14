@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure
 {
-    internal interface INimbusTransport
+    public interface INimbusTransport
     {
         INimbusMessageSender GetQueueSender(string queuePath);
         INimbusMessageReceiver GetQueueReceiver(string queuePath);

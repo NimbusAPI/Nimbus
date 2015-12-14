@@ -21,9 +21,9 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
 
         public WindowsServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                      IBrokeredMessageFactory brokeredMessageFactory,
-                                      ILogger logger,
-                                      IQueueManager queueManager)
+                                          IBrokeredMessageFactory brokeredMessageFactory,
+                                          ILogger logger,
+                                          IQueueManager queueManager)
         {
             _queueManager = queueManager;
             _brokeredMessageFactory = brokeredMessageFactory;

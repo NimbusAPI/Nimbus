@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
-namespace Nimbus.Transports.InProcess
+namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class InProcessQueueReceiver : INimbusMessageReceiver
     {

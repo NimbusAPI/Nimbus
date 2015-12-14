@@ -212,6 +212,14 @@
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Transports\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
+      <Project>{49B432F5-093E-454F-9BF5-76AB28CFB396}</Project>
+      <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
       <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
       <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>

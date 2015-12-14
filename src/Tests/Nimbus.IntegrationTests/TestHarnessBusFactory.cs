@@ -3,11 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
+using Nimbus.Transports.WindowsServiceBus;
 
 namespace Nimbus.IntegrationTests
 {
@@ -30,6 +33,8 @@ namespace Nimbus.IntegrationTests
             var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
 
             var bus = new BusBuilder().Configure()
+                                      //.WithTransport(new InProcessTransportConfiguration())
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
@@ -41,8 +46,8 @@ namespace Nimbus.IntegrationTests
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start(MessagePumpTypes.All);
 

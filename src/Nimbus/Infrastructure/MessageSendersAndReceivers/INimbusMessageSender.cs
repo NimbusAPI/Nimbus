@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
-    internal interface INimbusMessageSender
+    public interface INimbusMessageSender
     {
         Task Send(NimbusMessage message);
     }
