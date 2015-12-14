@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
+    <Compile Include="Configuration\BlobStorageConnectionString.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />

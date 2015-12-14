@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = TestHarnessLoggerFactory.Create();
             var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
-                                                                  .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
+                                                                  .UsingStorageAccountConnectionString(DefaultSettingsReader.Get<BlobStorageConnectionString>())
                                                                   .WithLogger(logger)
                                                                   .Build();
             var bus = new BusBuilder().Configure()
@@ -50,7 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             _busRequest = new BigFatRequest
                           {
-                              SomeBigQuestion = bigQuestion,
+                              SomeBigQuestion = bigQuestion
                           };
             _response = await Subject.Request(_busRequest, TimeSpan.FromSeconds(60));
         }

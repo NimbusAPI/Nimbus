@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.Azure.Configuration;
-using Nimbus.Tests.Common;
 using Nimbus.Windsor.Configuration;
 using NUnit.Framework;
 
@@ -29,10 +28,10 @@ namespace Nimbus.Extensions.IntegrationTests
 
                 container.Register(Component.For<ILargeMessageBodyStore>()
                                             .UsingFactoryMethod(c => new BlobStorageBuilder()
-                                                                         .Configure()
-                                                                         .UsingStorageAccountConnectionString(CommonResources.BlobStorageConnectionString)
-                                                                         .WithLogger(c.Resolve<ILogger>())
-                                                                         .Build())
+                                                                    .Configure()
+                                                                    .UsingStorageAccountConnectionString("Some fake connection string")
+                                                                    .WithLogger(c.Resolve<ILogger>())
+                                                                    .Build())
                                             .LifestyleSingleton());
 
                 container.Register(Component.For<IBus>()

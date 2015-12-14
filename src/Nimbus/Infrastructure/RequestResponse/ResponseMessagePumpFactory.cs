@@ -20,8 +20,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                             IBrokeredMessageFactory brokeredMessageFactory,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher responseMessageDispatcher,
-                                            PoorMansIoC container)
+                                            PoorMansIoC container,
+                                            ResponseMessageDispatcher responseMessageDispatcher)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;

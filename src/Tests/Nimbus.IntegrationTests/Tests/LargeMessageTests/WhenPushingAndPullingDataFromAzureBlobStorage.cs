@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.LargeMessages.Azure.Infrastructure;
@@ -24,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             var logger = TestHarnessLoggerFactory.Create();
             return new AzureBlobStorageLargeMessageBodyStore(
-                new AzureStorageAccountConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString},
+                new AzureStorageAccountConnectionStringSetting {Value = DefaultSettingsReader.Get<BlobStorageConnectionString>()},
                 new AutoCreateBlobStorageContainerNameSetting(),
                 logger);
         }
