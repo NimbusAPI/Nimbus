@@ -64,7 +64,7 @@ namespace Nimbus.Configuration
             container.RegisterType<OutboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IOutboundInterceptorFactory));
             container.RegisterType<PropertyInjector>(ComponentLifetime.SingleInstance, typeof (IPropertyInjector));
             container.RegisterType<NimbusMessageFactory>(ComponentLifetime.SingleInstance, typeof (INimbusMessageFactory));
-            container.RegisterType<NimbusMessagingFactory>(ComponentLifetime.SingleInstance, typeof (INimbusMessagingFactory));
+            container.RegisterType<NimbusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
             container.RegisterType<BusCommandSender>(ComponentLifetime.SingleInstance, typeof (ICommandSender));
             container.RegisterType<BusRequestSender>(ComponentLifetime.SingleInstance, typeof (IRequestSender));
             container.RegisterType<BusMulticastRequestSender>(ComponentLifetime.SingleInstance, typeof (IMulticastRequestSender));

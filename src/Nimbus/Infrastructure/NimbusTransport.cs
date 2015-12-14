@@ -7,7 +7,8 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
-    internal class NimbusMessagingFactory : INimbusMessagingFactory, IDisposable
+    //FIXME rename to WindowsServiceBusMessagingFactory?
+    internal class NimbusTransport : INimbusTransport, IDisposable
     {
         private readonly IQueueManager _queueManager;
 
@@ -20,7 +21,7 @@ namespace Nimbus.Infrastructure
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
 
-        public NimbusMessagingFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+        public NimbusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                       IBrokeredMessageFactory brokeredMessageFactory,
                                       ILogger logger,
                                       IQueueManager queueManager)

@@ -15,7 +15,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
         private readonly INimbusMessageFactory _brokeredMessageFactory;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
@@ -24,14 +24,14 @@ namespace Nimbus.Infrastructure.Commands
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
                                 INimbusMessageFactory brokeredMessageFactory,
-                                INimbusMessagingFactory messagingFactory,
+                                INimbusTransport transport,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
                                 IRouter router)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
@@ -71,7 +71,7 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
 
-                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
                     {
                         await interceptor.OnCommandSending(busCommand, brokeredMessage);

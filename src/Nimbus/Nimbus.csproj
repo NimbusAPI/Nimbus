@@ -155,12 +155,12 @@
     <Compile Include="Configuration\PoorMansIocContainer\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
+    <Compile Include="Infrastructure\INimbusTransport.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\ThrottlingMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
-    <Compile Include="Infrastructure\NimbusMessagingFactory.cs" />
+    <Compile Include="Infrastructure\NimbusTransport.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IKnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />

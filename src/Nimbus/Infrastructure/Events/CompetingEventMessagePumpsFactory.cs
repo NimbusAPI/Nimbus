@@ -14,7 +14,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ApplicationNameSetting _applicationName;
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.Events
                                                  IHandlerMapper handlerMapper,
                                                  ILogger logger,
                                                  IMessageDispatcherFactory messageDispatcherFactory,
-                                                 INimbusMessagingFactory messagingFactory,
+                                                 INimbusTransport transport,
                                                  IRouter router,
                                                  ITypeProvider typeProvider,
                                                  PoorMansIoC container)
@@ -33,7 +33,7 @@ namespace Nimbus.Infrastructure.Events
             _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _typeProvider = typeProvider;
             _container = container;
@@ -69,7 +69,7 @@ namespace Nimbus.Infrastructure.Events
 
                     _logger.Debug("Creating message pump for competing event subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
 
-                    var messageReceiver = _messagingFactory.GetTopicReceiver(binding.TopicPath, subscriptionName);
+                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName);
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 

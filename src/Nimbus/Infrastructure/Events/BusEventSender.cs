@@ -11,7 +11,7 @@ namespace Nimbus.Infrastructure.Events
 {
     internal class BusEventSender : IEventSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly ILogger _logger;
@@ -23,11 +23,11 @@ namespace Nimbus.Infrastructure.Events
                               IKnownMessageTypeVerifier knownMessageTypeVerifier,
                               ILogger logger,
                               INimbusMessageFactory nimbusMessageFactory,
-                              INimbusMessagingFactory messagingFactory,
+                              INimbusTransport transport,
                               IOutboundInterceptorFactory outboundInterceptorFactory,
                               IRouter router)
         {
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
@@ -54,7 +54,7 @@ namespace Nimbus.Infrastructure.Events
                 {
                     _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage);
 
-                    var topicSender = _messagingFactory.GetTopicSender(topicPath);
+                    var topicSender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
                     {
                         await interceptor.OnEventPublishing(busEvent, brokeredMessage);

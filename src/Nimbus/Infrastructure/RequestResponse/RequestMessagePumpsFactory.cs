@@ -12,7 +12,7 @@ namespace Nimbus.Infrastructure.RequestResponse
     {
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public RequestMessagePumpsFactory(IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
-                                          INimbusMessagingFactory messagingFactory,
+                                          INimbusTransport transport,
                                           IRouter router,
                                           ITypeProvider typeProvider,
                                           PoorMansIoC container)
@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
             _container = container;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
         }
 
@@ -54,7 +54,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 _logger.Debug("Creating message pump for request queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
 
-                var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
+                var messageReceiver = _transport.GetQueueReceiver(binding.QueuePath);
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
                 var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 

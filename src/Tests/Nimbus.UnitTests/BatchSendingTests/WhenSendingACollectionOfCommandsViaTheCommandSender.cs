@@ -27,7 +27,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
         {
             _nimbusMessageSender = Substitute.For<INimbusMessageSender>();
 
-            var messagingFactory = Substitute.For<INimbusMessagingFactory>();
+            var messagingFactory = Substitute.For<INimbusTransport>();
             messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();

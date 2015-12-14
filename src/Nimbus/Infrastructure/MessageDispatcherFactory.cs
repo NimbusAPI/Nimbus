@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly IPropertyInjector _propertyInjector;
 
@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
                                         INimbusMessageFactory nimbusMessageFactory,
-                                        INimbusMessagingFactory messagingFactory,
+                                        INimbusTransport transport,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
                                         IPropertyInjector propertyInjector)
         {
@@ -40,7 +40,7 @@ namespace Nimbus.Infrastructure
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _defaultMessageLockDuration = defaultMessageLockDuration;
             _propertyInjector = propertyInjector;
@@ -97,7 +97,7 @@ namespace Nimbus.Infrastructure
                                                     _inboundInterceptorFactory,
                                                     _outboundInterceptorFactory,
                                                     _logger,
-                                                    _messagingFactory,
+                                                    _transport,
                                                     handlerMap,
                                                     _defaultMessageLockDuration,
                                                     _propertyInjector);
@@ -110,7 +110,7 @@ namespace Nimbus.Infrastructure
                                                              _dependencyResolver,
                                                              _inboundInterceptorFactory,
                                                              _logger,
-                                                             _messagingFactory,
+                                                             _transport,
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
                                                              _defaultMessageLockDuration,

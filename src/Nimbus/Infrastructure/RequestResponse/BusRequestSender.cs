@@ -14,7 +14,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     public class BusRequestSender : IRequestSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
@@ -31,12 +31,12 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger,
                                   INimbusMessageFactory nimbusMessageFactory,
-                                  INimbusMessagingFactory messagingFactory,
+                                  INimbusTransport transport,
                                   IOutboundInterceptorFactory outboundInterceptorFactory,
                                   IRouter router,
                                   RequestResponseCorrelator requestResponseCorrelator)
         {
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
@@ -81,7 +81,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
 
-                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
                     {
                         await interceptor.OnRequestSending(busRequest, brokeredMessage);

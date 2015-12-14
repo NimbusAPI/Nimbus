@@ -42,7 +42,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             where TResponse : IBusResponse
             where TRequestHandler : IHandleRequest<TRequest, TResponse>, new()
         {
-            var messagingFactory = Substitute.For<INimbusMessagingFactory>();
+            var messagingFactory = Substitute.For<INimbusTransport>();
             var clock = Substitute.For<IClock>();
             var logger = Substitute.For<ILogger>();
             var dependencyResolver = Substitute.For<IDependencyResolver>();

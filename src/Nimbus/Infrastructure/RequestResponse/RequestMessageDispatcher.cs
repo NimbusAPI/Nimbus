@@ -22,7 +22,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly IPropertyInjector _propertyInjector;
@@ -34,7 +34,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             IInboundInterceptorFactory inboundInterceptorFactory,
             IOutboundInterceptorFactory outboundInterceptorFactory,
             ILogger logger,
-            INimbusMessagingFactory messagingFactory,
+            INimbusTransport transport,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
             DefaultMessageLockDurationSetting defaultMessageLockDuration,
             IPropertyInjector propertyInjector)
@@ -45,7 +45,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _logger = logger;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
             _propertyInjector = propertyInjector;
@@ -68,7 +68,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TBusResponse : IBusResponse
         {
             var replyQueueName = nimbusMessage.ReplyTo;
-            var replyQueueClient = _messagingFactory.GetQueueSender(replyQueueName);
+            var replyQueueClient = _transport.GetQueueSender(replyQueueName);
 
             Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
