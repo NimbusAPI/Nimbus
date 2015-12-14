@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using Nimbus.MessageContracts.Exceptions;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Configuration.PoorMansIocContainer
 {
     [Serializable]
     public class DependencyResolutionException : BusException

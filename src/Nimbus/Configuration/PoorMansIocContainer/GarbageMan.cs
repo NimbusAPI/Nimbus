@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Configuration.PoorMansIocContainer
 {
     internal class GarbageMan : IDisposable
     {

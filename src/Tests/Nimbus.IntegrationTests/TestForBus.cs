@@ -14,7 +14,14 @@ namespace Nimbus.IntegrationTests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
-            TestFixtureSetUpAsync().Wait();
+            try
+            {
+                TestFixtureSetUpAsync().Wait();
+            }
+            catch (AggregateException ae)
+            {
+                throw ae.InnerException;
+            }
         }
 
         private async Task TestFixtureSetUpAsync()

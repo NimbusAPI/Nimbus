@@ -1,13 +1,13 @@
 ﻿using System;
 using Nimbus.ConcurrentCollections;
-using Nimbus.Configuration;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
 {
-    internal class NimbusMessagingFactory : INimbusMessagingFactory, ICreateComponents
+    internal class NimbusMessagingFactory : INimbusMessagingFactory, IDisposable
     {
         private readonly IQueueManager _queueManager;
 

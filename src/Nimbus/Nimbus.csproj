@@ -67,6 +67,8 @@
     <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\ComponentRegistration.cs" />
     <Compile Include="Configuration\IMessagePumpsManager.cs" />
     <Compile Include="Configuration\MessagePumpsManager.cs" />
     <Compile Include="Configuration\INimbusConfiguration.cs" />
@@ -149,9 +151,8 @@
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\INimbusMessageFactory.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
-    <Compile Include="Configuration\GarbageMan.cs" />
-    <Compile Include="Configuration\ICreateComponents.cs" />
-    <Compile Include="Configuration\DependencyResolutionException.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\GarbageMan.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
     <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
@@ -175,7 +176,7 @@
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
     <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />
-    <Compile Include="Configuration\PoorMansIoC.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\PoorMansIoC.cs" />
     <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
     <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />

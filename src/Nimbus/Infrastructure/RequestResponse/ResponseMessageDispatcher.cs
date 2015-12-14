@@ -6,19 +6,23 @@ namespace Nimbus.Infrastructure.RequestResponse
     internal class ResponseMessageDispatcher : IMessageDispatcher
     {
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
-        private readonly INimbusMessageFactory _nimbusMessageFactory;
+        private readonly ILogger _logger;
 
-        public ResponseMessageDispatcher(INimbusMessageFactory nimbusMessageFactory, RequestResponseCorrelator requestResponseCorrelator)
+        public ResponseMessageDispatcher(ILogger logger, RequestResponseCorrelator requestResponseCorrelator)
         {
             _requestResponseCorrelator = requestResponseCorrelator;
-            _nimbusMessageFactory = nimbusMessageFactory;
+            _logger = logger;
         }
 
         public async Task Dispatch(NimbusMessage message)
         {
             var requestId = (Guid) message.Properties[MessagePropertyKeys.InReplyToRequestId];
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
-            if (responseCorrelationWrapper == null) return; //FIXME log
+            if (responseCorrelationWrapper == null)
+            {
+                _logger.Warn("Received a reply to request {MessageId} that had no corresponding request waiting for it.", requestId);
+                return;
+            }
 
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];
             if (success)

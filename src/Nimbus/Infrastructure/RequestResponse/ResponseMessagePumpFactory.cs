@@ -1,83 +1,42 @@
-﻿using System;
-using Nimbus.Configuration;
+﻿using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
-using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class ResponseMessagePumpFactory : ICreateComponents
+    internal class ResponseMessagePumpFactory
     {
         private readonly ILogger _logger;
-        private readonly ResponseMessageDispatcher _messageDispatcher;
+        private readonly PoorMansIoC _container;
         private readonly ReplyQueueNameSetting _replyQueueName;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly IClock _clock;
-        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IQueueManager _queueManager;
-        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttemptSetting;
-        private readonly IDeadLetterOffice _deadLetterOffice;
-        private readonly IDelayedDeliveryService _delayedDeliveryService;
-        private readonly IDeliveryRetryStrategy _deliveryRetryStrategy;
+        private readonly ResponseMessageDispatcher _responseMessageDispatcher;
 
-        private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
 
         internal ResponseMessagePumpFactory(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                            MaxDeliveryAttemptSetting maxDeliveryAttemptSetting,
                                             ReplyQueueNameSetting replyQueueName,
                                             IBrokeredMessageFactory brokeredMessageFactory,
-                                            IClock clock,
-                                            IDeadLetterOffice deadLetterOffice,
-                                            IDelayedDeliveryService delayedDeliveryService,
-                                            IDeliveryRetryStrategy deliveryRetryStrategy,
-                                            IDispatchContextManager dispatchContextManager,
                                             ILogger logger,
                                             IQueueManager queueManager,
-                                            ResponseMessageDispatcher messageDispatcher)
+                                            ResponseMessageDispatcher responseMessageDispatcher,
+                                            PoorMansIoC container)
         {
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _replyQueueName = replyQueueName;
-            _clock = clock;
-            _dispatchContextManager = dispatchContextManager;
             _logger = logger;
             _queueManager = queueManager;
-            _messageDispatcher = messageDispatcher;
-            _maxDeliveryAttemptSetting = maxDeliveryAttemptSetting;
-            _deadLetterOffice = deadLetterOffice;
-            _delayedDeliveryService = delayedDeliveryService;
-            _deliveryRetryStrategy = deliveryRetryStrategy;
+            _responseMessageDispatcher = responseMessageDispatcher;
+            _container = container;
             _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public IMessagePump Create()
         {
             var receiver = new NimbusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, _replyQueueName, _concurrentHandlerLimit, _logger);
-            _garbageMan.Add(receiver);
-
-            var pump = new MessagePump(_maxDeliveryAttemptSetting,
-                                       _clock,
-                                       _deadLetterOffice,
-                                       _delayedDeliveryService,
-                                       _deliveryRetryStrategy,
-                                       _dispatchContextManager,
-                                       _logger,
-                                       _messageDispatcher, receiver);
-            _garbageMan.Add(pump);
-
+            var pump = _container.ResolveWithOverrides<MessagePump>(receiver, _responseMessageDispatcher);
             return pump;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-            _garbageMan.Dispose();
         }
     }
 }

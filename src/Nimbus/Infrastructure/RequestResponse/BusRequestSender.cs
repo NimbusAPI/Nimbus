@@ -108,7 +108,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     await interceptor.OnRequestSendingError(busRequest, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception); //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return default(TResponse);

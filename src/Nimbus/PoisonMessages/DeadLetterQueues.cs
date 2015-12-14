@@ -1,5 +1,8 @@
-﻿namespace Nimbus.PoisonMessages
+﻿using System;
+
+namespace Nimbus.PoisonMessages
 {
+    [Obsolete("Not quite sure what to do with this yet but it needs to be better than it is now.")]
     public class DeadLetterQueues : IDeadLetterQueues
     {
         private readonly IDeadLetterQueue _commandQueue;
