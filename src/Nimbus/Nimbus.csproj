@@ -160,7 +160,7 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
-    <Compile Include="Infrastructure\NimbusTransport.cs" />
+    <Compile Include="Infrastructure\WindowsServiceBusTransport.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IKnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />
