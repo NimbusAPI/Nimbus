@@ -8,6 +8,7 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
@@ -30,11 +31,10 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         }
 
         [Test]
-        [ExpectedException(typeof (NotSupportedException), ExpectedMessage = UnsupportedLargeMessageBodyStore.FailureMessage)]
         public async Task MessageCreationShouldFail()
         {
             var brokeredMessageFactory = await Given();
-            var message = await When(brokeredMessageFactory);
+            Should.Throw<NotSupportedException>(() => When(brokeredMessageFactory).Wait());
         }
     }
 }

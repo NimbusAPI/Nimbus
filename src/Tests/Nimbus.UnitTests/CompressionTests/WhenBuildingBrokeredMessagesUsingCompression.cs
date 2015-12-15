@@ -42,7 +42,7 @@ namespace Nimbus.UnitTests.CompressionTests
         }
 
         [Test]
-        [Ignore]
+        [Ignore("Not quite sure where these should fit yet.")]
         public void ThenTheMessageShouldBeSmaller()
         {
             //_compressedMessage.Size.ShouldBeLessThan(_uncompressedMessage.Size);
