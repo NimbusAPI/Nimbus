@@ -93,7 +93,6 @@
     <Compile Include="Configuration\Transport\TransportConfiguration.cs" />
     <Compile Include="DevelopmentStubs\StubDeadLetterOffice.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
-    <Compile Include="DevelopmentStubs\StubDelayedDeliveryService.cs" />
     <Compile Include="DevelopmentStubs\StubDeliveryRetryStrategy.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />

@@ -14,6 +14,8 @@ namespace Nimbus.Transports.InProcess
             container.RegisterType<InProcessQueueSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<InProcessTopicSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<InProcessQueueReceiver>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<InProcessDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
+
 
             container.RegisterType<InProcessTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
         }

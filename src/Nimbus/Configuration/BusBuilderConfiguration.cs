@@ -31,11 +31,6 @@ namespace Nimbus.Configuration
             get { return new StubDeadLetterOffice(); }
         }
 
-        internal IDelayedDeliveryService DelayedDeliveryService
-        {
-            get { return new StubDelayedDeliveryService(); }
-        }
-
         internal IDeliveryRetryStrategy DeliveryRetryStrategy
         {
             get { return new StubDeliveryRetryStrategy(); }

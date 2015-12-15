@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.DevelopmentStubs
+namespace Nimbus.Transports.WindowsServiceBus.DevelopmentStubs
 {
     internal class StubDelayedDeliveryService : IDelayedDeliveryService
     {

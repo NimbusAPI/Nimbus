@@ -9,11 +9,13 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
     {
         private readonly ISerializer _serializer;
         private readonly Queue _queue;
+        private readonly InProcessMessageStore _messageStore;
 
-        public InProcessQueueSender(ISerializer serializer, Queue queue)
+        public InProcessQueueSender(ISerializer serializer, Queue queue, InProcessMessageStore messageStore)
         {
             _serializer = serializer;
             _queue = queue;
+            _messageStore = messageStore;
         }
 
         public Task Send(NimbusMessage message)
@@ -21,7 +23,8 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return Task.Run(() =>
                             {
                                 var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
-                                _queue.Add(messageClone);
+                                var messageQueue = _messageStore.GetMessageQueue(_queue.QueuePath);
+                                messageQueue.Add(messageClone);
                             }).ConfigureAwaitFalse();
         }
     }

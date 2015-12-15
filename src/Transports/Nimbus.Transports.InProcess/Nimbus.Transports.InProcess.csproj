@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InProcessDelayedDeliveryService.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessMessageStore.cs" />
     <Compile Include="InProcessTransport.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueReceiver.cs" />

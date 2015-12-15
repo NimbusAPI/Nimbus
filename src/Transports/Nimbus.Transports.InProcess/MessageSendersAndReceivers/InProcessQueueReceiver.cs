@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
@@ -8,12 +9,12 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class InProcessQueueReceiver : INimbusMessageReceiver
     {
-        private readonly Queue _queue;
+        private readonly BlockingCollection<NimbusMessage> _messageQueue;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public InProcessQueueReceiver(Queue queue)
+        public InProcessQueueReceiver(BlockingCollection<NimbusMessage> messageQueue)
         {
-            _queue = queue;
+            _messageQueue = messageQueue;
         }
 
         public Task Start(Func<NimbusMessage, Task> callback)
@@ -44,7 +45,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             {
                 try
                 {
-                    var nimbusMessage = _queue.Take(cancellationTokenSource.Token);
+                    var nimbusMessage = _messageQueue.Take(cancellationTokenSource.Token);
                     callback(nimbusMessage);
                 }
                 catch (OperationCanceledException)

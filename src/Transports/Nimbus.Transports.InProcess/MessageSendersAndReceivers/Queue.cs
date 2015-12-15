@@ -1,21 +1,17 @@
-﻿using System.Collections.Concurrent;
-using System.Threading;
-using Nimbus.Infrastructure;
-
-namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
+﻿namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class Queue
     {
-        private readonly BlockingCollection<NimbusMessage> _messages = new BlockingCollection<NimbusMessage>();
+        private readonly string _queuePath;
 
-        public void Add(NimbusMessage message)
+        public Queue(string queuePath)
         {
-            _messages.Add(message);
+            _queuePath = queuePath;
         }
 
-        public NimbusMessage Take(CancellationToken ct)
+        public string QueuePath
         {
-            return _messages.Take(ct);
+            get { return _queuePath; }
         }
     }
 }

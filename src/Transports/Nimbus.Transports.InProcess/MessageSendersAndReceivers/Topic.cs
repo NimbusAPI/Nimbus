@@ -1,20 +1,41 @@
-﻿using System.Linq;
-using Nimbus.ConcurrentCollections;
+﻿using System.Collections.Generic;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class Topic
     {
-        private readonly ThreadSafeDictionary<string, Queue> _subscriptionQueues = new ThreadSafeDictionary<string, Queue>();
+        private readonly string _topicPath;
+        private readonly List<string> _subscriptionNames = new List<string>();
 
-        public Queue GetSubscriptionQueue(string subscriptionName)
+        public Topic(string topicPath)
         {
-            return _subscriptionQueues.GetOrAdd(subscriptionName, p => new Queue());
+            _topicPath = topicPath;
         }
 
-        public Queue[] SubscriptionQueues
+        public void Subscribe(string subscriptionName)
         {
-            get { return _subscriptionQueues.ToDictionary().Values.ToArray(); }
+            lock (_subscriptionNames)
+            {
+                if (_subscriptionNames.Contains(subscriptionName)) return;
+
+                _subscriptionNames.Add(subscriptionName);
+            }
+        }
+
+        public string TopicPath
+        {
+            get { return _topicPath; }
+        }
+
+        public string[] SubscriptionNames
+        {
+            get
+            {
+                lock (_subscriptionNames)
+                {
+                    return _subscriptionNames.ToArray();
+                }
+            }
         }
     }
 }

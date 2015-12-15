@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure
         }
 
         public Guid CorrelationId { get; set; }
+        public string DeliverTo { get; set; }
         public string ReplyTo { get; set; }
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
         public IDictionary<string, object> Properties { get; set; }

@@ -9,6 +9,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.WindowsServiceBus.DevelopmentStubs;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -20,6 +21,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             container.RegisterType<WindowsServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof(IQueueManager));
+            container.RegisterType<StubDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
 
             var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
                 container.Resolve<ServerConnectionCountSetting>(),
