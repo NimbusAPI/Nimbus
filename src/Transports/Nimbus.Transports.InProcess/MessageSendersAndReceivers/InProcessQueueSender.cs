@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
@@ -9,9 +8,9 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
     internal class InProcessQueueSender : INimbusMessageSender
     {
         private readonly ISerializer _serializer;
-        private readonly BlockingCollection<NimbusMessage> _queue;
+        private readonly Queue _queue;
 
-        public InProcessQueueSender(ISerializer serializer, BlockingCollection<NimbusMessage> queue)
+        public InProcessQueueSender(ISerializer serializer, Queue queue)
         {
             _serializer = serializer;
             _queue = queue;

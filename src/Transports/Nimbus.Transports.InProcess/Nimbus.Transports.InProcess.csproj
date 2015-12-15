@@ -45,6 +45,8 @@
     <Compile Include="MessageSendersAndReceivers\InProcessQueueSender.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessTopicSender.cs" />
     <Compile Include="InProcessTransportConfiguration.cs" />
+    <Compile Include="MessageSendersAndReceivers\Queue.cs" />
+    <Compile Include="MessageSendersAndReceivers\Topic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

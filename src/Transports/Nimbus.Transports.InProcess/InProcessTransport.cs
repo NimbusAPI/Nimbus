@@ -36,7 +36,8 @@ namespace Nimbus.Transports.InProcess
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
         {
-            var subscriptionQueue = _messageStore.GetSubscriptionQueue(topicPath, subscriptionName);
+            var topic = _messageStore.GetTopic(topicPath);
+            var subscriptionQueue = topic.GetSubscriptionQueue(subscriptionName);
             return _container.ResolveWithOverrides<InProcessQueueReceiver>(subscriptionQueue);
         }
     }
