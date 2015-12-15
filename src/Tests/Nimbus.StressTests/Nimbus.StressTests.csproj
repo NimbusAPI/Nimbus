@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
-    <Compile Include="Configuration\BlobStorageConnectionString.cs" />
+    <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />

@@ -26,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             var logger = TestHarnessLoggerFactory.Create();
             return new AzureBlobStorageLargeMessageBodyStore(
-                new AzureStorageAccountConnectionStringSetting {Value = DefaultSettingsReader.Get<BlobStorageConnectionString>()},
+                new AzureStorageAccountConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureBlobStorageConnectionString>()},
                 new AutoCreateBlobStorageContainerNameSetting(),
                 logger);
         }

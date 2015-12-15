@@ -22,16 +22,26 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
         {
             return Task.Run(() =>
                             {
+                                var clone = Clone(message);
+                                var topicQueue = _messageStore.GetMessageQueue(_topic.TopicPath);
+                                topicQueue.Add(clone);
+
                                 _topic.SubscriptionNames
                                       .Do(subscriptionName =>
                                           {
-                                              var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
+                                              var messageClone = Clone(message);
                                               var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
                                               var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
                                               subscriptionQueue.Add(messageClone);
                                           })
                                       .Done();
                             });
+        }
+
+        private NimbusMessage Clone(NimbusMessage message)
+        {
+            var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
+            return messageClone;
         }
     }
 }

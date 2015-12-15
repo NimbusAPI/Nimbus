@@ -27,7 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var logger = TestHarnessLoggerFactory.Create();
             var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
-                                                                  .UsingStorageAccountConnectionString(DefaultSettingsReader.Get<BlobStorageConnectionString>())
+                                                                  .UsingStorageAccountConnectionString(DefaultSettingsReader.Get<AzureBlobStorageConnectionString>())
                                                                   .WithLogger(logger)
                                                                   .Build();
             var bus = new BusBuilder().Configure()

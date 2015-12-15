@@ -2,7 +2,7 @@ using ConfigInjector;
 
 namespace Nimbus.StressTests.Configuration
 {
-    public class BlobStorageConnectionString : ConfigurationSetting<string>
+    public class AzureBlobStorageConnectionString : ConfigurationSetting<string>
     {
     }
 }
