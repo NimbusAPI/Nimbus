@@ -46,7 +46,6 @@ namespace Nimbus.Configuration
                         .Done();
 
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
-            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<CommandMessagePumpsFactory>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestMessagePumpsFactory>(ComponentLifetime.SingleInstance);
             container.RegisterType<ResponseMessagePumpFactory>(ComponentLifetime.SingleInstance);
@@ -82,45 +81,6 @@ namespace Nimbus.Configuration
             RegisterPropertiesFromConfigurationObject(container, configuration.LargeMessageStorageConfiguration);
             RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
 
-            #region FIXME move these to the WindowsServiceBusTransportConfiguration once we've abstracted some message pump factories
-            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof(IBrokeredMessageFactory));
-            container.RegisterType<WindowsServiceBusTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));
-            container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof(IQueueManager));
-
-            var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
-                container.Resolve<ServerConnectionCountSetting>(),
-                () =>
-                {
-                    var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
-                    return namespaceManager;
-                },
-                nsm => false,
-                nsm => { });
-
-            container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
-
-            var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
-                container.Resolve<ServerConnectionCountSetting>(),
-                () =>
-                {
-                    var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    messagingFactory.PrefetchCount = container.Resolve<ConcurrentHandlerLimitSetting>();
-                    return messagingFactory;
-                },
-                mf => mf.IsBorked(),
-                mf => { });
-
-            container.Register<Func<MessagingFactory>>(c => messagingFactoryRoundRobin.GetNext);
-
-            if (container.Resolve<RemoveAllExistingNamespaceElementsSetting>())
-            {
-                var namespaceCleanser = container.Resolve<NamespaceCleanser>();
-                namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
-            }
-
-            #endregion
-
             logger.Debug("Creating message pumps...");
 
             var messagePumpsManager = new MessagePumpsManager(
@@ -137,7 +97,7 @@ namespace Nimbus.Configuration
 
             bus.Starting += delegate
                             {
-                                container.Resolve<AzureQueueManager>().WarmUp();
+                                //container.Resolve<AzureQueueManager>().WarmUp();
                                 container.Resolve<PropertyInjector>().Bus = bus;
                             };
             bus.Disposing += delegate { container.Dispose(); };

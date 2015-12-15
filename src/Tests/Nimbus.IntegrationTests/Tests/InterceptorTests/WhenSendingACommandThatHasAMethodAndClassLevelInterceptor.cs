@@ -9,6 +9,7 @@ using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -30,6 +31,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
             var logger = TestHarnessLoggerFactory.Create();
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)

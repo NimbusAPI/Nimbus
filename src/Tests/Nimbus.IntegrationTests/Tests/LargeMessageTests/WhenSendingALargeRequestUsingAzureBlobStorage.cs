@@ -8,6 +8,7 @@ using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.Azure.Configuration;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;
 
@@ -29,6 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                                                   .WithLogger(logger)
                                                                   .Build();
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)

@@ -68,6 +68,7 @@
     <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
     <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />
+    <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentRegistration.cs" />
     <Compile Include="Configuration\IMessagePumpsManager.cs" />

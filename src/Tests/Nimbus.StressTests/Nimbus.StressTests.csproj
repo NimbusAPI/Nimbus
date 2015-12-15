@@ -131,6 +131,10 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Transports\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
+      <Project>{49B432F5-093E-454F-9BF5-76AB28CFB396}</Project>
+      <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
       <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
       <Name>Nimbus.Tests.Common</Name>

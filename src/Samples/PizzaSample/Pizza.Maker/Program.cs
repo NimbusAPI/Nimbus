@@ -6,6 +6,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
+using Nimbus.Transports.WindowsServiceBus;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 using Serilog;
@@ -24,8 +25,8 @@ namespace Pizza.Maker
             var builder = new ContainerBuilder();
 
             builder.RegisterType<PizzaMaker>()
-                .AsImplementedInterfaces()
-                .SingleInstance();
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
 
             SetUpBus(builder);
             var container = builder.Build();
@@ -52,6 +53,7 @@ namespace Pizza.Maker
             builder.RegisterNimbus(typeProvider);
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
+                                 .WithTransport(new WindowsServiceBusTransportConfiguration())
                                  .WithConnectionString(connectionString)
                                  .WithNames("Maker", Environment.MachineName)
                                  .WithTypesFrom(typeProvider)

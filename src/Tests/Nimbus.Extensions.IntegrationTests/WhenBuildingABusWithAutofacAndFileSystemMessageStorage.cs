@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 
 namespace Nimbus.Extensions.IntegrationTests
@@ -34,6 +35,7 @@ namespace Nimbus.Extensions.IntegrationTests
                    .SingleInstance();
 
             builder.Register(c => new BusBuilder().Configure()
+                                                  .WithTransport(new WindowsServiceBusTransportConfiguration())
                                                   .WithNames("IntegrationTestHarness", Environment.MachineName)
                                                   .WithConnectionString(
                                                       @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")

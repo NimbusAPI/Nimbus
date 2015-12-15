@@ -34,7 +34,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                               multicastRequestSender,
                               _eventSender,
                               messagePumpsManager,
-                              deadLetterQueues,
+                              //deadLetterQueues,
                               Substitute.For<IHeartbeat>());
             return Task.FromResult(bus);
         }

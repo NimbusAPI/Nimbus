@@ -10,6 +10,7 @@ using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -37,6 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
             var dependencyResolver = new DependencyResolver(typeProvider);
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)

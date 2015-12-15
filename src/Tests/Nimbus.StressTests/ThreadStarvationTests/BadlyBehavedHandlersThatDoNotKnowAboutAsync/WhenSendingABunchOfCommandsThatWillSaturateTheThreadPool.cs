@@ -11,6 +11,7 @@ using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -32,6 +33,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
@@ -43,8 +45,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
                                       .WithLogger(_logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start();
 

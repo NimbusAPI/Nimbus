@@ -13,6 +13,7 @@ using Nimbus.Infrastructure.Logging;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
@@ -45,9 +46,10 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
             var logger = TestHarnessLoggerFactory.Create();
-            var typeProvider = new AssemblyScanningTypeProvider(new[] {assemblyBuilder});
+            var typeProvider = new AssemblyScanningTypeProvider(assemblyBuilder);
 
             var firstBus = new BusBuilder().Configure()
+                                           .WithTransport(new WindowsServiceBusTransportConfiguration())
                                            .WithNames("MyTestSuite", Environment.MachineName)
                                            .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                            .WithTypesFrom(typeProvider)
@@ -81,6 +83,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             WriteBlankLines();
 
             var subsequentBus = new BusBuilder().Configure()
+                                                .WithTransport(new WindowsServiceBusTransportConfiguration())
                                                 .WithNames("MyTestSuite", Environment.MachineName)
                                                 .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                                 .WithTypesFrom(typeProvider)

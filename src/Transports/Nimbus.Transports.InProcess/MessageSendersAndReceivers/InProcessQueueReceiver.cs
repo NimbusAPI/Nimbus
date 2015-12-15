@@ -31,17 +31,26 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return Task.Run(() =>
                             {
                                 if (_cancellationTokenSource == null) return;
-                                _cancellationTokenSource.Cancel(false);
+                                _cancellationTokenSource.Cancel();
                                 _cancellationTokenSource = null;
                             });
         }
 
         private void ReceiveMessages(Func<NimbusMessage, Task> callback)
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            var cancellationTokenSource = _cancellationTokenSource;
+            if (cancellationTokenSource == null) return;    // already cancelled
+
+            while (!cancellationTokenSource.IsCancellationRequested)
             {
-                var nimbusMessage = _queue.Take(_cancellationTokenSource.Token);
-                callback(nimbusMessage);
+                try
+                {
+                    var nimbusMessage = _queue.Take(cancellationTokenSource.Token);
+                    callback(nimbusMessage);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
         }
     }

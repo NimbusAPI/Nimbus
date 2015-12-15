@@ -33,8 +33,8 @@ namespace Nimbus.IntegrationTests
             var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
 
             var bus = new BusBuilder().Configure()
-                                      //.WithTransport(new InProcessTransportConfiguration())
-                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                      .WithTransport(new InProcessTransportConfiguration())
+                                      //.WithTransport(new WindowsServiceBusTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)

@@ -32,7 +32,7 @@ namespace Nimbus
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
-                     IDeadLetterQueues deadLetterQueues,
+                     //IDeadLetterQueues deadLetterQueues,
                      IHeartbeat heartbeat)
         {
             _logger = logger;
@@ -40,7 +40,7 @@ namespace Nimbus
             _requestSender = requestSender;
             _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
-            _deadLetterQueues = deadLetterQueues;
+            //_deadLetterQueues = deadLetterQueues;
             _heartbeat = heartbeat;
             _messagePumpsManager = messagePumpsManager;
 

@@ -89,6 +89,10 @@
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Pizza.Maker.Messages\Pizza.Maker.Messages.csproj">
       <Project>{86300BEC-7B51-41D5-8E0D-B2C85945329D}</Project>
       <Name>Pizza.Maker.Messages</Name>

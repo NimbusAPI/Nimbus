@@ -7,7 +7,7 @@ namespace Nimbus.Tests.Common
 {
     /// <summary>
     ///     A type provider that filters types we care about to only our own test's namespace. It's a performance optimisation
-    ///     because creating and deleting queues and topics is slow.
+    ///     because creating and deleting queues and topics is slow on some transports.
     /// </summary>
     public class TestHarnessTypeProvider : AssemblyScanningTypeProvider
     {

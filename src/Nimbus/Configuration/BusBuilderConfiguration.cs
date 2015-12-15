@@ -68,6 +68,7 @@ namespace Nimbus.Configuration
             Debugging = new BusBuilderDebuggingConfiguration();
             LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
             Router = new DestinationPerMessageTypeRouter();
+            Transport = new NotSupportedTransportConfiguration();
 
             Logger = new NullLogger();
             Compressor = new NullCompressor();

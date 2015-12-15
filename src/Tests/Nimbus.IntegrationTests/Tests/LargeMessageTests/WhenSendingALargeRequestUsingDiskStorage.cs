@@ -9,6 +9,7 @@ using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;
 
@@ -30,13 +31,14 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var logger = TestHarnessLoggerFactory.Create();
 
             logger.Debug("Starting disk storage large message test at {0}", _largeMessageBodyTempPath);
-            
+
             var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
                                                                         .WithStorageDirectory(_largeMessageBodyTempPath)
                                                                         .WithLogger(logger)
                                                                         .Build();
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
@@ -59,7 +61,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             _busRequest = new BigFatRequest
                           {
-                              SomeBigQuestion = bigQuestion,
+                              SomeBigQuestion = bigQuestion
                           };
             _response = await Subject.Request(_busRequest);
         }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
+using Nimbus.Transports.WindowsServiceBus;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
@@ -27,6 +28,7 @@ namespace Pizza.Ordering
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
                                       .WithNames("Ordering", Environment.MachineName)
                                       .WithConnectionString(connectionString)
                                       .WithTypesFrom(typeProvider)

@@ -6,6 +6,7 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -53,6 +54,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             var logger = TestHarnessLoggerFactory.Create();
 
             var busBuilder = new BusBuilder().Configure()
+                                             .WithTransport(new InProcessTransportConfiguration())
                                              .WithNames("IntegrationTestHarness", Environment.MachineName)
                                              .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                              .WithTypesFrom(typeProvider)
@@ -60,8 +62,8 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                              .WithLogger(logger)
                                              .WithDebugOptions(
                                                  dc =>
-                                                 dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                     "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                                     dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                         "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                 ;
 
             using (var bus = busBuilder.Build())
@@ -81,6 +83,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       var logger = TestHarnessLoggerFactory.Create();
 
                                       var bus = new BusBuilder().Configure()
+                                                                .WithTransport(new InProcessTransportConfiguration())
                                                                 .WithNames("IntegrationTestHarness", Environment.MachineName)
                                                                 .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                                                 .WithTypesFrom(typeProvider)
