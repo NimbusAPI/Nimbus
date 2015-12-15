@@ -28,9 +28,10 @@ namespace Pizza.Ordering
             var connectionString = ConfigurationManager.AppSettings["AzureConnectionString"];
 
             var bus = new BusBuilder().Configure()
-                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(connectionString)
+                )
                                       .WithNames("Ordering", Environment.MachineName)
-                                      .WithConnectionString(connectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .Build();

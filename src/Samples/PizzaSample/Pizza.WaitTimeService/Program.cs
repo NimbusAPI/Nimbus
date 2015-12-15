@@ -48,8 +48,9 @@ namespace Pizza.WaitTimeService
             builder.RegisterNimbus(typeProvider);
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
-                                 .WithTransport(new WindowsServiceBusTransportConfiguration())
-                                 .WithConnectionString(connectionString)
+                                 .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                    .WithConnectionString(connectionString)
+                                 )
                                  .WithNames("WaitTime", Environment.MachineName)
                                  .WithTypesFrom(typeProvider)
                                  .WithAutofacDefaults(componentContext)

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.LargeMessages.FileSystem.Configuration;
-using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.StressTests.ThroughputTests.Infrastructure;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -55,13 +54,11 @@ namespace Nimbus.StressTests.ThroughputTests
                                                                         .Build();
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("ThroughputTestSuite", Environment.MachineName)
                                       .WithLogger(_logger)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(_typeProvider)
                                       .WithDependencyResolver(_dependencyResolver)
-                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
-                                                                     .WithMaxSmallMessageSize(4096))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

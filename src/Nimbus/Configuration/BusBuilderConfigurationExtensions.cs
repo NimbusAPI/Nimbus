@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
 using Nimbus.Configuration.Debug;
-using Nimbus.Configuration.LargeMessages;
-using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
@@ -16,18 +13,6 @@ namespace Nimbus.Configuration
         {
             configuration.Transport = transportConfiguration;
             return configuration;
-        }
-
-        public static BusBuilderConfiguration WithConnectionString(this BusBuilderConfiguration configuration, string connectionString)
-        {
-            configuration.ConnectionString = new ConnectionStringSetting {Value = connectionString};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithConnectionStringFromFile(this BusBuilderConfiguration configuration, string filename)
-        {
-            var connectionString = File.ReadAllText(filename).Trim();
-            return configuration.WithConnectionString(connectionString);
         }
 
         /// <summary>
@@ -61,33 +46,15 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithLargeMessageStorage(this BusBuilderConfiguration configuration, Action<LargeMessageStorageConfiguration> configurationAction)
-        {
-            configurationAction(configuration.LargeMessageStorageConfiguration);
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithRouter(this BusBuilderConfiguration configuration, IRouter router)
         {
             configuration.Router = router;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithServerConnectionCount(this BusBuilderConfiguration configuration, int serverConnectionCount)
-        {
-            configuration.ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithDefaultTimeout(this BusBuilderConfiguration configuration, TimeSpan defaultTimeout)
         {
             configuration.DefaultTimeout = new DefaultTimeoutSetting {Value = defaultTimeout};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithDefaultMessageLockDuration(this BusBuilderConfiguration configuration, TimeSpan defaultLockDuration)
-        {
-            configuration.DefaultMessageLockDuration = new DefaultMessageLockDurationSetting {Value = defaultLockDuration};
             return configuration;
         }
 

@@ -10,6 +10,7 @@ using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
@@ -33,13 +34,12 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
             var bus = new BusBuilder().Configure()
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithTypesFrom(typeProvider)
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                      .WithDefaultMessageLockDuration(_messageLockDuration)
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>

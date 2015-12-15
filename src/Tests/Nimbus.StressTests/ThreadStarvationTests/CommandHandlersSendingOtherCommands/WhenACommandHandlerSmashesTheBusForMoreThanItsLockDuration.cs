@@ -10,6 +10,7 @@ using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;
 
@@ -27,19 +28,21 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                                                         .WithDefaultMessageLockDuration(_messageLockDuration)
+                )
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                      .WithDefaultMessageLockDuration(_messageLockDuration)
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start();
 

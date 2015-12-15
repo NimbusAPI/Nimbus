@@ -35,8 +35,9 @@ namespace Pizza.RetailWeb.AutofacModules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
-                                 .WithTransport(new WindowsServiceBusTransportConfiguration())
-                                 .WithConnectionString(connectionString)
+                                 .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                    .WithConnectionString(connectionString)
+                                 )
                                  .WithNames("MyApp", Environment.MachineName).WithTypesFrom(handlerTypesProvider)
                                  .WithAutofacDefaults(componentContext)
                                  .Build())

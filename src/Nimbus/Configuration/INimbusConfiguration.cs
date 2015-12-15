@@ -4,6 +4,6 @@ namespace Nimbus.Configuration
 {
     public interface INimbusConfiguration
     {
-        void Register(PoorMansIoC container);
+        void RegisterWith(PoorMansIoC container);
     }
 }

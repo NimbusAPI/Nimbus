@@ -16,7 +16,7 @@ namespace Nimbus.Configuration.LargeMessages
             LargeMessageBodyStore = new UnsupportedLargeMessageBodyStore();
         }
 
-        public void Register(PoorMansIoC container)
+        public void RegisterWith(PoorMansIoC container)
         {
         }
     }

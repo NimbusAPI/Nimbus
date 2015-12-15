@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Tests.Common;
-using Nimbus.Transports.InProcess;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 
@@ -22,9 +21,11 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             var logger = TestHarnessLoggerFactory.Create();
 
             var bus = new BusBuilder().Configure()
-                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(
+                                                             @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
+                )
                                       .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                      .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)

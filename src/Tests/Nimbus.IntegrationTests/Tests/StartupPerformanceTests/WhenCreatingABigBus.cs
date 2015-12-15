@@ -49,12 +49,13 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             var typeProvider = new AssemblyScanningTypeProvider(assemblyBuilder);
 
             var firstBus = new BusBuilder().Configure()
-                                           .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                           .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                              .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                                                              .WithServerConnectionCount(100)
+                )
                                            .WithNames("MyTestSuite", Environment.MachineName)
-                                           .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                            .WithTypesFrom(typeProvider)
                                            .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                           .WithServerConnectionCount(100)
                                            .WithLogger(logger)
                                            .Build();
             try
@@ -83,9 +84,10 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             WriteBlankLines();
 
             var subsequentBus = new BusBuilder().Configure()
-                                                .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                                .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                                   .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                )
                                                 .WithNames("MyTestSuite", Environment.MachineName)
-                                                .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                                 .WithTypesFrom(typeProvider)
                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                 .WithLogger(logger)

@@ -2,6 +2,7 @@ using System;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.Configuration;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.Azure.Configuration;
@@ -37,14 +38,13 @@ namespace Nimbus.Extensions.IntegrationTests
 
                 container.Register(Component.For<IBus>()
                                             .UsingFactoryMethod(c => new BusBuilder().Configure()
-                                                                                     .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                                                                     .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                                                                        .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
+                                                                                                        .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                                                                                                     .WithMaxSmallMessageSize(50*1024)
+                                                                                                                                     .WithMaxLargeMessageSize(1024*1024))
+                                                                    )
                                                                                      .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                                                     .WithConnectionString(
-                                                                                         @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
-                                                                                     .WithLargeMessageStorage(
-                                                                                         sc => sc.WithLargeMessageBodyStore(c.Resolve<ILargeMessageBodyStore>())
-                                                                                                 .WithMaxSmallMessageSize(50*1024)
-                                                                                                 .WithMaxLargeMessageSize(1024*1024))
                                                                                      .WithTypesFrom(typeProvider)
                                                                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                                                      .WithLogger(c.Resolve<ILogger>())

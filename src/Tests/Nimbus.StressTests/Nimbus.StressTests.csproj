@@ -135,6 +135,10 @@
       <Project>{49B432F5-093E-454F-9BF5-76AB28CFB396}</Project>
       <Name>Nimbus.Transports.InProcess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
       <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
       <Name>Nimbus.Tests.Common</Name>

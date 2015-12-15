@@ -33,7 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))

@@ -7,8 +7,9 @@ namespace Nimbus.Configuration.Debug
     {
         internal RemoveAllExistingNamespaceElementsSetting RemoveAllExistingNamespaceElements { get; set; }
 
-        public void Register(PoorMansIoC container)
+        public void RegisterWith(PoorMansIoC container)
         {
+            //FIXME add a startup hook here somehow to remove namespace components as per before.
         }
     }
 }

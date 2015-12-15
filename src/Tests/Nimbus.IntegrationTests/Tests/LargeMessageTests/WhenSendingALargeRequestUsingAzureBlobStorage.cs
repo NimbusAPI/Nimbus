@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Configuration.LargeMessages;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
@@ -30,15 +31,16 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                                                   .WithLogger(logger)
                                                                   .Build();
             var bus = new BusBuilder().Configure()
-                                      .WithTransport(new WindowsServiceBusTransportConfiguration())
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                                                         .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                                                      .WithMaxSmallMessageSize(64*1024)
+                                                                                      .WithMaxLargeMessageSize(10*1048576))
+                )
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
-                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
-                                                                     .WithMaxSmallMessageSize(64*1024)
-                                                                     .WithMaxLargeMessageSize(10*1048576))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

@@ -19,6 +19,9 @@ namespace Nimbus.Configuration
 {
     public class BusBuilderConfiguration
     {
+        internal TransportConfiguration Transport { get; set; }
+        internal BusBuilderDebuggingConfiguration Debugging { get; set; }
+
         internal ITypeProvider TypeProvider { get; set; }
         internal IDependencyResolver DependencyResolver { get; set; }
         internal ILogger Logger { get; set; }
@@ -26,26 +29,9 @@ namespace Nimbus.Configuration
         internal ICompressor Compressor { get; set; }
         internal IRouter Router { get; set; }
 
-        internal IDeadLetterOffice DeadLetterOffice
-        {
-            get { return new StubDeadLetterOffice(); }
-        }
-
-        internal IDeliveryRetryStrategy DeliveryRetryStrategy
-        {
-            get { return new StubDeliveryRetryStrategy(); }
-        }
-
-        internal TransportConfiguration Transport { get; set; }
-        internal BusBuilderDebuggingConfiguration Debugging { get; set; }
-        internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
-
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
-        internal ConnectionStringSetting ConnectionString { get; set; }
-        internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
         internal DefaultTimeoutSetting DefaultTimeout { get; set; }
-        internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
         internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; }
         internal AutoDeleteOnIdleSetting AutoDeleteOnIdle { get; set; }
@@ -60,10 +46,9 @@ namespace Nimbus.Configuration
 
         internal BusBuilderConfiguration()
         {
-            Debugging = new BusBuilderDebuggingConfiguration();
-            LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
-            Router = new DestinationPerMessageTypeRouter();
             Transport = new NotSupportedTransportConfiguration();
+            Debugging = new BusBuilderDebuggingConfiguration();
+            Router = new DestinationPerMessageTypeRouter();
 
             Logger = new NullLogger();
             Compressor = new NullCompressor();

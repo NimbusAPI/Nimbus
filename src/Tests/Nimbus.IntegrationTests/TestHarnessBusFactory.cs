@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
-using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Interceptors.Inbound;
@@ -34,9 +33,10 @@ namespace Nimbus.IntegrationTests
 
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new InProcessTransportConfiguration())
-                                      //.WithTransport(new WindowsServiceBusTransportConfiguration())
+                //                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                //                                         .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                //)
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
                                       .WithTypesFrom(typeProvider)
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())

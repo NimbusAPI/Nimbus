@@ -82,6 +82,10 @@
       <Project>{1b793c01-e824-4449-b93d-277626b1791f}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

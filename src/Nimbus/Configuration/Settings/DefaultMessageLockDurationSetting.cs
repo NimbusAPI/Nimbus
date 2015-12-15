@@ -2,6 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
+    [Obsolete("Damian, I'll leave you to do the honours :)")]
     public class DefaultMessageLockDurationSetting : Setting<TimeSpan>
     {
         public override TimeSpan Default

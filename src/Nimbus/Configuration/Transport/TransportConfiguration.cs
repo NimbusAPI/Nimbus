@@ -5,7 +5,7 @@ namespace Nimbus.Configuration.Transport
 {
     public abstract class TransportConfiguration: INimbusConfiguration
     {
-        public void Register(PoorMansIoC container)
+        public void RegisterWith(PoorMansIoC container)
         {
             RegisterComponents(container);
             //FIXME assert that a transport was actually registered
