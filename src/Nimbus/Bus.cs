@@ -20,7 +20,6 @@ namespace Nimbus
         private readonly IMulticastRequestSender _multicastRequestSender;
         private readonly IEventSender _eventSender;
         private readonly IMessagePumpsManager _messagePumpsManager;
-        private readonly IDeadLetterQueues _deadLetterQueues;
         private readonly IHeartbeat _heartbeat;
 
         private readonly object _mutex = new object();
@@ -86,7 +85,7 @@ namespace Nimbus
 
         public IDeadLetterQueues DeadLetterQueues
         {
-            get { return _deadLetterQueues; }
+            get { throw new NotImplementedException(); }
         }
 
         public EventHandler<EventArgs> Starting;
