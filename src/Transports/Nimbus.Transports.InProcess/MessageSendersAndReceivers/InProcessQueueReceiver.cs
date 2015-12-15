@@ -36,7 +36,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
                             });
         }
 
-        private void ReceiveMessages(Func<NimbusMessage, Task> callback)
+        private async Task ReceiveMessages(Func<NimbusMessage, Task> callback)
         {
             var cancellationTokenSource = _cancellationTokenSource;
             if (cancellationTokenSource == null) return; // already cancelled
@@ -46,7 +46,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
                 try
                 {
                     var nimbusMessage = _messageQueue.Take(cancellationTokenSource.Token);
-                    callback(nimbusMessage);
+                    await callback(nimbusMessage);
                 }
                 catch (OperationCanceledException)
                 {
