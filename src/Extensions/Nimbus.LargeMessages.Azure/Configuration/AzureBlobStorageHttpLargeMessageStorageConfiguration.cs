@@ -25,10 +25,11 @@ namespace Nimbus.LargeMessages.Azure.Configuration
             container.Register(c =>
                                {
                                    var uriFormatter = new UriFormatter(AzureBlobStorageContainerUri, AzureBlobStorageContainerSharedAccessSignature);
-                                   var blobStorageHttpClient = container.ResolveWithOverrides<AzureBlobStorageHttpClient>(uriFormatter);
+                                   var blobStorageHttpClient = container.ResolveWithOverrides<IAzureBlobStorageHttpClient>(uriFormatter);
                                    var messageBodyStore = container.ResolveWithOverrides<AzureBlobStorageHttpLargeMessageBodyStore>(blobStorageHttpClient);
                                    return messageBodyStore;
-                               });
+                               },
+                               typeof (ILargeMessageBodyStore));
         }
 
         public override void RegisterSupportingComponents(PoorMansIoC container)

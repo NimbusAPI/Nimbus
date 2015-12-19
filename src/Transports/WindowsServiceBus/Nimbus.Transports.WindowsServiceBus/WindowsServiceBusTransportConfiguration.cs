@@ -12,6 +12,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.Transports.WindowsServiceBus.DevelopmentStubs;
 
 namespace Nimbus.Transports.WindowsServiceBus
@@ -24,7 +25,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
         internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
 
-        internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
+        internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; } = new UnsupportedLargeMessageBodyStorageConfiguration();
 
         public WindowsServiceBusTransportConfiguration WithConnectionString(string connectionString)
         {

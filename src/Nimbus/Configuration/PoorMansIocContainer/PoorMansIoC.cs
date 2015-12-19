@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
@@ -21,14 +20,14 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             Register(this);
         }
 
-        public void Register<T>(T instance)
+        public void Register<T>(T instance, params Type[] implementedTypes)
         {
-            RegisterInstance(instance);
+            RegisterInstance(instance, implementedTypes);
         }
 
-        public void Register<T>(Func<PoorMansIoC, T> factory)
+        public void Register<T>(Func<PoorMansIoC, T> factory, params Type[] implementedTypes)
         {
-            RegisterFactoryDelegate(factory);
+            RegisterFactoryDelegate(factory, implementedTypes);
         }
 
         public void RegisterType<T>(ComponentLifetime lifetime, params Type[] implementedTypes)
@@ -39,7 +38,8 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         public void RegisterType(Type concreteType, ComponentLifetime lifetime, params Type[] implementedTypes)
         {
             if (concreteType.IsInterface) throw new ArgumentException("An interface was supplied where there should have been a concrete type");
-            if (implementedTypes.Any(it => !it.IsAssignableFrom(concreteType))) throw new ArgumentException("One or more of the implemented types is not actually implemented by this concrete type.");
+            if (implementedTypes.Any(it => !it.IsAssignableFrom(concreteType)))
+                throw new ArgumentException("One or more of the implemented types is not actually implemented by this concrete type.");
 
             var registrations = implementedTypes.Select(t => new ComponentRegistration(concreteType, t, lifetime)).ToArray();
             if (registrations.None())
@@ -52,17 +52,21 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             }
         }
 
-        private void RegisterFactoryDelegate<T>(Func<PoorMansIoC, T> factory)
+        private void RegisterFactoryDelegate<T>(Func<PoorMansIoC, T> factory, Type[] implementedTypes)
         {
-            _factoryDelegates[typeof (T)] = pmioc => factory(pmioc);
+            var providedTypes = implementedTypes.None() ? new[] { typeof(T) } : implementedTypes;
+
+            foreach (var type in providedTypes)
+            {
+                _factoryDelegates[type] = c => factory(c);
+            }
         }
 
-        private void RegisterInstance(object instance)
+        private void RegisterInstance(object instance, params Type[] implementedTypes)
         {
-            var concreteType = instance.GetType();
-            _singleInstanceComponents[concreteType] = instance;
+            var providedTypes = implementedTypes.None() ? new[] {instance.GetType()} : implementedTypes;
 
-            var types = concreteType.GetInterfaces();
+            var types = providedTypes;
             foreach (var type in types)
             {
                 _singleInstanceComponents[type] = instance;

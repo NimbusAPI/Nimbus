@@ -9,7 +9,7 @@ namespace Nimbus.LargeMessages.Azure.Configuration
     public class AzureBlobStorageLargeMessageStorageConfiguration : LargeMessageStorageConfiguration
     {
         internal AzureStorageAccountConnectionStringSetting AzureStorageAccountConnectionString { get; set; }
-        internal AutoCreateBlobStorageContainerNameSetting AutoCreateBlobStorageContainerName { get; set; }
+        internal AutoCreateBlobStorageContainerNameSetting AutoCreateBlobStorageContainerName { get; set; } = new AutoCreateBlobStorageContainerNameSetting();
 
         public AzureBlobStorageLargeMessageStorageConfiguration UsingStorageAccountConnectionString(string connectionString)
         {

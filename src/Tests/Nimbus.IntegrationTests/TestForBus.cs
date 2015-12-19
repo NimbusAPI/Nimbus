@@ -24,7 +24,9 @@ namespace Nimbus.IntegrationTests
         [TearDown]
         public void TearDown()
         {
-            Bus.Dispose();
+            var bus = Bus;
+
+            if (bus != null) bus.Dispose();
         }
     }
 }

@@ -62,12 +62,12 @@ namespace Nimbus.Configuration
 
         public void RegisterWith(PoorMansIoC container)
         {
-            container.Register(TypeProvider);
-            container.Register(DependencyResolver);
-            container.Register(Logger);
-            container.Register(Serializer);
-            container.Register(Compressor);
-            container.Register(Router);
+            container.Register(TypeProvider, typeof(ITypeProvider));
+            container.Register(DependencyResolver, typeof(IDependencyResolver));
+            container.Register(Logger, typeof(ILogger));
+            container.Register(Serializer, typeof(ISerializer));
+            container.Register(Compressor, typeof(ICompressor));
+            container.Register(Router, typeof(IRouter));
 
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
@@ -80,7 +80,6 @@ namespace Nimbus.Configuration
             container.RegisterType<SystemClock>(ComponentLifetime.SingleInstance, typeof (IClock));
             container.RegisterType<DispatchContextManager>(ComponentLifetime.SingleInstance, typeof (IDispatchContextManager));
             container.RegisterType<ResponseMessageDispatcher>(ComponentLifetime.SingleInstance);
-            container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<HandlerMapper>(ComponentLifetime.SingleInstance, typeof (IHandlerMapper));
             container.RegisterType<MessageDispatcherFactory>(ComponentLifetime.SingleInstance, typeof (IMessageDispatcherFactory));
             container.RegisterType<InboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IInboundInterceptorFactory));
@@ -94,6 +93,7 @@ namespace Nimbus.Configuration
             container.RegisterType<KnownMessageTypeVerifier>(ComponentLifetime.SingleInstance, typeof (IKnownMessageTypeVerifier));
             container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
             container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
+            container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
 
             #region To be fixed
 

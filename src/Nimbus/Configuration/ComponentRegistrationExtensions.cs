@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration.PoorMansIocContainer;
@@ -20,13 +19,8 @@ namespace Nimbus.Configuration
                 .GetType()
                 .GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => typeof (ISetting).IsAssignableFrom(p.PropertyType))
-                .Select(p =>
-                        {
-                            var v = p.GetValue(configuration);
-                            if (v == null) Debugger.Break();
-                            return v;
-                        })
-                .Do(container.Register)
+                .Select(p => p.GetValue(configuration))
+                .Do(o => container.Register(o))
                 .Done();
 
             configuration
