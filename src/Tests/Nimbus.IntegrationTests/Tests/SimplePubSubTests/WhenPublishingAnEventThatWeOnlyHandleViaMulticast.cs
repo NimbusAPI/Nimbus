@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
         public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -37,7 +37,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -50,7 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

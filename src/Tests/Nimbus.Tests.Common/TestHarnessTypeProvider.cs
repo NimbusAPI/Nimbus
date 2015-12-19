@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Nimbus.Infrastructure;
+using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Tests.Common
 {
@@ -21,11 +22,15 @@ namespace Nimbus.Tests.Common
         protected override Type[] ScanAssembliesForInterestingTypes()
         {
             var interestingTypes = base.ScanAssembliesForInterestingTypes();
+
             var interestingTypesInFilteredNamespaces = interestingTypes
                 .Where(t => _namespaces.Any(ns => (t.Namespace ?? string.Empty).StartsWith(ns)))
                 .Where(t => !t.Name.EndsWith("ThatIsNotReturedByTheTypeProvider"))
                 .ToArray();
-            return interestingTypesInFilteredNamespaces;
+
+            var knownTypesForThisTest = interestingTypesInFilteredNamespaces.Union(new[] {typeof (HeartbeatEvent)}).ToArray();
+
+            return knownTypesForThisTest;
         }
     }
 }

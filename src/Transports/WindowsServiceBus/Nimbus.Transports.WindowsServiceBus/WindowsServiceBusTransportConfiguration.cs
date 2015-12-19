@@ -59,8 +59,9 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         protected override void RegisterComponents(PoorMansIoC container)
         {
-            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<WindowsServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
+
+            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
             container.RegisterType<StubDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
@@ -79,9 +80,10 @@ namespace Nimbus.Transports.WindowsServiceBus
                                        nsm => { });
 
                                    return namespaceManagerRoundRobin;
-                               });
+                               },
+                               ComponentLifetime.SingleInstance);
 
-            container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext);
+            container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext, ComponentLifetime.InstancePerDependency);
 
             container.Register(c =>
                                {
@@ -97,9 +99,10 @@ namespace Nimbus.Transports.WindowsServiceBus
                                        mf => { });
 
                                    return messagingFactoryRoundRobin;
-                               });
+                               },
+                               ComponentLifetime.SingleInstance);
 
-            container.Register<Func<MessagingFactory>>(c => c.Resolve<RoundRobin<MessagingFactory>>().GetNext);
+            container.Register<Func<MessagingFactory>>(c => c.Resolve<RoundRobin<MessagingFactory>>().GetNext, ComponentLifetime.InstancePerDependency);
         }
 
         public override IEnumerable<string> Validate()

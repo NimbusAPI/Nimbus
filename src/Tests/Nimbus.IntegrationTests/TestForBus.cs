@@ -6,9 +6,11 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
+        protected const int TimeoutSeconds = 15;
+
         protected Bus Bus { get; private set; }
 
         protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.TestScenarioGeneration
 {
-    public class TestForAllBusConfigurations<TTestType> : IEnumerable<TestCaseData>
+    public class AllBusConfigurations<TTestType> : IEnumerable<TestCaseData>
     {
         public IEnumerator<TestCaseData> GetEnumerator()
         {

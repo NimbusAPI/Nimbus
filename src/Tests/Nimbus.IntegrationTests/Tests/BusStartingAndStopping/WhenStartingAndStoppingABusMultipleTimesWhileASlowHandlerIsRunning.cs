@@ -53,7 +53,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
         public async Task NothingShouldGoBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -61,7 +61,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
         public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

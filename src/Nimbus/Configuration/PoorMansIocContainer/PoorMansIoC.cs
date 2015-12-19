@@ -2,16 +2,14 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
 namespace Nimbus.Configuration.PoorMansIocContainer
 {
     public class PoorMansIoC : IDisposable
     {
-        private readonly ThreadSafeDictionary<Type, object> _singleInstanceComponents = new ThreadSafeDictionary<Type, object>();
-        private readonly ThreadSafeDictionary<Type, Func<PoorMansIoC, object>> _factoryDelegates = new ThreadSafeDictionary<Type, Func<PoorMansIoC, object>>();
-        private readonly ConcurrentBag<ComponentRegistration> _registrations = new ConcurrentBag<ComponentRegistration>();
+        private readonly ConcurrentBag<object> _singleInstanceComponents = new ConcurrentBag<object>();
+        private readonly ConcurrentBag<IComponentRegistration> _registrations = new ConcurrentBag<IComponentRegistration>();
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
 
@@ -22,16 +20,27 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         public void Register<T>(T instance, params Type[] implementedTypes)
         {
-            RegisterInstance(instance, implementedTypes);
+            var advertisedTypes = implementedTypes.None() ? new[] {instance.GetType()} : implementedTypes;
+            RegisterInstance(instance, advertisedTypes);
         }
 
-        public void Register<T>(Func<PoorMansIoC, T> factory, params Type[] implementedTypes)
+        public void Register<T>(Func<PoorMansIoC, T> factory, ComponentLifetime componentLifetime, params Type[] implementedTypes)
         {
-            RegisterFactoryDelegate(factory, implementedTypes);
+            foreach (var t in implementedTypes)
+            {
+                if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Factory return type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
+            }
+
+            RegisterFactoryDelegate(factory, componentLifetime, implementedTypes);
         }
 
         public void RegisterType<T>(ComponentLifetime lifetime, params Type[] implementedTypes)
         {
+            foreach (var t in implementedTypes)
+            {
+                if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Concrete type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
+            }
+
             RegisterType(typeof (T), lifetime, implementedTypes);
         }
 
@@ -41,36 +50,30 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             if (implementedTypes.Any(it => !it.IsAssignableFrom(concreteType)))
                 throw new ArgumentException("One or more of the implemented types is not actually implemented by this concrete type.");
 
-            var registrations = implementedTypes.Select(t => new ComponentRegistration(concreteType, t, lifetime)).ToArray();
-            if (registrations.None())
-            {
-                _registrations.Add(new ComponentRegistration(concreteType, concreteType, lifetime));
-            }
-            else
-            {
-                foreach (var registration in registrations) _registrations.Add(registration);
-            }
+            var advertisedTypes = implementedTypes.None() ? new[] {concreteType} : implementedTypes;
+
+            advertisedTypes.Select(t => new TypedRegistration(concreteType, t, lifetime))
+                           .Do(r => _registrations.Add(r))
+                           .Done();
         }
 
-        private void RegisterFactoryDelegate<T>(Func<PoorMansIoC, T> factory, Type[] implementedTypes)
+        private void RegisterFactoryDelegate<T>(Func<PoorMansIoC, T> factory, ComponentLifetime componentLifetime, Type[] implementedTypes)
         {
-            var providedTypes = implementedTypes.None() ? new[] { typeof(T) } : implementedTypes;
+            var providedTypes = implementedTypes.None() ? new[] {typeof (T)} : implementedTypes;
 
             foreach (var type in providedTypes)
             {
-                _factoryDelegates[type] = c => factory(c);
+                _registrations.Add(new FactoryRegistration(c => factory(c), typeof (T), componentLifetime, type));
             }
         }
 
-        private void RegisterInstance(object instance, params Type[] implementedTypes)
+        private void RegisterInstance(object instance, Type[] implementedTypes)
         {
-            var providedTypes = implementedTypes.None() ? new[] {instance.GetType()} : implementedTypes;
-
-            var types = providedTypes;
-            foreach (var type in types)
+            foreach (var implementedType in implementedTypes)
             {
-                _singleInstanceComponents[type] = instance;
+                _registrations.Add(new TypedRegistration(instance.GetType(), implementedType, ComponentLifetime.SingleInstance));
             }
+            _singleInstanceComponents.Add(instance);
         }
 
         public T Resolve<T>()
@@ -88,14 +91,21 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             var matchingOverride = overrides
                 .Where(type.IsInstanceOfType)
                 .FirstOrDefault();
+
             if (matchingOverride != null) return matchingOverride;
+
+            var registration = RegistrationForImplementedType(type);
 
             try
             {
-                object instance;
-                if (_singleInstanceComponents.TryGetValue(type, out instance)) return instance;
-                instance = ConstructObject(type, overrides);
-                RegisterInstanceIfSingleton(instance);
+                var concreteType = registration.ConcreteType;
+
+                var instance = _singleInstanceComponents
+                    .Where(o => o.GetType() == concreteType)
+                    .FirstOrDefault();
+                if (instance != null) return instance;
+
+                instance = ConstructObject(type, registration.Lifetime, overrides);
                 return instance;
             }
             catch (Exception exc)
@@ -104,73 +114,48 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             }
         }
 
-        private object ConstructObject(Type type, params object[] overrides)
+        private object ConstructObject(Type type, ComponentLifetime componentLifetime, params object[] overrides)
         {
-            var instance = ConstructObjectInternal(type, overrides);
+            var registration = _registrations
+                .Where(r => r.ImplementedType == type)
+                .First();
+
+            object instance = null;
+
+            var factoryRegistration = registration as FactoryRegistration;
+            if (factoryRegistration != null)
+            {
+                instance = factoryRegistration.Factory(this);
+            }
+
+            var typedRegistration = registration as TypedRegistration;
+            if (typedRegistration != null)
+            {
+                var constructorInfo = typedRegistration.ConcreteType
+                                                       .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                                       .Single();
+                var args = constructorInfo
+                    .GetParameters()
+                    .Select(p => Resolve(p.ParameterType, overrides))
+                    .ToArray();
+
+                instance = constructorInfo.Invoke(args);
+            }
+
+            if (instance == null) throw new DependencyResolutionException("No registration was found for type {0}".FormatWith(type.FullName));
+
+            if (componentLifetime == ComponentLifetime.SingleInstance)
+            {
+                _singleInstanceComponents.Add(instance);
+            }
+
             var disposable = instance as IDisposable;
             if (disposable != null) _garbageMan.Add(disposable);
+
             return instance;
         }
 
-        private object ConstructObjectInternal(Type type, params object[] overrides)
-        {
-            Func<PoorMansIoC, object> factory;
-            if (_factoryDelegates.TryGetValue(type, out factory))
-            {
-                var instance = factory(this);
-                RegisterInstanceIfSingleton(instance);
-                return instance;
-            }
-            else
-            {
-                var concreteType = ExtractConcreteTypeFor(type);
-                var args = concreteType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                       .Single()
-                                       .GetParameters()
-                                       .Select(p => Resolve(p.ParameterType, overrides))
-                                       .ToArray();
-
-                var instance = Activator.CreateInstance(concreteType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, args, null);
-                RegisterInstanceIfSingleton(instance);
-                return instance;
-            }
-        }
-
-        private void RegisterInstanceIfSingleton(object instance)
-        {
-            var componentLifetime = LifetimeFor(instance.GetType());
-            if (componentLifetime == ComponentLifetime.SingleInstance)
-            {
-                RegisterInstance(instance);
-            }
-        }
-
-        private ComponentLifetime LifetimeFor(Type concreteType)
-        {
-            var registration = RegistrationForConcreteType(concreteType);
-
-            return registration == null
-                ? ComponentLifetime.InstancePerDependency
-                : registration.Lifetime;
-        }
-
-        private Type ExtractConcreteTypeFor(Type type)
-        {
-            var registration = RegistrationForImplementedType(type);
-
-            if (registration == null) throw new DependencyResolutionException("No registration for a concrete type that implements {0}".FormatWith(type.FullName));
-
-            return registration.ConcreteType;
-        }
-
-        private ComponentRegistration RegistrationForConcreteType(Type type)
-        {
-            return _registrations
-                .Where(r => r.ConcreteType == type)
-                .FirstOrDefault();
-        }
-
-        private ComponentRegistration RegistrationForImplementedType(Type type)
+        private IComponentRegistration RegistrationForImplementedType(Type type)
         {
             return _registrations
                 .Where(r => r.ImplementedType == type)

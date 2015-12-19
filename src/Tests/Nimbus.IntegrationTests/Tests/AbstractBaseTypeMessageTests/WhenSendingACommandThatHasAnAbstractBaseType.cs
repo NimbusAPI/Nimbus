@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
         public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -32,7 +32,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

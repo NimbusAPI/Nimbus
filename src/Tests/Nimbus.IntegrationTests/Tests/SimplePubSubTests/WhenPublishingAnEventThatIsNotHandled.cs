@@ -26,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatIsNotHandled>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatIsNotHandled>))]
         public async Task NoExceptionIsThrown(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

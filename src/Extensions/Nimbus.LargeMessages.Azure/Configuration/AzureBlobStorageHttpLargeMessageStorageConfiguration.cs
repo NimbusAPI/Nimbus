@@ -29,6 +29,7 @@ namespace Nimbus.LargeMessages.Azure.Configuration
                                    var messageBodyStore = container.ResolveWithOverrides<AzureBlobStorageHttpLargeMessageBodyStore>(blobStorageHttpClient);
                                    return messageBodyStore;
                                },
+                               ComponentLifetime.SingleInstance,
                                typeof (ILargeMessageBodyStore));
         }
 

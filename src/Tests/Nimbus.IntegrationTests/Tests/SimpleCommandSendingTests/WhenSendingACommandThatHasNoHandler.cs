@@ -16,7 +16,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandThatHasNoHandler>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasNoHandler>))]
         public async Task NothingShouldGoBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

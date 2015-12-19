@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
@@ -17,7 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds * 1000)]
+    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
         private const int _timeoutSeconds = 5;
@@ -49,8 +46,8 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
 
             await bus.Start();

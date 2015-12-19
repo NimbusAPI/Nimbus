@@ -69,10 +69,12 @@
     <Compile Include="Configuration\ComponentRegistrationExtensions.cs" />
     <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\FactoryRegistration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\IComponentRegistration.cs" />
     <Compile Include="Configuration\Settings\ISetting.cs" />
     <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
-    <Compile Include="Configuration\PoorMansIocContainer\ComponentRegistration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\TypedRegistration.cs" />
     <Compile Include="Configuration\IMessagePumpsManager.cs" />
     <Compile Include="Configuration\MessagePumpsManager.cs" />
     <Compile Include="Configuration\INimbusConfiguration.cs" />

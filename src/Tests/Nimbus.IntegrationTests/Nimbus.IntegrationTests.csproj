@@ -82,7 +82,7 @@
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
     <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\TestForAllBusConfigurations.cs" />
+    <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
     <Compile Include="TestForBus.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />

@@ -39,7 +39,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -49,7 +49,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task WeShouldObserveOneDispatchContextPerMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -59,7 +59,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task AllParentMessageIdsShouldBeDifferent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -69,7 +69,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task TheCorrelationIdsShouldAllBeTheSame(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -79,7 +79,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task TheThirdMessageShouldBeCausedByTheSecondMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -89,7 +89,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task TheSecondMessageShouldBeCausedByTheFirstMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -99,7 +99,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
         public async Task TheFirstMessageShouldBeTheInitialMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
