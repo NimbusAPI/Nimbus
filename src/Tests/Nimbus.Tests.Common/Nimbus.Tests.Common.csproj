@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssertingStopwatch.cs" />
     <Compile Include="MethodCallCounter.cs" />
     <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="NullDependencyResolver.cs" />

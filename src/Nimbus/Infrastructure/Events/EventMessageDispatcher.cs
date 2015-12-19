@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
@@ -15,27 +14,18 @@ namespace Nimbus.Infrastructure.Events
     {
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
-        private readonly INimbusMessageFactory _nimbusMessageFactory;
-        private readonly IClock _clock;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly ILogger _logger;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
 
-        protected EventMessageDispatcher(INimbusMessageFactory nimbusMessageFactory,
-                                         IClock clock,
-                                         IDependencyResolver dependencyResolver,
+        protected EventMessageDispatcher(IDependencyResolver dependencyResolver,
                                          IReadOnlyDictionary<Type, Type[]> handlerMap,
                                          IInboundInterceptorFactory inboundInterceptorFactory,
-                                         ILogger logger,
-                                         DefaultMessageLockDurationSetting defaultMessageLockDuration)
+                                         ILogger logger)
         {
-            _nimbusMessageFactory = nimbusMessageFactory;
-            _clock = clock;
             _dependencyResolver = dependencyResolver;
             _handlerMap = handlerMap;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
         }
 
         public async Task Dispatch(NimbusMessage message)

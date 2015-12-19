@@ -5,6 +5,7 @@ using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Tests.Common;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
@@ -13,7 +14,6 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
     {
         [Test]
         [Timeout(15*1000)]
-        [ExpectedException(typeof (BusException))]
         public async Task ItShouldGoBangQuickly()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
@@ -31,7 +31,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                       .WithLogger(logger)
                                       .Build();
 
-            await bus.Start();
+            Should.Throw<BusException>(() => bus.Start().Wait());
         }
     }
 }

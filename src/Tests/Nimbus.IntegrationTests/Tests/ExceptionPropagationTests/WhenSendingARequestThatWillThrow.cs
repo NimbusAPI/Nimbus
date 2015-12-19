@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using NUnit.Framework;
 using Shouldly;
 
@@ -14,12 +16,12 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         private RequestThatWillThrowResponse _response;
         private Exception _exception;
 
-        protected override Task Given()
+        protected override Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
             _response = null;
             _exception = null;
 
-            return base.Given();
+            return base.Given(busBuilderConfiguration);
         }
 
         protected override async Task When()
@@ -36,26 +38,42 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        public async Task TheResponseShouldNotBeSet()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        public async Task TheResponseShouldNotBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _response.ShouldBe(null);
         }
 
         [Test]
-        public async Task AnExceptionShouldBeReThrownOnTheClient()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        public async Task AnExceptionShouldBeReThrownOnTheClient(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _exception.ShouldNotBe(null);
         }
 
         [Test]
-        public async Task TheExceptionShouldBeARequestFailedException()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        public async Task TheExceptionShouldBeARequestFailedException(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _exception.ShouldBeTypeOf<RequestFailedException>();
         }
 
         [Test]
-        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _exception.Message.ShouldContain(RequestThatWillThrowHandler.ExceptionMessage);
         }
     }

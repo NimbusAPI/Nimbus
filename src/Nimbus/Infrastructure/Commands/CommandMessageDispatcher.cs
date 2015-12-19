@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
@@ -17,30 +16,20 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
-        private readonly INimbusMessageFactory _brokeredMessageFactory;
-        private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly IPropertyInjector _propertyInjector;
 
-        public CommandMessageDispatcher(
-            INimbusMessageFactory brokeredMessageFactory,
-            IClock clock,
-            IDependencyResolver dependencyResolver,
-            IInboundInterceptorFactory inboundInterceptorFactory,
-            ILogger logger,
-            IReadOnlyDictionary<Type, Type[]> handlerMap,
-            DefaultMessageLockDurationSetting defaultMessageLockDuration,
-            IPropertyInjector propertyInjector)
+        public CommandMessageDispatcher(IDependencyResolver dependencyResolver,
+                                        IInboundInterceptorFactory inboundInterceptorFactory,
+                                        ILogger logger,
+                                        IReadOnlyDictionary<Type, Type[]> handlerMap,
+                                        IPropertyInjector propertyInjector)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _clock = clock;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _handlerMap = handlerMap;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
             _propertyInjector = propertyInjector;
         }
 

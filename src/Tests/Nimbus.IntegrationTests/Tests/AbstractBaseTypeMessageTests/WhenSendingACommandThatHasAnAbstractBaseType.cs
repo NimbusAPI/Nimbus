@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -21,14 +22,22 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        public async Task TheCommandBrokerShouldReceiveThatCommand()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<SomeConcreteCommandType>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
     }

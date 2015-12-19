@@ -45,9 +45,9 @@
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDomainScanner.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
@@ -80,7 +81,13 @@
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
+    <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\TestForAllBusConfigurations.cs" />
+    <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
+    <Compile Include="TestForBus.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeCompetingHandler.cs" />
+    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeMulticastHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteRequestTypeMulticastHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeAbstractCommandType.cs" />
@@ -91,8 +98,6 @@
     <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteEventType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteRequestType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\MessageContracts\SomeConcreteResponseType.cs" />
-    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeCompetingHandler.cs" />
-    <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeMulticastHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenPublishingAnEventThatHasAnAbstractBaseType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingACommandThatHasAnAbstractBaseType.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\WhenSendingAMulticastRequestThatHasAnAbstractBaseType.cs" />
@@ -110,12 +115,12 @@
     <Compile Include="Tests\AuditingInterceptorTests\WhenSendingOneOfEachKindOfMessage.cs" />
     <Compile Include="Tests\BusBuilderTests\Handlers\SomeCommandHandler.cs" />
     <Compile Include="Tests\BusBuilderTests\MessageContracts\SomeCommand.cs" />
-    <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
     <Compile Include="Tests\BusBuilderTests\WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint.cs" />
-    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\QuickCommand.cs" />
+    <Compile Include="Tests\BusBuilderTests\WhenStartingABusWithAnEndpointThatDoesNotExist.cs" />
     <Compile Include="Tests\BusStartingAndStopping\Handlers\QuickCommandHandler.cs" />
-    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\SlowCommand.cs" />
     <Compile Include="Tests\BusStartingAndStopping\Handlers\SlowCommandHandler.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\QuickCommand.cs" />
+    <Compile Include="Tests\BusStartingAndStopping\MessageContracts\SlowCommand.cs" />
     <Compile Include="Tests\BusStartingAndStopping\WhenStartingAndStoppingABusMultipleTimes.cs" />
     <Compile Include="Tests\BusStartingAndStopping\WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning.cs" />
     <Compile Include="Tests\BusStartingAndStopping\WhenStoppingTheBusWhileThereAreManyCommandsInAQueue.cs" />
@@ -123,25 +128,26 @@
     <Compile Include="Tests\ExceptionPropagationTests\MessageContracts\RequestThatWillThrowResponse.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\DemonstrationException.cs" />
     <Compile Include="Tests\ExceptionPropagationTests\RequestHandlers\RequestThatWillThrowHandler.cs" />
-    <Compile Include="Tests\InterceptorTests\Interceptors\SomeBaseClassLevelInterceptor.cs" />
+    <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
+    <Compile Include="Tests\InterceptorTests\Handlers\MultipleCommandHandler.cs" />
     <Compile Include="Tests\InterceptorTests\Handlers\SomeBaseCommandHandler.cs" />
+    <Compile Include="Tests\InterceptorTests\Interceptors\SomeBaseClassLevelInterceptor.cs" />
     <Compile Include="Tests\InterceptorTests\Interceptors\SomeBaseMethodLevelInterceptorForBar.cs" />
     <Compile Include="Tests\InterceptorTests\Interceptors\SomeBaseMethodLevelInterceptorForFoo.cs" />
+    <Compile Include="Tests\InterceptorTests\Interceptors\SomeClassLevelInterceptor.cs" />
     <Compile Include="Tests\InterceptorTests\Interceptors\SomeGlobalInterceptor.cs" />
     <Compile Include="Tests\InterceptorTests\Interceptors\SomeMethodLevelInterceptorForBar.cs" />
-    <Compile Include="Tests\InterceptorTests\Interceptors\SomeClassLevelInterceptor.cs" />
-    <Compile Include="Tests\InterceptorTests\MessageContracts\BarCommand.cs" />
-    <Compile Include="Tests\InterceptorTests\Handlers\MultipleCommandHandler.cs" />
     <Compile Include="Tests\InterceptorTests\Interceptors\SomeMethodLevelInterceptorForFoo.cs" />
+    <Compile Include="Tests\InterceptorTests\MessageContracts\BarCommand.cs" />
     <Compile Include="Tests\InterceptorTests\MessageContracts\FooCommand.cs" />
     <Compile Include="Tests\InterceptorTests\WhenSendingACommandThatHasAMethodAndClassLevelInterceptor.cs" />
     <Compile Include="Tests\LargeMessageTests\Handlers\BigFatRequestHandler.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatRequest.cs" />
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatResponse.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingAzureBlobStorage.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingDiskStorage.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingAzureBlobStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingDiskStorage.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\ApatheticBlackBallRequestHandler.cs" />
@@ -150,46 +156,45 @@
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowTwoResponders.cs" />
-    <Compile Include="TestForBus.cs" />
+    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
+    <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
+    <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
+    <Compile Include="TestScenarioGeneration\LargeMessageStorageConfigurationSources.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
+    <Compile Include="TestScenarioGeneration\PartialConfigurationScenario.cs" />
+    <Compile Include="TestScenarioGeneration\TransportConfigurationSources.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
-    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\FirstCommandHandler.cs" />
+    <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\ThirdCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\Interceptors\TestInterceptor.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\FirstCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\SecondCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\MessageContracts\ThirdCommand.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\WhenSendingACascadeOfCommands.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
-    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />
-    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatIsNotHandled.cs" />
     <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeCompetingEventHandler.cs" />
+    <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeMulticastEventHandler.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeDoNotHandle.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeHandleViaMulticastAndCompetition.cs" />
     <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaCompetition.cs" />
+    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaMulticast.cs" />
+    <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatIsNotHandled.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaCompetition.cs" />
-    <Compile Include="Tests\ExceptionPropagationTests\WhenSendingARequestThatWillThrow.cs" />
-    <Compile Include="Tests\StartupPerformanceTests\AssertingStopwatch.cs" />
-    <Compile Include="Tests\StartupPerformanceTests\WhenCreatingABigBus.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
-    <Compile Include="Tests\SimplePubSubTests\MessageContracts\SomeEventWeOnlyHandleViaMulticast.cs" />
-    <Compile Include="Tests\SimplePubSubTests\EventHandlers\SomeMulticastEventHandler.cs" />
-    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequest.cs" />
-    <Compile Include="Tests\SimpleRequestResponseTests\RequestHandlers\SomeRequestHandler.cs" />
-    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeResponse.cs" />
-    <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
-    <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
-    <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="ThenAttribute.cs" />
-    <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimplePubSubTests\WhenPublishingAnEventThatWeOnlyHandleViaMulticast.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeRequest.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\MessageContracts\SomeResponse.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\RequestHandlers\SomeRequestHandler.cs" />
+    <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestOnTheBus.cs" />
+    <Compile Include="ThenAttribute.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandOnTheBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\SimpleRequestResponseTests\WhenSendingARequestOnTheBus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
-using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.StressTests.ThroughputTests.Infrastructure;
 using Nimbus.Tests.Common;
@@ -47,11 +46,6 @@ namespace Nimbus.StressTests.ThroughputTests
 
             _logger = TestHarnessLoggerFactory.Create();
             //_logger = new NullLogger();
-
-            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
-                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
-                                                                        .WithLogger(_logger)
-                                                                        .Build();
 
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new InProcessTransportConfiguration())

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -24,26 +26,42 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        public async Task TheCommandBrokerShouldReceiveThatCommand()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<SomeOtherCommand>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheDispatchContextShouldBeSet()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheDispatchContextShouldBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             SomeOtherCommandHandler.ReceivedDispatchContext.ShouldNotBe(null);
         }
 
         [Test]
-        public async Task TheMessagePropertiesShouldBeSet()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheMessagePropertiesShouldBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             SomeOtherCommandHandler.ReceivedMessageProperties.ShouldNotBe(null);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
     }

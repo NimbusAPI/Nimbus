@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -51,13 +53,20 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public async Task NothingShouldGoBang()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        public async Task NothingShouldGoBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
         }
 
         [Test]
-        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler().ShouldBe(true);
         }
 

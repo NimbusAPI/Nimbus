@@ -57,14 +57,12 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             return new RequestMessageDispatcher(
                 NimbusMessageFactory,
-                clock,
                 dependencyResolver,
                 inboundInterceptorFactory,
                 outboundInterceptorFactory,
                 logger,
                 messagingFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),
-                new DefaultMessageLockDurationSetting(),
                 Substitute.For<IPropertyInjector>());
         }
 
@@ -82,14 +80,10 @@ namespace Nimbus.UnitTests.DispatcherTests
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<NimbusMessage>())
                                      .Returns(new[] {interceptor});
 
-            return new CommandMessageDispatcher(
-                NimbusMessageFactory,
-                clock,
-                dependencyResolver,
+            return new CommandMessageDispatcher(dependencyResolver,
                 inboundInterceptorFactory,
                 logger,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleCommand<>)),
-                new DefaultMessageLockDurationSetting(),
                 Substitute.For<IPropertyInjector>());
         }
 

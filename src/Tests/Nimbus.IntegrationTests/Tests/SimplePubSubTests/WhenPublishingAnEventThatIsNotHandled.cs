@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using NUnit.Framework;
 using Shouldly;
 
@@ -24,8 +26,12 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        public async Task NoExceptionIsThrown()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatIsNotHandled>))]
+        public async Task NoExceptionIsThrown(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _exception.ShouldBe(null);
         }
     }

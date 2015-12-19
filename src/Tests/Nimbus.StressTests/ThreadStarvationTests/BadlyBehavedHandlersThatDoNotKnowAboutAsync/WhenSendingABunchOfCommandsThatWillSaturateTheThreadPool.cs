@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.StressTests.Configuration;
-using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.Transports.InProcess;
@@ -21,7 +17,6 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
     public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
         private const int _timeoutSeconds = 180;
-        private static readonly TimeSpan _messageLockDuration = CommandThatWillBlockTheThreadHandler.SleepDuration.Add(TimeSpan.FromSeconds(1));
 
         private ILogger _logger;
         private int _numMessagesToSend;
@@ -53,7 +48,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task When()
         {
-            _numMessagesToSend = new MaximumThreadPoolThreadsSetting().Default*2;
+            _numMessagesToSend = (Environment.ProcessorCount*2)*Environment.ProcessorCount;
 
             var commands = Enumerable.Range(0, _numMessagesToSend)
                                      .Select(j => new CommandThatWillBlockTheThread())

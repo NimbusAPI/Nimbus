@@ -2,7 +2,6 @@ using System;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.Azure.Configuration;
@@ -21,26 +20,19 @@ namespace Nimbus.Extensions.IntegrationTests
             using (var container = new WindsorContainer())
             {
                 var typeProvider = new AssemblyScanningTypeProvider();
-
                 container.Register(Component.For<ILogger>()
                                             .ImplementedBy<ConsoleLogger>()
                                             .LifestyleSingleton());
 
                 container.RegisterNimbus(typeProvider);
 
-                container.Register(Component.For<ILargeMessageBodyStore>()
-                                            .UsingFactoryMethod(c => new BlobStorageBuilder()
-                                                                    .Configure()
-                                                                    .UsingStorageAccountConnectionString("Some fake connection string")
-                                                                    .WithLogger(c.Resolve<ILogger>())
-                                                                    .Build())
-                                            .LifestyleSingleton());
-
                 container.Register(Component.For<IBus>()
                                             .UsingFactoryMethod(c => new BusBuilder().Configure()
                                                                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
-                                                                                                        .WithConnectionString(@"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
-                                                                                                        .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                                                                        .WithConnectionString(
+                                                                                                            @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
+                                                                                                        .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
+                                                                                                                                     .UsingStorageAccountConnectionString("Some fake connection string")
                                                                                                                                      .WithMaxSmallMessageSize(50*1024)
                                                                                                                                      .WithMaxLargeMessageSize(1024*1024))
                                                                     )

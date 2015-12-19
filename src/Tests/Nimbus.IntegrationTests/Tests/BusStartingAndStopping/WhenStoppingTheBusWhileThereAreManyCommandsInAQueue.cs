@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -37,21 +39,33 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public async Task TheBusShouldStopBeforeAllTheCommandsAreHandled()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        public async Task TheBusShouldStopBeforeAllTheCommandsAreHandled(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             Console.WriteLine("Observed a total of {0} command handler invocations", _commandHandlerInvocationCount);
             _commandHandlerInvocationCount.ShouldBeLessThan(_totalCommands);
         }
 
         [Test]
-        public async Task AtLeastSomeOfTheCommandsShouldHaveBeenHandled()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        public async Task AtLeastSomeOfTheCommandsShouldHaveBeenHandled(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _commandHandlerInvocationCount.ShouldBeGreaterThan(0);
         }
 
         [Test]
-        public async Task NoMoreHandlerInvocationsShouldHaveOccurredAfterTheBusWasStopped()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        public async Task NoMoreHandlerInvocationsShouldHaveOccurredAfterTheBusWasStopped(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _additionalCommandHandlerInvocationCount.ShouldBe(0);
         }
     }

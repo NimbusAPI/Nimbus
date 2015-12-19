@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
@@ -25,22 +24,20 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected override async Task<Bus> Given()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var logger = TestHarnessLoggerFactory.Create();
-            var largeMessageBodyStorage = new BlobStorageBuilder().Configure()
-                                                                  .UsingStorageAccountConnectionString(DefaultSettingsReader.Get<AzureBlobStorageConnectionString>())
-                                                                  .WithLogger(logger)
-                                                                  .Build();
+
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                          .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                                                         .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                         .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
+                                                                                      .UsingStorageAccountConnectionString(
+                                                                                          DefaultSettingsReader.Get<AzureBlobStorageConnectionString>())
                                                                                       .WithMaxSmallMessageSize(64*1024)
                                                                                       .WithMaxLargeMessageSize(10*1048576))
                 )
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                      .WithLogger(logger)
+                                      .WithLogger(TestHarnessLoggerFactory.Create())
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();

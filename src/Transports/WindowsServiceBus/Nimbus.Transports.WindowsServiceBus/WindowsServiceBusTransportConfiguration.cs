@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
@@ -18,15 +19,12 @@ namespace Nimbus.Transports.WindowsServiceBus
     public class WindowsServiceBusTransportConfiguration : TransportConfiguration
     {
         internal ConnectionStringSetting ConnectionString { get; set; }
-        internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
-        internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
+        internal ServerConnectionCountSetting ServerConnectionCount { get; set; } = new ServerConnectionCountSetting();
+        internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; } = new DefaultMessageLockDurationSetting();
+        internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
+        internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
 
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
-
-        public WindowsServiceBusTransportConfiguration()
-        {
-            LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
-        }
 
         public WindowsServiceBusTransportConfiguration WithConnectionString(string connectionString)
         {
@@ -60,46 +58,52 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         protected override void RegisterComponents(PoorMansIoC container)
         {
-            LargeMessageStorageConfiguration.RegisterWith(container);
-            HackyComponentRegistrationExtensions.RegisterPropertiesFromConfigurationObject(container, LargeMessageStorageConfiguration);
-
-            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof(IBrokeredMessageFactory));
+            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<WindowsServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
             container.RegisterType<StubDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
 
-            var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
-                container.Resolve<ServerConnectionCountSetting>(),
-                () =>
-                {
-                    var namespaceManager = NamespaceManager.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
-                    return namespaceManager;
-                },
-                nsm => false,
-                nsm => { });
+            container.Register(c =>
+                               {
+                                   var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
+                                       c.Resolve<ServerConnectionCountSetting>(),
+                                       () =>
+                                       {
+                                           var namespaceManager = NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
+                                           namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                                           return namespaceManager;
+                                       },
+                                       nsm => false,
+                                       nsm => { });
 
-            container.Register<Func<NamespaceManager>>(c => namespaceManagerRoundRobin.GetNext);
+                                   return namespaceManagerRoundRobin;
+                               });
 
-            var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
-                container.Resolve<ServerConnectionCountSetting>(),
-                () =>
-                {
-                    var messagingFactory = MessagingFactory.CreateFromConnectionString(container.Resolve<ConnectionStringSetting>());
-                    messagingFactory.PrefetchCount = container.Resolve<ConcurrentHandlerLimitSetting>();
-                    return messagingFactory;
-                },
-                mf => mf.IsBorked(),
-                mf => { });
+            container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext);
 
-            container.Register<Func<MessagingFactory>>(c => messagingFactoryRoundRobin.GetNext);
+            container.Register(c =>
+                               {
+                                   var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
+                                       container.Resolve<ServerConnectionCountSetting>(),
+                                       () =>
+                                       {
+                                           var messagingFactory = MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
+                                           messagingFactory.PrefetchCount = c.Resolve<ConcurrentHandlerLimitSetting>();
+                                           return messagingFactory;
+                                       },
+                                       mf => mf.IsBorked(),
+                                       mf => { });
 
-            if (container.Resolve<RemoveAllExistingNamespaceElementsSetting>())
-            {
-                var namespaceCleanser = container.Resolve<NamespaceCleanser>();
-                namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
-            }
+                                   return messagingFactoryRoundRobin;
+                               });
+
+            container.Register<Func<MessagingFactory>>(c => c.Resolve<RoundRobin<MessagingFactory>>().GetNext);
+        }
+
+        public override IEnumerable<string> Validate()
+        {
+            yield break;
         }
     }
 }

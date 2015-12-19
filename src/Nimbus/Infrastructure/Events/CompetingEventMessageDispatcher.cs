@@ -21,7 +21,7 @@ namespace Nimbus.Infrastructure.Events
                                                DefaultMessageLockDurationSetting defaultMessageLockDuration,
                                                IPropertyInjector propertyInjector,
                                                ILogger logger)
-            : base(nimbusMessageFactory, clock, dependencyResolver, handlerMap, inboundInterceptorFactory, logger, defaultMessageLockDuration)
+            : base(dependencyResolver, handlerMap, inboundInterceptorFactory, logger)
         {
             _propertyInjector = propertyInjector;
         }

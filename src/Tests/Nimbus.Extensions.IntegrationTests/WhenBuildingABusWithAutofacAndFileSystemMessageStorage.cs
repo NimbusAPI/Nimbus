@@ -2,7 +2,6 @@
 using System.IO;
 using Autofac;
 using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.FileSystem.Configuration;
@@ -28,18 +27,12 @@ namespace Nimbus.Extensions.IntegrationTests
 
             var largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
-            builder.Register(c => new FileSystemStorageBuilder().Configure()
-                                                                .WithStorageDirectory(largeMessageBodyTempPath)
-                                                                .WithLogger(c.Resolve<ILogger>())
-                                                                .Build())
-                   .As<ILargeMessageBodyStore>()
-                   .SingleInstance();
-
             builder.Register(c => new BusBuilder().Configure()
                                                   .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                                      .WithConnectionString(
                                                                          @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
-                                                                     .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                                     .WithLargeMessageStorage(new FileSystemStorageConfiguration()
+                                                                                                  .WithStorageDirectory(largeMessageBodyTempPath)
                                                                                                   .WithMaxSmallMessageSize(50*1024)
                                                                                                   .WithMaxLargeMessageSize(1024*1024))
                                  )

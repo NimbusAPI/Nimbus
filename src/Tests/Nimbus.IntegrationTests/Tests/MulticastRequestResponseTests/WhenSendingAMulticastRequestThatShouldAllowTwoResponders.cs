@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -17,21 +19,29 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         {
             var request = new BlackBallRequest
                           {
-                              ProspectiveMemberName = "Fred Flintstone",
+                              ProspectiveMemberName = "Fred Flintstone"
                           };
 
             _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(3))).ToArray();
         }
 
         [Test]
-        public async Task WeShouldReceiveTwoResponses()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
+        public async Task WeShouldReceiveTwoResponses(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _response.Count().ShouldBe(2);
         }
 
         [Test]
-        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
+        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
     }

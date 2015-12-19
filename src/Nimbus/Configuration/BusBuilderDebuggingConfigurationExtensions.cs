@@ -12,12 +12,12 @@ namespace Nimbus.Configuration
             "You're asking me to do something dangerous but didn't provide the right confirmation message. You need to include exactly this string: '{0}'",
             _confirmationMessage);
 
-        public static BusBuilderDebuggingConfiguration RemoveAllExistingNamespaceElementsOnStartup(this BusBuilderDebuggingConfiguration debuggingConfiguration)
+        public static DebugConfiguration RemoveAllExistingNamespaceElementsOnStartup(this DebugConfiguration debuggingConfiguration)
         {
             throw new BusConfigurationException("RemoveAllExistingNamespaceElements", _requiresConfirmationMessage);
         }
 
-        public static BusBuilderDebuggingConfiguration RemoveAllExistingNamespaceElementsOnStartup(this BusBuilderDebuggingConfiguration debuggingConfiguration, string confirmation)
+        public static DebugConfiguration RemoveAllExistingNamespaceElementsOnStartup(this DebugConfiguration debuggingConfiguration, string confirmation)
         {
             if (confirmation != _confirmationMessage) throw new BusConfigurationException("RemoveAllExistingNamespaceElements", _requiresConfirmationMessage);
 
