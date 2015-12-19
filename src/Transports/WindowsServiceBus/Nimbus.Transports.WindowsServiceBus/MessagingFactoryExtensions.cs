@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal static class MessagingFactoryExtensions
     {

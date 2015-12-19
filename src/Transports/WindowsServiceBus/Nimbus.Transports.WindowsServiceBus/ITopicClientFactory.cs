@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Transports.WindowsServiceBus
 {
     [Obsolete("We should be using a dependency on some kind of INimbusEventSender", true)]
     internal interface ITopicClientFactory

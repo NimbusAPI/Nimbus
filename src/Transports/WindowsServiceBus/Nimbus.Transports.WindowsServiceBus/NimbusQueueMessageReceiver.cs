@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Transports.WindowsServiceBus;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {

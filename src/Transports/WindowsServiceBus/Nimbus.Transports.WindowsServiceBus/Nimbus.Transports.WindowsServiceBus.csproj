@@ -51,8 +51,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureQueueManager.cs" />
+    <Compile Include="BrokeredMessageExtensions.cs" />
+    <Compile Include="BrokeredMessageFactory.cs" />
+    <Compile Include="DeadLetterQueue.cs" />
+    <Compile Include="IBrokeredMessageFactory.cs" />
+    <Compile Include="IQueueManager.cs" />
+    <Compile Include="ITopicClientFactory.cs" />
+    <Compile Include="MessagingExceptionExtensions.cs" />
+    <Compile Include="MessagingFactoryExtensions.cs" />
+    <Compile Include="NamespaceCleanser.cs" />
+    <Compile Include="NimbusQueueMessageReceiver.cs" />
+    <Compile Include="NimbusQueueMessageSender.cs" />
+    <Compile Include="NimbusSubscriptionMessageReceiver.cs" />
+    <Compile Include="NimbusTopicMessageSender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DevelopmentStubs\StubDelayedDeliveryService.cs" />
+    <Compile Include="WindowsServiceBusTransport.cs" />
     <Compile Include="WindowsServiceBusTransportConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>

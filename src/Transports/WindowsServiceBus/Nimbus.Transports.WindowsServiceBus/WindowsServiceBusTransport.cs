@@ -3,9 +3,10 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal class WindowsServiceBusTransport : INimbusTransport, IDisposable
     {

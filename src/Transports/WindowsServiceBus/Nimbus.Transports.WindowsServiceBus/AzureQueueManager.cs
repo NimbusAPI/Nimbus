@@ -7,10 +7,11 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Routing;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal class AzureQueueManager : IQueueManager
     {

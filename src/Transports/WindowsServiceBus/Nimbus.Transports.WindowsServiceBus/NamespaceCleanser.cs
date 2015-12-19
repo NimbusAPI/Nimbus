@@ -4,7 +4,7 @@ using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Transports.WindowsServiceBus
 {
     public class NamespaceCleanser
     {

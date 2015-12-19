@@ -1,6 +1,7 @@
 ﻿using Microsoft.ServiceBus.Messaging;
+using Nimbus.Infrastructure;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal interface IBrokeredMessageFactory
     {

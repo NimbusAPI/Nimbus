@@ -99,7 +99,7 @@ namespace Nimbus.Configuration
 
             //FIXME these are either stubs that are yet to be implemented or obsolete components to be removed
             container.RegisterType<DeadLetterQueues>(ComponentLifetime.SingleInstance, typeof (DeadLetterQueues), typeof (IDeadLetterQueues));
-            container.RegisterType<DeadLetterQueue>(ComponentLifetime.SingleInstance, typeof (IDeadLetterQueue));
+            //container.RegisterType<DeadLetterQueue>(ComponentLifetime.SingleInstance, typeof (IDeadLetterQueue));
             container.RegisterType<StubDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<StubDeliveryRetryStrategy>(ComponentLifetime.SingleInstance, typeof (IDeliveryRetryStrategy));
 

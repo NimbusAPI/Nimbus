@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.PoisonMessages
+namespace Nimbus.Transports.WindowsServiceBus
 {
     public class DeadLetterQueue : IDeadLetterQueue
     {

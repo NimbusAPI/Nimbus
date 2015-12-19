@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.MessageContracts.Exceptions;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
