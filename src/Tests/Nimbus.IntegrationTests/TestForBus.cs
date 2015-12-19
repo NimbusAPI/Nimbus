@@ -9,7 +9,7 @@ namespace Nimbus.IntegrationTests
     [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
-        protected const int TimeoutSeconds = 15;
+        protected const int TimeoutSeconds = 10;
 
         protected Bus Bus { get; private set; }
 
@@ -27,8 +27,9 @@ namespace Nimbus.IntegrationTests
         public void TearDown()
         {
             var bus = Bus;
+            Bus = null;
 
-            if (bus != null) bus.Dispose();
+            bus?.Dispose();
         }
     }
 }

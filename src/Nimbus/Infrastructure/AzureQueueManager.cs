@@ -56,8 +56,6 @@ namespace Nimbus.Infrastructure
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
-
-            WarmUp();
         }
 
         public void WarmUp()
