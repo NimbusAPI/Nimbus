@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
+namespace Nimbus.LargeMessages.Azure.Http
 {
     internal class AzureBlobStorageHttpClient : IAzureBlobStorageHttpClient
     {

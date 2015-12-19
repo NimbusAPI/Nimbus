@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
-using Nimbus.LargeMessages.Azure.Infrastructure.Http;
 
-namespace Nimbus.LargeMessages.Azure.Configuration
+namespace Nimbus.LargeMessages.Azure.Http
 {
     public class AzureBlobStorageHttpLargeMessageStorageConfiguration : LargeMessageStorageConfiguration
     {

@@ -4,6 +4,7 @@ using Castle.Windsor;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Configuration;
 using Nimbus.Transports.WindowsServiceBus;
 using Nimbus.Windsor.Configuration;

@@ -2,7 +2,7 @@ using System;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.LargeMessages.Azure.Extensions;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
+namespace Nimbus.LargeMessages.Azure.Http
 {
     internal class UriFormatter : IUriFormatter
     {
@@ -19,6 +19,5 @@ namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
         {
             return new Uri(_containerUriSetting.Value.Append(storageKey) + _containerSharedAccessSignatureSetting, UriKind.Absolute);
         }
-
     }
 }
