@@ -6,7 +6,7 @@ using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Configuration
 {
-    public class NamespaceCleanser
+    public class NamespaceCleanser : INamespaceCleanser
     {
         private readonly ConnectionStringSetting _connectionString;
         private readonly ILogger _logger;

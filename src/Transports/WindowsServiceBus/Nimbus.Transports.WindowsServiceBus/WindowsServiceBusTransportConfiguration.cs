@@ -65,6 +65,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
             container.RegisterType<StubDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
+            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
 
             container.Register(c =>
                                {
