@@ -12,7 +12,7 @@ namespace Nimbus.Configuration
 {
     internal static class ComponentRegistrationExtensions
     {
-        public static void RegisterPropertiesFromConfigurationObject(this PoorMansIoC container, INimbusConfiguration configuration)
+        internal static void RegisterPropertiesFromConfigurationObject(this PoorMansIoC container, INimbusConfiguration configuration)
         {
             configuration.RegisterWith(container);
 
@@ -38,7 +38,7 @@ namespace Nimbus.Configuration
                 .Done();
         }
 
-        public static IEnumerable<string> ValidationErrors(this IValidatableConfigurationSetting o)
+        internal static IEnumerable<string> ValidationErrors(this IValidatableConfigurationSetting o)
         {
             foreach (var validationError in o.Validate()) yield return validationError;
 
@@ -61,7 +61,7 @@ namespace Nimbus.Configuration
             }
         }
 
-        public static void AssertConfigurationIsValid(this IValidatableConfigurationSetting configuration)
+        internal static void AssertConfigurationIsValid(this IValidatableConfigurationSetting configuration)
         {
             var validationErrors = configuration.ValidationErrors().ToArray();
             if (validationErrors.None()) return;
