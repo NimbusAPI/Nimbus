@@ -11,8 +11,8 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly ResponseMessageDispatcher _responseMessageDispatcher;
 
         internal ResponseMessagePumpFactory(ReplyQueueNameSetting replyQueueName,
-                                            PoorMansIoC container,
                                             INimbusTransport transport,
+                                            PoorMansIoC container,
                                             ResponseMessageDispatcher responseMessageDispatcher)
         {
             _replyQueueName = replyQueueName;
