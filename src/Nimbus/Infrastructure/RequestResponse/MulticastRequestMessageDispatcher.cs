@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -16,36 +15,30 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class MulticastRequestMessageDispatcher : IMessageDispatcher
     {
-        private readonly INimbusMessageFactory _brokeredMessageFactory;
-        private readonly IClock _clock;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusTransport _transport;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MulticastRequestMessageDispatcher(INimbusMessageFactory brokeredMessageFactory,
-                                                 IClock clock,
+        public MulticastRequestMessageDispatcher(INimbusMessageFactory nimbusMessageFactory,
                                                  IDependencyResolver dependencyResolver,
                                                  IInboundInterceptorFactory inboundInterceptorFactory,
                                                  ILogger logger,
                                                  INimbusTransport transport,
                                                  IOutboundInterceptorFactory outboundInterceptorFactory,
                                                  IReadOnlyDictionary<Type, Type[]> handlerMap,
-                                                 DefaultMessageLockDurationSetting defaultMessageLockDuration,
                                                  IPropertyInjector propertyInjector)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _clock = clock;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _transport = transport;
             _handlerMap = handlerMap;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
             _propertyInjector = propertyInjector;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
@@ -97,7 +90,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                     if (response != null)
                     {
-                        var responseMessage = (await _brokeredMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
+                        var responseMessage = (await _nimbusMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
                             .DestinedForQueue(replyQueueName)
                             ;
 
@@ -174,7 +167,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var failedResponseMessage =
-                        await _brokeredMessageFactory.CreateFailedResponse(nimbusMessage, exception);
+                        await _nimbusMessageFactory.CreateFailedResponse(nimbusMessage, exception);
 
                     _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                                  replyQueueName,

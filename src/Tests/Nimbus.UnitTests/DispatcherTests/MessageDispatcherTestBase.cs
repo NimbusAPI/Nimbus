@@ -101,13 +101,9 @@ namespace Nimbus.UnitTests.DispatcherTests
             inboundInterceptorFactory.CreateInterceptors(Arg.Any<IDependencyResolverScope>(), Arg.Any<object>(), Arg.Any<object>(), Arg.Any<NimbusMessage>())
                                      .Returns(new[] {interceptor});
 
-            return new MulticastEventMessageDispatcher(
-                NimbusMessageFactory,
-                clock,
-                dependencyResolver,
+            return new MulticastEventMessageDispatcher(dependencyResolver,
                 inboundInterceptorFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleMulticastEvent<>)),
-                new DefaultMessageLockDurationSetting(),
                 Substitute.For<IPropertyInjector>(),
                 logger);
         }

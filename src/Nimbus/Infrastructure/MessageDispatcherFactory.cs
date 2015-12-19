@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -16,18 +15,14 @@ namespace Nimbus.Infrastructure
     internal class MessageDispatcherFactory : IMessageDispatcherFactory
     {
         private readonly INimbusMessageFactory _nimbusMessageFactory;
-        private readonly IClock _clock;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
         private readonly INimbusTransport _transport;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        IClock clock,
-                                        IDependencyResolver dependencyResolver,
+        public MessageDispatcherFactory(IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
                                         INimbusMessageFactory nimbusMessageFactory,
@@ -36,13 +31,11 @@ namespace Nimbus.Infrastructure
                                         IPropertyInjector propertyInjector)
         {
             _nimbusMessageFactory = nimbusMessageFactory;
-            _clock = clock;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
             _transport = transport;
             _outboundInterceptorFactory = outboundInterceptorFactory;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
             _propertyInjector = propertyInjector;
         }
 
@@ -64,24 +57,18 @@ namespace Nimbus.Infrastructure
 
             if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
             {
-                return new CompetingEventMessageDispatcher(_nimbusMessageFactory,
-                                                           _clock,
-                                                           _dependencyResolver,
+                return new CompetingEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
-                                                           _defaultMessageLockDuration,
                                                            _propertyInjector,
                                                            _logger);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
             {
-                return new MulticastEventMessageDispatcher(_nimbusMessageFactory,
-                                                           _clock,
-                                                           _dependencyResolver,
+                return new MulticastEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
-                                                           _defaultMessageLockDuration,
                                                            _propertyInjector,
                                                            _logger);
             }
@@ -101,14 +88,12 @@ namespace Nimbus.Infrastructure
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
             {
                 return new MulticastRequestMessageDispatcher(_nimbusMessageFactory,
-                                                             _clock,
                                                              _dependencyResolver,
                                                              _inboundInterceptorFactory,
                                                              _logger,
                                                              _transport,
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
-                                                             _defaultMessageLockDuration,
                                                              _propertyInjector);
             }
 

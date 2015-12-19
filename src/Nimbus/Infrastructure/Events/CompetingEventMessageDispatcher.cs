@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.PropertyInjection;
@@ -13,12 +12,9 @@ namespace Nimbus.Infrastructure.Events
     {
         private readonly IPropertyInjector _propertyInjector;
 
-        public CompetingEventMessageDispatcher(INimbusMessageFactory nimbusMessageFactory,
-                                               IClock clock,
-                                               IDependencyResolver dependencyResolver,
+        public CompetingEventMessageDispatcher(IDependencyResolver dependencyResolver,
                                                IInboundInterceptorFactory inboundInterceptorFactory,
                                                IReadOnlyDictionary<Type, Type[]> handlerMap,
-                                               DefaultMessageLockDurationSetting defaultMessageLockDuration,
                                                IPropertyInjector propertyInjector,
                                                ILogger logger)
             : base(dependencyResolver, handlerMap, inboundInterceptorFactory, logger)
