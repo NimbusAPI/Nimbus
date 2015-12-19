@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using NUnit.Framework;
 using Shouldly;
 
@@ -28,14 +27,18 @@ namespace Nimbus.UnitTests.ParameterCheckingTests
         {
             var fodyTests = new FodyTests("dummy");
             var method = typeof (FodyTests).GetMethod("DoBar", BindingFlags.Instance | BindingFlags.NonPublic);
+            Exception ex = null;
+
             try
             {
-                Should.Throw<ArgumentNullException>(() => method.Invoke(fodyTests, new object[] {null}));
+                method.Invoke(fodyTests, new object[] {null});
             }
             catch (TargetInvocationException exc)
             {
-                ExceptionDispatchInfo.Capture(exc.InnerException).Throw();
+                ex = exc.InnerException;
             }
+
+            ex.ShouldBeTypeOf<ArgumentNullException>();
         }
     }
 }
