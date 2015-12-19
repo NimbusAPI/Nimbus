@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests
             MethodCallCounter.Clear();
 
             Bus = busBuilderConfiguration.Build();
-            await busBuilderConfiguration.Build().Start();
+            await Bus.Start();
         }
 
         protected abstract Task When();
