@@ -55,13 +55,10 @@ namespace Nimbus.Infrastructure
         {
             if (openGenericHandlerType == typeof (IHandleCommand<>))
             {
-                return new CommandMessageDispatcher(_nimbusMessageFactory,
-                                                    _clock,
-                                                    _dependencyResolver,
+                return new CommandMessageDispatcher(_dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _logger,
                                                     handlerMap,
-                                                    _defaultMessageLockDuration,
                                                     _propertyInjector);
             }
 
@@ -92,14 +89,12 @@ namespace Nimbus.Infrastructure
             if (openGenericHandlerType == typeof (IHandleRequest<,>))
             {
                 return new RequestMessageDispatcher(_nimbusMessageFactory,
-                                                    _clock,
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _outboundInterceptorFactory,
                                                     _logger,
                                                     _transport,
                                                     handlerMap,
-                                                    _defaultMessageLockDuration,
                                                     _propertyInjector);
             }
 

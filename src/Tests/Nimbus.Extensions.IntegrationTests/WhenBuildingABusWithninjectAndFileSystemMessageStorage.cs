@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.LargeMessages.FileSystem.Configuration;
@@ -28,15 +27,6 @@ namespace Nimbus.Extensions.IntegrationTests
 
                 var largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
-                container.Bind<ILargeMessageBodyStore>()
-                         .ToMethod(
-                             c =>
-                                 new FileSystemStorageBuilder().Configure()
-                                                               .WithStorageDirectory(largeMessageBodyTempPath)
-                                                               .WithLogger(c.Kernel.Get<ILogger>())
-                                                               .Build())
-                         .InSingletonScope();
-
                 container.Bind<IBus>()
                          .ToMethod(
                              c =>
@@ -44,7 +34,8 @@ namespace Nimbus.Extensions.IntegrationTests
                                                  .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                                     .WithConnectionString(
                                                                         @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
-                                                                    .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                                    .WithLargeMessageStorage(new FileSystemStorageConfiguration()
+                                                                                                 .WithStorageDirectory(largeMessageBodyTempPath)
                                                                                                  .WithMaxSmallMessageSize(50*1024)
                                                                                                  .WithMaxLargeMessageSize(1024*1024))
                                  )

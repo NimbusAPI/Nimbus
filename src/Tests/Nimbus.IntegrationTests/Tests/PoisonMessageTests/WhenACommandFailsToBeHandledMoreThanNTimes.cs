@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -32,8 +33,12 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Test]
-        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _deadLetterMessages.Count().ShouldBe(1);
             _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }

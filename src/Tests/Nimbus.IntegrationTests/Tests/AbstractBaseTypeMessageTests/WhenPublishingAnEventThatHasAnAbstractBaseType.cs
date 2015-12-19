@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -20,24 +21,36 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeConcreteEventTypeCompetingHandler>(mb => mb.Handle(null))
                              .Count()
                              .ShouldBe(1);
         }
 
         [Test]
-        public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeConcreteEventTypeMulticastHandler>(mb => mb.Handle(null))
                              .Count()
                              .ShouldBe(1);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeConcreteEventType>()
                              .Count()
@@ -45,8 +58,12 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages
                              .Count()
                              .ShouldBe(2);

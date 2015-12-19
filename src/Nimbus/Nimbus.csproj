@@ -64,10 +64,12 @@
     <Compile Include="ConcurrentCollections\RoundRobin.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeLazy.cs" />
-    <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
-    <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
+    <Compile Include="Configuration\Compression\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\ComponentRegistrationExtensions.cs" />
     <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />
+    <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
+    <Compile Include="Configuration\Settings\ISetting.cs" />
     <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentRegistration.cs" />
@@ -76,7 +78,7 @@
     <Compile Include="Configuration\INimbusConfiguration.cs" />
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
-    <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
+    <Compile Include="Infrastructure\NimbusMessageServices\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
     <Compile Include="Configuration\MessagingFactoryExtensions.cs" />
     <Compile Include="Configuration\NamespaceCleanser.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
@@ -182,7 +184,7 @@
     <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
     <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
-    <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />
+    <Compile Include="Configuration\Debug\DebugConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderDebuggingConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\PathFactory.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />

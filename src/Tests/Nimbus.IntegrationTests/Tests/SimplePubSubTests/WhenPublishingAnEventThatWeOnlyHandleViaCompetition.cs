@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -24,16 +25,24 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
                              .Count()
                              .ShouldBe(1);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaCompetition>()
                              .Count()
@@ -41,9 +50,11 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
-            ;
+            await Given(busBuilderConfiguration);
+            await When();
 
             MethodCallCounter.AllReceivedMessages
                              .Count()

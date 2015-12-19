@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using NUnit.Framework;
 using Shouldly;
 
@@ -19,9 +21,10 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
         }
 
         [Test]
-        public async Task WeShouldGetSomethingNiceBack()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestOnTheBus>))]
+        public async Task WeShouldGetSomethingNiceBack(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
-            await Given();
+            await Given(busBuilderConfiguration);
             await When();
 
             _response.ShouldNotBe(null);

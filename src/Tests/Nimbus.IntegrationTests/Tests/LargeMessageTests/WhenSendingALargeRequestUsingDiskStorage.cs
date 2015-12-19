@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
@@ -33,15 +32,11 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             logger.Debug("Starting disk storage large message test at {0}", _largeMessageBodyTempPath);
 
-            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
-                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
-                                                                        .WithLogger(logger)
-                                                                        .Build();
-
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                          .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                                                         .WithLargeMessageStorage(new LargeMessageStorageConfiguration()
+                                                         .WithLargeMessageStorage(new FileSystemStorageConfiguration()
+                                                                                      .WithStorageDirectory(_largeMessageBodyTempPath)
                                                                                       .WithMaxSmallMessageSize(64*1024)
                                                                                       .WithMaxLargeMessageSize(10*1048576))
                 )

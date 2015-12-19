@@ -71,14 +71,14 @@
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
       <Link>Properties\NullGuard.cs</Link>
     </Compile>
+    <Compile Include="Configuration\AzureBlobStorageHttpLargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\AutoCreateBlobStorageContainerNameSetting.cs" />
     <Compile Include="Configuration\Settings\AzureBlobStorageContainerSharedAccessSignatureSetting.cs" />
     <Compile Include="Configuration\Settings\AzureBlobStorageContainerUriSetting.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\Http\AzureBlobStorageHttpLargeMessageBodyStore.cs" />
-    <Compile Include="Configuration\BlobStorageBuilder.cs" />
-    <Compile Include="Configuration\BlobStorageConfiguration.cs" />
+    <Compile Include="Configuration\AzureBlobStorageLargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\AzureStorageAccountConnectionStringSetting.cs" />
     <Compile Include="Infrastructure\Http\IAzureBlobStorageHttpClient.cs" />
     <Compile Include="Infrastructure\Http\IUriFormatter.cs" />

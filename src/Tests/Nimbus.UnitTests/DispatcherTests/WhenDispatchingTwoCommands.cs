@@ -47,13 +47,10 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                              clock,
                                                              new DispatchContextManager());
 
-            return new CommandMessageDispatcher(_nimbusMessageFactory,
-                                                new SystemClock(),
-                                                new DependencyResolver(typeProvider),
+            return new CommandMessageDispatcher(new DependencyResolver(typeProvider),
                                                 new NullInboundInterceptorFactory(),
                                                 new NullLogger(),
                                                 handlerMap,
-                                                new DefaultMessageLockDurationSetting(),
                                                 Substitute.For<IPropertyInjector>());
         }
 

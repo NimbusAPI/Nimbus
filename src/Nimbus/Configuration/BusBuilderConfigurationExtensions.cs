@@ -7,6 +7,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
+    [Obsolete("We should be able to inline these now.")]
     public static class BusBuilderConfigurationExtensions
     {
         public static BusBuilderConfiguration WithTransport(this BusBuilderConfiguration configuration, TransportConfiguration transportConfiguration)
@@ -125,9 +126,9 @@ namespace Nimbus.Configuration
         }
 
         public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
-                                                               Func<BusBuilderDebuggingConfiguration, BusBuilderDebuggingConfiguration> debugConfiguration)
+                                                               Func<DebugConfiguration, DebugConfiguration> debugConfiguration)
         {
-            debugConfiguration(configuration.Debugging);
+            debugConfiguration(configuration.Debug);
             return configuration;
         }
     }

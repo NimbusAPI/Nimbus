@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 using Shouldly;
@@ -19,10 +21,11 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         private IDispatchContext[] _dispatchContexts;
         private NimbusMessage[] _nimbusMessages;
 
-        protected override async Task Given()
+        protected override Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
-            await base.Given();
             TestInterceptor.Clear();
+
+            return base.Given(busBuilderConfiguration);
         }
 
         protected override async Task When()
@@ -36,44 +39,72 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         }
 
         [Test]
-        public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _nimbusMessages.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task WeShouldObserveOneDispatchContextPerMessage()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task WeShouldObserveOneDispatchContextPerMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _dispatchContexts.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task AllParentMessageIdsShouldBeDifferent()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task AllParentMessageIdsShouldBeDifferent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _dispatchContexts.GroupBy(x => x.ResultOfMessageId).Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task TheCorrelationIdsShouldAllBeTheSame()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheCorrelationIdsShouldAllBeTheSame(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _dispatchContexts.GroupBy(x => x.CorrelationId).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _nimbusMessages[1].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[0].MessageId);
         }
 
         [Test]
-        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _nimbusMessages[2].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[1].MessageId);
         }
 
         [Test]
-        public async Task TheFirstMessageShouldBeTheInitialMessage()
+        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheFirstMessageShouldBeTheInitialMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
+            await Given(busBuilderConfiguration);
+            await When();
+
             _nimbusMessages[0].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(null);
         }
     }

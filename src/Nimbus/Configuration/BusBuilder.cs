@@ -1,20 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Nimbus.Configuration.PoorMansIocContainer;
-using Nimbus.DevelopmentStubs;
-using Nimbus.Extensions;
-using Nimbus.Infrastructure;
+﻿using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure.Commands;
-using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
-using Nimbus.Infrastructure.Heartbeat;
-using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Interceptors.Inbound;
-using Nimbus.Interceptors.Outbound;
-using Nimbus.PoisonMessages;
 
 namespace Nimbus.Configuration
 {
@@ -30,60 +18,12 @@ namespace Nimbus.Configuration
             var logger = configuration.Logger;
             logger.Debug("Constructing bus...");
 
+            configuration.AssertConfigurationIsValid();
+
             var container = new PoorMansIoC();
-
-            // Register settings types as singletons
-            typeof (Bus).Assembly
-                        .DefinedTypes
-                        .Where(t => typeof (IValidatableConfigurationSetting).IsAssignableFrom(t))
-                        .Where(t => t.IsInstantiable())
-                        .Do(t => container.RegisterType(t, ComponentLifetime.SingleInstance, t))
-                        .Done();
-
-            container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
-            container.RegisterType<CommandMessagePumpsFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<RequestMessagePumpsFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<ResponseMessagePumpFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<MulticastRequestMessagePumpsFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<MulticastEventMessagePumpsFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<CompetingEventMessagePumpsFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<SystemClock>(ComponentLifetime.SingleInstance, typeof (IClock));
-            container.RegisterType<DispatchContextManager>(ComponentLifetime.SingleInstance, typeof (IDispatchContextManager));
-            container.RegisterType<ResponseMessageDispatcher>(ComponentLifetime.SingleInstance);
-            container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<HandlerMapper>(ComponentLifetime.SingleInstance, typeof (IHandlerMapper));
-            container.RegisterType<MessageDispatcherFactory>(ComponentLifetime.SingleInstance, typeof (IMessageDispatcherFactory));
-            container.RegisterType<InboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IInboundInterceptorFactory));
-            container.RegisterType<OutboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IOutboundInterceptorFactory));
-            container.RegisterType<PropertyInjector>(ComponentLifetime.SingleInstance, typeof (IPropertyInjector));
-            container.RegisterType<NimbusMessageFactory>(ComponentLifetime.SingleInstance, typeof (INimbusMessageFactory));
-            container.RegisterType<BusCommandSender>(ComponentLifetime.SingleInstance, typeof (ICommandSender));
-            container.RegisterType<BusRequestSender>(ComponentLifetime.SingleInstance, typeof (IRequestSender));
-            container.RegisterType<BusMulticastRequestSender>(ComponentLifetime.SingleInstance, typeof (IMulticastRequestSender));
-            container.RegisterType<BusEventSender>(ComponentLifetime.SingleInstance, typeof (IEventSender));
-            container.RegisterType<KnownMessageTypeVerifier>(ComponentLifetime.SingleInstance, typeof (IKnownMessageTypeVerifier));
-            container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
-            container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
-
-            configuration.Debugging.RegisterWith(container);
-            configuration.Transport.RegisterWith(container);
-
-            #region To be fixed
-
-            //FIXME these are either stubs that are yet to be implemented or obsolete components to be removed
-            container.RegisterType<DeadLetterQueues>(ComponentLifetime.SingleInstance, typeof (DeadLetterQueues), typeof (IDeadLetterQueues));
-            container.RegisterType<DeadLetterQueue>(ComponentLifetime.SingleInstance, typeof (IDeadLetterQueue));
-            container.RegisterType<StubDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-            container.RegisterType<StubDeliveryRetryStrategy>(ComponentLifetime.SingleInstance, typeof (IDeliveryRetryStrategy));
-
-            // FIXME remove these
-            HackyComponentRegistrationExtensions.RegisterPropertiesFromConfigurationObject(container, configuration);
-            HackyComponentRegistrationExtensions.RegisterPropertiesFromConfigurationObject(container, configuration.Debugging);
-
-            #endregion
+            container.RegisterPropertiesFromConfigurationObject(configuration);
 
             logger.Debug("Creating message pumps...");
-
             var messagePumpsManager = new MessagePumpsManager(
                 container.Resolve<ResponseMessagePumpFactory>().Create(),
                 container.Resolve<RequestMessagePumpsFactory>().CreateAll(),
@@ -106,21 +46,6 @@ namespace Nimbus.Configuration
             logger.Info("Bus built. Job done!");
 
             return bus;
-        }
-    }
-
-    internal static class HackyComponentRegistrationExtensions
-    {
-        [Obsolete("We should be doing a recursive scan of settings and configuration objects")]
-        public static void RegisterPropertiesFromConfigurationObject(PoorMansIoC container, object configuration)
-        {
-            foreach (var prop in configuration.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
-            {
-                var value = prop.GetValue(configuration);
-                if (value == null) continue;
-
-                container.Register(value);
-            }
         }
     }
 }

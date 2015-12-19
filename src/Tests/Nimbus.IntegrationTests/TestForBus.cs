@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Tests.Common;
 using NUnit.Framework;
 
@@ -11,49 +11,20 @@ namespace Nimbus.IntegrationTests
     {
         protected Bus Bus { get; private set; }
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
-        {
-            try
-            {
-                TestFixtureSetUpAsync().Wait();
-            }
-            catch (AggregateException ae)
-            {
-                throw ae.InnerException;
-            }
-        }
-
-        private async Task TestFixtureSetUpAsync()
+        protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
             MethodCallCounter.Clear();
 
-            Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
-            Console.WriteLine();
-            Console.WriteLine();
-
-            await Given();
-            Console.WriteLine();
-            Console.WriteLine();
-
-            await When();
-            MethodCallCounter.Stop();
-            Console.WriteLine();
-            Console.WriteLine();
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Console.WriteLine();
-            Console.WriteLine();
-            Bus.Dispose();
-        }
-
-        protected virtual async Task Given()
-        {
+            Bus = busBuilderConfiguration.Build();
+            await busBuilderConfiguration.Build().Start();
         }
 
         protected abstract Task When();
+
+        [TearDown]
+        public void TearDown()
+        {
+            Bus.Dispose();
+        }
     }
 }
