@@ -148,7 +148,7 @@ namespace Nimbus.Infrastructure
                 {
                     try
                     {
-                        var nextDeliveryTime = _deliveryRetryStrategy.CalculateNextRetryTime(message.DeliveryAttempts);
+                        var nextDeliveryTime = _deliveryRetryStrategy.CalculateNextRetryTime(message);
                         _logger.Info("Re-enqueuing message {MessageId} for attempt {DeliveryAttempts} at delivery at {DeliveryTime}",
                                      message.MessageId,
                                      numDeliveryAttempts + 1,
