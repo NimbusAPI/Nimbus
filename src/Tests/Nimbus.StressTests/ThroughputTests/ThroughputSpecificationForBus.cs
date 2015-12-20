@@ -54,11 +54,14 @@ namespace Nimbus.StressTests.ThroughputTests
                                                             .Average();
             Console.WriteLine("Average one-way latency: {0} milliseconds", _averageOneWayLatency);
 
-            _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages
-                                                                     .Select(m => m.WhenReceived - m.RequestSentAt)
-                                                                     .Select(ts => ts.TotalMilliseconds)
-                                                                     .Average();
-            Console.WriteLine("Average request/response latency: {0} milliseconds", _averageRequestResponseLatency);
+            if (StressTestMessageHandler.ResponseMessages.Any())
+            {
+                _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages
+                                                                         .Select(m => m.WhenReceived - m.RequestSentAt)
+                                                                         .Select(ts => ts.TotalMilliseconds)
+                                                                         .Average();
+                Console.WriteLine("Average request/response latency: {0} milliseconds", _averageRequestResponseLatency);
+            }
         }
 
         [Test]
