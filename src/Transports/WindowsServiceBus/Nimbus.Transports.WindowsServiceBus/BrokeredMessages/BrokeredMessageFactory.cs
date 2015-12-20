@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -78,7 +77,7 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
 
                                       foreach (var property in message.Properties)
                                       {
-                                          brokeredMessage.Properties.Add(property.Key, property.Value);
+                                          brokeredMessage.Properties[property.Key] = property.Value;
                                       }
 
                                       return brokeredMessage;
@@ -93,35 +92,30 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
 
         private byte[] SerializeNimbusMessage(object serializableObject)
         {
-            var serialized = _serializer.Serialize(serializableObject);
-            var serializedBytes = Encoding.UTF8.GetBytes(serialized);
+            var serializedString = _serializer.Serialize(serializableObject);
+            var serializedBytes = Encoding.UTF8.GetBytes(serializedString);
             var compressedBytes = _compressor.Compress(serializedBytes);
             return compressedBytes;
         }
 
         public async Task<NimbusMessage> DeserializeNimbusMessage(BrokeredMessage message)
         {
-            byte[] bodyBytes;
+            byte[] compressedBytes;
 
             object blobId;
             if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
             {
-                bodyBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
+                compressedBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
             }
             else
             {
-                // Yep, this will actually give us the body Stream instead of trying to deserialize the body... cool API bro!
-                using (var dataStream = message.GetBody<Stream>())
-                using (var memoryStream = new MemoryStream())
-                {
-                    dataStream.CopyTo(memoryStream);
-                    bodyBytes = memoryStream.ToArray();
-                }
+                compressedBytes = message.GetBody<byte[]>();
             }
 
-            var decompressedBytes = _compressor.Decompress(bodyBytes);
-            var deserialized = (NimbusMessage) _serializer.Deserialize(Encoding.UTF8.GetString(decompressedBytes), typeof (NimbusMessage));
-            return deserialized;
+            var serializedBytes = _compressor.Decompress(compressedBytes);
+            var serializedString = Encoding.UTF8.GetString(serializedBytes);
+            var deserialized = _serializer.Deserialize(serializedString, typeof (NimbusMessage));
+            return (NimbusMessage) deserialized;
         }
     }
 }
