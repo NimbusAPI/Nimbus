@@ -8,19 +8,19 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
 {
     public class SomeClassLevelInterceptor : InboundInterceptor
     {
-        public override async Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, NimbusMessage brokeredMessage)
+        public override async Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
         {
-            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerExecuting(busCommand, brokeredMessage));
+            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerExecuting(busCommand, nimbusMessage));
         }
 
-        public override async Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand busCommand, NimbusMessage brokeredMessage)
+        public override async Task OnCommandHandlerSuccess<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
         {
-            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerSuccess(busCommand, brokeredMessage));
+            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerSuccess(busCommand, nimbusMessage));
         }
 
-        public override async Task OnCommandHandlerError<TBusCommand>(TBusCommand busCommand, NimbusMessage brokeredMessage, Exception exception)
+        public override async Task OnCommandHandlerError<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage, Exception exception)
         {
-            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerError(busCommand, brokeredMessage, exception));
+            MethodCallCounter.RecordCall<SomeClassLevelInterceptor>(h => h.OnCommandHandlerError(busCommand, nimbusMessage, exception));
         }
     }
 }

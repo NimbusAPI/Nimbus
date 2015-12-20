@@ -22,10 +22,10 @@ namespace Nimbus.Infrastructure.Events
             _propertyInjector = propertyInjector;
         }
 
-        protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, NimbusMessage brokeredMessage)
+        protected override object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, NimbusMessage nimbusMessage)
         {
             var handler = (IHandleMulticastEvent<TBusEvent>) scope.Resolve(handlerType);
-            _propertyInjector.Inject(handler, brokeredMessage);
+            _propertyInjector.Inject(handler, nimbusMessage);
             return handler;
         }
 

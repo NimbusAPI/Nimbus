@@ -38,7 +38,7 @@ namespace Nimbus.Infrastructure.Events
             await (Task) Dispatch((dynamic) busEvent, message, handlerType);
         }
 
-        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, NimbusMessage brokeredMessage)
+        protected abstract object CreateHandlerFromScope<TBusEvent>(IDependencyResolverScope scope, TBusEvent busEvent, Type handlerType, NimbusMessage nimbusMessage)
             where TBusEvent : IBusEvent;
 
         protected abstract Task DispatchToHandleMethod<TBusEvent>(TBusEvent busEvent, object handler)

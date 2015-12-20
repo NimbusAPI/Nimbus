@@ -14,10 +14,10 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.In
         public IDispatchContext DispatchContext { get; set; }
         public object BrokeredMessage { get; set; }
 
-        public override async Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, NimbusMessage brokeredMessage)
+        public override async Task OnCommandHandlerExecuting<TBusCommand>(TBusCommand busCommand, NimbusMessage nimbusMessage)
         {
             DispatchContexts.Add(DispatchContext);
-            NimbusMessages.Add(brokeredMessage);
+            NimbusMessages.Add(nimbusMessage);
         }
 
         public static void Clear()

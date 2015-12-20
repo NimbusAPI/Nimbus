@@ -4,30 +4,17 @@ namespace Nimbus.Infrastructure.Dispatching
 {
     internal class SubsequentDispatchContext : IDispatchContext
     {
-        private readonly Guid _dispatchId;
-        private readonly Guid _correlationId;
         private readonly Guid _resultOfMessageId;
 
-        public SubsequentDispatchContext(NimbusMessage brokeredMessage)
+        public SubsequentDispatchContext(NimbusMessage nimbusMessage)
         {
-            _dispatchId = Guid.NewGuid();
-            _correlationId = brokeredMessage.CorrelationId;
-            _resultOfMessageId = brokeredMessage.MessageId;
+            DispatchId = Guid.NewGuid();
+            CorrelationId = nimbusMessage.CorrelationId;
+            _resultOfMessageId = nimbusMessage.MessageId;
         }
 
-        public Guid DispatchId
-        {
-            get { return _dispatchId; }
-        }
-
-        public Guid? ResultOfMessageId
-        {
-            get { return _resultOfMessageId; }
-        }
-
-        public Guid CorrelationId
-        {
-            get { return _correlationId; }
-        }
+        public Guid DispatchId { get; }
+        public Guid CorrelationId { get; }
+        public Guid? ResultOfMessageId => _resultOfMessageId;
     }
 }
