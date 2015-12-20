@@ -1,7 +1,7 @@
 using System;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Transports.WindowsServiceBus.Extensions
 {
     internal static class MessagingExceptionExtensions
     {

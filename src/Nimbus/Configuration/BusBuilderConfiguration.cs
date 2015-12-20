@@ -47,8 +47,6 @@ namespace Nimbus.Configuration
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; } = new GlobalInboundInterceptorTypesSetting();
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; } = new GlobalOutboundInterceptorTypesSetting();
         internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; } = new ConcurrentHandlerLimitSetting();
-        internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; } = new MaximumThreadPoolThreadsSetting();
-        internal MinimumThreadPoolThreadsSetting MinimumThreadPoolThreads { get; set; } = new MinimumThreadPoolThreadsSetting();
 
         public Bus Build()
         {

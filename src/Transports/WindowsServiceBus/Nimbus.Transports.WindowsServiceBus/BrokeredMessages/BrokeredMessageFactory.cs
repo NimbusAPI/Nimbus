@@ -7,10 +7,9 @@ using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.MessageContracts.Exceptions;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
 {
     internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {

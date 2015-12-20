@@ -13,7 +13,9 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using Nimbus.Transports.WindowsServiceBus.DevelopmentStubs;
+using Nimbus.Transports.WindowsServiceBus.Extensions;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -21,7 +23,6 @@ namespace Nimbus.Transports.WindowsServiceBus
     {
         internal ConnectionStringSetting ConnectionString { get; set; }
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; } = new ServerConnectionCountSetting();
-        internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; } = new DefaultMessageLockDurationSetting();
         internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
         internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
 
@@ -48,12 +49,6 @@ namespace Nimbus.Transports.WindowsServiceBus
         public WindowsServiceBusTransportConfiguration WithServerConnectionCount(int serverConnectionCount)
         {
             ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
-            return this;
-        }
-
-        public WindowsServiceBusTransportConfiguration WithDefaultMessageLockDuration(TimeSpan defaultLockDuration)
-        {
-            DefaultMessageLockDuration = new DefaultMessageLockDurationSetting {Value = defaultLockDuration};
             return this;
         }
 

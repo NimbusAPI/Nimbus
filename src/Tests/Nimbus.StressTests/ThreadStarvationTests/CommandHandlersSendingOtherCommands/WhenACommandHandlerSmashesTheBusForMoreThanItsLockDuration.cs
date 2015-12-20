@@ -30,7 +30,6 @@ namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCo
             var bus = new BusBuilder().Configure()
                                       .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                          .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                                                         .WithDefaultMessageLockDuration(_messageLockDuration)
                 )
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)

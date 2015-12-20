@@ -6,10 +6,12 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.Extensions;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 {
-    internal class NimbusSubscriptionMessageReceiver : ThrottlingMessageReceiver
+    internal class WindowsServiceBusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
@@ -17,7 +19,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly string _subscriptionName;
         private SubscriptionClient _subscriptionClient;
 
-        public NimbusSubscriptionMessageReceiver(IQueueManager queueManager,
+        public WindowsServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
                                                  string topicPath,
                                                  string subscriptionName,
                                                  ConcurrentHandlerLimitSetting concurrentHandlerLimit,

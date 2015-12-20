@@ -1,7 +1,7 @@
 ﻿using Microsoft.ServiceBus.Messaging;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.Extensions
+namespace Nimbus.Transports.WindowsServiceBus.Extensions
 {
     internal static class BrokeredMessageExtensions
     {

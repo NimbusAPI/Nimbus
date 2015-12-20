@@ -27,7 +27,6 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
@@ -37,7 +36,6 @@ namespace Nimbus.Transports.WindowsServiceBus
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
                                  ILogger logger,
                                  IRouter router,
-                                 DefaultMessageLockDurationSetting defaultMessageLockDuration,
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
@@ -48,7 +46,6 @@ namespace Nimbus.Transports.WindowsServiceBus
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
             _router = router;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
@@ -242,7 +239,6 @@ namespace Nimbus.Transports.WindowsServiceBus
                                                   DefaultMessageTimeToLive = _defaultMessageTimeToLive,
                                                   EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
                                                   EnableBatchedOperations = true,
-                                                  LockDuration = _defaultMessageLockDuration,
                                                   RequiresSession = false,
                                                   AutoDeleteOnIdle = _autoDeleteOnIdle
                                               };
@@ -294,7 +290,6 @@ namespace Nimbus.Transports.WindowsServiceBus
                                            DefaultMessageTimeToLive = TimeSpan.MaxValue,
                                            EnableDeadLetteringOnMessageExpiration = true,
                                            EnableBatchedOperations = true,
-                                           LockDuration = _defaultMessageLockDuration,
                                            RequiresDuplicateDetection = false,
                                            RequiresSession = false,
                                            SupportOrdering = false,

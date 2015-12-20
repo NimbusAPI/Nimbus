@@ -14,7 +14,7 @@ namespace Nimbus.Infrastructure.Commands
     {
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
-        private readonly INimbusMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IDependencyResolver _dependencyResolver;
@@ -23,12 +23,12 @@ namespace Nimbus.Infrastructure.Commands
         public BusCommandSender(IDependencyResolver dependencyResolver,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
-                                INimbusMessageFactory brokeredMessageFactory,
+                                INimbusMessageFactory nimbusMessageFactory,
                                 INimbusTransport transport,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
                                 IRouter router)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
             _transport = transport;
@@ -42,7 +42,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = await _brokeredMessageFactory.Create(busCommand);
+            var message = await _nimbusMessageFactory.Create(busCommand);
 
             await Deliver(busCommand, commandType, message);
         }
@@ -52,7 +52,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = (await _brokeredMessageFactory.Create(busCommand)).WithScheduledEnqueueTime(whenToSend);
+            var message = (await _nimbusMessageFactory.Create(busCommand)).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(busCommand, commandType, message);
         }

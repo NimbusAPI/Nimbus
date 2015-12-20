@@ -3,11 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
-using Nimbus.Transports.WindowsServiceBus;
+using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.Extensions;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 {
-    internal class NimbusQueueMessageReceiver : ThrottlingMessageReceiver
+    internal class WindowsServiceBusQueueMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
@@ -16,7 +19,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private volatile MessageReceiver _messageReceiver;
         private readonly object _mutex = new object();
 
-        public NimbusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
+        public WindowsServiceBusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
                                           IQueueManager queueManager,
                                           string queuePath,
                                           ConcurrentHandlerLimitSetting concurrentHandlerLimit,

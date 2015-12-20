@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
-using Nimbus.Transports.WindowsServiceBus;
+using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 {
-    internal class NimbusTopicMessageSender : INimbusMessageSender, IDisposable
+    internal class WindowsServiceBusTopicMessageSender : INimbusMessageSender, IDisposable
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
@@ -15,7 +17,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         private TopicClient _topicClient;
 
-        public NimbusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager, string topicPath, ILogger logger)
+        public WindowsServiceBusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager, string topicPath, ILogger logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;

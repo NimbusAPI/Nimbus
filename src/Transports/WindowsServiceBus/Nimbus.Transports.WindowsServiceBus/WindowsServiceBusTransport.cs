@@ -5,6 +5,8 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.SendersAndRecievers;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -55,28 +57,28 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
         {
-            var sender = new NimbusQueueMessageSender(_brokeredMessageFactory, _queueManager, queuePath, _logger);
+            var sender = new WindowsServiceBusQueueMessageSender(_brokeredMessageFactory, _queueManager, queuePath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new NimbusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, queuePath, _concurrentHandlerLimit, _logger);
+            var receiver = new WindowsServiceBusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, queuePath, _concurrentHandlerLimit, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }
 
         private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            var sender = new NimbusTopicMessageSender(_brokeredMessageFactory, _queueManager, topicPath, _logger);
+            var sender = new WindowsServiceBusTopicMessageSender(_brokeredMessageFactory, _queueManager, topicPath, _logger);
             _garbageMan.Add(sender);
             return sender;
         }
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new NimbusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _brokeredMessageFactory, _logger);
+            var receiver = new WindowsServiceBusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _brokeredMessageFactory, _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

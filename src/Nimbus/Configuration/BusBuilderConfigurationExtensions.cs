@@ -65,18 +65,6 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithMaximumThreadPoolThreads(this BusBuilderConfiguration configuration, int maximumThreadPoolThreads)
-        {
-            configuration.MaximumThreadPoolThreads = new MaximumThreadPoolThreadsSetting {Value = maximumThreadPoolThreads};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithMinimumThreadPoolThreads(this BusBuilderConfiguration configuration, int minimumThreadPoolThreads)
-        {
-            configuration.MinimumThreadPoolThreads = new MinimumThreadPoolThreadsSetting {Value = minimumThreadPoolThreads};
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithMaxDeliveryAttempts(this BusBuilderConfiguration configuration, int maxDeliveryAttempts)
         {
             configuration.MaxDeliveryAttempts = new MaxDeliveryAttemptSetting {Value = maxDeliveryAttempts};
