@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureQueueManager.cs" />
-    <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="BrokeredMessages\BrokeredMessageFactory.cs" />
     <Compile Include="DeadLetterQueue.cs" />
     <Compile Include="BrokeredMessages\IBrokeredMessageFactory.cs" />

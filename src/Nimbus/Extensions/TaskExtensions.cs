@@ -27,5 +27,15 @@ namespace Nimbus.Extensions
             task.ConfigureAwait(false);
             return task;
         }
+
+        internal static async Task<T[]> SelectResultsAsync<T>(this IEnumerable<Task<T>> tasks)
+        {
+            var taskArray = tasks.ToArray();
+            await Task.WhenAll(taskArray);
+            var results = taskArray
+                .Select(t => t.Result)
+                .ToArray();
+            return results;
+        }
     }
 }

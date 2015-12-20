@@ -41,7 +41,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         public async Task Post(NimbusMessage message)
         {
             var messageSender = await _queueManager.CreateDeadQueueMessageSender();
-            var brokeredMessage = _brokeredMessageFactory.BuildBrokeredMessage(message);
+            var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
             await messageSender.SendAsync(brokeredMessage);
         }
 

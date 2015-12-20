@@ -19,7 +19,7 @@ namespace Nimbus.Transports.WindowsServiceBus.DevelopmentStubs
         public async Task DeliverAt(NimbusMessage message, DateTimeOffset deliveryTime)
         {
             var messageSender = await _queueManager.CreateMessageSender(message.To);
-            var brokeredMessage = _brokeredMessageFactory.BuildBrokeredMessage(message);
+            var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
             await messageSender.SendAsync(brokeredMessage);
         }
     }

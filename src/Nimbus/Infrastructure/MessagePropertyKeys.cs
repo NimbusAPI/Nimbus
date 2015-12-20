@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure
         public const string ExceptionMachineName = "ExceptionMachineName";
         public const string ExceptionIdentityName = "ExceptionIdentityName";
         public const string LargeBodyBlobIdentifier = "LargeBodyBlobIdentifier";
-        public const string MessageType = "MessageType";
+        //public const string MessageType = "MessageType";
         //public const string InReplyToRequestId = "InReplyToRequestId";
         public const string SentToQueue = "SentToQueue";
         public const string SentToTopic = "SentToTopic";
