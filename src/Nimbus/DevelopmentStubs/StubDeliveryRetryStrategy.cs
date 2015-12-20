@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Infrastructure;
 
@@ -7,9 +6,9 @@ namespace Nimbus.DevelopmentStubs
 {
     internal class StubDeliveryRetryStrategy : IDeliveryRetryStrategy
     {
-        public DateTimeOffset CalculateNextRetryTime(IEnumerable<DateTimeOffset> deliveryAttempts)
+        public DateTimeOffset CalculateNextRetryTime(NimbusMessage message)
         {
-            return deliveryAttempts.Last().AddSeconds(1);
+            return message.DeliveryAttempts.Max().AddSeconds(1);
         }
     }
 }

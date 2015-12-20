@@ -35,6 +35,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
+        internal IDeliveryRetryStrategy RetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
@@ -66,6 +67,7 @@ namespace Nimbus.Configuration
             container.Register(Serializer, typeof(ISerializer));
             container.Register(Compressor, typeof(ICompressor));
             container.Register(Router, typeof(IRouter));
+            container.Register(RetryStrategy, typeof(IDeliveryRetryStrategy));
 
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
@@ -99,7 +101,6 @@ namespace Nimbus.Configuration
             container.RegisterType<DeadLetterQueues>(ComponentLifetime.SingleInstance, typeof (DeadLetterQueues), typeof (IDeadLetterQueues));
             //container.RegisterType<DeadLetterQueue>(ComponentLifetime.SingleInstance, typeof (IDeadLetterQueue));
             container.RegisterType<StubDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-            container.RegisterType<StubDeliveryRetryStrategy>(ComponentLifetime.SingleInstance, typeof (IDeliveryRetryStrategy));
 
             #endregion
         }
