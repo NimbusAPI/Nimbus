@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Nimbus.Serializers.Json
@@ -16,6 +17,18 @@ namespace Nimbus.Serializers.Json
                 .ToList();
 
             return members;
+        }
+
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var jsonProperty = base.CreateProperty(member, memberSerialization);
+            if (jsonProperty.Writable) return jsonProperty;
+
+            var propertyInfo = member as PropertyInfo;
+            if (propertyInfo == null) return jsonProperty;
+
+            jsonProperty.Writable = propertyInfo.CanWrite;
+            return jsonProperty;
         }
     }
 }

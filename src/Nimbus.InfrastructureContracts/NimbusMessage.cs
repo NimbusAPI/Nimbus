@@ -24,10 +24,10 @@ namespace Nimbus
             Payload = payload;
         }
 
-        public Guid MessageId { get; set; }
+        public Guid MessageId { get; protected set; }
         public Guid CorrelationId { get; set; }
-        public string DestinationPath { get; set; }
-        public object Payload { get; set; }
+        public string DestinationPath { get; protected set; }
+        public object Payload { get; protected set; }
         public string ReplyTo { get; set; }
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }
