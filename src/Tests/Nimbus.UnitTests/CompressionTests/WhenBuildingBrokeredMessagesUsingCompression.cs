@@ -37,8 +37,8 @@ namespace Nimbus.UnitTests.CompressionTests
 
         protected override async Task When()
         {
-            _uncompressedMessage = await _defaultNimbusMessageFactory.Create(new CommandToCompress());
-            _compressedMessage = await Subject.Create(new CommandToCompress());
+            _uncompressedMessage = await _defaultNimbusMessageFactory.Create("nullQueue", new CommandToCompress());
+            _compressedMessage = await Subject.Create("nullQueue", new CommandToCompress());
         }
 
         [Test]

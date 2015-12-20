@@ -42,7 +42,8 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = await _nimbusMessageFactory.Create(busCommand);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var message = await _nimbusMessageFactory.Create(destinationPath, busCommand);
 
             await Deliver(busCommand, commandType, message);
         }
@@ -52,7 +53,8 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = (await _nimbusMessageFactory.Create(busCommand)).WithScheduledEnqueueTime(whenToSend);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var message = (await _nimbusMessageFactory.Create(destinationPath, busCommand)).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(busCommand, commandType, message);
         }

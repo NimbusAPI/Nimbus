@@ -90,9 +90,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                     if (response != null)
                     {
-                        var responseMessage = (await _nimbusMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
-                            .DestinedForQueue(replyQueueName)
-                            ;
+                        var responseMessage = await _nimbusMessageFactory.CreateSuccessfulResponse(replyQueueName, response, nimbusMessage);
 
                         var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                         _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
@@ -167,7 +165,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     }
 
                     var failedResponseMessage =
-                        await _nimbusMessageFactory.CreateFailedResponse(nimbusMessage, exception);
+                        await _nimbusMessageFactory.CreateFailedResponse(replyQueueName, nimbusMessage, exception);
 
                     _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                                  replyQueueName,

@@ -61,8 +61,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
-            await Subject.Dispatch(await _nimbusMessageFactory.Create(command1));
-            await Subject.Dispatch(await _nimbusMessageFactory.Create(command2));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create("nullQueue", command1));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create("nullQueue", command2));
 
             MethodCallCounter.Stop();
         }

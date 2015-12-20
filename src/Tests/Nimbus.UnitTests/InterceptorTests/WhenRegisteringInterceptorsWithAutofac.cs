@@ -44,7 +44,7 @@ namespace Nimbus.UnitTests.InterceptorTests
                                                                                                      Substitute.For<IDispatchContextManager>(),
                                                                                                      Substitute.For<ILargeMessageBodyStore>()));
 
-                var dummyNimbusMessage = new NimbusMessage();
+                var dummyNimbusMessage = new NimbusMessage("nullQueue");
                 var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyNimbusMessage);
 
                 interceptors.Count().ShouldBe(1);

@@ -64,9 +64,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
 
-            var brokeredMessage = (await _nimbusMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _nimbusMessageFactory.Create(queuePath, busRequest))
                 .WithRequestTimeout(timeout)
-                .DestinedForQueue(queuePath)
                 ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);

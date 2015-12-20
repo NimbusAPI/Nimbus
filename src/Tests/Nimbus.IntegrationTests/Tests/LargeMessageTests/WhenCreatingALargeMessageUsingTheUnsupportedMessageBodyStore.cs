@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         private async Task<NimbusMessage> When(NimbusMessageFactory brokeredMessageFactory)
         {
             var bigFatObject = new string(Enumerable.Range(0, 256*1024).Select(i => '.').ToArray());
-            return await brokeredMessageFactory.Create(bigFatObject);
+            return await brokeredMessageFactory.Create("noPath", bigFatObject);
         }
 
         [Test]

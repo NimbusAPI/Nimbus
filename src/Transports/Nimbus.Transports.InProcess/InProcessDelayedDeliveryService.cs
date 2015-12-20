@@ -25,7 +25,7 @@ namespace Nimbus.Transports.InProcess
                                var delay = deliveryTime.Subtract(_clock.UtcNow);
                                if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                                await Task.Delay(delay);
-                               var queue = _messageStore.GetMessageQueue(message.ReceivedFromPath);
+                               var queue = _messageStore.GetMessageQueue(message.DestinationPath);
                                queue.Add(message);
                            }).ConfigureAwaitFalse();
 

@@ -15,6 +15,8 @@ namespace Nimbus.Transports.WindowsServiceBus
 {
     internal class AzureQueueManager : IQueueManager
     {
+        public const string DeadLetterQueuePath = "deadletteroffice";
+
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
@@ -103,16 +105,14 @@ namespace Nimbus.Transports.WindowsServiceBus
                             });
         }
 
-        public Task<QueueClient> CreateDeadLetterQueueClient<T>()
+        public Task<MessageSender> CreateDeadQueueMessageSender()
         {
-            return Task.Run(() =>
-                            {
-                                var messageContractType = typeof (T);
-                                var queueName = GetDeadLetterQueueName(messageContractType);
+            return CreateMessageSender(DeadLetterQueuePath);
+        }
 
-                                EnsureQueueExists(messageContractType);
-                                return _messagingFactory().CreateQueueClient(queueName);
-                            });
+        public Task<MessageReceiver> CreateDeadQueueMessageReceiver()
+        {
+            return CreateMessageReceiver(DeadLetterQueuePath);
         }
 
         private ConcurrentBag<string> FetchExistingTopics()
@@ -316,13 +316,6 @@ namespace Nimbus.Transports.WindowsServiceBus
 
                 _knownQueues.Value.Add(queuePath);
             }
-        }
-
-        private string GetDeadLetterQueueName(Type messageContractType)
-        {
-            var queuePath = _router.Route(messageContractType, QueueOrTopic.Queue);
-            var deadLetterQueueName = QueueClient.FormatDeadLetterPath(queuePath);
-            return deadLetterQueueName;
         }
 
         private object LockFor(string path)

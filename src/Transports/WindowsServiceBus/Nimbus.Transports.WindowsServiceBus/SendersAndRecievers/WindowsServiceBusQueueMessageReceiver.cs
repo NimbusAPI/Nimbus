@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
@@ -51,11 +52,15 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 
                 var receiveTask = messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
                 await Task.WhenAny(receiveTask, cancellationTask);
-
                 if (cancellationTask.IsCompleted) return new NimbusMessage[0];
 
-                var messages = await receiveTask;
-                return messages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
+                var brokeredMessages = await receiveTask;
+
+                var mappingTasks = brokeredMessages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
+                await mappingTasks.WhenAll();
+
+                var nimbusMessages = mappingTasks.Select(t => t.Result).ToArray();
+                return nimbusMessages;
             }
             catch (Exception exc)
             {

@@ -57,8 +57,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 
                 if (cancellationTask.IsCompleted) return new NimbusMessage[0];
 
-                var messages = await receiveTask;
-                return messages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
+                var brokeredMessages = await receiveTask;
+
+                var mappingTasks = brokeredMessages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
+                await Task.WhenAll(mappingTasks);
+
+                var nimbusMessages = mappingTasks.Select(t => t.Result).ToArray();
+                return nimbusMessages;
             }
             catch (Exception exc)
             {

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using JsonSerializer = Nimbus.Serializers.Json.JsonSerializer;
 
 namespace Nimbus.Configuration
 {
@@ -12,11 +13,10 @@ namespace Nimbus.Configuration
         /// </summary>
         /// <param name="configuration">The bus configuration to apply the serializer to.</param>
         /// <param name="settings">To configure serialization settings.</param>
-        /// <param name="formatting">To configure serialization formatting.</param>
         /// <returns>Bus configuration.</returns>
-        public static BusBuilderConfiguration WithJsonSerializer(this BusBuilderConfiguration configuration, JsonSerializerSettings settings, Formatting formatting = Formatting.None)
+        public static BusBuilderConfiguration WithJsonSerializer(this BusBuilderConfiguration configuration, JsonSerializerSettings settings)
         {
-            return configuration.WithSerializer(new Nimbus.Serializers.Json.JsonSerializer(settings, formatting));
+            return configuration.WithSerializer(new JsonSerializer(settings));
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Nimbus.Configuration
         /// <returns>Bus configuration.</returns>
         public static BusBuilderConfiguration WithJsonSerializer(this BusBuilderConfiguration configuration)
         {
-            return configuration.WithSerializer(new Nimbus.Serializers.Json.JsonSerializer());
+            return configuration.WithSerializer(new JsonSerializer());
         }
     }
 }

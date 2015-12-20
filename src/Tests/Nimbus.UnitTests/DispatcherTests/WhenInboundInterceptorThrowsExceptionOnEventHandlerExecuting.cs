@@ -1,5 +1,4 @@
 ﻿using System;
-using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -8,8 +7,7 @@ using NUnit.Framework;
 
 namespace Nimbus.UnitTests.DispatcherTests
 {
-    public class WhenInboundInterceptorThrowsExceptionOnEventHandlerExecuting
-        : MessageDispatcherTestBase
+    public class WhenInboundInterceptorThrowsExceptionOnEventHandlerExecutin : MessageDispatcherTestBase
     {
         [Test]
         public void TheExceptionIsBubbledBackThroughTheInterceptors()
@@ -19,11 +17,11 @@ namespace Nimbus.UnitTests.DispatcherTests
                 .When(x => x.OnEventHandlerExecuting(Arg.Any<EmptyEvent>(), Arg.Any<NimbusMessage>()))
                 .Do(x => { throw new Exception("Ruh roh"); });
             var dispatcher = GetEventMessageDispatcher<EmptyEvent, EmptyEventHandler>(interceptor);
-            var brokeredMessage = NimbusMessageFactory.Create(new EmptyEvent()).Result;
+            var nimbusMessage = NimbusMessageFactory.Create("someQueue", new EmptyEvent()).Result;
 
             try
             {
-                dispatcher.Dispatch(brokeredMessage).Wait();
+                dispatcher.Dispatch(nimbusMessage).Wait();
             }
             catch (AggregateException)
             {
@@ -32,7 +30,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             interceptor
                 .Received()
-                .OnEventHandlerError(Arg.Any<EmptyEvent>(), brokeredMessage, Arg.Any<Exception>());
+                .OnEventHandlerError(Arg.Any<EmptyEvent>(), nimbusMessage, Arg.Any<Exception>());
         }
     }
 }

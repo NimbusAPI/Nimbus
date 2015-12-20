@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure
         /// </summary>
         /// <param name="payload"></param>
         /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
-        Task<NimbusMessage> Create(object payload);
+        Task<NimbusMessage> Create(string destinationPath, object payload);
 
         /// <summary>
         ///     Creates a <see cref="NimbusMessage" /> as successful response to the original request using the specified content
@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure
         /// <param name="responsePayload">The content to be serialized into the message body.</param>
         /// <param name="originalRequest">The original request this response is for.</param>
         /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
-        Task<NimbusMessage> CreateSuccessfulResponse(object responsePayload, NimbusMessage originalRequest);
+        Task<NimbusMessage> CreateSuccessfulResponse(string destinationPath, object responsePayload, NimbusMessage originalRequest);
 
         /// <summary>
         ///     Creates a <see cref="NimbusMessage" /> as failure response to the original request with an empty body but the
@@ -28,6 +28,6 @@ namespace Nimbus.Infrastructure
         /// <param name="originalRequest">The original request this response is for.</param>
         /// <param name="exception">The exception that caused the request to fail.</param>
         /// <returns>The newly minted <see cref="NimbusMessage" /></returns>
-        Task<NimbusMessage> CreateFailedResponse(NimbusMessage originalRequest, Exception exception);
+        Task<NimbusMessage> CreateFailedResponse(string destinationPath, NimbusMessage originalRequest, Exception exception);
     }
 }

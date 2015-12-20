@@ -86,6 +86,7 @@
     <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
     <Compile Include="TestForBus.cs" />
+    <Compile Include="TestScenarioGeneration\SerializerConfigurationSources.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeCompetingHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeMulticastHandler.cs" />
@@ -214,6 +215,14 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
       <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj">
+      <Project>{109fb118-fa9a-4eb2-88af-f66c973ce50f}</Project>
+      <Name>Nimbus.Serializers.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.ProtoBuf\Nimbus.Serializers.ProtoBuf.csproj">
+      <Project>{b4162aa1-5f41-4ffd-90fb-4d7093955f6d}</Project>
+      <Name>Nimbus.Serializers.ProtoBuf</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>

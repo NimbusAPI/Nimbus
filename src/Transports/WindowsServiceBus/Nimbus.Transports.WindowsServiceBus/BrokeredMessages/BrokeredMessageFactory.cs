@@ -61,51 +61,54 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
 
         public Task<NimbusMessage> Create(object payload = null)
         {
-            return Task.Run(async () =>
-                                  {
-                                      NimbusMessage nimbusMessage;
-                                      if (payload == null)
-                                      {
-                                          nimbusMessage = new NimbusMessage();
-                                      }
-                                      else
-                                      {
-                                          var messageBodyBytes = BuildBodyBytes(payload);
+            throw new NotImplementedException();
+            //FIXME we'll need this again in a minute :p
 
-                                          if (messageBodyBytes.Length > _maxLargeMessageSize)
-                                          {
-                                              var errorMessage =
-                                                  "Message body size of {0} is larger than the permitted maximum of {1}. You need to change this in your bus configuration settings if you want to send messages this large."
-                                                      .FormatWith(messageBodyBytes.Length, _maxLargeMessageSize.Value);
-                                              throw new BusException(errorMessage);
-                                          }
+            //return Task.Run(async () =>
+            //                      {
+            //                          NimbusMessage nimbusMessage;
+            //                          if (payload == null)
+            //                          {
+            //                              nimbusMessage = new NimbusMessage();
+            //                          }
+            //                          else
+            //                          {
+            //                              var messageBodyBytes = BuildBodyBytes(payload);
 
-                                          if (messageBodyBytes.Length > _maxSmallMessageSize)
-                                          {
-                                              nimbusMessage = new NimbusMessage();
-                                              var expiresAfter = nimbusMessage.ExpiresAfter;
-                                              var blobIdentifier = await _largeMessageBodyStore.Store(nimbusMessage.MessageId, messageBodyBytes, expiresAfter);
-                                              nimbusMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
-                                          }
-                                          else
-                                          {
-                                              nimbusMessage = new NimbusMessage(messageBodyBytes);
-                                          }
-                                          nimbusMessage.Properties[MessagePropertyKeys.MessageType] = payload.GetType().FullName;
-                                      }
+            //                              if (messageBodyBytes.Length > _maxLargeMessageSize)
+            //                              {
+            //                                  var errorMessage =
+            //                                      "Message body size of {0} is larger than the permitted maximum of {1}. You need to change this in your bus configuration settings if you want to send messages this large."
+            //                                          .FormatWith(messageBodyBytes.Length, _maxLargeMessageSize.Value);
+            //                                  throw new BusException(errorMessage);
+            //                              }
 
-                                      var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
-                                      nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
-                                      nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
-                                      nimbusMessage.ReplyTo = nimbusMessage.ReplyTo;
+            //                              if (messageBodyBytes.Length > _maxSmallMessageSize)
+            //                              {
+            //                                  nimbusMessage = new NimbusMessage();
+            //                                  var expiresAfter = nimbusMessage.ExpiresAfter;
+            //                                  var blobIdentifier = await _largeMessageBodyStore.Store(nimbusMessage.MessageId, messageBodyBytes, expiresAfter);
+            //                                  nimbusMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
+            //                              }
+            //                              else
+            //                              {
+            //                                  nimbusMessage = new NimbusMessage(messageBodyBytes);
+            //                              }
+            //                              nimbusMessage.Properties[MessagePropertyKeys.MessageType] = payload.GetType().FullName;
+            //                          }
 
-                                      return nimbusMessage;
-                                  });
+            //                          var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
+            //                          nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
+            //                          nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
+            //                          nimbusMessage.ReplyTo = nimbusMessage.ReplyTo;
+
+            //                          return nimbusMessage;
+            //                      });
         }
 
-        public NimbusMessage BuildNimbusMessage(BrokeredMessage message)
+        public async Task<NimbusMessage> BuildNimbusMessage(BrokeredMessage message)
         {
-            var nimbusMessage = (NimbusMessage) GetBody(message).Result; //FIXME ick. Make async.
+            var nimbusMessage = (NimbusMessage) await GetBody(message);
             return nimbusMessage;
         }
 

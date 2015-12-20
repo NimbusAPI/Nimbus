@@ -11,6 +11,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         Task<TopicClient> CreateTopicSender(string topicPath);
         Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName);
 
-        Task<QueueClient> CreateDeadLetterQueueClient<T>();
+        Task<MessageSender> CreateDeadQueueMessageSender();
+        Task<MessageReceiver> CreateDeadQueueMessageReceiver();
     }
 }

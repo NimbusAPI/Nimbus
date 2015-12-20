@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
@@ -48,7 +47,6 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
                 try
                 {
                     var nimbusMessage = _messageQueue.Take(cancellationTokenSource.Token);
-                    nimbusMessage.ReceivedFromPath = _queuePath;
                     await callback(nimbusMessage);
                 }
                 catch (OperationCanceledException)

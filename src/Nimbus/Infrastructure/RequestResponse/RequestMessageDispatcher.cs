@@ -90,8 +90,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var handlerTask = handler.Handle(busRequest);
                     var response = await handlerTask;
 
-                    var responseMessage = (await _nimbusMessageFactory.CreateSuccessfulResponse(response, nimbusMessage))
-                        .DestinedForQueue(replyQueueName);
+                    var responseMessage = await _nimbusMessageFactory.CreateSuccessfulResponse(replyQueueName, response, nimbusMessage);
 
                     var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                     foreach (var interceptor in outboundInterceptors.Reverse())
@@ -184,8 +183,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                       nimbusMessage.CorrelationId);
                     }
 
-                    var failedResponseMessage = (await _nimbusMessageFactory.CreateFailedResponse(nimbusMessage, exception))
-                        .DestinedForQueue(replyQueueName);
+                    var failedResponseMessage = (await _nimbusMessageFactory.CreateFailedResponse(replyQueueName, nimbusMessage, exception));
 
                     _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
                                  replyQueueName,

@@ -16,7 +16,7 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             var dispatcher = GetRequestMessageDispatcher<ExceptingRequest, ExceptingResponse, ExceptingRequestHandler>(interceptor);
-            var brokeredMessage = NimbusMessageFactory.Create(new ExceptingRequest()).Result;
+            var brokeredMessage = NimbusMessageFactory.Create("nullQueue", new ExceptingRequest()).Result;
 
             dispatcher.Dispatch(brokeredMessage).Wait();
 

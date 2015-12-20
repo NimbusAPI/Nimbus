@@ -1,11 +1,11 @@
-﻿using Microsoft.ServiceBus.Messaging;
-using Nimbus.Infrastructure;
+﻿using System.Threading.Tasks;
+using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
 {
     internal interface IBrokeredMessageFactory
     {
         BrokeredMessage BuildBrokeredMessage(NimbusMessage message);
-        NimbusMessage BuildNimbusMessage(BrokeredMessage message);
+        Task<NimbusMessage> BuildNimbusMessage(BrokeredMessage message);
     }
 }

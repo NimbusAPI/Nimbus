@@ -15,7 +15,7 @@ namespace Nimbus.UnitTests.NimbusMessageFactoryTests
 
         protected override async Task When()
         {
-            _message = await Subject.Create(new TestMessage());
+            _message = await Subject.Create("someQueue", new TestMessage());
         }
 
         [Test]

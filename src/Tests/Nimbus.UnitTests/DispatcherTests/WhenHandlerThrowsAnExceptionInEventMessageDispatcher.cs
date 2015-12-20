@@ -7,19 +7,18 @@ using NUnit.Framework;
 
 namespace Nimbus.UnitTests.DispatcherTests
 {
-    public class WhenHandlerThrowsAnExceptionInEventMessageDispatcher
-        : MessageDispatcherTestBase
+    public class WhenHandlerThrowsAnExceptionInEventMessageDispatcher : MessageDispatcherTestBase
     {
         [Test]
         public void TheExceptionIsBubbledThroughTheInterceptors()
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             var dispatcher = GetEventMessageDispatcher<ExceptingEvent, ExceptingEventHandler>(interceptor);
-            var brokeredMessage = NimbusMessageFactory.Create(new ExceptingEvent()).Result;
+            var nimbusMessage = NimbusMessageFactory.Create("someQueue", new ExceptingEvent()).Result;
 
             try
             {
-                dispatcher.Dispatch(brokeredMessage).Wait();
+                dispatcher.Dispatch(nimbusMessage).Wait();
             }
             catch (AggregateException)
             {
@@ -28,7 +27,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             interceptor
                 .Received()
-                .OnEventHandlerError(Arg.Any<ExceptingEvent>(), brokeredMessage, Arg.Any<Exception>());
+                .OnEventHandlerError(Arg.Any<ExceptingEvent>(), nimbusMessage, Arg.Any<Exception>());
         }
     }
 }

@@ -42,8 +42,8 @@ namespace Nimbus.Infrastructure.Events
 
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
-            var brokeredMessage = await _nimbusMessageFactory.Create(busEvent);
             var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
+            var brokeredMessage = await _nimbusMessageFactory.Create(topicPath, busEvent);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {

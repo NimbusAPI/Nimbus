@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
+using NullGuard;
 
 namespace Nimbus.Infrastructure.NimbusMessageServices
 {
@@ -24,9 +25,9 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
             _dispatchContextManager = dispatchContextManager;
         }
 
-        public Task<NimbusMessage> Create(object payload = null)
+        public Task<NimbusMessage> Create(string destinationPath, [AllowNull] object payload)
         {
-            var nimbusMessage = new NimbusMessage(payload);
+            var nimbusMessage = new NimbusMessage(destinationPath, payload);
             var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
             var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
             nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
@@ -38,22 +39,22 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
             return Task.FromResult(nimbusMessage);
         }
 
-        public Task<NimbusMessage> CreateSuccessfulResponse(object responsePayload, NimbusMessage originalRequest)
+        public Task<NimbusMessage> CreateSuccessfulResponse(string destinationPath, object responsePayload, NimbusMessage originalRequest)
         {
             return Task.Run(async () =>
                                   {
-                                      var responseMessage = (await Create(responsePayload)).WithReplyToRequestId(originalRequest.MessageId);
+                                      var responseMessage = (await Create(destinationPath, responsePayload)).WithReplyToRequestId(originalRequest.MessageId);
                                       responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = true;
 
                                       return responseMessage;
                                   });
         }
 
-        public Task<NimbusMessage> CreateFailedResponse(NimbusMessage originalRequest, Exception exception)
+        public Task<NimbusMessage> CreateFailedResponse(string destinationPath, NimbusMessage originalRequest, Exception exception)
         {
             return Task.Run(async () =>
                                   {
-                                      var responseMessage = (await Create()).WithReplyToRequestId(originalRequest.MessageId);
+                                      var responseMessage = (await Create(destinationPath, null)).WithReplyToRequestId(originalRequest.MessageId);
                                       responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = false;
                                       foreach (var prop in exception.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
 
