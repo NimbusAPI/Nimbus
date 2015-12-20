@@ -21,7 +21,8 @@ namespace Nimbus.Extensions
 
         internal static NimbusMessage WithReplyToRequestId(this NimbusMessage message, Guid requestId)
         {
-            return message.WithProperty(MessagePropertyKeys.InReplyToRequestId, requestId);
+            message.InReplyToMessageId = requestId;
+            return message;
         }
 
         internal static NimbusMessage DestinedForQueue(this NimbusMessage message, string queuePath)
@@ -36,7 +37,7 @@ namespace Nimbus.Extensions
 
         internal static NimbusMessage WithReplyTo(this NimbusMessage message, string replyTo)
         {
-            message.ReplyTo = replyTo;
+            message.From = replyTo;
             return message;
         }
 
@@ -75,8 +76,6 @@ namespace Nimbus.Extensions
         internal static IDictionary<string, object> ExtractProperties(this NimbusMessage NimbusMessage)
         {
             var properties = NimbusMessage.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            properties[MessagePropertyKeys.MessageId] = NimbusMessage.MessageId;
-            properties[MessagePropertyKeys.CorrelationId] = NimbusMessage.CorrelationId;
             return properties;
         }
 

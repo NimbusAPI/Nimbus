@@ -47,7 +47,7 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
             var brokeredMessage = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(serializedNimbusMessage)), true);
             brokeredMessage.CorrelationId = message.CorrelationId.ToString();
             brokeredMessage.MessageId = message.MessageId.ToString();
-            brokeredMessage.ReplyTo = message.ReplyTo;
+            brokeredMessage.ReplyTo = message.From;
             brokeredMessage.TimeToLive = message.ExpiresAfter.Subtract(DateTimeOffset.UtcNow);
             brokeredMessage.ScheduledEnqueueTimeUtc = message.ScheduledEnqueueTimeUtc;
 

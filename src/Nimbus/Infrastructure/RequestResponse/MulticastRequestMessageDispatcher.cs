@@ -59,7 +59,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
-            var replyQueueName = nimbusMessage.ReplyTo;
+            var replyQueueName = nimbusMessage.From;
             var replyQueueClient = _transport.GetQueueSender(replyQueueName);
 
             Exception exception = null;

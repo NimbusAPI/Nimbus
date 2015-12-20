@@ -11,29 +11,30 @@ namespace Nimbus
         {
         }
 
-        public NimbusMessage(string destinationPath)
+        public NimbusMessage(string to)
         {
-            DestinationPath = destinationPath;
+            To = to;
             MessageId = Guid.NewGuid();
             Properties = new Dictionary<string, object>();
             DeliveryAttempts = new DateTimeOffset[0];
             ExpiresAfter = DateTimeOffset.UtcNow.AddMinutes(30); //FIXME awful hack.
         }
 
-        public NimbusMessage(string destinationPath, object payload) : this(destinationPath)
+        public NimbusMessage(string to, object payload) : this(to)
         {
             Payload = payload;
         }
 
         public Guid MessageId { get; protected set; }
         public Guid CorrelationId { get; set; }
-        public string DestinationPath { get; protected set; }
-        public object Payload { get; protected set; }
-        public string ReplyTo { get; set; }
+        public string From { get; set; }
+        public string To { get; protected set; }
+        public Guid? InReplyToMessageId { get; set; }
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }
         public DateTimeOffset[] DeliveryAttempts { get; set; }
         public IDictionary<string, object> Properties { get; set; }
+        public object Payload { get; protected set; }
 
         public void RecordDeliveryAttempt(DateTimeOffset deliveryAttemptTimestamp)
         {

@@ -115,7 +115,7 @@ namespace Nimbus.Infrastructure
                     _logger.Error(exc,
                                   "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                                   message.SafelyGetBodyTypeNameOrDefault(),
-                                  message.ReplyTo,
+                                  message.From,
                                   message.MessageId,
                                   message.CorrelationId);
                 }
@@ -136,7 +136,7 @@ namespace Nimbus.Infrastructure
                         _logger.Error(exc,
                                       "Failed to post message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
                                       message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.ReplyTo,
+                                      message.From,
                                       message.MessageId,
                                       message.CorrelationId);
                     }
@@ -157,7 +157,7 @@ namespace Nimbus.Infrastructure
                         _logger.Error(exc,
                                       "Failed to re-enqueue message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] for re-delivery.",
                                       message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.ReplyTo,
+                                      message.From,
                                       message.MessageId,
                                       message.CorrelationId);
                     }
@@ -174,7 +174,7 @@ namespace Nimbus.Infrastructure
             _logger.Debug("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                           activity,
                           message.SafelyGetBodyTypeNameOrDefault(),
-                          message.ReplyTo,
+                          message.From,
                           message.MessageId,
                           message.CorrelationId);
         }
@@ -184,7 +184,7 @@ namespace Nimbus.Infrastructure
             _logger.Info("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                          activity,
                          message.SafelyGetBodyTypeNameOrDefault(),
-                         message.ReplyTo,
+                         message.From,
                          message.MessageId,
                          message.CorrelationId);
         }

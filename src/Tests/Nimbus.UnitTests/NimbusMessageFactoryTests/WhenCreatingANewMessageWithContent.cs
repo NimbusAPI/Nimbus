@@ -39,7 +39,7 @@ namespace Nimbus.UnitTests.NimbusMessageFactoryTests
         [Test]
         public void ThenTheReplyToAddressShouldBeSetToTheSenderAddress()
         {
-            _message.ReplyTo.ShouldBe(ReplyQueueNameSetting.Value);
+            _message.From.ShouldBe(ReplyQueueNameSetting.Value);
         }
 
         [DataContract]

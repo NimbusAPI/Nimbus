@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -16,7 +17,8 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Dispatch(NimbusMessage message)
         {
-            var requestId = (Guid) message.Properties[MessagePropertyKeys.InReplyToRequestId];
+            var requestId = (Guid)message.InReplyToMessageId;
+
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
             if (responseCorrelationWrapper == null)
             {

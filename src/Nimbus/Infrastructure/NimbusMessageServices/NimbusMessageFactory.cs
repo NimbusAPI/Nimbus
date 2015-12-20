@@ -32,7 +32,7 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
             var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
             nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
             nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
-            nimbusMessage.ReplyTo = _replyQueueName;
+            nimbusMessage.From = _replyQueueName;
             nimbusMessage.ExpiresAfter = expiresAfter;
             nimbusMessage.Properties[MessagePropertyKeys.MessageType] = nimbusMessage.SafelyGetBodyTypeNameOrDefault();
 
