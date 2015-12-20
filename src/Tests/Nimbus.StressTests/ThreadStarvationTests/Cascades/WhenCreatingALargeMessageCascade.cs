@@ -1,12 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.StressTests.Configuration;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
 using Nimbus.Tests.Common;
@@ -43,8 +41,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start(MessagePumpTypes.All);
 

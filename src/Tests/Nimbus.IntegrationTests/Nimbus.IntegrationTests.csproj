@@ -73,20 +73,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDomainScanner.cs" />
-    <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
-    <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
-    <Compile Include="Stubs\ImmediateRetryDeliveryStrategy.cs" />
-    <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
-    <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
     <Compile Include="TestForBus.cs" />
-    <Compile Include="TestScenarioGeneration\SerializerConfigurationSources.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeCompetingHandler.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteEventTypeMulticastHandler.cs" />
@@ -163,10 +156,7 @@
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
-    <Compile Include="TestScenarioGeneration\LargeMessageStorageConfigurationSources.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
-    <Compile Include="TestScenarioGeneration\PartialConfigurationScenario.cs" />
-    <Compile Include="TestScenarioGeneration\TransportConfigurationSources.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />

@@ -41,6 +41,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Nimbus.Tests.Common", AllInternalsVisible = true)]
 [assembly: InternalsVisibleTo("Nimbus.UnitTests", AllInternalsVisible = true)]
 [assembly: InternalsVisibleTo("Nimbus.IntegrationTests", AllInternalsVisible = true)]
+[assembly: InternalsVisibleTo("Nimbus.StressTests", AllInternalsVisible = true)]
 [assembly: InternalsVisibleTo("Nimbus.Autofac")]
 [assembly: InternalsVisibleTo("Nimbus.Windsor")]
 [assembly: InternalsVisibleTo("Nimbus.LargeMessages.Azure")]

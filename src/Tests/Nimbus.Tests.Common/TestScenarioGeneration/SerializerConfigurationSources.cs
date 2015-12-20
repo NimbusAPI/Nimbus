@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Serializers.Json;
-using Nimbus.Serializers.ProtoBuf;
 
 namespace Nimbus.IntegrationTests.TestScenarioGeneration
 {

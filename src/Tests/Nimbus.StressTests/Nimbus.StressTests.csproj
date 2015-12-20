@@ -62,9 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
-    <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartupPerformanceTests\WhenCreatingABigBus.cs" />
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingACommand.cs" />
@@ -86,9 +85,7 @@
     <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool.cs" />
-    <Compile Include="ThroughputTests\EventHandlers\FakeHandler.cs" />
-    <Compile Include="ThroughputTests\Infrastructure\FakeChildScope.cs" />
-    <Compile Include="ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
+    <Compile Include="ThroughputTests\EventHandlers\StressTestMessageHandler.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BarCommand.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BarEvent.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BazCommand.cs" />
@@ -99,11 +96,14 @@
     <Compile Include="ThroughputTests\MessageContracts\FooResponse.cs" />
     <Compile Include="ThroughputTests\MessageContracts\QuxCommand.cs" />
     <Compile Include="ThroughputTests\MessageContracts\QuxEvent.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\StressTestMessage.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\StressTestResponseMessage.cs" />
     <Compile Include="ThroughputTests\ThroughputSpecificationForBus.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyIndividualRequestsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
   </ItemGroup>
@@ -145,9 +145,7 @@
       <Name>Nimbus.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="StartupPerformanceTests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

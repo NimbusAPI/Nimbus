@@ -1,103 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Logging;
+using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
-using Nimbus.StressTests.ThroughputTests.Infrastructure;
-using Nimbus.Tests.Common;
-using Nimbus.Transports.InProcess;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
     [Timeout(60*1000)]
-    public abstract class ThroughputSpecificationForBus : SpecificationForAsync<Bus>
+    public abstract class ThroughputSpecificationForBus
     {
-        private TimeSpan _timeout;
-        private AssemblyScanningTypeProvider _typeProvider;
-
-        private FakeDependencyResolver _dependencyResolver;
-        private FakeHandler _fakeHandler;
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
-        private ILogger _logger;
-        private string _largeMessageBodyTempPath;
+        private double _averageOneWayLatency;
+        private double _averageRequestResponseLatency;
 
-        protected virtual int NumMessagesToSend
+        protected Bus Bus { get; private set; }
+
+        protected virtual int NumMessagesToSend => 10*1000;
+
+        protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
-            get { return 8000; }
+            busBuilderConfiguration.WithLogger(new NullLogger());
+            Bus = busBuilderConfiguration.Build();
+            await Bus.Start();
         }
 
-        protected abstract int ExpectedMessagesPerSecond { get; }
-
-        protected override async Task<Bus> Given()
-        {
-            _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
-
-            _fakeHandler = new FakeHandler(NumMessagesToSend);
-            _dependencyResolver = new FakeDependencyResolver(_fakeHandler);
-            _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
-            _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-
-            _logger = TestHarnessLoggerFactory.Create();
-            //_logger = new NullLogger();
-
-            var bus = new BusBuilder().Configure()
-                                      .WithTransport(new InProcessTransportConfiguration())
-                                      .WithNames("ThroughputTestSuite", Environment.MachineName)
-                                      .WithLogger(_logger)
-                                      .WithTypesFrom(_typeProvider)
-                                      .WithDependencyResolver(_dependencyResolver)
-                                      .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                          "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                      .Build();
-            await bus.Start();
-            return bus;
-        }
-
-        protected override async Task When()
+        protected virtual async Task When()
         {
             Console.WriteLine("Starting to send messages...");
+            StressTestMessageHandler.Reset(NumMessagesToSend);
             _stopwatch = Stopwatch.StartNew();
 
-            await Task.WhenAll(SendMessages(Subject));
+            await Task.WhenAll(SendMessages(Bus));
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            _fakeHandler.WaitUntilDone(_timeout);
+            StressTestMessageHandler.WaitUntilDone(TimeSpan.FromSeconds(60));
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
-            _messagesPerSecond = _fakeHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
+
+            _messagesPerSecond = StressTestMessageHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
-        }
 
-        [TestFixtureTearDown]
-        public override void TestFixtureTearDown()
-        {
-            Subject.Stop().Wait();
-            _dependencyResolver = null;
-            base.TestFixtureTearDown();
-            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
-        }
+            _averageOneWayLatency = StressTestMessageHandler.Messages
+                                                            .Select(m => m.WhenReceived - m.WhenSent)
+                                                            .Select(ts => ts.TotalMilliseconds)
+                                                            .Average();
+            Console.WriteLine("Average one-way latency: {0} milliseconds", _averageOneWayLatency);
 
-        public abstract IEnumerable<Task> SendMessages(IBus bus);
-
-        [Test]
-        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
-        {
-            _fakeHandler.ActualNumMessagesReceived.ShouldBe(_fakeHandler.ExpectedNumMessagesReceived);
+            _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages
+                                                                     .Select(m => m.WhenReceived - m.RequestSentAt)
+                                                                     .Select(ts => ts.TotalMilliseconds)
+                                                                     .Average();
+            Console.WriteLine("Average request/response latency: {0} milliseconds", _averageRequestResponseLatency);
         }
 
         [Test]
-        public async Task WeShouldGetAcceptableThroughput()
+        [TestCaseSource(typeof (AllBusConfigurations<ThroughputSpecificationForBus>))]
+        public async Task Run(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
-            _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
+            await Given(busBuilderConfiguration);
+            await When();
+        }
+
+        public abstract Task SendMessages(IBus bus);
+
+        [TearDown]
+        public void TearDown()
+        {
+            var bus = Bus;
+            bus?.Dispose();
         }
     }
 }

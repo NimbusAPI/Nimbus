@@ -9,12 +9,7 @@ namespace Nimbus.StressTests.ThroughputTests
     [TestFixture]
     public class WhenPublishingManyEventsOfDifferentTypes : ThroughputSpecificationForBus
     {
-        protected override int ExpectedMessagesPerSecond
-        {
-            get { return 400; }
-        }
-
-        public override IEnumerable<Task> SendMessages(IBus bus)
+        public override Task SendMessages(IBus bus)
         {
             var messages = new List<IBusEvent>();
             for (var i = 0; i < NumMessagesToSend/8; i++) // /8 because we'll see each event once via multicast and once via competition
@@ -25,7 +20,7 @@ namespace Nimbus.StressTests.ThroughputTests
                 messages.Add(new QuxEvent());
             }
 
-            yield return bus.PublishAll(messages);
+            return bus.PublishAll(messages);
         }
     }
 }
