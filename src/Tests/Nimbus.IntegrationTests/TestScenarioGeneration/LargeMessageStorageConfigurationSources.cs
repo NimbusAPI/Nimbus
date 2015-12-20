@@ -6,7 +6,9 @@ using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.IntegrationTests.Configuration;
+using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Configuration;
+using Nimbus.LargeMessages.Azure.Http;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 
 namespace Nimbus.IntegrationTests.TestScenarioGeneration

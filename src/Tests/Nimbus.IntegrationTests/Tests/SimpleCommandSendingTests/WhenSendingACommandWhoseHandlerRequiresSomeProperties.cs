@@ -12,21 +12,18 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingACommandWhoseHandlerRequiresSomeProperties : TestForBus
     {
-        private const int _timeoutSeconds = 5;
-
         protected override async Task When()
         {
             SomeOtherCommandHandler.Clear();
             var someCommand = new SomeOtherCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
         public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -36,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
         public async Task TheDispatchContextShouldBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -46,7 +43,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
         public async Task TheMessagePropertiesShouldBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -56,7 +53,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

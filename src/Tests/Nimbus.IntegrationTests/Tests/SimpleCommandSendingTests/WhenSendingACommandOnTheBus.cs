@@ -11,20 +11,17 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingACommandOnTheBus : TestForBus
     {
-        private const int _timeoutSeconds = 5;
-
         protected override async Task When()
         {
             var someCommand = new SomeCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandOnTheBus>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
         public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -34,7 +31,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingACommandOnTheBus>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

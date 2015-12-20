@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
         public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

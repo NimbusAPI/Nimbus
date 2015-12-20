@@ -6,9 +6,11 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
+        protected const int TimeoutSeconds = 10;
+
         protected Bus Bus { get; private set; }
 
         protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
@@ -16,7 +18,7 @@ namespace Nimbus.IntegrationTests
             MethodCallCounter.Clear();
 
             Bus = busBuilderConfiguration.Build();
-            await busBuilderConfiguration.Build().Start();
+            await Bus.Start();
         }
 
         protected abstract Task When();
@@ -25,8 +27,9 @@ namespace Nimbus.IntegrationTests
         public void TearDown()
         {
             var bus = Bus;
+            Bus = null;
 
-            if (bus != null) bus.Dispose();
+            bus?.Dispose();
         }
     }
 }

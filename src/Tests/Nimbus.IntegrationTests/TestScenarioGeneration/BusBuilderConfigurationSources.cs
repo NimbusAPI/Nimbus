@@ -44,7 +44,7 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
                                                                 dc.RemoveAllExistingNamespaceElementsOnStartup(
                                                                     "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."));
 
-                    var scenarioName = PartialConfigurationScenario<BusBuilderConfiguration>.Combine(transport.Name, router.Name);
+                    var scenarioName = PartialConfigurationScenario.Combine(transport.Name, router.Name);
                     yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration);
                 }
             }

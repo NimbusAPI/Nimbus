@@ -1,4 +1,5 @@
-﻿using Nimbus.Configuration.PoorMansIocContainer;
+﻿using Nimbus.Configuration.Debug.Settings;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
@@ -40,6 +41,13 @@ namespace Nimbus.Configuration
                             {
                                 //container.Resolve<AzureQueueManager>().WarmUp();
                                 container.Resolve<PropertyInjector>().Bus = bus;
+
+                                var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
+                                if (removeAllExistingElements)
+                                {
+                                    var cleanser = container.Resolve<INamespaceCleanser>();
+                                    cleanser.RemoveAllExistingNamespaceElements();
+                                }
                             };
             bus.Disposing += delegate { container.Dispose(); };
 

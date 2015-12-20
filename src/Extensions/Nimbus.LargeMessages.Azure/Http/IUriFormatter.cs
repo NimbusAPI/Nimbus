@@ -1,6 +1,6 @@
 using System;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
+namespace Nimbus.LargeMessages.Azure.Http
 {
     internal interface IUriFormatter
     {

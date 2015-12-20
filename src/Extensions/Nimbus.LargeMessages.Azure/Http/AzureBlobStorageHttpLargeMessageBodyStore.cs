@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration.LargeMessages;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure.Http
+namespace Nimbus.LargeMessages.Azure.Http
 {
     internal class AzureBlobStorageHttpLargeMessageBodyStore : ILargeMessageBodyStore
     {

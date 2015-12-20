@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Nimbus.Configuration;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Transport;
+using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
@@ -17,6 +19,7 @@ namespace Nimbus.Transports.InProcess
             container.RegisterType<InProcessTopicSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<InProcessQueueReceiver>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<InProcessDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
+            container.RegisterType<StubNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
 
             //FIXME The transport itself should have an opinion on this, not the NimbusMessageFactory. We shouldn't know about this here.
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof (ILargeMessageBodyStore));

@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
         public async Task TheHandlerShouldReceiveThatRequest(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -43,7 +43,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
         public async Task TheResponseShouldNotBeNull(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

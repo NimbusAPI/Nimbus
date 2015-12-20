@@ -8,7 +8,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 
-namespace Nimbus.LargeMessages.Azure.Infrastructure
+namespace Nimbus.LargeMessages.Azure.Client
 {
     internal class AzureBlobStorageLargeMessageBodyStore : ILargeMessageBodyStore
     {

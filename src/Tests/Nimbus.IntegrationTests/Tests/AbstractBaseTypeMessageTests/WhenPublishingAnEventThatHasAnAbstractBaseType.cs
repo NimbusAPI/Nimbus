@@ -21,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
         public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
         public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -45,7 +45,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -58,7 +58,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatHasAnAbstractBaseType>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

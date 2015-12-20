@@ -38,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
         public async Task TheResponseShouldNotBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -48,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
         public async Task AnExceptionShouldBeReThrownOnTheClient(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -58,7 +58,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
         public async Task TheExceptionShouldBeARequestFailedException(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -68,7 +68,7 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
         public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

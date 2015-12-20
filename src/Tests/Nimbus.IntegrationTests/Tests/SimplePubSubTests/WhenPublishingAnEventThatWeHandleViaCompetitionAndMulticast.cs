@@ -24,7 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
         public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -36,7 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
         public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -48,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
         public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -61,7 +61,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
         public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

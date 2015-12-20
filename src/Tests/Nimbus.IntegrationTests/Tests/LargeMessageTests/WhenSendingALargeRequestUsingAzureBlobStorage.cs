@@ -6,6 +6,7 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
+using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Configuration;
 using Nimbus.Tests.Common;
 using Nimbus.Transports.WindowsServiceBus;

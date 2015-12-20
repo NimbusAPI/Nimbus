@@ -57,32 +57,32 @@ namespace Nimbus.Infrastructure.Commands
             await Deliver(busCommand, commandType, message);
         }
 
-        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, NimbusMessage brokeredMessage) where TBusCommand : IBusCommand
+        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, NimbusMessage nimbusMessage) where TBusCommand : IBusCommand
         {
             var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
-            brokeredMessage.DestinedForQueue(queuePath);
+            nimbusMessage.DestinedForQueue(queuePath);
 
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
 
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sending", queuePath, nimbusMessage);
 
                     var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
                     {
-                        await interceptor.OnCommandSending(busCommand, brokeredMessage);
+                        await interceptor.OnCommandSending(busCommand, nimbusMessage);
                     }
-                    await sender.Send(brokeredMessage);
+                    await sender.Send(nimbusMessage);
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnCommandSent(busCommand, brokeredMessage);
+                        await interceptor.OnCommandSent(busCommand, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sent", queuePath, nimbusMessage);
                     return;
                 }
                 catch (Exception exc)
@@ -92,9 +92,9 @@ namespace Nimbus.Infrastructure.Commands
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    await interceptor.OnCommandSendingError(busCommand, brokeredMessage, exception);
+                    await interceptor.OnCommandSendingError(busCommand, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+                _logger.LogDispatchError("sending", queuePath, nimbusMessage, exception);
             }
         }
     }

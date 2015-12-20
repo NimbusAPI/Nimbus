@@ -39,7 +39,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
         public async Task TheBusShouldStopBeforeAllTheCommandsAreHandled(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -50,7 +50,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
         public async Task AtLeastSomeOfTheCommandsShouldHaveBeenHandled(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -60,7 +60,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
         public async Task NoMoreHandlerInvocationsShouldHaveOccurredAfterTheBusWasStopped(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

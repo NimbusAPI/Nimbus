@@ -21,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingARequestOnTheBus>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestOnTheBus>))]
         public async Task WeShouldGetSomethingNiceBack(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);

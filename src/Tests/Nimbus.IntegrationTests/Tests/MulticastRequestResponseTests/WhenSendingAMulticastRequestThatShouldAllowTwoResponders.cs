@@ -26,7 +26,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
         public async Task WeShouldReceiveTwoResponses(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
@@ -36,7 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         }
 
         [Test]
-        [TestCaseSource(typeof (TestForAllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
         public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
