@@ -33,10 +33,10 @@ namespace Nimbus.Infrastructure.PropertyInjection
                 requireDispatchContext.DispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
             }
 
-            var requireBrokeredMessage = handlerOrInterceptor as IRequireNimbusMessage;
-            if (requireBrokeredMessage != null)
+            var requireNimbusMessage = handlerOrInterceptor as IRequireNimbusMessage;
+            if (requireNimbusMessage != null)
             {
-                requireBrokeredMessage.NimbusMessage = nimbusMessage;
+                requireNimbusMessage.NimbusMessage = nimbusMessage;
             }
 
             var requireDateTime = handlerOrInterceptor as IRequireDateTime;

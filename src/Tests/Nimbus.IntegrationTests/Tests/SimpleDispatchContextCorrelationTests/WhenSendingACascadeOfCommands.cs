@@ -40,7 +40,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
             await When();
