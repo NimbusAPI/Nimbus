@@ -11,8 +11,9 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithAutofacDefaults(this BusBuilderConfiguration configuration, IComponentContext componentContext)
         {
             return configuration
+                .WithTypesFrom(componentContext.Resolve<ITypeProvider>())
                 .WithDependencyResolver(componentContext.Resolve<IDependencyResolver>())
-                .WithLogger(componentContext.Resolve<ILogger>());
+                ;
         }
     }
 }

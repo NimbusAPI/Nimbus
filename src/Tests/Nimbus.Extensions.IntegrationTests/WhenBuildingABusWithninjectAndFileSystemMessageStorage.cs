@@ -40,9 +40,9 @@ namespace Nimbus.Extensions.IntegrationTests
                                                                                                  .WithMaxLargeMessageSize(1024*1024))
                                  )
                                                  .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                 .WithTypesFrom(typeProvider)
                                                  .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                  .WithLogger(c.Kernel.Get<ILogger>())
+                                                 .WithNinjectDefaults(c.Kernel)
                                                  .Build())
                          .InSingletonScope();
 

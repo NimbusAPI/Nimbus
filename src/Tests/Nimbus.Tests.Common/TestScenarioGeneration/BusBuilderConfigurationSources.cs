@@ -27,35 +27,40 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
             var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
             var logger = TestHarnessLoggerFactory.Create();
 
-            foreach (var transport in new TransportConfigurationSources())
+            foreach (var iocContainer in new IoCContainerConfigurationSources())
             {
-                foreach (var router in new RouterConfigurationSources())
+                foreach (var transport in new TransportConfigurationSources())
                 {
-                    foreach (var serializer in new SerializerConfigurationSources(typeProvider))
+                    foreach (var router in new RouterConfigurationSources())
                     {
-                        var scenarioName = PartialConfigurationScenario.Combine(transport.Name, router.Name, serializer.Name);
+                        foreach (var serializer in new SerializerConfigurationSources(typeProvider))
+                        {
+                            var scenarioName = PartialConfigurationScenario.Combine(iocContainer.Name, transport.Name, router.Name, serializer.Name);
 
-                        var configuration = new BusBuilder().Configure()
-                                                            .WithTransport(transport.Configuration)
-                                                            .WithRouter(router.Configuration)
-                                                            .WithSerializer(serializer.Configuration)
-                                                            .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                                                            .WithNames("MyTestSuite", Environment.MachineName)
-                                                            .WithTypesFrom(typeProvider)
-                                                            .WithGlobalInboundInterceptorTypes(
-                                                                typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                            .WithGlobalOutboundInterceptorTypes(
-                                                                typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                            .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                            .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                            .WithHeartbeatInterval(TimeSpan.MaxValue)
-                                                            .WithLogger(logger)
-                                                            .WithDebugOptions(
-                                                                dc =>
-                                                                    dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                                        "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."));
+                            var configuration = new BusBuilder().Configure()
+                                                                .WithTransport(transport.Configuration)
+                                                                .WithRouter(router.Configuration)
+                                                                .WithSerializer(serializer.Configuration)
+                                                                .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                                .WithNames("MyTestSuite", Environment.MachineName)
+                                                                .WithTypesFrom(typeProvider)
+                                                                .WithGlobalInboundInterceptorTypes(
+                                                                    typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                                                .WithGlobalOutboundInterceptorTypes(
+                                                                    typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                                                .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                                .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                                .WithLogger(logger)
+                                                                .WithDebugOptions(
+                                                                    dc =>
+                                                                        dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                                            "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                                                .Chain(iocContainer.Configuration.ApplyContainerDefaults)
+                                                                ;
 
-                        yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration);
+                            yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration);
+                        }
                     }
                 }
             }

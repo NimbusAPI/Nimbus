@@ -28,16 +28,15 @@ namespace Nimbus.Extensions.IntegrationTests
             var largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
 
             builder.Register(c => new BusBuilder().Configure()
+                                                  .WithNames("IntegrationTestHarness", Environment.MachineName)
                                                   .WithTransport(new WindowsServiceBusTransportConfiguration()
                                                                      .WithConnectionString(
                                                                          @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                                                                      .WithLargeMessageStorage(new FileSystemStorageConfiguration()
                                                                                                   .WithStorageDirectory(largeMessageBodyTempPath)
                                                                                                   .WithMaxSmallMessageSize(50*1024)
-                                                                                                  .WithMaxLargeMessageSize(1024*1024))
-                                 )
-                                                  .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                  .WithTypesFrom(typeProvider)
+                                                                                                  .WithMaxLargeMessageSize(1024*1024)))
+                                                  .WithAutofacDefaults(c)
                                                   .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                   .WithLogger(c.Resolve<ILogger>())
                                                   .Build())

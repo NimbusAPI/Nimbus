@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Nimbus.Unity.nuspec" />
+    <Compile Include="Configuration\UnityContainerExtensions.cs" />
     <Compile Include="Properties\NullGuard.cs" />
     <Compile Include="Configuration\UnityBusBuilderExtensions.cs" />
     <Compile Include="Infastructure\UnityDependencyResolver.cs" />

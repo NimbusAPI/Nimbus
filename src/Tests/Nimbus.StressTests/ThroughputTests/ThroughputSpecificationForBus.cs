@@ -21,7 +21,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected Bus Bus { get; private set; }
 
-        protected virtual int NumMessagesToSend => 10*1000;
+        protected virtual int NumMessagesToSend => 1*1000;
 
         protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
