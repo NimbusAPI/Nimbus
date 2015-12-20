@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
+using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Transports.WindowsServiceBus
