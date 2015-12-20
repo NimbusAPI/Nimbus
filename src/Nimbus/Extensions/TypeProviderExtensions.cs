@@ -41,9 +41,9 @@ namespace Nimbus.Extensions
             var handledEvents = handlers.SelectMany(hand => hand.GetInterfaces())
                                         .Where(
                                             i =>
-                                            i.IsClosedTypeOf(typeof (IHandleCompetingEvent<>)) ||
-                                            i.IsClosedTypeOf(typeof (IHandleMulticastEvent<>)) ||
-                                            i.IsClosedTypeOf(typeof (IHandleMulticastRequest<,>))
+                                                i.IsClosedTypeOf(typeof (IHandleCompetingEvent<>)) ||
+                                                i.IsClosedTypeOf(typeof (IHandleMulticastEvent<>)) ||
+                                                i.IsClosedTypeOf(typeof (IHandleMulticastRequest<,>))
                 )
                                         .SelectMany(i => i.GetGenericArguments());
 
@@ -62,6 +62,13 @@ namespace Nimbus.Extensions
                                         .SelectMany(i => i.GetGenericArguments());
 
             return handledEvents.Distinct().ToArray();
+        }
+
+        public static Type[] AllSerializableTypes(this ITypeProvider typeProvider)
+        {
+            return new[] {typeof (NimbusMessage)}
+                .Union(typeProvider.AllMessageContractTypes())
+                .ToArray();
         }
 
         public static Type[] AllMessageContractTypes(this ITypeProvider typeProvider)

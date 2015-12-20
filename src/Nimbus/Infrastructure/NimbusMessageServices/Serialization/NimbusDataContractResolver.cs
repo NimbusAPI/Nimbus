@@ -16,7 +16,7 @@ namespace Nimbus.Infrastructure.BrokeredMessageServices.Serialization
         public NimbusDataContractResolver(ITypeProvider typeProvider)
         {
             _typeToAssemblyLookup = typeProvider
-                .AllMessageContractTypes()
+                .AllSerializableTypes()
                 .ToDictionary(t => t.FullName, t => t.Assembly);
         }
 
