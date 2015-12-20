@@ -26,7 +26,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var multicastRequestSender = Substitute.For<IMulticastRequestSender>();
             _eventSender = Substitute.For<IEventSender>();
             var messagePumpsManager = Substitute.For<IMessagePumpsManager>();
-            var deadLetterQueues = Substitute.For<IDeadLetterQueues>();
+            var deadLetterOffice = Substitute.For<IDeadLetterOffice>();
 
             var bus = new Bus(logger,
                               commandSender,
@@ -34,7 +34,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                               multicastRequestSender,
                               _eventSender,
                               messagePumpsManager,
-                              //deadLetterQueues,
+                              deadLetterOffice,
                               Substitute.For<IHeartbeat>());
             return Task.FromResult(bus);
         }

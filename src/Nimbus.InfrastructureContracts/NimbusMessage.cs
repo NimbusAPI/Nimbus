@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus
 {
     public class NimbusMessage
     {
@@ -20,7 +20,7 @@ namespace Nimbus.Infrastructure
         }
 
         public Guid CorrelationId { get; set; }
-        public string DeliverTo { get; set; }
+        public string ReceivedFromPath { get; set; }
         public string ReplyTo { get; set; }
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
         public IDictionary<string, object> Properties { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
@@ -16,9 +15,16 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
     {
         private GoBangCommand _goBangCommand;
         private string _someContent;
-        private GoBangCommand[] _deadLetterMessages;
+        private NimbusMessage[] _deadLetterMessages;
 
-        private const int _maxDeliveryAttempts = 3;
+        private int _maxDeliveryAttempts;
+
+        protected override Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        {
+            _maxDeliveryAttempts = busBuilderConfiguration.MaxDeliveryAttempts;
+
+            return base.Given(busBuilderConfiguration);
+        }
 
         protected override async Task When()
         {
@@ -26,10 +32,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _goBangCommand = new GoBangCommand(_someContent);
 
             await Bus.Send(_goBangCommand);
-
             await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-            _deadLetterMessages = (await FetchAllDeadLetterMessages(Bus)).ToArray();
+            _deadLetterMessages = await Bus.DeadLetterOffice.PopAll();
         }
 
         [Test]
@@ -40,19 +45,27 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             await When();
 
             _deadLetterMessages.Count().ShouldBe(1);
-            _deadLetterMessages.Single().SomeContent.ShouldBe(_someContent);
         }
 
-        private static async Task<List<GoBangCommand>> FetchAllDeadLetterMessages(IBus bus)
+        [Test]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        public async Task ThePayloadOfTheMessageShouldBeTheOriginalCommandThatWentBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
-            var deadLetterMessages = new List<GoBangCommand>();
-            while (true)
-            {
-                var message = await bus.DeadLetterQueues.CommandQueue.Pop<GoBangCommand>();
-                if (message == null) break;
-                deadLetterMessages.Add(message);
-            }
-            return deadLetterMessages;
+            await Given(busBuilderConfiguration);
+            await When();
+
+            ((GoBangCommand) _deadLetterMessages.Single().Payload).SomeContent.ShouldBe(_someContent);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        {
+            await Given(busBuilderConfiguration);
+            await When();
+
+            var nimbusMessage = _deadLetterMessages.Single();
+            nimbusMessage.DeliveryAttempts.Count().ShouldBe(_maxDeliveryAttempts);
         }
     }
 }

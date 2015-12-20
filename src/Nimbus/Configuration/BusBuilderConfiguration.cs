@@ -19,7 +19,6 @@ using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.PoisonMessages;
 using Nimbus.Routing;
 
 namespace Nimbus.Configuration
@@ -35,7 +34,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
-        internal IDeliveryRetryStrategy RetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
+        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
@@ -61,13 +60,13 @@ namespace Nimbus.Configuration
 
         public void RegisterWith(PoorMansIoC container)
         {
-            container.Register(TypeProvider, typeof(ITypeProvider));
-            container.Register(DependencyResolver, typeof(IDependencyResolver));
-            container.Register(Logger, typeof(ILogger));
-            container.Register(Serializer, typeof(ISerializer));
-            container.Register(Compressor, typeof(ICompressor));
-            container.Register(Router, typeof(IRouter));
-            container.Register(RetryStrategy, typeof(IDeliveryRetryStrategy));
+            container.Register(TypeProvider, typeof (ITypeProvider));
+            container.Register(DependencyResolver, typeof (IDependencyResolver));
+            container.Register(Logger, typeof (ILogger));
+            container.Register(Serializer, typeof (ISerializer));
+            container.Register(Compressor, typeof (ICompressor));
+            container.Register(Router, typeof (IRouter));
+            container.Register(DeliveryRetryStrategy, typeof (IDeliveryRetryStrategy));
 
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
@@ -84,7 +83,7 @@ namespace Nimbus.Configuration
             container.RegisterType<MessageDispatcherFactory>(ComponentLifetime.SingleInstance, typeof (IMessageDispatcherFactory));
             container.RegisterType<InboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IInboundInterceptorFactory));
             container.RegisterType<OutboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IOutboundInterceptorFactory));
-            container.RegisterType<PropertyInjector>(ComponentLifetime.SingleInstance, typeof (IPropertyInjector), typeof(PropertyInjector));
+            container.RegisterType<PropertyInjector>(ComponentLifetime.SingleInstance, typeof (IPropertyInjector), typeof (PropertyInjector));
             container.RegisterType<NimbusMessageFactory>(ComponentLifetime.SingleInstance, typeof (INimbusMessageFactory));
             container.RegisterType<BusCommandSender>(ComponentLifetime.SingleInstance, typeof (ICommandSender));
             container.RegisterType<BusRequestSender>(ComponentLifetime.SingleInstance, typeof (IRequestSender));
@@ -94,15 +93,6 @@ namespace Nimbus.Configuration
             container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
             container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
             container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
-
-            #region To be fixed
-
-            //FIXME these are either stubs that are yet to be implemented or obsolete components to be removed
-            container.RegisterType<DeadLetterQueues>(ComponentLifetime.SingleInstance, typeof (DeadLetterQueues), typeof (IDeadLetterQueues));
-            //container.RegisterType<DeadLetterQueue>(ComponentLifetime.SingleInstance, typeof (IDeadLetterQueue));
-            container.RegisterType<StubDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-
-            #endregion
         }
 
         public IEnumerable<string> Validate()

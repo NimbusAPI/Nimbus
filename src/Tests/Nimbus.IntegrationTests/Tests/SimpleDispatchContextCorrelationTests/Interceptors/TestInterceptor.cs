@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.PropertyInjection;
 

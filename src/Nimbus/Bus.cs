@@ -31,7 +31,7 @@ namespace Nimbus
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
-                     //IDeadLetterQueues deadLetterQueues,
+                     IDeadLetterOffice deadLetterOffice,
                      IHeartbeat heartbeat)
         {
             _logger = logger;
@@ -39,9 +39,9 @@ namespace Nimbus
             _requestSender = requestSender;
             _multicastRequestSender = multicastRequestSender;
             _eventSender = eventSender;
-            //_deadLetterQueues = deadLetterQueues;
             _heartbeat = heartbeat;
             _messagePumpsManager = messagePumpsManager;
+            DeadLetterOffice = deadLetterOffice;
 
             Started += async delegate { await _heartbeat.Start(); };
             Stopping += async delegate { await _heartbeat.Stop(); };
@@ -83,10 +83,7 @@ namespace Nimbus
             return _eventSender.Publish(busEvent).ConfigureAwaitFalse();
         }
 
-        public IDeadLetterQueues DeadLetterQueues
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public IDeadLetterOffice DeadLetterOffice { get; }
 
         public EventHandler<EventArgs> Starting;
         public EventHandler<EventArgs> Started;
@@ -106,7 +103,7 @@ namespace Nimbus
             try
             {
                 var startingHandler = Starting;
-                if (startingHandler != null) startingHandler(this, EventArgs.Empty);
+                startingHandler?.Invoke(this, EventArgs.Empty);
 
                 await _messagePumpsManager.Start(messagePumpTypes);
             }
@@ -117,7 +114,7 @@ namespace Nimbus
             }
 
             var startedHandler = Started;
-            if (startedHandler != null) startedHandler(this, EventArgs.Empty);
+            startedHandler?.Invoke(this, EventArgs.Empty);
 
             _logger.Info("Bus started.");
         }
@@ -135,7 +132,7 @@ namespace Nimbus
             try
             {
                 var stoppingHandler = Stopping;
-                if (stoppingHandler != null) stoppingHandler(this, EventArgs.Empty);
+                stoppingHandler?.Invoke(this, EventArgs.Empty);
 
                 await _messagePumpsManager.Stop(messagePumpTypes);
             }
@@ -145,7 +142,7 @@ namespace Nimbus
             }
 
             var stoppedHandler = Stopped;
-            if (stoppedHandler != null) stoppedHandler(this, EventArgs.Empty);
+            stoppedHandler?.Invoke(this, EventArgs.Empty);
 
             _logger.Info("Bus stopped.");
         }
@@ -163,7 +160,7 @@ namespace Nimbus
             if (!disposing) return;
 
             var handler = Disposing;
-            if (handler != null) handler(this, EventArgs.Empty);
+            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }

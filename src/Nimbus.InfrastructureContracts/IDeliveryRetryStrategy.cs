@@ -2,7 +2,7 @@
 
 namespace Nimbus.Infrastructure
 {
-    internal interface IDeliveryRetryStrategy
+    public interface IDeliveryRetryStrategy
     {
         DateTimeOffset CalculateNextRetryTime(NimbusMessage message);
     }

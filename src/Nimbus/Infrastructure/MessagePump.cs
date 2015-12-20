@@ -98,8 +98,6 @@ namespace Nimbus.Infrastructure
 
             try
             {
-                Exception exception = null;
-
                 try
                 {
                     LogInfo("Dispatching", message);
@@ -120,8 +118,6 @@ namespace Nimbus.Infrastructure
                                   message.ReplyTo,
                                   message.MessageId,
                                   message.CorrelationId);
-
-                    exception = exc;
                 }
 
                 var numDeliveryAttempts = message.DeliveryAttempts.Count();
@@ -130,6 +126,7 @@ namespace Nimbus.Infrastructure
                     _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}. Posting it to the dead letter office.",
                                   numDeliveryAttempts,
                                   message.MessageId);
+
                     try
                     {
                         await _deadLetterOffice.Post(message);

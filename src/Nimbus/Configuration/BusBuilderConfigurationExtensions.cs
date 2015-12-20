@@ -3,6 +3,7 @@ using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
+using Nimbus.Infrastructure;
 using Nimbus.Routing;
 
 namespace Nimbus.Configuration
@@ -50,6 +51,12 @@ namespace Nimbus.Configuration
         public static BusBuilderConfiguration WithRouter(this BusBuilderConfiguration configuration, IRouter router)
         {
             configuration.Router = router;
+            return configuration;
+        }
+
+        public static BusBuilderConfiguration WithDeliveryRetryStrategy(this BusBuilderConfiguration configuration, IDeliveryRetryStrategy deliveryRetryStrategy )
+        {
+            configuration.DeliveryRetryStrategy = deliveryRetryStrategy;
             return configuration;
         }
 

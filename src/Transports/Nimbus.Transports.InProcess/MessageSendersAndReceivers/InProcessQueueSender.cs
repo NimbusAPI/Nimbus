@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers

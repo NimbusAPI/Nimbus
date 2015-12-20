@@ -9,11 +9,13 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class InProcessQueueReceiver : INimbusMessageReceiver
     {
+        private readonly string _queuePath;
         private readonly BlockingCollection<NimbusMessage> _messageQueue;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public InProcessQueueReceiver(BlockingCollection<NimbusMessage> messageQueue)
+        public InProcessQueueReceiver(string queuePath, BlockingCollection<NimbusMessage> messageQueue)
         {
+            _queuePath = queuePath;
             _messageQueue = messageQueue;
         }
 
@@ -46,6 +48,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
                 try
                 {
                     var nimbusMessage = _messageQueue.Take(cancellationTokenSource.Token);
+                    nimbusMessage.ReceivedFromPath = _queuePath;
                     await callback(nimbusMessage);
                 }
                 catch (OperationCanceledException)

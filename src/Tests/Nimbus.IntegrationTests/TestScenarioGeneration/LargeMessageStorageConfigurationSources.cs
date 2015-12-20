@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.LargeMessages;
-using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Http;
@@ -16,11 +15,6 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
     {
         public IEnumerator<PartialConfigurationScenario<LargeMessageStorageConfiguration>> GetEnumerator()
         {
-            yield return new PartialConfigurationScenario<LargeMessageStorageConfiguration>(
-                typeof (UnsupportedLargeMessageBodyStorageConfiguration).Name,
-                new UnsupportedLargeMessageBodyStorageConfiguration()
-                );
-
             var largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                                         "Nimbus Integration Test Suite",
                                                         Guid.NewGuid().ToString());

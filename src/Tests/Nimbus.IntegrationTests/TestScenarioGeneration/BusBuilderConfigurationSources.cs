@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.IntegrationTests.Stubs;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Tests.Common;
@@ -19,6 +21,7 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
             _testFixtureType = testFixtureType;
         }
 
+        [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
         public IEnumerator<PartialConfigurationScenario<BusBuilderConfiguration>> GetEnumerator()
         {
             foreach (var transport in new TransportConfigurationSources())
@@ -31,6 +34,7 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
                     var configuration = new BusBuilder().Configure()
                                                         .WithTransport(transport.Configuration)
                                                         .WithRouter(router.Configuration)
+                                                        .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                                                         .WithNames("MyTestSuite", Environment.MachineName)
                                                         .WithTypesFrom(typeProvider)
                                                         .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())

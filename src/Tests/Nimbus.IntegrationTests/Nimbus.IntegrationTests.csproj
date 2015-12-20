@@ -81,6 +81,7 @@
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
+    <Compile Include="Stubs\ImmediateRetryDeliveryStrategy.cs" />
     <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowTwoResponders.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
+    <Compile Include="Tests\PoisonMessageTests\DeadLetterOfficeExtensions.cs" />
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />

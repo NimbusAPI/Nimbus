@@ -48,13 +48,14 @@
     <Compile Include="Handlers\IHandleMulticastRequest.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="ICompressor.cs" />
+    <Compile Include="IDeadLetterOffice.cs" />
     <Compile Include="IDeadLetterQueue.cs" />
-    <Compile Include="IDeadLetterQueues.cs" />
     <Compile Include="Handlers\IHandleCommand.cs" />
     <Compile Include="Handlers\IHandleCompetingEvent.cs" />
     <Compile Include="Handlers\IHandleMulticastEvent.cs" />
     <Compile Include="Handlers\IHandleRequest.cs" />
     <Compile Include="DependencyResolution\IDependencyResolverScope.cs" />
+    <Compile Include="IDeliveryRetryStrategy.cs" />
     <Compile Include="IDispatchContext.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
