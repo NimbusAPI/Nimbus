@@ -3,11 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.Azure.Client;
-using Nimbus.LargeMessages.Azure.Configuration;
 using Nimbus.Tests.Common;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
@@ -37,6 +37,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                 )
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
+                                      .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(TestHarnessLoggerFactory.Create())
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(

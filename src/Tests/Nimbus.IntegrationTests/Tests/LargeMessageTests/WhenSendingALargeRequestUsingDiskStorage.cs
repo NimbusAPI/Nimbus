@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Configuration;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
@@ -42,6 +43,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                 )
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
+                                      .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                       .WithLogger(logger)
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
