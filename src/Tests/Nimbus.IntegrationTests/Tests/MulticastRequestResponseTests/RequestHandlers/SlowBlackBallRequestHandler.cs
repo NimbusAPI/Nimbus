@@ -13,7 +13,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
         {
             MethodCallCounter.RecordCall<SlowBlackBallRequestHandler>(handler => handler.Handle(request));
 
-            await Task.Delay(TimeSpan.FromSeconds(3));
+            await Task.Delay(TimeSpan.FromSeconds(1));
 
             return new BlackBallResponse
                    {
