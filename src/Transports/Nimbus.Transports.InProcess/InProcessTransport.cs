@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -14,6 +15,11 @@ namespace Nimbus.Transports.InProcess
         {
             _messageStore = messageStore;
             _container = container;
+        }
+
+        public Task TestConnection()
+        {
+            return Task.Delay(0);
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)

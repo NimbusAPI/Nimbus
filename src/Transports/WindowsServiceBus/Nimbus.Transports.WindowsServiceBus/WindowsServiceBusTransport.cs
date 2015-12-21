@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
@@ -13,25 +15,34 @@ namespace Nimbus.Transports.WindowsServiceBus
     internal class WindowsServiceBusTransport : INimbusTransport, IDisposable
     {
         private readonly IQueueManager _queueManager;
+        private readonly Func<NamespaceManager> _namespaceManager;
+        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ILogger _logger;
 
         private readonly ThreadSafeDictionary<string, INimbusMessageSender> _queueMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _queueMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly ThreadSafeDictionary<string, INimbusMessageSender> _topicMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly ILogger _logger;
 
         public WindowsServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                           IBrokeredMessageFactory brokeredMessageFactory,
                                           ILogger logger,
-                                          IQueueManager queueManager)
+                                          IQueueManager queueManager,
+                                          Func<NamespaceManager> namespaceManager)
         {
             _queueManager = queueManager;
+            _namespaceManager = namespaceManager;
             _brokeredMessageFactory = brokeredMessageFactory;
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
+        }
+
+        public async Task TestConnection()
+        {
+            var version = await _namespaceManager().GetVersionInfoAsync();
+            _logger.Info("Windows Service Bus transport is online with API version {ApiVersion}", version);
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)

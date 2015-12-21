@@ -1,5 +1,6 @@
 ﻿using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
@@ -36,11 +37,11 @@ namespace Nimbus.Configuration
             logger.Debug("Message pumps are all created.");
 
             var bus = container.ResolveWithOverrides<Bus>(messagePumpsManager);
+            container.Resolve<PropertyInjector>().Bus = bus;
 
             bus.Starting += delegate
                             {
-                                //container.Resolve<AzureQueueManager>().WarmUp();
-                                container.Resolve<PropertyInjector>().Bus = bus;
+                                container.Resolve<INimbusTransport>().TestConnection().Wait();
 
                                 var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
                                 if (removeAllExistingElements)

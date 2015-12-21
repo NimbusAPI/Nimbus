@@ -4,6 +4,10 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Infrastructure.Logging;
+using Nimbus.Infrastructure.Routing;
 using Nimbus.Routing;
 
 namespace Nimbus.Configuration
@@ -11,6 +15,17 @@ namespace Nimbus.Configuration
     [Obsolete("We should be able to inline these now.")]
     public static class BusBuilderConfigurationExtensions
     {
+        public static BusBuilderConfiguration WithDefaults(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
+        {
+            return configuration
+                .WithTypesFrom(typeProvider)
+                .WithDependencyResolver(new DependencyResolver(typeProvider))
+                .WithRouter(new DestinationPerMessageTypeRouter())
+                .WithCompressor(new NullCompressor())
+                .WithLogger(new NullLogger())
+                ;
+        }
+
         public static BusBuilderConfiguration WithTransport(this BusBuilderConfiguration configuration, TransportConfiguration transportConfiguration)
         {
             configuration.Transport = transportConfiguration;

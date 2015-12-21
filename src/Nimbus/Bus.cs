@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
@@ -31,6 +32,7 @@ namespace Nimbus
                      IMulticastRequestSender multicastRequestSender,
                      IEventSender eventSender,
                      IMessagePumpsManager messagePumpsManager,
+                     INimbusTransport nimbusTransport,
                      IDeadLetterOffice deadLetterOffice,
                      IHeartbeat heartbeat)
         {

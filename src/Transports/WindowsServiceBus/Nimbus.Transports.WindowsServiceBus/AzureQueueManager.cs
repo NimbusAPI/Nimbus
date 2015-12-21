@@ -9,7 +9,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
-using Nimbus.Routing;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -22,9 +21,9 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly DefaultTimeoutSetting _defaultTimeout;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly ILogger _logger;
-        private readonly IRouter _router;
 
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
@@ -37,42 +36,25 @@ namespace Nimbus.Transports.WindowsServiceBus
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
                                  ILogger logger,
-                                 IRouter router,
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 DefaultTimeoutSetting defaultTimeout,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _logger = logger;
-            _router = router;
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
+            _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
-        }
-
-        public void WarmUp()
-        {
-            try
-            {
-                // ReSharper disable UnusedVariable
-                var task0 = Task.Run(() => { var dummy0 = _knownQueues.Value; });
-                var task1 = Task.Run(() => { var dummy1 = _knownSubscriptions.Value; });
-                // ReSharper restore UnusedVariable
-
-                Task.WaitAll(task0, task1);
-            }
-            catch (Exception exc)
-            {
-                throw new BusException("Azure queue manager failed to start", exc);
-            }
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
@@ -118,9 +100,8 @@ namespace Nimbus.Transports.WindowsServiceBus
         private ConcurrentBag<string> FetchExistingTopics()
         {
             _logger.Debug("Fetching existing topics...");
-
             var topicsAsync = _namespaceManager().GetTopicsAsync();
-            if (!topicsAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+            if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
             var topics = topicsAsync.Result;
             var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
@@ -171,7 +152,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             _logger.Debug("Fetching existing queues...");
 
             var queuesAsync = _namespaceManager().GetQueuesAsync();
-            if (!queuesAsync.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+            if (!queuesAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
             var queues = queuesAsync.Result;
             var queuePaths = queues.Select(q => q.Path)
@@ -191,11 +172,11 @@ namespace Nimbus.Transports.WindowsServiceBus
 
                 var topicDescription = new TopicDescription(topicPath)
                                        {
-                                           DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                           DefaultMessageTimeToLive = _defaultMessageTimeToLive,
                                            EnableBatchedOperations = true,
                                            RequiresDuplicateDetection = false,
                                            SupportOrdering = false,
-                                           AutoDeleteOnIdle = TimeSpan.FromDays(367)
+                                           AutoDeleteOnIdle = _autoDeleteOnIdle
                                        };
 
                 // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
@@ -268,12 +249,6 @@ namespace Nimbus.Transports.WindowsServiceBus
             return "{0}/{1}".FormatWith(topicPath, subscriptionName);
         }
 
-        private void EnsureQueueExists(Type commandType)
-        {
-            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
-            EnsureQueueExists(queuePath);
-        }
-
         internal void EnsureQueueExists(string queuePath)
         {
             if (_knownQueues.Value.Contains(queuePath)) return;
@@ -287,7 +262,7 @@ namespace Nimbus.Transports.WindowsServiceBus
                 var queueDescription = new QueueDescription(queuePath)
                                        {
                                            MaxDeliveryCount = _maxDeliveryAttempts,
-                                           DefaultMessageTimeToLive = TimeSpan.MaxValue,
+                                           DefaultMessageTimeToLive = _defaultMessageTimeToLive,
                                            EnableDeadLetteringOnMessageExpiration = true,
                                            EnableBatchedOperations = true,
                                            RequiresDuplicateDetection = false,

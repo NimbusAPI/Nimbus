@@ -84,7 +84,7 @@
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\HeartbeatInterval.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
-    <Compile Include="Configuration\Settings\SubscriptionAutoDeleteOnIdleSetting.cs" />
+    <Compile Include="Configuration\Settings\AutoDeleteOnIdleSetting.cs" />
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
     <Compile Include="Configuration\Transport\TransportConfiguration.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />

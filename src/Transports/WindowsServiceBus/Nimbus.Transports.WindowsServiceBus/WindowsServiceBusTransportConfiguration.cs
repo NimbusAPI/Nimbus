@@ -70,7 +70,7 @@ namespace Nimbus.Transports.WindowsServiceBus
                                        () =>
                                        {
                                            var namespaceManager = NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
-                                           namespaceManager.Settings.OperationTimeout = TimeSpan.FromSeconds(120);
+                                           namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
                                            return namespaceManager;
                                        },
                                        nsm => false,
