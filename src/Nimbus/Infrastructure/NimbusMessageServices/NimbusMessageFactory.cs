@@ -30,7 +30,7 @@ namespace Nimbus.Infrastructure.NimbusMessageServices
             var nimbusMessage = new NimbusMessage(destinationPath, payload);
             var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
             var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
-            nimbusMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
+            nimbusMessage.PrecedingMessageId = currentDispatchContext.ResultOfMessageId;
             nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
             nimbusMessage.From = _replyQueueName;
             nimbusMessage.ExpiresAfter = expiresAfter;

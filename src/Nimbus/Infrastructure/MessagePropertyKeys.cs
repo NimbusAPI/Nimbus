@@ -20,6 +20,6 @@ namespace Nimbus.Infrastructure
         //public const string InReplyToRequestId = "InReplyToRequestId";
         public const string SentToQueue = "SentToQueue";
         public const string SentToTopic = "SentToTopic";
-        public const string PrecedingMessageId = "PrecedingMessageId";
+        //public const string PrecedingMessageId = "PrecedingMessageId";
     }
 }

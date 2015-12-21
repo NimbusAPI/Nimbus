@@ -27,6 +27,7 @@ namespace Nimbus
 
         public Guid MessageId { get; protected set; }
         public Guid CorrelationId { get; set; }
+        public Guid? PrecedingMessageId { get; set; }
         public string From { get; set; }
         public string To { get; protected set; }
         public Guid? InReplyToMessageId { get; set; }

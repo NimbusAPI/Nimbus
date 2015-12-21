@@ -73,7 +73,6 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
                                       brokeredMessage.ReplyTo = message.From;
                                       brokeredMessage.TimeToLive = message.ExpiresAfter.Subtract(DateTimeOffset.UtcNow);
                                       brokeredMessage.ScheduledEnqueueTimeUtc = message.ScheduledEnqueueTimeUtc;
-                                      brokeredMessage.Properties[MessagePropertyKeys.PrecedingMessageId] = currentDispatchContext.ResultOfMessageId;
 
                                       foreach (var property in message.Properties)
                                       {

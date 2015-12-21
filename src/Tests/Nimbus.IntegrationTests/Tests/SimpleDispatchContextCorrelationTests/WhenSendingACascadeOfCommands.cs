@@ -2,12 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -88,7 +85,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             await Given(busBuilderConfiguration);
             await When();
 
-            _nimbusMessages[1].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[0].MessageId);
+            _nimbusMessages[1].PrecedingMessageId.ShouldBe(_nimbusMessages[0].MessageId);
         }
 
         [Test]
@@ -98,7 +95,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             await Given(busBuilderConfiguration);
             await When();
 
-            _nimbusMessages[2].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_nimbusMessages[1].MessageId);
+            _nimbusMessages[2].PrecedingMessageId.ShouldBe(_nimbusMessages[1].MessageId);
         }
 
         [Test]
@@ -108,7 +105,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             await Given(busBuilderConfiguration);
             await When();
 
-            _nimbusMessages[0].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(null);
+            _nimbusMessages[0].PrecedingMessageId.ShouldBe(null);
         }
     }
 }
