@@ -5,6 +5,7 @@ using Autofac;
 using Castle.Windsor;
 using Microsoft.Practices.Unity;
 using Nimbus.Configuration;
+using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Ninject.Configuration;
 using Nimbus.Unity.Configuration;
 using Nimbus.Windsor.Configuration;
@@ -17,10 +18,10 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
         public IEnumerator<PartialConfigurationScenario<ContainerConfiguration>> GetEnumerator()
         {
             yield return new PartialConfigurationScenario<ContainerConfiguration>(
-                "No container",
+                "NoContainer",
                 new ContainerConfiguration
                 {
-                    ApplyContainerDefaults = bbc => bbc
+                    ApplyContainerDefaults = bbc => bbc.WithDependencyResolver(new DependencyResolver(bbc.TypeProvider))
                 });
 
             yield return new PartialConfigurationScenario<ContainerConfiguration>(

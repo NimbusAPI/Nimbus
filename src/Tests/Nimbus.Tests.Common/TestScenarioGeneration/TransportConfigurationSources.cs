@@ -21,7 +21,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
                 nameof(WindowsServiceBusTransportConfiguration),
                 new WindowsServiceBusTransportConfiguration()
                     .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                    .WithLargeMessageStorage(new UnsupportedLargeMessageBodyStorageConfiguration()));
+                    .WithLargeMessageStorage(new UnsupportedLargeMessageBodyStorageConfiguration()),
+                "Slow");
 
             //FIXME: how many levels of nesting would we like? :)
             //foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())

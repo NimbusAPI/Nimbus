@@ -1,12 +1,16 @@
+using System.Linq;
+
 namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public abstract class PartialConfigurationScenario
     {
         public string Name { get; set; }
+        public string[] Categories { get; set; }
 
-        protected PartialConfigurationScenario(string name)
+        protected PartialConfigurationScenario(string name, params string[] additionalCategories)
         {
             Name = name;
+            Categories = new[] {name}.Union(additionalCategories).ToArray();
         }
 
         public static string Combine(params string[] names)
@@ -17,7 +21,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
 
     public class PartialConfigurationScenario<T> : PartialConfigurationScenario
     {
-        public PartialConfigurationScenario(string name, T configuration) : base(name)
+        public PartialConfigurationScenario(string name, T configuration, params string[] additionalCategories) : base(name, additionalCategories)
         {
             Configuration = configuration;
         }

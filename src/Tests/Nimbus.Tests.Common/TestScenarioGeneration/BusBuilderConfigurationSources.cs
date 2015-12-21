@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Tests.Common.Stubs;
@@ -36,6 +35,13 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
                         {
                             var scenarioName = PartialConfigurationScenario.Combine(iocContainer.Name, transport.Name, router.Name, serializer.Name);
 
+                            var scenarioCategories = new string[0]
+                                .Union(iocContainer.Categories)
+                                .Union(transport.Categories)
+                                .Union(router.Categories)
+                                .Union(serializer.Categories)
+                                .ToArray();
+
                             var configuration = new BusBuilder().Configure()
                                                                 .WithTransport(transport.Configuration)
                                                                 .WithRouter(router.Configuration)
@@ -47,7 +53,6 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
                                                                     typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                                                 .WithGlobalOutboundInterceptorTypes(
                                                                     typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                                .WithDependencyResolver(new DependencyResolver(typeProvider))
                                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                                                                 .WithLogger(logger)
@@ -58,7 +63,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
                                                                 .Chain(iocContainer.Configuration.ApplyContainerDefaults)
                                 ;
 
-                            yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration);
+                            yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration, scenarioCategories);
                         }
                     }
                 }
