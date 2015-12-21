@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Serializers.Protobuf</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.Serializers.Protobuf</title>
     <authors>Ben Gale</authors>
     <owners>Ben Gale</owners>

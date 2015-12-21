@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Ninject</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.Ninject</title>
     <authors>Adrian Edwards</authors>
     <owners>Adrian Edwards</owners>

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.LargeMessages.Azure</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.LargeMessages.Azure</title>
     <authors>Damian Maclennan and Andrew Harcourt</authors>
     <owners>Damian Maclennan</owners>
