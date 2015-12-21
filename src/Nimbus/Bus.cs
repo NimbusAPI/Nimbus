@@ -90,61 +90,67 @@ namespace Nimbus
         public EventHandler<EventArgs> Stopping;
         public EventHandler<EventArgs> Stopped;
 
-        public async Task Start(MessagePumpTypes messagePumpTypes = MessagePumpTypes.Default)
+        public Task Start(MessagePumpTypes messagePumpTypes = MessagePumpTypes.Default)
         {
-            lock (_mutex)
-            {
-                if (_isRunning) return;
-                _isRunning = true;
-            }
+            return Task.Run(async () =>
+                                  {
+                                      lock (_mutex)
+                                      {
+                                          if (_isRunning) return;
+                                          _isRunning = true;
+                                      }
 
-            _logger.Debug("Bus starting...");
+                                      _logger.Debug("Bus starting...");
 
-            try
-            {
-                var startingHandler = Starting;
-                startingHandler?.Invoke(this, EventArgs.Empty);
+                                      try
+                                      {
+                                          var startingHandler = Starting;
+                                          startingHandler?.Invoke(this, EventArgs.Empty);
 
-                await _messagePumpsManager.Start(messagePumpTypes);
-            }
-            catch (AggregateException aex)
-            {
-                _logger.Error(aex, "Failed to start bus.");
-                throw new BusException("Failed to start bus", aex);
-            }
+                                          await _messagePumpsManager.Start(messagePumpTypes);
+                                      }
+                                      catch (AggregateException aex)
+                                      {
+                                          _logger.Error(aex, "Failed to start bus.");
+                                          throw new BusException("Failed to start bus", aex);
+                                      }
 
-            var startedHandler = Started;
-            startedHandler?.Invoke(this, EventArgs.Empty);
+                                      var startedHandler = Started;
+                                      startedHandler?.Invoke(this, EventArgs.Empty);
 
-            _logger.Info("Bus started.");
+                                      _logger.Info("Bus started.");
+                                  }).ConfigureAwaitFalse();
         }
 
-        public async Task Stop(MessagePumpTypes messagePumpTypes = MessagePumpTypes.All)
+        public Task Stop(MessagePumpTypes messagePumpTypes = MessagePumpTypes.All)
         {
-            lock (_mutex)
-            {
-                if (!_isRunning) return;
-                _isRunning = false;
-            }
+            return Task.Run(async () =>
+                                  {
+                                      lock (_mutex)
+                                      {
+                                          if (!_isRunning) return;
+                                          _isRunning = false;
+                                      }
 
-            _logger.Debug("Bus stopping...");
+                                      _logger.Debug("Bus stopping...");
 
-            try
-            {
-                var stoppingHandler = Stopping;
-                stoppingHandler?.Invoke(this, EventArgs.Empty);
+                                      try
+                                      {
+                                          var stoppingHandler = Stopping;
+                                          stoppingHandler?.Invoke(this, EventArgs.Empty);
 
-                await _messagePumpsManager.Stop(messagePumpTypes);
-            }
-            catch (AggregateException aex)
-            {
-                throw new BusException("Failed to stop bus", aex);
-            }
+                                          await _messagePumpsManager.Stop(messagePumpTypes);
+                                      }
+                                      catch (AggregateException aex)
+                                      {
+                                          throw new BusException("Failed to stop bus", aex);
+                                      }
 
-            var stoppedHandler = Stopped;
-            stoppedHandler?.Invoke(this, EventArgs.Empty);
+                                      var stoppedHandler = Stopped;
+                                      stoppedHandler?.Invoke(this, EventArgs.Empty);
 
-            _logger.Info("Bus stopped.");
+                                      _logger.Info("Bus stopped.");
+                                  }).ConfigureAwaitFalse();
         }
 
         public EventHandler<EventArgs> Disposing;
