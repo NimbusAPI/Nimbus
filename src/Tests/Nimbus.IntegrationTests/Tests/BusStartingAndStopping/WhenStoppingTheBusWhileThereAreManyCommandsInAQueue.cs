@@ -33,11 +33,6 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             Console.WriteLine("Bus has stopped.");
             Console.WriteLine("Number of commands received immediately afterwards: {0}", _commandHandlerInvocationCount);
             MethodCallCounter.Clear();
-
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            _additionalCommandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
-            Console.WriteLine("Number of commands received after that: {0}", _additionalCommandHandlerInvocationCount);
-            MethodCallCounter.Stop();
         }
 
         [Test]
@@ -67,6 +62,11 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         {
             await Given(busBuilderConfiguration);
             await When();
+
+            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            _additionalCommandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
+            Console.WriteLine("Number of commands received after that: {0}", _additionalCommandHandlerInvocationCount);
+            MethodCallCounter.Stop();
 
             _additionalCommandHandlerInvocationCount.ShouldBe(0);
         }
