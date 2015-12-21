@@ -6,6 +6,7 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests.ThroughputTests

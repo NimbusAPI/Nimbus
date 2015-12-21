@@ -7,7 +7,7 @@ using Nimbus.Tests.Common.Configuration;
 using Nimbus.Transports.InProcess;
 using Nimbus.Transports.WindowsServiceBus;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
     public class TransportConfigurationSources : IEnumerable<PartialConfigurationScenario<TransportConfiguration>>
     {

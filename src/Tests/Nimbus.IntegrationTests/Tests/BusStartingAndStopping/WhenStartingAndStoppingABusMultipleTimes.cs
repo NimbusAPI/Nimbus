@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping

@@ -9,7 +9,7 @@ using Nimbus.LargeMessages.Azure.Http;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Tests.Common.Configuration;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
     public class LargeMessageStorageConfigurationSources : IEnumerable<PartialConfigurationScenario<LargeMessageStorageConfiguration>>
     {

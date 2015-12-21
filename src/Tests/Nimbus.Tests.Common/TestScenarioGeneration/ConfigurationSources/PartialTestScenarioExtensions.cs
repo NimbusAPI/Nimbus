@@ -1,16 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Extensions;
 using NUnit.Framework;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
-    public class AllBusConfigurations<TTestType> : IEnumerable<TestCaseData>
+    internal static class PartialTestScenarioExtensions
     {
-        public IEnumerator<TestCaseData> GetEnumerator()
+        public static IEnumerable<TestCaseData> BuildTestCases<T>(this IEnumerable<PartialConfigurationScenario<T>> scenarios)
         {
-            return new BusBuilderConfigurationSources(typeof (TTestType))
+            return scenarios
                 .OrderBy(c => c.Name)
                 .Select(c => new TestCaseData(c.Name, c.Configuration)
                             .Chain(tc =>
@@ -21,13 +20,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration
 
                                        return tc;
                                    })
-                )
-                .GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+                );
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
     public abstract class PartialConfigurationScenario
     {

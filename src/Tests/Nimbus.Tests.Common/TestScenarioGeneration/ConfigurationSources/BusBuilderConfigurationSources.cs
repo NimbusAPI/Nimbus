@@ -8,7 +8,7 @@ using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Tests.Common.Stubs;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
     public class BusBuilderConfigurationSources : IEnumerable<PartialConfigurationScenario<BusBuilderConfiguration>>
     {

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
-using Nimbus.Tests.Common;
+using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Infrastructure.Routing;
+using Nimbus.Serializers.Json;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Transports.InProcess;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
@@ -17,48 +19,43 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
         private Bus[] _buses;
+        private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
 
         [Test]
-        public async Task NoneOfThemShouldGoBang()
+        [TestCaseSource(typeof (AllTransportConfigurations))]
+        public async Task NoneOfThemShouldGoBang(string testName, TransportConfiguration transportConfiguration)
         {
-            var tasks = Enumerable.Range(0, 5)
-                                  .Select(i => BuildMeABus())
-                                  .ToArray();
+            await ClearMeABus(transportConfiguration);
 
-            await Task.WhenAll(tasks);
-
-            _buses = tasks.Select(t => t.Result).ToArray();
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Task.Run(async () => { await ClearMeABus(); }).Wait();
+            _buses = await Enumerable.Range(0, 10)
+                                     .Select(i => BuildMeABus(transportConfiguration))
+                                     .SelectResultsAsync();
         }
 
         [TearDown]
         public void TearDown()
         {
-            _buses
-                .AsParallel()
-                .Do(b => b.Dispose())
-                .Done();
+            _buses?.AsParallel()
+                   .Do(b => b.Dispose())
+                   .Done();
         }
 
-        private async Task ClearMeABus()
+        private async Task ClearMeABus(TransportConfiguration transportConfiguration)
         {
-            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-            // deleting queues and topics is slow.
+            // We want a namespace that doesn't exist here so that all the queues and topics are removed.
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
 
-            var logger = TestHarnessLoggerFactory.Create();
-
             var busBuilder = new BusBuilder().Configure()
-                                             .WithTransport(new InProcessTransportConfiguration())
-                                             .WithNames("IntegrationTestHarness", Environment.MachineName)
+                                             .WithTransport(transportConfiguration)
+                                             .WithRouter(new DestinationPerMessageTypeRouter())
+                                             .WithSerializer(new JsonSerializer())
+                                             .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                             .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                             .WithNames("MyTestSuite", Environment.MachineName)
                                              .WithTypesFrom(typeProvider)
                                              .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                             .WithLogger(logger)
+                                             .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                             .WithLogger(_logger)
                                              .WithDebugOptions(
                                                  dc =>
                                                      dc.RemoveAllExistingNamespaceElementsOnStartup(
@@ -71,24 +68,32 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
             }
         }
 
-        private Task<Bus> BuildMeABus()
+        private Task<Bus> BuildMeABus(TransportConfiguration transportConfiguration)
         {
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+
             return Task.Run(async () =>
                                   {
-                                      // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-                                      // deleting queues and topics is slow.
-                                      var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+                                      // we grab a new one of these each time so that we're guaranteed to get a new instance of
+                                      // all the builders etc. It's a bit ick. Sorry :(  -andrewh 21/12/2015
+                                      var actualTransportConfiguration = new TransportConfigurationSources()
+                                          .Where(tcs => tcs.Configuration.GetType() == transportConfiguration.GetType())
+                                          .First();
 
-                                      var logger = TestHarnessLoggerFactory.Create();
+                                      var configuration = new BusBuilder().Configure()
+                                                                          .WithTransport(actualTransportConfiguration.Configuration)
+                                                                          .WithRouter(new DestinationPerMessageTypeRouter())
+                                                                          .WithSerializer(new JsonSerializer())
+                                                                          .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                                          .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                                          .WithNames("MyTestSuite", Environment.MachineName)
+                                                                          .WithTypesFrom(typeProvider)
+                                                                          .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                                          .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                                          .WithLogger(_logger)
+                                          ;
 
-                                      var bus = new BusBuilder().Configure()
-                                                                .WithTransport(new InProcessTransportConfiguration())
-                                                                .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                                .WithTypesFrom(typeProvider)
-                                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                                .WithLogger(logger)
-                                                                .Build();
-                                      bus.ShouldNotBe(null);
+                                      var bus = configuration.Build();
                                       await bus.Start();
                                       return bus;
                                   });

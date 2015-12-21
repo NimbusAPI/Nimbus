@@ -95,6 +95,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialTestScenarioExtensions.cs" />
     <Compile Include="TestUtilities\AssertingStopwatch.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
@@ -108,15 +110,15 @@
     <Compile Include="Stubs\TestHarnessLoggerFactory.cs" />
     <Compile Include="Stubs\ImmediateRetryDeliveryStrategy.cs" />
     <Compile Include="Stubs\TestHarnessTypeProvider.cs" />
-    <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
-    <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\FluentConfigurationExtensions.cs" />
-    <Compile Include="TestScenarioGeneration\IoCContainerConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\LargeMessageStorageConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\PartialConfigurationScenario.cs" />
-    <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\SerializerConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\TransportConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\TestCaseSources\AllBusConfigurations.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\FluentConfigurationExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainerConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStorageConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialConfigurationScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\RouterConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\SerializerConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\TransportConfigurationSources.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
