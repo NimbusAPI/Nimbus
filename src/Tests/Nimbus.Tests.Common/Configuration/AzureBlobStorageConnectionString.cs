@@ -1,6 +1,8 @@
 using ConfigInjector;
 
-namespace Nimbus.IntegrationTests.Configuration
+namespace Nimbus.Tests.Common.Configuration
 {
-    public class AzureBlobStorageConnectionString : ConfigurationSetting<string> { }
+    public class AzureBlobStorageConnectionString : ConfigurationSetting<string>
+    {
+    }
 }

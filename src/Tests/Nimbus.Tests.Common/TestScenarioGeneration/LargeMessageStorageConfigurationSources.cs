@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.LargeMessages;
-using Nimbus.IntegrationTests.Configuration;
 using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Http;
 using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.Tests.Common.Configuration;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public class LargeMessageStorageConfigurationSources : IEnumerable<PartialConfigurationScenario<LargeMessageStorageConfiguration>>
     {

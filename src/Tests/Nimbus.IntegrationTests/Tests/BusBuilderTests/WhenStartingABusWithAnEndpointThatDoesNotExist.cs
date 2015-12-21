@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;

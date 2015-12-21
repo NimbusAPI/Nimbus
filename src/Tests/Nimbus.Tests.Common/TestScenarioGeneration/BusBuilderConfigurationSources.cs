@@ -5,12 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Stubs;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public class BusBuilderConfigurationSources : IEnumerable<PartialConfigurationScenario<BusBuilderConfiguration>>
     {
@@ -57,7 +56,7 @@ namespace Nimbus.IntegrationTests.TestScenarioGeneration
                                                                         dc.RemoveAllExistingNamespaceElementsOnStartup(
                                                                             "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                                                 .Chain(iocContainer.Configuration.ApplyContainerDefaults)
-                                                                ;
+                                ;
 
                             yield return new PartialConfigurationScenario<BusBuilderConfiguration>(scenarioName, configuration);
                         }

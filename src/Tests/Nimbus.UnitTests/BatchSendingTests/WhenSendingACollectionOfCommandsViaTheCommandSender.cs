@@ -11,6 +11,7 @@ using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;

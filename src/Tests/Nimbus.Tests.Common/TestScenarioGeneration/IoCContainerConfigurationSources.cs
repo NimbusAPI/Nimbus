@@ -10,7 +10,7 @@ using Nimbus.Unity.Configuration;
 using Nimbus.Windsor.Configuration;
 using Ninject;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public class IoCContainerConfigurationSources : IEnumerable<PartialConfigurationScenario<IoCContainerConfigurationSources.ContainerConfiguration>>
     {

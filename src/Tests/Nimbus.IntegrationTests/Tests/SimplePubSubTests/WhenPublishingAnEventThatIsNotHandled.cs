@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration;
 using NUnit.Framework;
 using Shouldly;
 

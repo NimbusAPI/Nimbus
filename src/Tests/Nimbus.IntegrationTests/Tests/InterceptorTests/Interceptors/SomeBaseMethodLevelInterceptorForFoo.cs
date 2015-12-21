@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestUtilities;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
 {

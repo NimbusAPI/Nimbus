@@ -8,7 +8,7 @@ using System.Threading;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
-namespace Nimbus.Tests.Common
+namespace Nimbus.Tests.Common.TestUtilities
 {
     public static class MethodCallCounter
     {

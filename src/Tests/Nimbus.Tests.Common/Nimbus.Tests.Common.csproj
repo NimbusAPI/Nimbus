@@ -95,19 +95,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssertingStopwatch.cs" />
+    <Compile Include="TestUtilities\AssertingStopwatch.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
-    <Compile Include="MethodCallCounter.cs" />
-    <Compile Include="MethodInfoExtensions.cs" />
-    <Compile Include="NullDependencyResolver.cs" />
-    <Compile Include="NullDependencyResolverScope.cs" />
-    <Compile Include="NullInboundInterceptorFactory.cs" />
-    <Compile Include="NullOutboundInterceptorFactory.cs" />
+    <Compile Include="TestUtilities\MethodCallCounter.cs" />
+    <Compile Include="Extensions\MethodInfoExtensions.cs" />
+    <Compile Include="Stubs\NullDependencyResolver.cs" />
+    <Compile Include="Stubs\NullDependencyResolverScope.cs" />
+    <Compile Include="Stubs\NullInboundInterceptorFactory.cs" />
+    <Compile Include="Stubs\NullOutboundInterceptorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerilogLoggerFactory.cs" />
+    <Compile Include="Stubs\TestHarnessLoggerFactory.cs" />
     <Compile Include="Stubs\ImmediateRetryDeliveryStrategy.cs" />
-    <Compile Include="TestHarnessTypeProvider.cs" />
+    <Compile Include="Stubs\TestHarnessTypeProvider.cs" />
     <Compile Include="TestScenarioGeneration\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\BusBuilderConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\FluentConfigurationExtensions.cs" />
@@ -117,7 +117,7 @@
     <Compile Include="TestScenarioGeneration\RouterConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\SerializerConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\TransportConfigurationSources.cs" />
-    <Compile Include="ThreadExtensions.cs" />
+    <Compile Include="Extensions\ThreadExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">

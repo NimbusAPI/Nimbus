@@ -5,6 +5,7 @@ using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
 

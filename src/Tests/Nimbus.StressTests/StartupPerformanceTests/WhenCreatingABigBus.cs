@@ -10,9 +10,11 @@ using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
-using Nimbus.IntegrationTests.Configuration;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Logging;
-using Nimbus.IntegrationTests.TestScenarioGeneration;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
+using Nimbus.Tests.Common.TestScenarioGeneration;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests.ThroughputTests

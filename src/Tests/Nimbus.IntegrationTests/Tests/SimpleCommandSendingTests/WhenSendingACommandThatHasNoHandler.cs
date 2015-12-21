@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests

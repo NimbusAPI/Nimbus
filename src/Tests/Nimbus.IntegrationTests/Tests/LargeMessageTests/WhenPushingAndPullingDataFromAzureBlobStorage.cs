@@ -3,11 +3,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
-using Nimbus.IntegrationTests.Configuration;
-using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
 using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 

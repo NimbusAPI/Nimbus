@@ -2,6 +2,7 @@
 using Nimbus.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestUtilities;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.CommandHandlersSendingOtherCommands.Handlers
 {

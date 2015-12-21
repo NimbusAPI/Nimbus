@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Serializers.Json;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public class SerializerConfigurationSources : IEnumerable<PartialConfigurationScenario<ISerializer>>
     {

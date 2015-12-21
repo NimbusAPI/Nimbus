@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.Transports.InProcess;
 using Nimbus.Transports.WindowsServiceBus;
 

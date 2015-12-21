@@ -6,6 +6,7 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Extensions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
 

@@ -1,7 +1,7 @@
 using System;
 using Nimbus.Infrastructure;
 
-namespace Nimbus.IntegrationTests.Stubs
+namespace Nimbus.Tests.Common.Stubs
 {
     internal class ImmediateRetryDeliveryStrategy : IDeliveryRetryStrategy
     {

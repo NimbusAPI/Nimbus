@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests

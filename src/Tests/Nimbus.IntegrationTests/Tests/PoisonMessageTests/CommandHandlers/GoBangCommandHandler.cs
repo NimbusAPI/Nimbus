@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestUtilities;
 
 namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.CommandHandlers
 {

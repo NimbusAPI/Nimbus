@@ -1,4 +1,4 @@
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public abstract class PartialConfigurationScenario
     {

@@ -1,7 +1,7 @@
 ﻿using Nimbus.Logger.Serilog;
 using Serilog;
 
-namespace Nimbus.Tests.Common
+namespace Nimbus.Tests.Common.Stubs
 {
     public class TestHarnessLoggerFactory
     {
@@ -13,7 +13,6 @@ namespace Nimbus.Tests.Common
                 .WriteTo.Seq("http://localhost:5341")
                 .MinimumLevel.Debug()
                 .CreateLogger();
-
 
             var logger = new SerilogLogger(log);
             return logger;

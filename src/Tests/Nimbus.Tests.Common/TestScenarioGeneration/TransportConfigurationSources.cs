@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
-using Nimbus.IntegrationTests.Configuration;
+using Nimbus.Tests.Common.Configuration;
 using Nimbus.Transports.InProcess;
 using Nimbus.Transports.WindowsServiceBus;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     public class TransportConfigurationSources : IEnumerable<PartialConfigurationScenario<TransportConfiguration>>
     {

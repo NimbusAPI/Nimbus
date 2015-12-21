@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests

@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using NUnit.Framework;
 using Shouldly;

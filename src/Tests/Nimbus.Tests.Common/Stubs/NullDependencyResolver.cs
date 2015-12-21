@@ -1,6 +1,6 @@
 using Nimbus.DependencyResolution;
 
-namespace Nimbus.Tests.Common
+namespace Nimbus.Tests.Common.Stubs
 {
     public class NullDependencyResolver : IDependencyResolver
     {

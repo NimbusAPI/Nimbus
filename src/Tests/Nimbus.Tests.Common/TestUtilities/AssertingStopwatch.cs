@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
+namespace Nimbus.Tests.Common.TestUtilities
 {
     public class AssertingStopwatch : IDisposable
     {

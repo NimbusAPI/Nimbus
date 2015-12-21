@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.DependencyResolution;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.UnitTests.DependencyResolverTests.DisposableComponents.Handlers;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using NUnit.Framework;

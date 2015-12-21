@@ -1,7 +1,7 @@
 using System;
 using ConfigInjector;
 
-namespace Nimbus.IntegrationTests.Configuration
+namespace Nimbus.Tests.Common.Configuration
 {
     public class AzureServiceBusConnectionString : ConfigurationSetting<string>
     {

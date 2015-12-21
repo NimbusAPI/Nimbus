@@ -4,7 +4,7 @@ using System.Reflection;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.ControlMessages;
 
-namespace Nimbus.Tests.Common
+namespace Nimbus.Tests.Common.Stubs
 {
     /// <summary>
     ///     A type provider that filters types we care about to only our own test's namespace. It's a performance optimisation

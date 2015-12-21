@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Routing;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration
+namespace Nimbus.Tests.Common.TestScenarioGeneration
 {
     internal class RouterConfigurationSources : IEnumerable<PartialConfigurationScenario<IRouter>>
     {

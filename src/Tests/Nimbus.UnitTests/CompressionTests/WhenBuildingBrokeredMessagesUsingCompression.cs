@@ -7,6 +7,7 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using NSubstitute;
 using NUnit.Framework;
 using DataContractSerializer = Nimbus.Infrastructure.BrokeredMessageServices.Serialization.DataContractSerializer;
