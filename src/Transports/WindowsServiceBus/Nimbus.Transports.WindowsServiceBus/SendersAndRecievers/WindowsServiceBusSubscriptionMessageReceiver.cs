@@ -25,7 +25,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                                                             IBrokeredMessageFactory brokeredMessageFactory,
                                                             IGlobalHandlerThrottle globalHandlerThrottle,
                                                             ILogger logger)
-            : base(concurrentHandlerLimit, logger, globalHandlerThrottle)
+            : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;

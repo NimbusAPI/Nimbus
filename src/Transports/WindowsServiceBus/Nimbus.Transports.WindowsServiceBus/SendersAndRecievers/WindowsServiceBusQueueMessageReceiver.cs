@@ -23,7 +23,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                                                      ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                                      IGlobalHandlerThrottle globalHandlerThrottle,
                                                      ILogger logger)
-            : base(concurrentHandlerLimit, logger, globalHandlerThrottle)
+            : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;

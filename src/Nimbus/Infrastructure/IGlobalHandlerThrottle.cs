@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure
 {
-    public interface IGlobalHandlerThrottle
+    internal interface IGlobalHandlerThrottle
     {
         Task Wait(CancellationToken ct);
         void Release();

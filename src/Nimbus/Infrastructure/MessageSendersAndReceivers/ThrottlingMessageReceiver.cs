@@ -17,7 +17,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        protected ThrottlingMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger, IGlobalHandlerThrottle globalHandlerThrottle)
+        protected ThrottlingMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, IGlobalHandlerThrottle globalHandlerThrottle, ILogger logger)
         {
             ConcurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
