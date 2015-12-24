@@ -12,7 +12,7 @@ namespace Nimbus.Extensions
             if (timeSpan >= TimeSpan.Zero)
             {
                 if (dateTimeOffset > DateTimeOffset.MaxValue - timeSpan) return DateTimeOffset.MaxValue;
-                if (dateTimeOffset < DateTimeOffset.MinValue - timeSpan) return DateTimeOffset.MinValue;
+                if (dateTimeOffset < DateTimeOffset.MinValue + timeSpan) return DateTimeOffset.MinValue;
             }
             else
             {
