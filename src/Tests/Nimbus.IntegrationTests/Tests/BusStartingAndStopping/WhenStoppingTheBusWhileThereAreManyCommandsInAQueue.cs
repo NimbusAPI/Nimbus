@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -26,7 +27,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             Enumerable.Range(0, _totalCommands)
                       .Select(i => Bus.Send(new SlowCommand()))
                       .WaitAll();
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            await TimeSpan.FromSeconds(1).WaitUntil(() => MethodCallCounter.TotalReceivedCalls > 0);
             await Bus.Stop();
 
             _commandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
@@ -64,9 +65,9 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             await When();
 
             await Task.Delay(TimeSpan.FromSeconds(0.5));
+            MethodCallCounter.Stop();
             _additionalCommandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
             Console.WriteLine("Number of commands received after that: {0}", _additionalCommandHandlerInvocationCount);
-            MethodCallCounter.Stop();
 
             _additionalCommandHandlerInvocationCount.ShouldBe(0);
         }
