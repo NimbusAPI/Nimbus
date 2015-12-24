@@ -65,6 +65,7 @@
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\FactoryRegistration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\IComponentRegistration.cs" />
+    <Compile Include="Configuration\Settings\GlobalConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\ISetting.cs" />
     <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
+    <Compile Include="Infrastructure\GlobalHandlerThrottle.cs" />
+    <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\NimbusMessageServices\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />

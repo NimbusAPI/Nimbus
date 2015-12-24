@@ -18,6 +18,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly IGlobalHandlerThrottle _globalHandlerThrottle;
         private readonly ILogger _logger;
 
         private readonly ThreadSafeDictionary<string, INimbusMessageSender> _queueMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
@@ -28,6 +29,7 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         public WindowsServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                           IBrokeredMessageFactory brokeredMessageFactory,
+                                          IGlobalHandlerThrottle globalHandlerThrottle,
                                           ILogger logger,
                                           IQueueManager queueManager,
                                           Func<NamespaceManager> namespaceManager)
@@ -35,6 +37,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             _queueManager = queueManager;
             _namespaceManager = namespaceManager;
             _brokeredMessageFactory = brokeredMessageFactory;
+            _globalHandlerThrottle = globalHandlerThrottle;
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
         }
@@ -75,7 +78,12 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new WindowsServiceBusQueueMessageReceiver(_brokeredMessageFactory, _queueManager, queuePath, _concurrentHandlerLimit, _logger);
+            var receiver = new WindowsServiceBusQueueMessageReceiver(_brokeredMessageFactory,
+                                                                     _queueManager,
+                                                                     queuePath,
+                                                                     _concurrentHandlerLimit,
+                                                                     _globalHandlerThrottle,
+                                                                     _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }
@@ -89,7 +97,13 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
         {
-            var receiver = new WindowsServiceBusSubscriptionMessageReceiver(_queueManager, topicPath, subscriptionName, _concurrentHandlerLimit, _brokeredMessageFactory, _logger);
+            var receiver = new WindowsServiceBusSubscriptionMessageReceiver(_queueManager,
+                                                                            topicPath,
+                                                                            subscriptionName,
+                                                                            _concurrentHandlerLimit,
+                                                                            _brokeredMessageFactory,
+                                                                            _globalHandlerThrottle,
+                                                                            _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

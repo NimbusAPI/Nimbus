@@ -11,7 +11,7 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         public override async Task SendMessages(IBus bus)
         {
-            var batchSize = 500;
+            var batchSize = 100;
 
             var messageCount = 0;
 

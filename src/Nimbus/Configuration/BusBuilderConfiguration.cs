@@ -46,7 +46,8 @@ namespace Nimbus.Configuration
         internal HeartbeatIntervalSetting HeartbeatInterval { get; set; } = new HeartbeatIntervalSetting();
         internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; } = new GlobalInboundInterceptorTypesSetting();
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; } = new GlobalOutboundInterceptorTypesSetting();
-        internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; } = new ConcurrentHandlerLimitSetting();
+        internal ConcurrentHandlerLimitSetting ConcurrentHandlerLimit { get; set; } = new ConcurrentHandlerLimitSetting();
+        internal GlobalConcurrentHandlerLimitSetting GlobalConcurrentHandlerLimit { get; set; } = new GlobalConcurrentHandlerLimitSetting();
 
         public Bus Build()
         {
@@ -93,6 +94,7 @@ namespace Nimbus.Configuration
             container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
             container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
             container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<GlobalHandlerThrottle>(ComponentLifetime.SingleInstance, typeof(IGlobalHandlerThrottle));
         }
 
         public IEnumerable<string> Validate()

@@ -4,9 +4,6 @@ namespace Nimbus.Configuration.Settings
 {
     public class ConcurrentHandlerLimitSetting : Setting<int>
     {
-        public override int Default
-        {
-            get { return Environment.ProcessorCount * Environment.ProcessorCount; }
-        }
+        public override int Default => Environment.ProcessorCount*2;
     }
 }

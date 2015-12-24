@@ -83,7 +83,7 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithDefaultConcurrentHandlerLimit(this BusBuilderConfiguration configuration, int defaultConcurrentHandlerLimit)
         {
-            configuration.DefaultConcurrentHandlerLimit = new ConcurrentHandlerLimitSetting {Value = defaultConcurrentHandlerLimit};
+            configuration.ConcurrentHandlerLimit = new ConcurrentHandlerLimitSetting {Value = defaultConcurrentHandlerLimit};
             return configuration;
         }
 

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -7,30 +6,32 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
-using Nimbus.Transports.WindowsServiceBus.Extensions;
 
 namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 {
     internal class WindowsServiceBusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ILogger _logger;
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
         private SubscriptionClient _subscriptionClient;
 
         public WindowsServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
-                                                 string topicPath,
-                                                 string subscriptionName,
-                                                 ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                                 IBrokeredMessageFactory brokeredMessageFactory,
-                                                 ILogger logger)
-            : base(concurrentHandlerLimit, logger)
+                                                            string topicPath,
+                                                            string subscriptionName,
+                                                            ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                                            IBrokeredMessageFactory brokeredMessageFactory,
+                                                            IGlobalHandlerThrottle globalHandlerThrottle,
+                                                            ILogger logger)
+            : base(concurrentHandlerLimit, logger, globalHandlerThrottle)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
             _brokeredMessageFactory = brokeredMessageFactory;
+            _logger = logger;
         }
 
         public override string ToString()
@@ -43,31 +44,25 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             await GetSubscriptionClient();
         }
 
-        protected override async Task<NimbusMessage[]> FetchBatch(int batchSize, Task cancellationTask)
+        protected override async Task<NimbusMessage> Fetch(Task cancellationTask)
         {
-            if (batchSize < 1)
-                return new NimbusMessage[0];
-
             try
             {
                 var subscriptionClient = await GetSubscriptionClient();
 
-                var receiveTask = subscriptionClient.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
+                var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300));
                 await Task.WhenAny(receiveTask, cancellationTask);
+                if (cancellationTask.IsCompleted) return null;
 
-                if (cancellationTask.IsCompleted) return new NimbusMessage[0];
+                var brokeredMessage = await receiveTask;
 
-                var brokeredMessages = await receiveTask;
+                var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
 
-                var mappingTasks = brokeredMessages.Select(_brokeredMessageFactory.BuildNimbusMessage).ToArray();
-                await Task.WhenAll(mappingTasks);
-
-                var nimbusMessages = mappingTasks.Select(t => t.Result).ToArray();
-                return nimbusMessages;
+                return nimbusMessage;
             }
             catch (Exception exc)
             {
-                if (exc.IsTransientFault()) throw;
+                _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");
                 DiscardSubscriptionClient();
                 throw;
             }

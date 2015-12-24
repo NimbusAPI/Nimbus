@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -11,6 +9,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         protected readonly ConcurrentHandlerLimitSetting ConcurrentHandlerLimit;
         private readonly ILogger _logger;
+        private readonly IGlobalHandlerThrottle _globalHandlerThrottle;
         private bool _running;
 
         private Task _workerTask;
@@ -18,10 +17,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        protected ThrottlingMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
+        protected ThrottlingMessageReceiver(ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger, IGlobalHandlerThrottle globalHandlerThrottle)
         {
             ConcurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
+            _globalHandlerThrottle = globalHandlerThrottle;
             _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
@@ -78,7 +78,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected abstract Task WarmUp();
 
-        protected abstract Task<NimbusMessage[]> FetchBatch(int batchSize, Task cancellationTask);
+        protected abstract Task<NimbusMessage> Fetch(Task cancellationTask);
 
         private async Task Worker(Func<NimbusMessage, Task> callback, Task cancellationTask)
         {
@@ -86,32 +86,29 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             {
                 try
                 {
-                    int workerThreads;
-                    int completionPortThreads;
-                    ThreadPool.GetMinThreads(out workerThreads, out completionPortThreads);
-                    var batchSize = Math.Min(_throttle.CurrentCount, completionPortThreads);
-                    var messages = await FetchBatch(batchSize, cancellationTask);
-                    if (!_running) return;
-                    if (messages.None()) continue;
+                    await _globalHandlerThrottle.Wait(_cancellationTokenSource.Token);
+                    try
+                    {
+                        await _throttle.WaitAsync(_cancellationTokenSource.Token);
+                        try
+                        {
+                            if (!_running) break;
 
-                    GlobalMessageCounters.IncrementReceivedMessageCount(messages.Length);
+                            var message = await Fetch(cancellationTask);
+                            if (message == null) continue;
 
-                    var tasks = messages
-                        .Select(m => Task.Run(async () =>
-                                                    {
-                                                        await _throttle.WaitAsync(_cancellationTokenSource.Token);
-                                                        try
-                                                        {
-                                                            await callback(m);
-                                                        }
-                                                        finally
-                                                        {
-                                                            _throttle.Release();
-                                                        }
-                                                    }))
-                        .ToArray();
-
-                    if (_throttle.CurrentCount == 0) await Task.WhenAny(tasks);
+                            GlobalMessageCounters.IncrementReceivedMessageCount(1);
+                            await callback(message);
+                        }
+                        finally
+                        {
+                            _throttle.Release();
+                        }
+                    }
+                    finally
+                    {
+                        _globalHandlerThrottle.Release();
+                    }
                 }
                 catch (OperationCanceledException)
                 {
