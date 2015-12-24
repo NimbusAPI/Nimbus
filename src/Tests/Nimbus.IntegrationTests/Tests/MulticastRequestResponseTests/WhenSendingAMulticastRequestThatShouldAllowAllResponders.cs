@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
-using Nimbus.Tests.Common;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -24,7 +22,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone"
                           };
 
-            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2))).ToArray();
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2)))
+                .Take(3)
+                .ToArray();
         }
 
         [Test]
