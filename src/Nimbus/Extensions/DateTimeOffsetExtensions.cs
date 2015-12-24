@@ -6,14 +6,21 @@ namespace Nimbus.Extensions
     {
         internal static DateTimeOffset AddSafely(this DateTimeOffset dateTimeOffset, TimeSpan timeSpan)
         {
-            try
+            if (timeSpan == TimeSpan.MaxValue) return DateTimeOffset.MaxValue;
+            if (timeSpan == TimeSpan.MinValue) return DateTimeOffset.MinValue;
+
+            if (timeSpan >= TimeSpan.Zero)
             {
-                return dateTimeOffset.Add(timeSpan);
+                if (dateTimeOffset > DateTimeOffset.MaxValue - timeSpan) return DateTimeOffset.MaxValue;
+                if (dateTimeOffset < DateTimeOffset.MinValue - timeSpan) return DateTimeOffset.MinValue;
             }
-            catch (ArgumentOutOfRangeException)
+            else
             {
-                return DateTimeOffset.MaxValue;
+                if (dateTimeOffset > DateTimeOffset.MaxValue + timeSpan) return DateTimeOffset.MaxValue;
+                if (dateTimeOffset < DateTimeOffset.MinValue - timeSpan) return DateTimeOffset.MinValue;
             }
+
+            return dateTimeOffset.Add(timeSpan);
         }
     }
 }
