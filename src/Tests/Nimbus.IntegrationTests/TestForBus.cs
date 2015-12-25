@@ -2,6 +2,8 @@
 using Nimbus.Configuration;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
+using Serilog;
+using Serilog.Events;
 
 namespace Nimbus.IntegrationTests
 {
@@ -30,6 +32,24 @@ namespace Nimbus.IntegrationTests
             Bus = null;
 
             bus?.Dispose();
+
+            var testStatus = TestContext.CurrentContext.Result.Status;
+            LogEventLevel level;
+            switch (testStatus)
+            {
+                case TestStatus.Failed:
+                    level = LogEventLevel.Error;
+                    break;
+                case TestStatus.Inconclusive:
+                case TestStatus.Skipped:
+                    level = LogEventLevel.Warning;
+                    break;
+                default:
+                    level = LogEventLevel.Information;
+                    break;
+            }
+
+            Log.Logger.Write(level, "Test completed with result {TestResult}", testStatus);
         }
     }
 }
