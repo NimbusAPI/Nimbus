@@ -9,6 +9,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
+using Polly;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -31,6 +32,8 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
+        private readonly Policy _retryPolicy;
+        private const int _retryCount = 5;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
@@ -55,6 +58,11 @@ namespace Nimbus.Transports.WindowsServiceBus
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
+
+            _retryPolicy = Policy.Handle<MessagingException>()
+                                 .WaitAndRetry(_retryCount,
+                                               attempt => TimeSpan.FromSeconds(attempt),
+                                               (exception, ts) => { _logger.Error(exception, "An error occurred. Retrying."); });
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
@@ -74,7 +82,18 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureTopicExists(topicPath);
-                                return _messagingFactory().CreateTopicClient(topicPath);
+                                var policyResult = _retryPolicy.ExecuteAndCapture(
+                                    () => _messagingFactory().CreateTopicClient(topicPath)
+                                    );
+
+                                if (policyResult.Outcome != OutcomeType.Successful)
+                                {
+                                    throw new BusException("Failed to create topic sender after multiple attempts")
+                                        .WithData("TopicPath", topicPath)
+                                        .WithData("RetryCount", _retryCount);
+                                }
+
+                                return policyResult.Result;
                             });
         }
 
@@ -83,7 +102,19 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureSubscriptionExists(topicPath, subscriptionName);
-                                return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                var policyResult = _retryPolicy.ExecuteAndCapture(
+                                    () => _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete)
+                                    );
+
+                                if (policyResult.Outcome != OutcomeType.Successful)
+                                {
+                                    throw new BusException("Failed to create subscription client after multiple attempts")
+                                        .WithData("TopicPath", topicPath)
+                                        .WithData("SubscriptionName", subscriptionName)
+                                        .WithData("RetryCount", _retryCount);
+                                }
+
+                                return policyResult.Result;
                             });
         }
 
