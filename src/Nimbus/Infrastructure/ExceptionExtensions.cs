@@ -18,7 +18,7 @@ namespace Nimbus.Infrastructure
                        {MessagePropertyKeys.ExceptionStackTrace, exception.StackTrace},
                        {MessagePropertyKeys.ExceptionTimestamp, timestamp.ToString()},
                        {MessagePropertyKeys.ExceptionMachineName, Environment.MachineName},
-                       {MessagePropertyKeys.ExceptionIdentityName, GetCurrentIdentityName()},
+                       {MessagePropertyKeys.ExceptionIdentityName, GetCurrentIdentityName()}
                    };
         }
 
@@ -29,6 +29,12 @@ namespace Nimbus.Infrastructure
                     Thread.CurrentPrincipal.Identity.IsAuthenticated)
                 ? Thread.CurrentPrincipal.Identity.Name
                 : "";
+        }
+
+        internal static T WithData<T>(this T exception, string key, object value) where T : Exception
+        {
+            exception.Data[key] = value;
+            return exception;
         }
     }
 }
