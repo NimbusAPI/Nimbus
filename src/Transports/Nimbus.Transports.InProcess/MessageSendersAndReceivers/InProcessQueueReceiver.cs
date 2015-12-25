@@ -18,6 +18,11 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             _messageQueue = messageQueue;
         }
 
+        public override string ToString()
+        {
+            return _queuePath;
+        }
+
         public Task Start(Func<NimbusMessage, Task> callback)
         {
             return Task.Run(() =>
