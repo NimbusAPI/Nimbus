@@ -3,9 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -37,7 +35,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             await Bus.Send(_goBangCommand);
             await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
-            _deadLetterMessages = await Bus.DeadLetterOffice.PopAll();
+            _deadLetterMessages = await Bus.DeadLetterOffice.PopAll(1, TimeSpan.FromSeconds(TimeoutSeconds));
         }
 
         [Test]
@@ -61,7 +59,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof(AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
         public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts(string testName, BusBuilderConfiguration busBuilderConfiguration)
         {
             await Given(busBuilderConfiguration);
