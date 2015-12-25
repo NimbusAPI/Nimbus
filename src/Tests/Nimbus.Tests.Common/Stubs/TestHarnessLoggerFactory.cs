@@ -1,5 +1,6 @@
 ﻿using Nimbus.Logger.Serilog;
 using Serilog;
+using Serilog.Exceptions;
 
 namespace Nimbus.Tests.Common.Stubs
 {
@@ -11,7 +12,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .Enrich.With<TestNameEnricher>()
-                .Enrich.With<ExceptionDataEnricher>()
+                .Enrich.WithExceptionDetails()
                 .WriteTo.Seq("http://localhost:5341")
                 .MinimumLevel.Verbose()
                 .CreateLogger();
