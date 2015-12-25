@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
@@ -10,7 +9,7 @@ namespace Nimbus.IntegrationTests
     [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
-        protected const int TimeoutSeconds = 10;
+        protected const int TimeoutSeconds = 15;
 
         protected Bus Bus { get; private set; }
 
