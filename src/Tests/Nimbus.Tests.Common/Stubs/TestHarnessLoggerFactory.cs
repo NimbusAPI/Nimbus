@@ -11,6 +11,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .Enrich.With<TestNameEnricher>()
+                .Enrich.With<ExceptionDataEnricher>()
                 .WriteTo.Seq("http://localhost:5341")
                 .MinimumLevel.Verbose()
                 .CreateLogger();
