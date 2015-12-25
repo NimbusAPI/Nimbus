@@ -10,9 +10,12 @@ namespace Nimbus.Tests.Common.Stubs
             var log = new LoggerConfiguration()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
+                .Enrich.With<TestNameEnricher>()
                 .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Debug()
+                .MinimumLevel.Verbose()
                 .CreateLogger();
+
+            Log.Logger = log;
 
             var logger = new SerilogLogger(log);
             return logger;
