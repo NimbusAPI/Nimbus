@@ -48,23 +48,16 @@ namespace Nimbus.Configuration
             var messagePumpsToWaitFor = GetMessagePumps(waitForPumpTypes).ToArray();
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
-            await messagePumpsToWaitFor
+            var tasksToWaitFor = messagePumpsToWaitFor
                 .Select(pump => Task.Run(() => action(pump)))
+                .ToArray();
+
+            messagePumpsToHandleInBackground
+                .Select(pump => Task.Run(() => action(pump)))
+                .Done();
+
+            await tasksToWaitFor
                 .WhenAll();
-
-#pragma warning disable 4014
-            Task.Run(async () =>
-                           {
-                               // pause for a tiny bit here so that if people want messages on the bus immediately then their
-                               // _bus.Send/Whatever(...) call can get into the threadpool queue before we flood it with potentially
-                               // thousands of other message pump creation tasks.
-                               await Task.Delay(0);
-
-                               await messagePumpsToHandleInBackground
-                                   .Select(pump => Task.Run(() => action(pump)))
-                                   .WhenAll();
-                           });
-#pragma warning restore 4014
         }
 
         private IEnumerable<IMessagePump> GetMessagePumps(MessagePumpTypes messagePumpTypes)
