@@ -87,7 +87,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             if (subscriptionClient == null) return;
             if (subscriptionClient.IsClosed) return;
 
-            subscriptionClient.Close();
+            try
+            {
+                subscriptionClient.Close();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc, "An exception occurred while closing a SubscriptionClient.");
+            }
         }
 
         protected override void Dispose(bool disposing)

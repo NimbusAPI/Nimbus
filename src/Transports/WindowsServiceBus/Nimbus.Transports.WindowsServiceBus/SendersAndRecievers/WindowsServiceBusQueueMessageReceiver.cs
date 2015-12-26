@@ -84,7 +84,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             if (messageReceiver == null) return;
             if (messageReceiver.IsClosed) return;
 
-            messageReceiver.Close();
+            try
+            {
+                messageReceiver.Close();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc, "An exception occurred while closing a MessageReceiver.");
+            }
         }
 
         protected override void Dispose(bool disposing)
