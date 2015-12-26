@@ -14,7 +14,7 @@ namespace Nimbus.Tests.Common.Extensions
                 if (exitCondition()) return;
                 if (sw.Elapsed >= timeout) throw new TimeoutException();
 
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
+                await Task.Delay(TimeSpan.FromMilliseconds(250));
             }
         }
     }
