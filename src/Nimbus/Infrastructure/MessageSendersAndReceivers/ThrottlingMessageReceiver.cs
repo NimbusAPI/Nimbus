@@ -61,7 +61,14 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
                 var workerTasks = _workerTasks.ToArray();
                 _workerTasks = null;
-                await Task.WhenAll(workerTasks);
+                try
+                {
+                    await Task.WhenAll(workerTasks);
+                }
+                catch (OperationCanceledException)
+                {
+                    // this will be thrown by the tasks that get cancelled.
+                }
             }
             finally
             {
