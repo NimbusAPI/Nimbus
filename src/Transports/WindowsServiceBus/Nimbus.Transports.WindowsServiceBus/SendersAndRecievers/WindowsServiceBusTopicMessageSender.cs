@@ -14,6 +14,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
         private readonly ILogger _logger;
 
         private TopicClient _topicClient;
+        private const int _maxRetries = 5;
 
         public WindowsServiceBusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager, string topicPath, ILogger logger)
         {
@@ -25,17 +26,23 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 
         public async Task Send(NimbusMessage message)
         {
-            var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
+            var attempts = 0;
+            while (true)
+            {
+                attempts++;
+                var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
 
-            var topicClient = GetTopicClient();
-            try
-            {
-                await topicClient.SendAsync(brokeredMessage);
-            }
-            catch (Exception)
-            {
-                DiscardTopicClient();
-                throw;
+                var topicClient = GetTopicClient();
+                try
+                {
+                    await topicClient.SendAsync(brokeredMessage);
+                    break;
+                }
+                catch (Exception)
+                {
+                    DiscardTopicClient();
+                    if (attempts > _maxRetries) throw;
+                }
             }
         }
 
