@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
@@ -26,7 +25,10 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
-            busBuilderConfiguration.WithLogger(new NullLogger());
+            if (!Debugger.IsAttached)
+            {
+                busBuilderConfiguration.WithLogger(new NullLogger());
+            }
             Bus = busBuilderConfiguration.Build();
             await Bus.Start();
         }
