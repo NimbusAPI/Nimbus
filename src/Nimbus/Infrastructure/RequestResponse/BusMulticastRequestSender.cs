@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -61,6 +62,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.AddSafely(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(nimbusMessage.MessageId, expiresAfter);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -68,7 +70,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", topicPath, nimbusMessage);
+                    _logger.LogDispatchAction("Sending", topicPath, nimbusMessage, sw.Elapsed);
 
                     var sender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
@@ -81,11 +83,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                         await interceptor.OnMulticastRequestSent(busRequest, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", topicPath, nimbusMessage);
+                    _logger.LogDispatchAction("Sent", topicPath, nimbusMessage, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", topicPath, nimbusMessage);
+                    _logger.LogDispatchAction("Waiting for response to", topicPath, nimbusMessage, sw.Elapsed);
                     var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-                    _logger.LogDispatchAction("Received response to", topicPath, nimbusMessage);
+                    _logger.LogDispatchAction("Received response to", topicPath, nimbusMessage, sw.Elapsed);
 
                     return response;
                 }
@@ -98,7 +100,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     await interceptor.OnMulticastRequestSendingError(busRequest, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", topicPath, nimbusMessage, exception);
+                _logger.LogDispatchError("sending", topicPath, nimbusMessage, sw.Elapsed, exception);
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return null;

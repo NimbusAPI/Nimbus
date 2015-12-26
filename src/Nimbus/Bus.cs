@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
@@ -101,6 +102,7 @@ namespace Nimbus
                                       }
 
                                       _logger.Debug("Bus starting...");
+                                      var sw = Stopwatch.StartNew();
 
                                       try
                                       {
@@ -118,7 +120,8 @@ namespace Nimbus
                                       var startedHandler = Started;
                                       startedHandler?.Invoke(this, EventArgs.Empty);
 
-                                      _logger.Info("Bus started.");
+                                      sw.Stop();
+                                      _logger.Info("Bus started in {Elapsed}.", sw.Elapsed);
                                   }).ConfigureAwaitFalse();
         }
 
@@ -133,6 +136,7 @@ namespace Nimbus
                                       }
 
                                       _logger.Debug("Bus stopping...");
+                                      var sw = Stopwatch.StartNew();
 
                                       try
                                       {
@@ -149,7 +153,8 @@ namespace Nimbus
                                       var stoppedHandler = Stopped;
                                       stoppedHandler?.Invoke(this, EventArgs.Empty);
 
-                                      _logger.Info("Bus stopped.");
+                                      sw.Stop();
+                                      _logger.Info("Bus stopped in {Elapsed}.", sw.Elapsed);
                                   }).ConfigureAwaitFalse();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
@@ -64,6 +65,7 @@ namespace Nimbus.Infrastructure.Commands
             var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
             nimbusMessage.DestinedForQueue(queuePath);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -71,7 +73,7 @@ namespace Nimbus.Infrastructure.Commands
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, nimbusMessage);
+                    _logger.LogDispatchAction("Sending", queuePath, nimbusMessage, sw.Elapsed);
 
                     var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
@@ -84,7 +86,7 @@ namespace Nimbus.Infrastructure.Commands
                         await interceptor.OnCommandSent(busCommand, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", queuePath, nimbusMessage);
+                    _logger.LogDispatchAction("Sent", queuePath, nimbusMessage, sw.Elapsed);
                     return;
                 }
                 catch (Exception exc)
@@ -96,7 +98,7 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     await interceptor.OnCommandSendingError(busCommand, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, nimbusMessage, exception);
+                _logger.LogDispatchError("sending", queuePath, nimbusMessage, sw.Elapsed, exception);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -71,6 +72,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var expiresAfter = _clock.UtcNow.Add(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(brokeredMessage.MessageId, expiresAfter);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -78,7 +80,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage, sw.Elapsed);
 
                     var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
@@ -90,11 +92,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                     {
                         await interceptor.OnRequestSent(busRequest, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage, sw.Elapsed);
                     var response = await responseCorrelationWrapper.WaitForResponse(timeout);
-                    _logger.LogDispatchAction("Received response to", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Received response to", queuePath, brokeredMessage, sw.Elapsed);
 
                     return response;
                 }
@@ -107,7 +109,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     await interceptor.OnRequestSendingError(busRequest, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception); //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
+                _logger.LogDispatchError("sending", queuePath, brokeredMessage, sw.Elapsed, exception);
+                    //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return default(TResponse);
