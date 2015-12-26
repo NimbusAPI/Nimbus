@@ -49,7 +49,7 @@ namespace Nimbus.Configuration
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
             await messagePumpsToWaitFor
-                .Select(action)
+                .Select(pump => Task.Run(() => action(pump)))
                 .WhenAll();
 
 #pragma warning disable 4014
@@ -61,7 +61,7 @@ namespace Nimbus.Configuration
                                await Task.Delay(100);
 
                                await messagePumpsToHandleInBackground
-                                   .Select(action)
+                                   .Select(pump => Task.Run(() => action(pump)))
                                    .WhenAll();
                            });
 #pragma warning restore 4014
