@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests
@@ -37,6 +38,7 @@ namespace Nimbus.IntegrationTests
         [TearDown]
         public virtual void TearDown()
         {
+            TestLoggingExtensions.LogTestResult();
         }
 
         [TestFixtureTearDown]
