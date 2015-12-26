@@ -56,7 +56,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 if (!_running) return;
                 _running = false;
 
-                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource?.Cancel();
                 _cancellationTokenSource = null;
 
                 var workerTasks = _workerTasks.ToArray();
