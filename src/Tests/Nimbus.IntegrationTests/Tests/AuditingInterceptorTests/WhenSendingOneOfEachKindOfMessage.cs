@@ -19,7 +19,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
     [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
-        private const int _timeoutSeconds = 15;
+        private const int _timeoutSeconds = 30;
 
         protected override async Task<IBus> Given()
         {
