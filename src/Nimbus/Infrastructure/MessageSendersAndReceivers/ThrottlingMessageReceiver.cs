@@ -75,8 +75,11 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         private async Task Worker(Func<NimbusMessage, Task> callback)
         {
-            while (_running)
+            while (true)
             {
+                if (!_running) break;
+                if (_cancellationTokenSource.IsCancellationRequested) break;
+
                 try
                 {
                     var message = await Fetch(_cancellationTokenSource.Token);
@@ -102,9 +105,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 {
                     _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, this);
                 }
-
-                if (!_running) break;
-                if (_cancellationTokenSource.IsCancellationRequested) break;
             }
         }
 
