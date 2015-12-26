@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -20,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         {
             var busEvent = new SomeConcreteEventType();
             await Bus.Publish(busEvent);
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
         }
 
         [Test]
