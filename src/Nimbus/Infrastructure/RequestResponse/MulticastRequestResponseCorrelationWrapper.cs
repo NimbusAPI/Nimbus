@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class MulticastRequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper, IDisposable
     {
-        private readonly DateTimeOffset _expiresAfter;
-        private readonly BlockingCollection<TResponse> _responses = new BlockingCollection<TResponse>();
+        private readonly AsyncBlockingCollection<TResponse> _responses = new AsyncBlockingCollection<TResponse>();
 
         public MulticastRequestResponseCorrelationWrapper(DateTimeOffset expiresAfter)
         {
-            _expiresAfter = expiresAfter;
+            ExpiresAfter = expiresAfter;
         }
 
-        public DateTimeOffset ExpiresAfter
-        {
-            get { return _expiresAfter; }
-        }
+        public DateTimeOffset ExpiresAfter { get; }
 
         public void Reply(object response)
         {
@@ -36,8 +33,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             while (sw.Elapsed < timeout)
             {
                 var remainingTime = timeout - sw.Elapsed;
-                TResponse response;
-                if (_responses.TryTake(out response, remainingTime)) yield return response;
+                var response = _responses.TryTake(remainingTime, CancellationToken.None).Result;
+                if (response != null) yield return response;
             }
         }
 
