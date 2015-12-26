@@ -100,6 +100,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\TestLoggingExtensions.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialTestScenarioExtensions.cs" />

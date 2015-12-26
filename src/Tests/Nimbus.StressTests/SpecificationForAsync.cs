@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
@@ -47,14 +47,15 @@ namespace Nimbus.StressTests
         [TearDown]
         public virtual void TearDown()
         {
+            TestLoggingExtensions.LogTestResult();
         }
 
         [TestFixtureTearDown]
         public virtual void TestFixtureTearDown()
         {
             var disposable = Subject as IDisposable;
-            if (disposable != null) disposable.Dispose();
             Subject = null;
+            disposable?.Dispose();
         }
     }
 }

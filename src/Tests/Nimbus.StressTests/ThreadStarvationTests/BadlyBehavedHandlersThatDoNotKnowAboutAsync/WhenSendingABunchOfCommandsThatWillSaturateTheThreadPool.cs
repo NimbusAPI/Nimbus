@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
@@ -16,10 +16,10 @@ using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync
 {
-    [Timeout(_timeoutSeconds*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
-        private const int _timeoutSeconds = 180;
+        public const int TimeoutSeconds = 15;
 
         private ILogger _logger;
         private int _numMessagesToSend;
@@ -51,7 +51,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task When()
         {
-            _numMessagesToSend = (Environment.ProcessorCount*2)*Environment.ProcessorCount;
+            _numMessagesToSend = new ConcurrentHandlerLimitSetting().Default;
 
             var commands = Enumerable.Range(0, _numMessagesToSend)
                                      .Select(j => new CommandThatWillBlockTheThread())
@@ -59,7 +59,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
             await Subject.SendAll(commands);
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
         }
 
         [Test]

@@ -1,18 +1,22 @@
-using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.ConcurrentCollections;
+using Nimbus.Configuration.Settings;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
-    internal class InProcessQueueReceiver : INimbusMessageReceiver
+    internal class InProcessQueueReceiver : ThrottlingMessageReceiver
     {
         private readonly string _queuePath;
-        private readonly BlockingCollection<NimbusMessage> _messageQueue;
-        private CancellationTokenSource _cancellationTokenSource;
+        private readonly AsyncBlockingCollection<NimbusMessage> _messageQueue;
 
-        public InProcessQueueReceiver(string queuePath, BlockingCollection<NimbusMessage> messageQueue)
+        public InProcessQueueReceiver(string queuePath,
+                                      AsyncBlockingCollection<NimbusMessage> messageQueue,
+                                      ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                      IGlobalHandlerThrottle globalHandlerThrottle,
+                                      ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queuePath = queuePath;
             _messageQueue = messageQueue;
@@ -23,41 +27,15 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return _queuePath;
         }
 
-        public Task Start(Func<NimbusMessage, Task> callback)
+        protected override Task WarmUp()
         {
-            return Task.Run(() =>
-                            {
-                                _cancellationTokenSource = new CancellationTokenSource();
-                                Task.Run(() => ReceiveMessages(callback));
-                            });
+            return Task.Delay(0);
         }
 
-        public Task Stop()
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
-                            {
-                                if (_cancellationTokenSource == null) return;
-                                _cancellationTokenSource.Cancel();
-                                _cancellationTokenSource = null;
-                            });
-        }
-
-        private async Task ReceiveMessages(Func<NimbusMessage, Task> callback)
-        {
-            var cancellationTokenSource = _cancellationTokenSource;
-            if (cancellationTokenSource == null) return; // already cancelled
-
-            while (!cancellationTokenSource.IsCancellationRequested)
-            {
-                try
-                {
-                    var nimbusMessage = _messageQueue.Take(cancellationTokenSource.Token);
-                    await callback(nimbusMessage);
-                }
-                catch (OperationCanceledException)
-                {
-                }
-            }
+            var nimbusMessage = await _messageQueue.Take(cancellationToken);
+            return nimbusMessage;
         }
     }
 }

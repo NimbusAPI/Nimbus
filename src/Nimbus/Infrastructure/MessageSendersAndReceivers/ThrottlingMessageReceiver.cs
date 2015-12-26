@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
@@ -12,8 +13,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly IGlobalHandlerThrottle _globalHandlerThrottle;
         private bool _running;
 
-        private Task _workerTask;
-        private readonly SemaphoreSlim _throttle;
+        private Task[] _workerTasks;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -22,7 +22,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             ConcurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
             _globalHandlerThrottle = globalHandlerThrottle;
-            _throttle = new SemaphoreSlim(concurrentHandlerLimit, concurrentHandlerLimit);
         }
 
         public async Task Start(Func<NimbusMessage, Task> callback)
@@ -37,9 +36,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 await WarmUp();
 
                 _cancellationTokenSource = new CancellationTokenSource();
-                var cancellationTask = Task.Run(() => { _cancellationTokenSource.Token.WaitHandle.WaitOne(); }, _cancellationTokenSource.Token);
 
-                _workerTask = Task.Run(() => Worker(callback, cancellationTask));
+                _workerTasks = Enumerable.Range(0, ConcurrentHandlerLimit)
+                                         .Select(i => Task.Run(() => Worker(callback), _cancellationTokenSource.Token))
+                                         .ToArray();
             }
             finally
             {
@@ -59,16 +59,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 _cancellationTokenSource.Cancel();
                 _cancellationTokenSource = null;
 
-                var workerTask = _workerTask;
-                _workerTask = null;
-                if (workerTask != null) await workerTask;
-
-                // wait for all our existing tasks to complete
-                //FIXME a bit ick..
-                while (_throttle.CurrentCount < ConcurrentHandlerLimit)
-                {
-                    await Task.Delay(TimeSpan.FromMilliseconds(100));
-                }
+                var workerTasks = _workerTasks.ToArray();
+                _workerTasks = null;
+                await Task.WhenAll(workerTasks);
             }
             finally
             {
@@ -78,32 +71,22 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         protected abstract Task WarmUp();
 
-        protected abstract Task<NimbusMessage> Fetch(Task cancellationTask);
+        protected abstract Task<NimbusMessage> Fetch(CancellationToken cancellationToken);
 
-        private async Task Worker(Func<NimbusMessage, Task> callback, Task cancellationTask)
+        private async Task Worker(Func<NimbusMessage, Task> callback)
         {
             while (_running)
             {
                 try
                 {
+                    var message = await Fetch(_cancellationTokenSource.Token);
+                    if (message == null) continue;
+
                     await _globalHandlerThrottle.Wait(_cancellationTokenSource.Token);
                     try
                     {
-                        await _throttle.WaitAsync(_cancellationTokenSource.Token);
-                        try
-                        {
-                            if (!_running) break;
-
-                            var message = await Fetch(cancellationTask);
-                            if (message == null) continue;
-
-                            GlobalMessageCounters.IncrementReceivedMessageCount(1);
-                            await callback(message);
-                        }
-                        finally
-                        {
-                            _throttle.Release();
-                        }
+                        GlobalMessageCounters.IncrementReceivedMessageCount(1);
+                        await callback(message);
                     }
                     finally
                     {
@@ -113,11 +96,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 catch (OperationCanceledException)
                 {
                     // will be thrown when someone calls .Stop() on us
+                    break;
                 }
                 catch (Exception exc)
                 {
                     _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, this);
                 }
+
+                if (!_running) break;
+                if (_cancellationTokenSource.IsCancellationRequested) break;
             }
         }
 
@@ -142,8 +129,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             catch (ObjectDisposedException)
             {
             }
-
-            _throttle.Dispose();
         }
     }
 }

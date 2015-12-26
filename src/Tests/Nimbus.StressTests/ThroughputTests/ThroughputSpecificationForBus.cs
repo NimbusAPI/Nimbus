@@ -26,7 +26,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
         {
-            busBuilderConfiguration.WithLogger(new NullLogger());
+            //busBuilderConfiguration.WithLogger(new NullLogger());
             Bus = busBuilderConfiguration.Build();
             await Bus.Start();
         }

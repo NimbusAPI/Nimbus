@@ -7,7 +7,6 @@ using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
@@ -17,11 +16,10 @@ using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 {
-    [Timeout(_timeoutSeconds*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenCreatingALargeMessageCascade : SpecificationForAsync<Bus>
     {
-        private const int _timeoutSeconds = 300;
-        private static readonly TimeSpan _messageLockDuration = TimeSpan.FromSeconds(30);
+        public const int TimeoutSeconds = 300;
         public const int NumberOfDoThingACommands = 10;
 
         private const int _expectedMessageCount = NumberOfDoThingACommands*ThingAHappenedEventHandler.NumberOfDoThingBCommands*ThingBHappenedEventHandler.NumberOfDoThingCCommands;
@@ -63,7 +61,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
             await Task.WhenAll(tasks);
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
         }
 
         [Test]

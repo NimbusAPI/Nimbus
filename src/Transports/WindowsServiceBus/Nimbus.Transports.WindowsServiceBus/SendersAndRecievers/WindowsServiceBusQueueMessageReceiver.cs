@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -41,13 +42,15 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             await GetMessageReceiver();
         }
 
-        protected override async Task<NimbusMessage> Fetch(Task cancellationTask)
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             try
             {
                 var messageReceiver = await GetMessageReceiver();
 
                 var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300));
+                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken);
+
                 await Task.WhenAny(receiveTask, cancellationTask);
                 if (cancellationTask.IsCompleted) return null;
 
