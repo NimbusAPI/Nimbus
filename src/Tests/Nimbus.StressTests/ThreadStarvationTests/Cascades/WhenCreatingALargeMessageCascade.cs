@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -54,19 +55,15 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
         {
             Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof (DoThingCCommand).Name);
 
-            var tasks = Enumerable.Range(0, NumberOfDoThingACommands)
-                                  .AsParallel()
-                                  .Select(i => Subject.Send(new DoThingACommand()))
-                                  .ToArray();
-
-            await Task.WhenAll(tasks);
-
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
+            await Enumerable.Range(0, NumberOfDoThingACommands)
+                            .Select(i => Subject.Send(new DoThingACommand()))
+                            .WhenAll();
         }
 
         [Test]
         public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
             MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(_expectedMessageCount);
         }
     }
