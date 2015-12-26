@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone"
                           };
 
-            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(1)))
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2)))
                 .Take(2)
                 .ToArray();
         }
@@ -45,7 +45,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
             await Given(busBuilderConfiguration);
             await When();
 
-            await TimeSpan.FromSeconds(1).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
+            await TimeSpan.FromSeconds(2).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
     }
