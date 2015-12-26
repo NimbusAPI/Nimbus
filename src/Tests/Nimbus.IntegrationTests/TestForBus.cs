@@ -33,7 +33,8 @@ namespace Nimbus.IntegrationTests
 
             bus?.Dispose();
 
-            var testStatus = TestContext.CurrentContext.Result.Status;
+            var testContext = TestContext.CurrentContext;
+            var testStatus = testContext.Result.Status;
             LogEventLevel level;
             switch (testStatus)
             {
@@ -49,7 +50,7 @@ namespace Nimbus.IntegrationTests
                     break;
             }
 
-            Log.Logger.Write(level, "Test completed with result {TestResult}", testStatus);
+            Log.Logger.Write(level, "Test {TestName} completed with result {TestResult}", testContext.Test.FullName, testStatus);
         }
     }
 }
