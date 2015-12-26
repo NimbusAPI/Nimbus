@@ -13,9 +13,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
+    [Timeout(TimeoutSeconds * 1000)]
     public class WhenSendingACascadeOfCommands : TestForBus
     {
         private const int _numExpectedMessages = 3;
+        public new const int TimeoutSeconds = 30;
 
         private IDispatchContext[] _dispatchContexts;
         private NimbusMessage[] _nimbusMessages;
