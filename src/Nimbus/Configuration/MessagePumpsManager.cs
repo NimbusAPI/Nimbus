@@ -58,7 +58,7 @@ namespace Nimbus.Configuration
                                // pause for a tiny bit here so that if people want messages on the bus immediately then their
                                // _bus.Send/Whatever(...) call can get into the threadpool queue before we flood it with potentially
                                // thousands of other message pump creation tasks.
-                               await Task.Delay(100);
+                               await Task.Delay(0);
 
                                await messagePumpsToHandleInBackground
                                    .Select(pump => Task.Run(() => action(pump)))
