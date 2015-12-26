@@ -10,26 +10,23 @@ namespace Nimbus.ConcurrentCollections
         readonly SemaphoreSlim _itemsSemaphore = new SemaphoreSlim(0, int.MaxValue);
         readonly ConcurrentQueue<T> _items = new ConcurrentQueue<T>();
 
-        public async Task<T> TryTake(TimeSpan timeout, CancellationToken cancellationToken)
+        public Task<T> TryTake(TimeSpan timeout, CancellationToken cancellationToken)
         {
-            try
-            {
-                await _itemsSemaphore.WaitAsync(timeout, cancellationToken);
-                try
-                {
-                    T result;
-                    _items.TryDequeue(out result);
-                    return result;
-                }
-                finally
-                {
-                    _itemsSemaphore.Release();
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                return default(T);
-            }
+            return Task.Run(async () =>
+                                  {
+                                      try
+                                      {
+                                          await _itemsSemaphore.WaitAsync(timeout, cancellationToken);
+                                          T result;
+                                          _items.TryDequeue(out result);
+                                          return result;
+                                      }
+                                      catch (OperationCanceledException)
+                                      {
+                                          return default(T);
+                                      }
+                                  },
+                            cancellationToken);
         }
 
         public Task<T> Take(CancellationToken cancellationToken)
