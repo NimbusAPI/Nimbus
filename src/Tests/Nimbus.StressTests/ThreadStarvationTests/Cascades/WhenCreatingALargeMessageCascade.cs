@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.StressTests.ThreadStarvationTests.Cascades.Handlers;
@@ -27,8 +27,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
         protected override async Task<Bus> Given()
         {
-            var logger = TestHarnessLoggerFactory.Create();
-            //var logger = new NullLogger();
+            //var logger = TestHarnessLoggerFactory.Create();
+            var logger = new NullLogger();
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
@@ -55,15 +55,18 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
         {
             Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof (DoThingCCommand).Name);
 
-            await Enumerable.Range(0, NumberOfDoThingACommands)
-                            .Select(i => Subject.Send(new DoThingACommand()))
-                            .WhenAll();
+            var commands = Enumerable.Range(0, NumberOfDoThingACommands)
+                                     .Select(i => new DoThingACommand())
+                                     .ToArray();
+
+            await Subject.SendAll(commands);
+
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
         }
 
         [Test]
         public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
             MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(_expectedMessageCount);
         }
     }
