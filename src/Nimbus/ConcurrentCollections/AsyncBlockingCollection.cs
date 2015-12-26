@@ -12,22 +12,30 @@ namespace Nimbus.ConcurrentCollections
 
         public async Task<T> TryTake(TimeSpan timeout, CancellationToken cancellationToken)
         {
-            await _itemsSemaphore.WaitAsync(timeout, cancellationToken);
             try
             {
-                T result;
-                _items.TryDequeue(out result);
-                return result;
+                await _itemsSemaphore.WaitAsync(timeout, cancellationToken);
+                try
+                {
+                    T result;
+                    _items.TryDequeue(out result);
+                    return result;
+                }
+                finally
+                {
+                    _itemsSemaphore.Release();
+                }
             }
-            finally
+            catch (OperationCanceledException)
             {
-                _itemsSemaphore.Release();
+                return default(T);
             }
         }
 
         public Task<T> Take(CancellationToken cancellationToken)
         {
-            return TryTake(TimeSpan.MaxValue, cancellationToken);
+            var timeout = TimeSpan.FromTicks(int.MaxValue); // ConcurrentQueue has a different view on TimeSpan.MaxValue than the rest of the world :(
+            return TryTake(timeout, cancellationToken);
         }
 
         public Task Add(T item)
