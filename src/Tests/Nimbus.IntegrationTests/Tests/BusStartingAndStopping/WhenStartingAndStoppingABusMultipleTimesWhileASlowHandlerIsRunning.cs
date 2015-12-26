@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -18,10 +16,11 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
     [Timeout(TimeoutSeconds*1000)]
     public class WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning : TestForBus
     {
+        public new const int TimeoutSeconds = 60;
+
         private SlowCommand[] _commands;
         private Guid[] _sentCommandIds;
-        public const int TimeoutSeconds = 30;
-        private const int _totalCommands = 100;
+        private const int _totalCommands = 50;
 
         protected override async Task When()
         {
@@ -53,14 +52,6 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
 
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             await Bus.Start();
-        }
-
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
-        public async Task NothingShouldGoBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
-        {
-            await Given(busBuilderConfiguration);
-            await When();
         }
 
         [Test]
