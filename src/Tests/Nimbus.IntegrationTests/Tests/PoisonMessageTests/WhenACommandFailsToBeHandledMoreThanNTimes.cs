@@ -33,7 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _goBangCommand = new GoBangCommand(_someContent);
 
             await Bus.Send(_goBangCommand);
-            await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
             _deadLetterMessages = await Bus.DeadLetterOffice.PopAll(1, TimeSpan.FromSeconds(TimeoutSeconds));
         }

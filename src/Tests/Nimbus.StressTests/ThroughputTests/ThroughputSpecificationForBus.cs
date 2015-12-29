@@ -12,9 +12,11 @@ using NUnit.Framework;
 namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
-    [Timeout(60*1000)]
+    [Timeout(TimeoutSeconds * 1000)]
     public abstract class ThroughputSpecificationForBus
     {
+        protected const int TimeoutSeconds = 60;
+
         private Stopwatch _stopwatch;
         private double _messagesPerSecond;
         private double _averageOneWayLatency;
@@ -47,7 +49,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            StressTestMessageHandler.WaitUntilDone(TimeSpan.FromSeconds(60));
+            StressTestMessageHandler.WaitUntilDone(TimeSpan.FromSeconds(TimeoutSeconds));
             _stopwatch.Stop();
 
             Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);

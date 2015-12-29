@@ -14,11 +14,9 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingACascadeOfCommands : TestForBus
     {
         private const int _numExpectedMessages = 3;
-        public new const int TimeoutSeconds = 30;
 
         private IDispatchContext[] _dispatchContexts;
         private NimbusMessage[] _nimbusMessages;
@@ -34,7 +32,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         {
             var someCommand = new FirstCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _numExpectedMessages);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _numExpectedMessages);
 
             _dispatchContexts = TestInterceptor.DispatchContexts.ToArray();
             _nimbusMessages = TestInterceptor.NimbusMessages.ToArray();

@@ -15,14 +15,13 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     public class WhenSendingACommandThatHasAnAbstractBaseType : TestForBus
     {
         protected override async Task When()
         {
             var someCommand = new SomeConcreteCommandType();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]

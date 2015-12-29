@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -15,11 +14,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
     {
         private SomeResponse _response;
 
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
-
         protected override async Task When()
         {
-            _response = await Bus.Request(new SomeRequest(), _timeout);
+            _response = await Bus.Request(new SomeRequest(), TimeSpan.FromSeconds(TimeoutSeconds));
         }
 
         [Test]

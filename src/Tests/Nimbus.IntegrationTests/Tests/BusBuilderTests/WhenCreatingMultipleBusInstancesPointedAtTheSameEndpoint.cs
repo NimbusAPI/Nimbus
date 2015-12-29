@@ -15,9 +15,11 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(120*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
+        protected const int TimeoutSeconds = 120;
+
         private Bus[] _buses;
         private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
 
@@ -56,7 +58,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                                                  .WithDependencyResolver(new DependencyResolver(typeProvider))
                                                  .WithNames("MyTestSuite", Environment.MachineName)
                                                  .WithTypesFrom(typeProvider)
-                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                                  .WithHeartbeatInterval(TimeSpan.MaxValue)
                                                  .WithLogger(_logger)
                                                  .WithDebugOptions(

@@ -18,11 +18,9 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         private const int _expectedTotalCallCount = 11; // 5 interceptors * 2 + 1 handler
-        public const int TimeoutSeconds = 15;
 
         protected override async Task<IBus> Given()
         {
@@ -37,7 +35,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithMaxDeliveryAttempts(1)
                                       .WithGlobalInboundInterceptorTypes(typeof (SomeGlobalInterceptor))
                                       .WithLogger(logger)

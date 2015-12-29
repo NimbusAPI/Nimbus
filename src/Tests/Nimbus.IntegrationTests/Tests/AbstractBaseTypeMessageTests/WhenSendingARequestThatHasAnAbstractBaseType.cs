@@ -23,7 +23,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
             var request = new SomeConcreteRequestType();
             _response = await Bus.Request(request);
 
-            await TimeSpan.FromSeconds(15).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]

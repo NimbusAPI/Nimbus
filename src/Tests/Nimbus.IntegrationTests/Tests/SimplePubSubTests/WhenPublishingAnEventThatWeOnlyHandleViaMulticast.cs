@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             var myEvent = new SomeEventWeOnlyHandleViaMulticast();
             await Bus.Publish(myEvent);
 
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]

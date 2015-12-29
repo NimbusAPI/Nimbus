@@ -20,7 +20,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
     [Timeout(TimeoutSeconds*1000)]
     public class WhenCreatingALargeMessageCascade : SpecificationForAsync<Bus>
     {
-        public const int TimeoutSeconds = 300;
+        public new const int TimeoutSeconds = 300;
         public const int NumberOfDoThingACommands = 10;
 
         private const int _expectedMessageCount = NumberOfDoThingACommands*ThingAHappenedEventHandler.NumberOfDoThingBCommands*ThingBHappenedEventHandler.NumberOfDoThingCCommands;
@@ -39,7 +39,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(logger)
                                       .WithDebugOptions(
                                           dc =>

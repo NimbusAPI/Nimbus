@@ -15,7 +15,6 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     internal class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
     {
         private Guid _id;
@@ -38,7 +37,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             _bytes = Encoding.UTF8.GetBytes(Enumerable.Range(0, 1024).Select(i => '.').ToArray());
             _expiresAfter = DateTimeOffset.UtcNow.AddDays(1);
 
-            using (new AssertingStopwatch("Store", TimeSpan.FromSeconds(10)))
+            using (new AssertingStopwatch("Store", TimeSpan.FromSeconds(TimeoutSeconds)))
             {
                 _storageKey = await Subject.Store(_id, _bytes, _expiresAfter);
             }
@@ -49,7 +48,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         [Test]
         public async Task TheRetrievedValueShouldBeTheSameAsTheStoredValue()
         {
-            using (new AssertingStopwatch("Retrieve", TimeSpan.FromSeconds(10)))
+            using (new AssertingStopwatch("Retrieve", TimeSpan.FromSeconds(TimeoutSeconds)))
             {
                 var retrieved = await Subject.Retrieve(_storageKey);
                 retrieved.ShouldBe(_bytes);

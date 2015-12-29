@@ -16,11 +16,8 @@ using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync
 {
-    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
-        public const int TimeoutSeconds = 15;
-
         private ILogger _logger;
         private int _numMessagesToSend;
 
@@ -37,7 +34,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(_logger)
                                       .WithDebugOptions(
                                           dc =>

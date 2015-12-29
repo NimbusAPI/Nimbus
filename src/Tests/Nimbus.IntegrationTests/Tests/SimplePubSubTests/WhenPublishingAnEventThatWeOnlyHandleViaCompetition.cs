@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -24,8 +22,6 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             await Bus.Publish(myEvent);
-
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
@@ -34,6 +30,11 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() =>
+                                         MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
+                                                          .Any());
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
                              .Count()
@@ -47,6 +48,11 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             await Given(scenario);
             await When();
 
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() => MethodCallCounter.AllReceivedMessages
+                                                            .OfType<SomeEventWeOnlyHandleViaCompetition>()
+                                                            .Any());
+
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaCompetition>()
                              .Count()
@@ -59,6 +65,10 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() => MethodCallCounter.AllReceivedMessages
+                                                            .Any());
 
             MethodCallCounter.AllReceivedMessages
                              .Count()
