@@ -11,14 +11,13 @@ using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
+namespace Nimbus.StressTests.StartupPerformanceTests
 {
     [TestFixture]
     [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
