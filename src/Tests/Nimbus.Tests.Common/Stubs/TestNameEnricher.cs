@@ -8,10 +8,16 @@ namespace Nimbus.Tests.Common.Stubs
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            var testName = TestContext.CurrentContext?.Test.FullName;
-            if (testName == null) return;
+            try
+            {
+                var testName = TestContext.CurrentContext?.Test.FullName;
+                if (testName == null) return;
 
-            logEvent.AddOrUpdateProperty(new LogEventProperty("TestName", new ScalarValue(testName)));
+                logEvent.AddOrUpdateProperty(new LogEventProperty("TestName", new ScalarValue(testName)));
+            }
+            catch
+            {
+            }
         }
     }
 }
