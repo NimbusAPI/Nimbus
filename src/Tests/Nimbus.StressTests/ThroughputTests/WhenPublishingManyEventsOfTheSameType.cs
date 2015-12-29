@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
 using NUnit.Framework;
@@ -10,11 +10,12 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         public override async Task SendMessages(IBus bus)
         {
-            for (var i = 0; i < NumMessagesToSend/2; i++)
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < SendMessagesFor)
             {
                 await bus.Publish(new FooEvent());
+                ExpectToReceiveMessages(2);
             }
-            Console.WriteLine();
         }
     }
 }

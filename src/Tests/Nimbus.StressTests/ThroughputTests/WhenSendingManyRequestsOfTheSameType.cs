@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
@@ -11,17 +12,14 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         public override async Task SendMessages(IBus bus)
         {
-            var batchSize = 100;
+            const int batchSize = 10;
 
-            var messageCount = 0;
-
-            while (messageCount < NumMessagesToSend)
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < SendMessagesFor)
             {
                 var tasks = new List<Task>();
                 for (var i = 0; i < batchSize; i++)
                 {
-                    if (messageCount >= NumMessagesToSend) break;
-
                     var task = Task.Run(async () =>
                                               {
                                                   var response = await bus.Request(new FooRequest());
@@ -29,9 +27,10 @@ namespace Nimbus.StressTests.ThroughputTests
                                               });
 
                     tasks.Add(task);
-                    messageCount++;
                 }
                 await Task.WhenAll(tasks);
+
+                ExpectToReceiveMessages(batchSize);
             }
         }
     }

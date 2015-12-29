@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
@@ -9,18 +9,16 @@ namespace Nimbus.StressTests.ThroughputTests
     [TestFixture]
     public class WhenPublishingManyEventsOfDifferentTypes : ThroughputSpecificationForBus
     {
-        public override Task SendMessages(IBus bus)
+        public override async Task SendMessages(IBus bus)
         {
-            var messages = new List<IBusEvent>();
-            for (var i = 0; i < NumMessagesToSend/8; i++) // /8 because we'll see each event once via multicast and once via competition
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < SendMessagesFor)
             {
-                messages.Add(new FooEvent());
-                messages.Add(new BarEvent());
-                messages.Add(new BazEvent());
-                messages.Add(new QuxEvent());
-            }
+                var messages = new IBusEvent[] {new FooEvent(), new BarEvent(), new BazEvent(), new QuxEvent()};
+                await bus.PublishAll(messages);
 
-            return bus.PublishAll(messages);
+                ExpectToReceiveMessages(8);
+            }
         }
     }
 }
