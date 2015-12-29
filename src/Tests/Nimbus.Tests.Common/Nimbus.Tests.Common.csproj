@@ -127,7 +127,6 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\InProcess.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\WindowsServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
-    <Compile Include="TestUtilities\AssertingStopwatch.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
     <Compile Include="TestUtilities\MethodCallCounter.cs" />
