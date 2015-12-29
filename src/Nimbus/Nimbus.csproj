@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="BackwardCompatibilityAdaptorExtensions.cs" />
     <Compile Include="BatchSendingExtensions.cs" />
+    <Compile Include="ConcurrentCollections\AsyncBlockingCollection.cs" />
     <Compile Include="ConcurrentCollections\RoundRobin.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeLazy.cs" />

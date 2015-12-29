@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.TestUtilities;
 
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers
@@ -13,11 +12,11 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
         {
             MethodCallCounter.RecordCall<SlowBlackBallRequestHandler>(handler => handler.Handle(request));
 
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(2));
 
             return new BlackBallResponse
                    {
-                       IsBlackBalled = false,
+                       IsBlackBalled = false
                    };
         }
     }

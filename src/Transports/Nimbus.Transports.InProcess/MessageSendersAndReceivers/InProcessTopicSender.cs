@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
@@ -18,24 +17,21 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             _messageStore = messageStore;
         }
 
-        public Task Send(NimbusMessage message)
+        public async Task Send(NimbusMessage message)
         {
-            return Task.Run(() =>
-                            {
-                                var clone = Clone(message);
-                                var topicQueue = _messageStore.GetMessageQueue(_topic.TopicPath);
-                                topicQueue.Add(clone);
+            var clone = Clone(message);
+            var topicQueue = _messageStore.GetMessageQueue(_topic.TopicPath);
+            await topicQueue.Add(clone);
 
-                                _topic.SubscriptionNames
-                                      .Do(subscriptionName =>
-                                          {
-                                              var messageClone = Clone(message);
-                                              var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
-                                              var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
-                                              subscriptionQueue.Add(messageClone);
-                                          })
-                                      .Done();
-                            });
+            _topic.SubscriptionNames
+                  .Do(async subscriptionName =>
+                            {
+                                var messageClone = Clone(message);
+                                var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
+                                var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
+                                await subscriptionQueue.Add(messageClone);
+                            })
+                  .Done();
         }
 
         private NimbusMessage Clone(NimbusMessage message)

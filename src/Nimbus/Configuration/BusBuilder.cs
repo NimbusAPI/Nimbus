@@ -47,7 +47,7 @@ namespace Nimbus.Configuration
                                 if (removeAllExistingElements)
                                 {
                                     var cleanser = container.Resolve<INamespaceCleanser>();
-                                    cleanser.RemoveAllExistingNamespaceElements();
+                                    cleanser.RemoveAllExistingNamespaceElements().Wait();
                                 }
                             };
             bus.Disposing += delegate { container.Dispose(); };

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
@@ -10,19 +11,28 @@ namespace Nimbus.IntegrationTests
     [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
-        protected const int TimeoutSeconds = 10;
+        protected const int TimeoutSeconds = 60;
 
+        protected ScenarioInstance<BusBuilderConfiguration> Instance { get; private set; }
         protected Bus Bus { get; private set; }
 
-        protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             MethodCallCounter.Clear();
 
-            Bus = busBuilderConfiguration.Build();
+            Instance = scenario.CreateInstance();
+
+            Bus = Instance.Configuration.Build();
             await Bus.Start();
         }
 
         protected abstract Task When();
+
+        [SetUp]
+        public void SetUp()
+        {
+            TestLoggingExtensions.LogTestStart();
+        }
 
         [TearDown]
         public void TearDown()
@@ -30,7 +40,13 @@ namespace Nimbus.IntegrationTests
             var bus = Bus;
             Bus = null;
 
+            bus?.Stop().Wait();
             bus?.Dispose();
+
+            Instance?.Dispose();
+            Instance = null;
+
+            TestLoggingExtensions.LogTestResult();
         }
     }
 }

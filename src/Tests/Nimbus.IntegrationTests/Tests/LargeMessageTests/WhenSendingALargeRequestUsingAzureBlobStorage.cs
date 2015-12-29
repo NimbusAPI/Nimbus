@@ -7,7 +7,6 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.Azure.Client;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Transports.WindowsServiceBus;
@@ -17,7 +16,6 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(30*1000)]
     public class WhenSendingALargeRequestUsingAzureBlobStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
@@ -39,7 +37,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(TestHarnessLoggerFactory.Create())
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
@@ -56,7 +54,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                           {
                               SomeBigQuestion = bigQuestion
                           };
-            _response = await Subject.Request(_busRequest, TimeSpan.FromSeconds(60));
+            _response = await Subject.Request(_busRequest, TimeSpan.FromSeconds(TimeoutSeconds));
         }
 
         [Test]

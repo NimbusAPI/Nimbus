@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -23,16 +22,19 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             var myEvent = new SomeEventWeOnlyHandleViaCompetition();
             await Bus.Publish(myEvent);
-
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() =>
+                                         MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
+                                                          .Any());
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaCompetition) null))
                              .Count()
@@ -41,10 +43,15 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() => MethodCallCounter.AllReceivedMessages
+                                                            .OfType<SomeEventWeOnlyHandleViaCompetition>()
+                                                            .Any());
 
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeOnlyHandleViaCompetition>()
@@ -54,10 +61,14 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaCompetition>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() => MethodCallCounter.AllReceivedMessages
+                                                            .Any());
 
             MethodCallCounter.AllReceivedMessages
                              .Count()

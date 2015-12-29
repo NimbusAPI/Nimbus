@@ -54,13 +54,13 @@
       <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.4.14\lib\net45\Serilog.dll</HintPath>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog.FullNetFx, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.4.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly, Version=1.1.1.1, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -82,7 +82,6 @@
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />
     <Compile Include="TestConfiguration.cs" />
-    <Compile Include="TestHarnessBusFactory.cs" />
     <Compile Include="Conventions\AllIntegrationTests.cs" />
     <Compile Include="TestForBus.cs" />
     <Compile Include="Tests\AbstractBaseTypeMessageTests\Handlers\SomeConcreteCommandTypeHandler.cs" />
@@ -162,12 +161,12 @@
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\FirstCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\ThirdCommandHandler.cs" />

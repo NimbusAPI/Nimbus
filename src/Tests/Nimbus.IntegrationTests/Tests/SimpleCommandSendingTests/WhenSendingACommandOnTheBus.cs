@@ -6,6 +6,7 @@ using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -25,9 +26,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
-        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
@@ -35,9 +36,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);

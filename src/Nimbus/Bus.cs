@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
@@ -49,38 +50,38 @@ namespace Nimbus
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {
-            return _commandSender.Send(busCommand).ConfigureAwaitFalse();
+            return Task.Run(() => _commandSender.Send(busCommand)).ConfigureAwaitFalse();
         }
 
         public Task SendAt<TBusCommand>(TBusCommand busCommand, DateTimeOffset deliveryTime) where TBusCommand : IBusCommand
         {
-            return _commandSender.SendAt(busCommand, deliveryTime).ConfigureAwaitFalse();
+            return Task.Run(() => _commandSender.SendAt(busCommand, deliveryTime)).ConfigureAwaitFalse();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return _requestSender.SendRequest(busRequest).ConfigureAwaitFalse();
+            return Task.Run(() => _requestSender.SendRequest(busRequest)).ConfigureAwaitFalse();
         }
 
         public Task<TResponse> Request<TRequest, TResponse>(IBusRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusRequest<TRequest, TResponse>
             where TResponse : IBusResponse
         {
-            return _requestSender.SendRequest(busRequest, timeout).ConfigureAwaitFalse();
+            return Task.Run(() => _requestSender.SendRequest(busRequest, timeout)).ConfigureAwaitFalse();
         }
 
         public Task<IEnumerable<TResponse>> MulticastRequest<TRequest, TResponse>(IBusMulticastRequest<TRequest, TResponse> busRequest, TimeSpan timeout)
             where TRequest : IBusMulticastRequest<TRequest, TResponse>
             where TResponse : IBusMulticastResponse
         {
-            return _multicastRequestSender.SendRequest(busRequest, timeout).ConfigureAwaitFalse();
+            return Task.Run(() => _multicastRequestSender.SendRequest(busRequest, timeout)).ConfigureAwaitFalse();
         }
 
         public Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent
         {
-            return _eventSender.Publish(busEvent).ConfigureAwaitFalse();
+            return Task.Run(() => _eventSender.Publish(busEvent)).ConfigureAwaitFalse();
         }
 
         public IDeadLetterOffice DeadLetterOffice { get; }
@@ -101,6 +102,7 @@ namespace Nimbus
                                       }
 
                                       _logger.Debug("Bus starting...");
+                                      var sw = Stopwatch.StartNew();
 
                                       try
                                       {
@@ -118,7 +120,8 @@ namespace Nimbus
                                       var startedHandler = Started;
                                       startedHandler?.Invoke(this, EventArgs.Empty);
 
-                                      _logger.Info("Bus started.");
+                                      sw.Stop();
+                                      _logger.Info("Bus started in {Elapsed}.", sw.Elapsed);
                                   }).ConfigureAwaitFalse();
         }
 
@@ -133,6 +136,7 @@ namespace Nimbus
                                       }
 
                                       _logger.Debug("Bus stopping...");
+                                      var sw = Stopwatch.StartNew();
 
                                       try
                                       {
@@ -149,7 +153,8 @@ namespace Nimbus
                                       var stoppedHandler = Stopped;
                                       stoppedHandler?.Invoke(this, EventArgs.Empty);
 
-                                      _logger.Info("Bus stopped.");
+                                      sw.Stop();
+                                      _logger.Info("Bus stopped in {Elapsed}.", sw.Elapsed);
                                   }).ConfigureAwaitFalse();
         }
 

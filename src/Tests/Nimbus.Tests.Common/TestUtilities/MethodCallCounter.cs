@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
+using Serilog;
 
 namespace Nimbus.Tests.Common.TestUtilities
 {
@@ -40,7 +41,7 @@ namespace Nimbus.Tests.Common.TestUtilities
             methodCallBag.Add(args.ToArray());
 
             var callCount = Interlocked.Increment(ref _callCount);
-            Console.WriteLine("{0:00000} | Observed call to {1}".FormatWith(callCount, key));
+            Log.Information("Observed call {CallCount} to {HandlerMethod}", callCount, key);
         }
 
         public static IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls

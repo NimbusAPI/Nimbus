@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -44,17 +45,19 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             await GetSubscriptionClient();
         }
 
-        protected override async Task<NimbusMessage> Fetch(Task cancellationTask)
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             try
             {
                 var subscriptionClient = await GetSubscriptionClient();
 
                 var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300));
+                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken);
                 await Task.WhenAny(receiveTask, cancellationTask);
                 if (cancellationTask.IsCompleted) return null;
 
                 var brokeredMessage = await receiveTask;
+                if (brokeredMessage == null) return null;
 
                 var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
 
@@ -85,7 +88,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             if (subscriptionClient == null) return;
             if (subscriptionClient.IsClosed) return;
 
-            subscriptionClient.Close();
+            try
+            {
+                subscriptionClient.Close();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc, "An exception occurred while closing a SubscriptionClient.");
+            }
         }
 
         protected override void Dispose(bool disposing)

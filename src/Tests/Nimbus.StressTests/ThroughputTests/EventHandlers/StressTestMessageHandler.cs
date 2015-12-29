@@ -25,11 +25,10 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
         public static ConcurrentBag<StressTestMessage> Messages { get; private set; } = new ConcurrentBag<StressTestMessage>();
         public static ConcurrentBag<StressTestResponseMessage> ResponseMessages { get; private set; } = new ConcurrentBag<StressTestResponseMessage>();
 
-        public static void Reset(int expectedNumMessagesReceived)
+        public static void Reset()
         {
             Messages = new ConcurrentBag<StressTestMessage>();
             ResponseMessages = new ConcurrentBag<StressTestResponseMessage>();
-            ExpectedNumMessagesReceived = expectedNumMessagesReceived;
         }
 
         public async Task Handle(FooEvent busEvent)
@@ -82,16 +81,15 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
                    };
         }
 
-        public static int ExpectedNumMessagesReceived { get; private set; }
         public static int ActualNumMessagesReceived => Messages.Count;
 
-        public static void WaitUntilDone(TimeSpan timeout)
+        public static void WaitUntilDone(int expectedNumMessagesReceived, TimeSpan timeout)
         {
             var sw = Stopwatch.StartNew();
             while (true)
             {
                 if (sw.Elapsed >= timeout) return;
-                if (ActualNumMessagesReceived >= ExpectedNumMessagesReceived) return;
+                if (ActualNumMessagesReceived >= expectedNumMessagesReceived) return;
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
         }

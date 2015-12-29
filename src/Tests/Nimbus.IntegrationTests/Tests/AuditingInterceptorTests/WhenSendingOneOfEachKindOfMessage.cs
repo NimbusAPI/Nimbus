@@ -6,7 +6,6 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
@@ -17,13 +16,8 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingOneOfEachKindOfMessage : SpecificationForAsync<IBus>
     {
-        private const int _timeoutSeconds = 5;
-
-        private object[] _allAuditedMessages;
-
         protected override async Task<IBus> Given()
         {
             MethodCallCounter.Clear();
@@ -42,7 +36,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(dependencyResolver)
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithMaxDeliveryAttempts(1)
                                       .WithHeartbeatInterval(TimeSpan.MaxValue)
                                       .WithGlobalOutboundInterceptorTypes(typeof (OutboundAuditingInterceptor))
@@ -67,67 +61,76 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                 Subject.MulticastRequest(new SomeMulticastRequest(), TimeSpan.FromSeconds(1)),
                 Subject.Publish(new SomeEvent())
                 );
+        }
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
-            MethodCallCounter.Stop();
-
-            _allAuditedMessages = MethodCallCounter.AllReceivedMessages
-                                                   .OfType<AuditEvent>()
-                                                   .Select(ae => ae.MessageBody)
-                                                   .ToArray();
+        private static object[] AllAuditedMessages()
+        {
+            return MethodCallCounter.AllReceivedMessages
+                                    .OfType<AuditEvent>()
+                                    .Select(ae => ae.MessageBody)
+                                    .ToArray();
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeCommand()
         {
-            _allAuditedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeCommand>().Count() == 1);
+            AllAuditedMessages().OfType<SomeCommand>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeCommandSentViaDelay()
         {
-            _allAuditedMessages.OfType<SomeCommandSentViaDelay>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeCommandSentViaDelay>().Count() == 1);
+            AllAuditedMessages().OfType<SomeCommandSentViaDelay>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeRequest()
         {
-            _allAuditedMessages.OfType<SomeRequest>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeRequest>().Count() == 1);
+            AllAuditedMessages().OfType<SomeRequest>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeResponse()
         {
-            _allAuditedMessages.OfType<SomeResponse>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeResponse>().Count() == 1);
+            AllAuditedMessages().OfType<SomeResponse>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeMulticastRequest()
         {
-            _allAuditedMessages.OfType<SomeMulticastRequest>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeMulticastRequest>().Count() == 1);
+            AllAuditedMessages().OfType<SomeMulticastRequest>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeMulticastResponse()
         {
-            _allAuditedMessages.OfType<SomeMulticastResponse>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeMulticastResponse>().Count() == 1);
+            AllAuditedMessages().OfType<SomeMulticastResponse>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeAnAuditRecordForSomeEvent()
         {
-            _allAuditedMessages.OfType<SomeEvent>().Count().ShouldBe(1);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => AllAuditedMessages().OfType<SomeEvent>().Count() == 1);
+            AllAuditedMessages().OfType<SomeEvent>().Count().ShouldBe(1);
         }
 
         [Test]
         public async Task ThereShouldBeATotalOfSevenAuditRecords()
         {
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
             MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(7);
         }
 
         [Test]
         public async Task ThereShouldBeATotalOfSevenRecordedHandlerCalls()
         {
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
             MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
         }
     }

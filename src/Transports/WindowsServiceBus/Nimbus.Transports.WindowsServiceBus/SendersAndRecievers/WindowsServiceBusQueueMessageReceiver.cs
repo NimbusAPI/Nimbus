@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
@@ -41,17 +42,20 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             await GetMessageReceiver();
         }
 
-        protected override async Task<NimbusMessage> Fetch(Task cancellationTask)
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             try
             {
                 var messageReceiver = await GetMessageReceiver();
 
                 var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300));
+                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken);
+
                 await Task.WhenAny(receiveTask, cancellationTask);
                 if (cancellationTask.IsCompleted) return null;
 
                 var brokeredMessage = await receiveTask;
+                if (brokeredMessage == null) return null;
 
                 var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
                 return nimbusMessage;
@@ -81,7 +85,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             if (messageReceiver == null) return;
             if (messageReceiver.IsClosed) return;
 
-            messageReceiver.Close();
+            try
+            {
+                messageReceiver.Close();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc, "An exception occurred while closing a MessageReceiver.");
+            }
         }
 
         protected override void Dispose(bool disposing)

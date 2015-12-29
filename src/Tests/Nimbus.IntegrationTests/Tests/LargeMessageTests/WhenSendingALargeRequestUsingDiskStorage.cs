@@ -18,7 +18,6 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     public class WhenSendingALargeRequestUsingDiskStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
@@ -45,7 +44,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(logger)
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))

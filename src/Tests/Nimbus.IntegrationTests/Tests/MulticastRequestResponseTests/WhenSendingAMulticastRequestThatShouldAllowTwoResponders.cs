@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -23,16 +24,16 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone"
                           };
 
-            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(1)))
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2)))
                 .Take(2)
                 .ToArray();
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
-        public async Task WeShouldReceiveTwoResponses(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task WeShouldReceiveTwoResponses(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _response.Count().ShouldBe(2);
@@ -40,12 +41,12 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowTwoResponders>))]
-        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
-            await TimeSpan.FromSeconds(1).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
+            await TimeSpan.FromSeconds(2).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
     }

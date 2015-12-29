@@ -59,14 +59,22 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
         {
-            EnsureQueueExists(queuePath);
-            return _messagingFactory().CreateMessageSenderAsync(queuePath);
+            return Task.Run(async () =>
+                                  {
+                                      EnsureQueueExists(queuePath);
+                                      var messageSender = await _messagingFactory().CreateMessageSenderAsync(queuePath);
+                                      return messageSender;
+                                  }).ConfigureAwaitFalse();
         }
 
         public Task<MessageReceiver> CreateMessageReceiver(string queuePath)
         {
-            EnsureQueueExists(queuePath);
-            return _messagingFactory().CreateMessageReceiverAsync(queuePath, ReceiveMode.ReceiveAndDelete);
+            return Task.Run(async () =>
+                                  {
+                                      EnsureQueueExists(queuePath);
+                                      var receiverAsync = await _messagingFactory().CreateMessageReceiverAsync(queuePath, ReceiveMode.ReceiveAndDelete);
+                                      return receiverAsync;
+                                  }).ConfigureAwaitFalse();
         }
 
         public Task<TopicClient> CreateTopicSender(string topicPath)
@@ -74,8 +82,9 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureTopicExists(topicPath);
-                                return _messagingFactory().CreateTopicClient(topicPath);
-                            });
+                                var topicClient = _messagingFactory().CreateTopicClient(topicPath);
+                                return topicClient;
+                            }).ConfigureAwaitFalse();
         }
 
         public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
@@ -83,8 +92,9 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureSubscriptionExists(topicPath, subscriptionName);
-                                return _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
-                            });
+                                var subscriptionClient = _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                return subscriptionClient;
+                            }).ConfigureAwaitFalse();
         }
 
         public Task<MessageSender> CreateDeadQueueMessageSender()
@@ -286,7 +296,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                     if (!exc.Message.Contains("SubCode=40901")) throw;
 
                     // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
-                    if (!_namespaceManager().QueueExists(queuePath)) throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
+                    if (!_namespaceManager().QueueExists(queuePath))
+                        throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
                 }
 
                 _knownQueues.Value.Add(queuePath);

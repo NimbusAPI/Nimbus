@@ -6,6 +6,7 @@ using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContract
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -14,21 +15,20 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     public class WhenSendingACommandThatHasAnAbstractBaseType : TestForBus
     {
         protected override async Task When()
         {
             var someCommand = new SomeConcreteCommandType();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
-        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages.OfType<SomeConcreteCommandType>().Count().ShouldBe(1);
@@ -36,9 +36,9 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasAnAbstractBaseType>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);

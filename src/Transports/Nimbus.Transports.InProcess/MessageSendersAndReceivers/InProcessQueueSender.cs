@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
@@ -17,14 +16,11 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             _messageStore = messageStore;
         }
 
-        public Task Send(NimbusMessage message)
+        public async Task Send(NimbusMessage message)
         {
-            return Task.Run(() =>
-                            {
-                                var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
-                                var messageQueue = _messageStore.GetMessageQueue(_queue.QueuePath);
-                                messageQueue.Add(messageClone);
-                            }).ConfigureAwaitFalse();
+            var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
+            var messageQueue = _messageStore.GetMessageQueue(_queue.QueuePath);
+            await messageQueue.Add(messageClone);
         }
     }
 }

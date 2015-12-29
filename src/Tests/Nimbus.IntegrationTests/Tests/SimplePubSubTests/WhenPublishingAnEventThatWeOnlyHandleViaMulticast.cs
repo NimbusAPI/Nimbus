@@ -7,6 +7,7 @@ using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -24,14 +25,14 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
             var myEvent = new SomeEventWeOnlyHandleViaMulticast();
             await Bus.Publish(myEvent);
 
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
-        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeOnlyHandleViaMulticast) null))
@@ -41,9 +42,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages
@@ -54,9 +55,9 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeOnlyHandleViaMulticast>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages

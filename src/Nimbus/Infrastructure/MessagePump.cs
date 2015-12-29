@@ -56,9 +56,10 @@ namespace Nimbus.Infrastructure
                 if (_started) return;
                 _started = true;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} starting...", _receiver);
                 await _receiver.Start(Dispatch);
-                _logger.Debug("Message pump for {Receiver} started", _receiver);
+                _logger.Debug("Message pump for {Receiver} started in {Elapsed}", _receiver, sw.Elapsed);
             }
             finally
             {
@@ -75,9 +76,10 @@ namespace Nimbus.Infrastructure
                 if (!_started) return;
                 _started = false;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} stopping...", _receiver);
                 await _receiver.Stop();
-                _logger.Debug("Message pump for {Receiver} stopped.", _receiver);
+                _logger.Debug("Message pump for {Receiver} stopped in {Elapsed}.", _receiver, sw.Elapsed);
             }
             finally
             {
@@ -89,9 +91,14 @@ namespace Nimbus.Infrastructure
         {
             // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
             // bail - it will already have been picked up by someone else.
-            if (message.ExpiresAfter <= _clock.UtcNow)
+            var now = _clock.UtcNow;
+            if (message.ExpiresAfter <= now)
             {
-                _logger.Debug("Message {MessageId} appears to have already expired so we're not dispatching it. Watch out for clock drift between your hosts!", message.MessageId);
+                _logger.Debug(
+                    "Message {MessageId} appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
+                    message.MessageId,
+                    message.ExpiresAfter,
+                    now);
                 await _deadLetterOffice.Post(message);
                 return;
             }
@@ -101,7 +108,7 @@ namespace Nimbus.Infrastructure
                 try
                 {
                     LogInfo("Dispatching", message);
-                    message.RecordDeliveryAttempt(_clock.UtcNow);
+                    message.RecordDeliveryAttempt(now);
                     using (_dispatchContextManager.StartNewDispatchContext(new SubsequentDispatchContext(message)))
                     {
                         await _messageDispatcher.Dispatch(message);

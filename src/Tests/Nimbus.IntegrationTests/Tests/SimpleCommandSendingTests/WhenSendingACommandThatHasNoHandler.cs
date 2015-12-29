@@ -2,6 +2,7 @@
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
@@ -18,9 +19,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandThatHasNoHandler>))]
-        public async Task NothingShouldGoBang(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task NothingShouldGoBang(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
         }
     }

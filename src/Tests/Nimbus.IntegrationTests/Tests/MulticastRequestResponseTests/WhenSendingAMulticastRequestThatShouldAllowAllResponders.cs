@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -29,9 +30,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowAllResponders>))]
-        public async Task WeShouldReceiveThreeResponses(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task WeShouldReceiveThreeResponses(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _response.Count().ShouldBe(3);
@@ -39,9 +40,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowAllResponders>))]
-        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);

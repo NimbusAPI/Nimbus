@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Nimbus.ConcurrentCollections;
-using Nimbus.Infrastructure;
+﻿using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
@@ -8,7 +6,9 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
     {
         private readonly ThreadSafeDictionary<string, Queue> _queues = new ThreadSafeDictionary<string, Queue>();
         private readonly ThreadSafeDictionary<string, Topic> _topics = new ThreadSafeDictionary<string, Topic>();
-        private readonly ThreadSafeDictionary<string, BlockingCollection<NimbusMessage>> _messageQueues = new ThreadSafeDictionary<string, BlockingCollection<NimbusMessage>>();
+
+        private readonly ThreadSafeDictionary<string, AsyncBlockingCollection<NimbusMessage>> _messageQueues =
+            new ThreadSafeDictionary<string, AsyncBlockingCollection<NimbusMessage>>();
 
         public Queue GetQueue(string queuePath)
         {
@@ -20,9 +20,9 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return _topics.GetOrAdd(topicPath, p => new Topic(topicPath));
         }
 
-        public BlockingCollection<NimbusMessage> GetMessageQueue(string path)
+        public AsyncBlockingCollection<NimbusMessage> GetMessageQueue(string path)
         {
-            return _messageQueues.GetOrAdd(path, p => new BlockingCollection<NimbusMessage>());
+            return _messageQueues.GetOrAdd(path, p => new AsyncBlockingCollection<NimbusMessage>());
         }
     }
 }

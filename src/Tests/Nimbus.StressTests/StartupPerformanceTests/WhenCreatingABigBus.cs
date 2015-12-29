@@ -11,14 +11,12 @@ using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
+namespace Nimbus.StressTests.StartupPerformanceTests
 {
     [TestFixture]
     [Explicit("We pay $$ for messages when we're hitting the Azure Message Bus. Let's not run these on CI builds.")]
@@ -43,7 +41,7 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
         [Timeout(10*60*1000)]
         public async Task TheStartupTimeShouldBeAcceptable()
         {
-            const int numMessageTypes = 100;
+            const int numMessageTypes = 50;
 
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
@@ -51,77 +49,54 @@ namespace Nimbus.IntegrationTests.Tests.StartupPerformanceTests
             var typeProvider = new AssemblyScanningTypeProvider(assemblyBuilder);
 
             var firstBus = new BusBuilder().Configure()
-                                           .WithTransport(new WindowsServiceBusTransportConfiguration()
-                                                              .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                                                              .WithServerConnectionCount(100)
-                )
                                            .WithNames("MyTestSuite", Environment.MachineName)
-                                           .WithTypesFrom(typeProvider)
-                                           .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                           .WithDefaults(typeProvider)
+                                           .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                              .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>()))
                                            .WithLogger(logger)
+                                           .WithDebugOptions(
+                                               dc =>
+                                                   dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                       "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                            .Build();
             try
             {
-                using (new AssertingStopwatch("First bus startup", TimeSpan.FromMinutes(1)))
+                try
                 {
-                    {
-                        try
-                        {
-                            await firstBus.Start(MessagePumpTypes.All);
-                            WriteBlankLines();
-                        }
-                        catch (AggregateException exc)
-                        {
-                            throw exc.Flatten();
-                        }
-                    }
+                    await firstBus.Start(MessagePumpTypes.All);
+                }
+                catch (AggregateException exc)
+                {
+                    throw exc.Flatten();
                 }
             }
             finally
             {
-                WriteBlankLines();
                 firstBus.Dispose();
             }
 
-            WriteBlankLines();
-
             var subsequentBus = new BusBuilder().Configure()
-                                                .WithTransport(new WindowsServiceBusTransportConfiguration()
-                                                                   .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-                )
                                                 .WithNames("MyTestSuite", Environment.MachineName)
-                                                .WithTypesFrom(typeProvider)
-                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                                   .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>()))
+                                                .WithDefaults(typeProvider)
                                                 .WithLogger(logger)
                                                 .Build();
 
             try
             {
-                using (new AssertingStopwatch("Subsequent bus startup", TimeSpan.FromSeconds(20)))
+                try
                 {
-                    try
-                    {
-                        await subsequentBus.Start(MessagePumpTypes.All);
-                        WriteBlankLines();
-                    }
-                    catch (AggregateException exc)
-                    {
-                        throw exc.Flatten();
-                    }
+                    await subsequentBus.Start(MessagePumpTypes.All);
+                }
+                catch (AggregateException exc)
+                {
+                    throw exc.Flatten();
                 }
             }
             finally
             {
-                WriteBlankLines();
                 subsequentBus.Dispose();
-            }
-        }
-
-        private static void WriteBlankLines()
-        {
-            for (var i = 0; i < 10; i++)
-            {
-                Console.WriteLine();
             }
         }
 

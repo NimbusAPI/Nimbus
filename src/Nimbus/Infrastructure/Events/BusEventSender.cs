@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
@@ -45,6 +46,7 @@ namespace Nimbus.Infrastructure.Events
             var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
             var brokeredMessage = await _nimbusMessageFactory.Create(topicPath, busEvent);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -52,7 +54,7 @@ namespace Nimbus.Infrastructure.Events
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage, sw.Elapsed);
 
                     var topicSender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
@@ -64,7 +66,7 @@ namespace Nimbus.Infrastructure.Events
                     {
                         await interceptor.OnEventPublished(busEvent, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage, sw.Elapsed);
 
                     return;
                 }
@@ -77,7 +79,7 @@ namespace Nimbus.Infrastructure.Events
                 {
                     await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, exception);
+                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, sw.Elapsed, exception);
             }
         }
     }

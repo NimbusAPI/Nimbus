@@ -1,32 +1,56 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
-using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
-    [Timeout(60*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class ThroughputSpecificationForBus
     {
+        protected const int TimeoutSeconds = 60;
+
         private Stopwatch _stopwatch;
+        private int _numMessagesSent;
         private double _messagesPerSecond;
         private double _averageOneWayLatency;
         private double _averageRequestResponseLatency;
+        private ScenarioInstance<BusBuilderConfiguration> _instance;
 
         protected Bus Bus { get; private set; }
 
-        protected virtual int NumMessagesToSend => 1*1000;
+        protected virtual TimeSpan SendMessagesFor { get; } = TimeSpan.FromSeconds(5);
 
-        protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        protected void ExpectToReceiveMessages(int numMessages = 1)
         {
-            busBuilderConfiguration.WithLogger(new NullLogger());
+            Interlocked.Add(ref _numMessagesSent, numMessages);
+        }
+
+        protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
+        {
+            _instance = scenario.CreateInstance();
+            _numMessagesSent = 0;
+
+            var busBuilderConfiguration = _instance.Configuration;
+
+            // make sure we set this back to the defaults - we turn it down for most of the regression suite
+            // so that the bus can stop more quickly.
+            busBuilderConfiguration.WithDefaultConcurrentHandlerLimit(new ConcurrentHandlerLimitSetting().Value);
+
+            if (!Debugger.IsAttached)
+            {
+                busBuilderConfiguration.WithLogger(new NullLogger());
+            }
+
             Bus = busBuilderConfiguration.Build();
             await Bus.Start();
         }
@@ -34,17 +58,17 @@ namespace Nimbus.StressTests.ThroughputTests
         protected virtual async Task When()
         {
             Console.WriteLine("Starting to send messages...");
-            StressTestMessageHandler.Reset(NumMessagesToSend);
+            StressTestMessageHandler.Reset();
             _stopwatch = Stopwatch.StartNew();
 
             await Task.WhenAll(SendMessages(Bus));
 
             Console.WriteLine();
             Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            StressTestMessageHandler.WaitUntilDone(TimeSpan.FromSeconds(60));
+            StressTestMessageHandler.WaitUntilDone(_numMessagesSent, TimeSpan.FromSeconds(TimeoutSeconds));
             _stopwatch.Stop();
 
-            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
+            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, _numMessagesSent);
 
             _messagesPerSecond = StressTestMessageHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
@@ -67,9 +91,9 @@ namespace Nimbus.StressTests.ThroughputTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<ThroughputSpecificationForBus>))]
-        public async Task Run(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
         }
 
@@ -79,7 +103,11 @@ namespace Nimbus.StressTests.ThroughputTests
         public void TearDown()
         {
             var bus = Bus;
+            Bus = null;
             bus?.Dispose();
+
+            _instance?.Dispose();
+            _instance = null;
         }
     }
 }
