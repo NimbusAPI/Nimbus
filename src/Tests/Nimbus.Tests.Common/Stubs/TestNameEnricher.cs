@@ -17,6 +17,8 @@ namespace Nimbus.Tests.Common.Stubs
             }
             catch
             {
+                // NUnit throws internal NullReferenceExceptions sometimes when we try to fetch
+                // the test details :(
             }
         }
     }
