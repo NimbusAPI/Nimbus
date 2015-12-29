@@ -6,6 +6,11 @@ namespace Nimbus.Tests.Common.Extensions
 {
     public static class TestLoggingExtensions
     {
+        public static void LogTestStart()
+        {
+            Log.Information("Test {TestName} starting", TestContext.CurrentContext.Test.FullName);
+        }
+
         public static void LogTestResult()
         {
             var testContext = TestContext.CurrentContext;

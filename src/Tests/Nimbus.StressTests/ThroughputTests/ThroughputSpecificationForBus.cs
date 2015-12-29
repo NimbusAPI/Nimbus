@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
@@ -18,18 +19,21 @@ namespace Nimbus.StressTests.ThroughputTests
         private double _messagesPerSecond;
         private double _averageOneWayLatency;
         private double _averageRequestResponseLatency;
+        private ScenarioInstance<BusBuilderConfiguration> _instance;
 
         protected Bus Bus { get; private set; }
 
         protected virtual int NumMessagesToSend => 1*1000;
 
-        protected virtual async Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            _instance = scenario.CreateInstance();
+
             if (!Debugger.IsAttached)
             {
-                busBuilderConfiguration.WithLogger(new NullLogger());
+                _instance.Configuration.WithLogger(new NullLogger());
             }
-            Bus = busBuilderConfiguration.Build();
+            Bus = _instance.Configuration.Build();
             await Bus.Start();
         }
 
@@ -69,9 +73,9 @@ namespace Nimbus.StressTests.ThroughputTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<ThroughputSpecificationForBus>))]
-        public async Task Run(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
         }
 
@@ -81,7 +85,11 @@ namespace Nimbus.StressTests.ThroughputTests
         public void TearDown()
         {
             var bus = Bus;
+            Bus = null;
             bus?.Dispose();
+
+            _instance?.Dispose();
+            _instance = null;
         }
     }
 }

@@ -23,12 +23,12 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
         [Test]
         [TestCaseSource(typeof (AllTransportConfigurations))]
-        public async Task NoneOfThemShouldGoBang(string testName, TransportConfiguration transportConfiguration)
+        public async Task NoneOfThemShouldGoBang(string testName, IConfigurationScenario<TransportConfiguration> scenario)
         {
-            await ClearMeABus(transportConfiguration);
+            await ClearMeABus(scenario);
 
             _buses = await Enumerable.Range(0, 10)
-                                     .Select(i => BuildMeABus(transportConfiguration))
+                                     .Select(i => Task.Run(async () => await BuildMeABus(scenario)))
                                      .SelectResultsAsync();
         }
 
@@ -40,63 +40,65 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                    .Done();
         }
 
-        private async Task ClearMeABus(TransportConfiguration transportConfiguration)
+        private async Task ClearMeABus(IConfigurationScenario<TransportConfiguration> scenario)
         {
-            // We want a namespace that doesn't exist here so that all the queues and topics are removed.
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
-
-            var busBuilder = new BusBuilder().Configure()
-                                             .WithTransport(transportConfiguration)
-                                             .WithRouter(new DestinationPerMessageTypeRouter())
-                                             .WithSerializer(new JsonSerializer())
-                                             .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                                             .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                             .WithNames("MyTestSuite", Environment.MachineName)
-                                             .WithTypesFrom(typeProvider)
-                                             .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                             .WithHeartbeatInterval(TimeSpan.MaxValue)
-                                             .WithLogger(_logger)
-                                             .WithDebugOptions(
-                                                 dc =>
-                                                     dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                         "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                ;
-
-            using (var bus = busBuilder.Build())
+            using (var instance = scenario.CreateInstance())
             {
-                await bus.Start();
+                // We want a namespace that doesn't exist here so that all the queues and topics are removed.
+                var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
+                var transportConfiguration = instance.Configuration;
+
+                var busBuilder = new BusBuilder().Configure()
+                                                 .WithTransport(transportConfiguration)
+                                                 .WithRouter(new DestinationPerMessageTypeRouter())
+                                                 .WithSerializer(new JsonSerializer())
+                                                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                 .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                 .WithNames("MyTestSuite", Environment.MachineName)
+                                                 .WithTypesFrom(typeProvider)
+                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                 .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                 .WithLogger(_logger)
+                                                 .WithDebugOptions(
+                                                     dc =>
+                                                         dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                             "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                    ;
+
+                using (var bus = busBuilder.Build())
+                {
+                    await bus.Start();
+                    await bus.Stop();
+                }
             }
         }
 
-        private Task<Bus> BuildMeABus(TransportConfiguration transportConfiguration)
+        private async Task<Bus> BuildMeABus(IConfigurationScenario<TransportConfiguration> scenario)
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
-            return Task.Run(async () =>
-                                  {
-                                      // we grab a new one of these each time so that we're guaranteed to get a new instance of
-                                      // all the builders etc. It's a bit ick. Sorry :(  -andrewh 21/12/2015
-                                      var actualTransportConfiguration = new TransportConfigurationSources()
-                                          .Where(tcs => tcs.Configuration.GetType() == transportConfiguration.GetType())
-                                          .First();
+            using (var instance = scenario.CreateInstance())
+            {
+                var transportConfiguration = instance.Configuration;
 
-                                      var configuration = new BusBuilder().Configure()
-                                                                          .WithTransport(actualTransportConfiguration.Configuration)
-                                                                          .WithRouter(new DestinationPerMessageTypeRouter())
-                                                                          .WithSerializer(new JsonSerializer())
-                                                                          .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                                                                          .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                                          .WithNames("MyTestSuite", Environment.MachineName)
-                                                                          .WithTypesFrom(typeProvider)
-                                                                          .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                                          .WithHeartbeatInterval(TimeSpan.MaxValue)
-                                                                          .WithLogger(_logger)
-                                          ;
+                var configuration = new BusBuilder().Configure()
+                                                    .WithTransport(transportConfiguration)
+                                                    .WithRouter(new DestinationPerMessageTypeRouter())
+                                                    .WithSerializer(new JsonSerializer())
+                                                    .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                    .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                    .WithNames("MyTestSuite", Environment.MachineName)
+                                                    .WithTypesFrom(typeProvider)
+                                                    .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                    .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                    .WithLogger(_logger)
+                    ;
 
-                                      var bus = configuration.Build();
-                                      await bus.Start();
-                                      return bus;
-                                  });
+                var bus = configuration.Build();
+                await bus.Start();
+                await bus.Stop();
+                return bus;
+            }
         }
     }
 }

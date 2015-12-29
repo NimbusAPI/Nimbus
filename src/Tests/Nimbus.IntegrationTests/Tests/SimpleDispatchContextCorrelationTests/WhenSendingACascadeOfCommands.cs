@@ -5,6 +5,7 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds * 1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingACascadeOfCommands : TestForBus
     {
         private const int _numExpectedMessages = 3;
@@ -22,11 +23,11 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
         private IDispatchContext[] _dispatchContexts;
         private NimbusMessage[] _nimbusMessages;
 
-        protected override Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        protected override Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             TestInterceptor.Clear();
 
-            return base.Given(busBuilderConfiguration);
+            return base.Given(scenario);
         }
 
         protected override async Task When()
@@ -41,9 +42,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _nimbusMessages.Count().ShouldBe(_numExpectedMessages);
@@ -51,9 +52,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task WeShouldObserveOneDispatchContextPerMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task WeShouldObserveOneDispatchContextPerMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _dispatchContexts.Count().ShouldBe(_numExpectedMessages);
@@ -61,9 +62,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task AllParentMessageIdsShouldBeDifferent(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task AllParentMessageIdsShouldBeDifferent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _dispatchContexts.GroupBy(x => x.ResultOfMessageId).Count().ShouldBe(_numExpectedMessages);
@@ -71,9 +72,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheCorrelationIdsShouldAllBeTheSame(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheCorrelationIdsShouldAllBeTheSame(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _dispatchContexts.GroupBy(x => x.CorrelationId).Count().ShouldBe(1);
@@ -81,9 +82,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _nimbusMessages[1].PrecedingMessageId.ShouldBe(_nimbusMessages[0].MessageId);
@@ -91,9 +92,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _nimbusMessages[2].PrecedingMessageId.ShouldBe(_nimbusMessages[1].MessageId);
@@ -101,9 +102,9 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
-        public async Task TheFirstMessageShouldBeTheInitialMessage(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheFirstMessageShouldBeTheInitialMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _nimbusMessages[0].PrecedingMessageId.ShouldBe(null);

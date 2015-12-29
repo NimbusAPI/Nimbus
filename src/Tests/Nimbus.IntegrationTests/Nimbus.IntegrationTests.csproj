@@ -162,12 +162,12 @@
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />
-    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommand.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeCommandHandler.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandThatHasNoHandler.cs" />
+    <Compile Include="Tests\SimpleCommandSendingTests\WhenSendingACommandWhoseHandlerRequiresSomeProperties.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\FirstCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\SecondCommandHandler.cs" />
     <Compile Include="Tests\SimpleDispatchContextCorrelationTests\CommandHandlers\ThirdCommandHandler.cs" />

@@ -49,11 +49,11 @@ namespace Nimbus.Configuration
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
             var tasksToWaitFor = messagePumpsToWaitFor
-                .Select(pump => Task.Run(() => action(pump)))
+                .Select(pump => Task.Run(() => action(pump)).ConfigureAwaitFalse())
                 .ToArray();
 
             messagePumpsToHandleInBackground
-                .Select(pump => Task.Run(() => action(pump)))
+                .Select(pump => Task.Run(() => action(pump)).ConfigureAwaitFalse())
                 .Done();
 
             await tasksToWaitFor

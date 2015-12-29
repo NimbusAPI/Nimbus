@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
 using NUnit.Framework;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
@@ -10,7 +12,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
         public IEnumerator<TestCaseData> GetEnumerator()
         {
             return new TransportConfigurationSources()
-                .BuildTestCases()
+                .Select(scenario => scenario.BuildTestCase())
+                .OrderBy(tc => tc.TestName)
                 .GetEnumerator();
         }
 

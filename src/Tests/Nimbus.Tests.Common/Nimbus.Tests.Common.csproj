@@ -46,16 +46,20 @@
       <HintPath>..\..\packages\ConfigInjector.2.0.392.0\lib\net45\ConfigInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Unity.3.5.1404.0\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -102,8 +106,27 @@
   <ItemGroup>
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
-    <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\AutofacScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeConfigurationScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\ContainerConfiguration.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NinjectScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NoContainerScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\UnityScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\WindsorScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorage.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorageViaHttp.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\FileSystem.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialTestScenarioExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\DestinationPerMessageType.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\SingleQueueAndTopicPerMessageType.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\DataContract.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\Json.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\ProtoBuf.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\InProcess.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\WindowsServiceBus.cs" />
+    <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
     <Compile Include="TestUtilities\AssertingStopwatch.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
@@ -119,13 +142,12 @@
     <Compile Include="Stubs\TestHarnessTypeProvider.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\FluentConfigurationExtensions.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainerConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStorageConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialConfigurationScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\RouterConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\SerializerConfigurationSources.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\TransportConfigurationSources.cs" />
+    <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\IoCContainerConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\LargeMessageStorageConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\RouterConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\SerializerConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\TransportConfigurationSources.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

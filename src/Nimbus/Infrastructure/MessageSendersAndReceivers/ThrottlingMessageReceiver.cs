@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -38,7 +40,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 _cancellationTokenSource = new CancellationTokenSource();
 
                 _workerTasks = Enumerable.Range(0, ConcurrentHandlerLimit)
-                                         .Select(i => Task.Run(() => Worker(callback), _cancellationTokenSource.Token))
+                                         .Select(i => Task.Run(() => Worker(callback), _cancellationTokenSource.Token).ConfigureAwaitFalse())
                                          .ToArray();
             }
             finally

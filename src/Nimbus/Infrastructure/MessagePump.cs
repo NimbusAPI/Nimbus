@@ -56,9 +56,10 @@ namespace Nimbus.Infrastructure
                 if (_started) return;
                 _started = true;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} starting...", _receiver);
                 await _receiver.Start(Dispatch);
-                _logger.Debug("Message pump for {Receiver} started", _receiver);
+                _logger.Debug("Message pump for {Receiver} started in {Elapsed}", _receiver, sw.Elapsed);
             }
             finally
             {
@@ -75,9 +76,10 @@ namespace Nimbus.Infrastructure
                 if (!_started) return;
                 _started = false;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} stopping...", _receiver);
                 await _receiver.Stop();
-                _logger.Debug("Message pump for {Receiver} stopped.", _receiver);
+                _logger.Debug("Message pump for {Receiver} stopped in {Elapsed}.", _receiver, sw.Elapsed);
             }
             finally
             {

@@ -4,7 +4,7 @@ using Nimbus.Configuration;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
-using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
@@ -17,12 +17,12 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         private RequestThatWillThrowResponse _response;
         private Exception _exception;
 
-        protected override Task Given(BusBuilderConfiguration busBuilderConfiguration)
+        protected override Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             _response = null;
             _exception = null;
 
-            return base.Given(busBuilderConfiguration);
+            return base.Given(scenario);
         }
 
         protected override async Task When()
@@ -40,9 +40,9 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheResponseShouldNotBeSet(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheResponseShouldNotBeSet(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _response.ShouldBe(null);
@@ -50,9 +50,9 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task AnExceptionShouldBeReThrownOnTheClient(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task AnExceptionShouldBeReThrownOnTheClient(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _exception.ShouldNotBe(null);
@@ -60,9 +60,9 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheExceptionShouldBeARequestFailedException(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheExceptionShouldBeARequestFailedException(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _exception.ShouldBeTypeOf<RequestFailedException>();
@@ -70,9 +70,9 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, BusBuilderConfiguration busBuilderConfiguration)
+        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(busBuilderConfiguration);
+            await Given(scenario);
             await When();
 
             _exception.Message.ShouldContain(RequestThatWillThrowHandler.ExceptionMessage);

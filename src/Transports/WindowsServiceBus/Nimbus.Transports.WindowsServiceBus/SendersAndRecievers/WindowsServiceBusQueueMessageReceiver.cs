@@ -55,6 +55,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                 if (cancellationTask.IsCompleted) return null;
 
                 var brokeredMessage = await receiveTask;
+                if (brokeredMessage == null) return null;
 
                 var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
                 return nimbusMessage;
