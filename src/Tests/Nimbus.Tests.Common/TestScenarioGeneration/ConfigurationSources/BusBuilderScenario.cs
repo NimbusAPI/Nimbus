@@ -52,7 +52,6 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
                                                     _typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                                 .WithGlobalOutboundInterceptorTypes(
                                                     _typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                                                 .WithLogger(_logger)
                                                 .WithDebugOptions(
