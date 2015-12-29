@@ -19,6 +19,8 @@ public class SetUpFixture
 
     private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
+        if ((e.ExceptionObject as Exception)?.Source == "nunit.framework") return; // sigh.
+
         Log.Warning(e.ExceptionObject as Exception, "An unhandled exception was thrown by {sender}", sender);
     }
 
