@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
