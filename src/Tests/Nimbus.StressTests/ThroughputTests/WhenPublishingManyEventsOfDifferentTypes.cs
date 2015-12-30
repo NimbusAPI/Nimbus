@@ -17,7 +17,7 @@ namespace Nimbus.StressTests.ThroughputTests
                 var messages = new IBusEvent[] {new FooEvent(), new BarEvent(), new BazEvent(), new QuxEvent()};
                 await bus.PublishAll(messages);
 
-                ExpectToReceiveMessages(8);
+                IncrementExpectedMessageCount(8);
             }
         }
     }

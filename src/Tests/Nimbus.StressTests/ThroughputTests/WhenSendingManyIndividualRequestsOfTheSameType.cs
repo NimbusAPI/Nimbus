@@ -15,7 +15,7 @@ namespace Nimbus.StressTests.ThroughputTests
             while (sw.Elapsed < SendMessagesFor)
             {
                 var response = await bus.Request(new FooRequest());
-                ExpectToReceiveMessages();
+                IncrementExpectedMessageCount();
                 StressTestMessageHandler.RecordResponseMessageReceipt(response);
             }
         }

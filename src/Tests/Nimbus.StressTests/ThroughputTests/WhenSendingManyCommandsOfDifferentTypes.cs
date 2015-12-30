@@ -17,7 +17,7 @@ namespace Nimbus.StressTests.ThroughputTests
                 await bus.Send(new BarCommand());
                 await bus.Send(new BazCommand());
                 await bus.Send(new QuxCommand());
-                ExpectToReceiveMessages(4);
+                IncrementExpectedMessageCount(4);
             }
         }
     }

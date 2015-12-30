@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
@@ -20,7 +19,7 @@ namespace Nimbus.StressTests.ThroughputTests
     [Timeout(TimeoutSeconds*1000)]
     public abstract class ThroughputSpecificationForBus
     {
-        protected const int TimeoutSeconds = 60;
+        protected const int TimeoutSeconds = 300;
 
         private Stopwatch _sendingStopwatch;
         private Stopwatch _sendingAndReceivingStopwatch;
@@ -47,17 +46,15 @@ namespace Nimbus.StressTests.ThroughputTests
 
             var busBuilderConfiguration = _instance.Configuration;
 
-            // make sure we set this back to the defaults - we turn it down for most of the regression suite
-            // so that the bus can stop more quickly.
-            busBuilderConfiguration.WithDefaultConcurrentHandlerLimit(new ConcurrentHandlerLimitSetting().Value);
-
             if (!Debugger.IsAttached)
             {
                 busBuilderConfiguration.WithLogger(new NullLogger());
             }
 
             Bus = busBuilderConfiguration.Build();
+            Log.Debug("Starting bus...");
             await Bus.Start();
+            Log.Debug("Bus started.");
         }
 
         protected virtual async Task When()
@@ -67,7 +64,7 @@ namespace Nimbus.StressTests.ThroughputTests
             _sendingStopwatch = Stopwatch.StartNew();
             _sendingAndReceivingStopwatch = Stopwatch.StartNew();
 
-            await Enumerable.Range(0, 5)
+            await Enumerable.Range(0, 20)
                             .Select(i => Task.Run(() => SendMessages(Bus)).ConfigureAwaitFalse())
                             .WhenAll();
 
@@ -81,7 +78,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
         public abstract Task SendMessages(IBus bus);
 
-        protected void ExpectToReceiveMessages(int numMessages = 1)
+        protected void IncrementExpectedMessageCount(int numMessages = 1)
         {
             Interlocked.Add(ref _numMessagesSent, numMessages);
         }

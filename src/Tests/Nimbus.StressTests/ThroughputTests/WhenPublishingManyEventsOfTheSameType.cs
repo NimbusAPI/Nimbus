@@ -14,7 +14,7 @@ namespace Nimbus.StressTests.ThroughputTests
             while (sw.Elapsed < SendMessagesFor)
             {
                 await bus.Publish(new FooEvent());
-                ExpectToReceiveMessages(2);
+                IncrementExpectedMessageCount(2);
             }
         }
     }

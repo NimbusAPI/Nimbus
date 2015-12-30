@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
+using Serilog;
 
 namespace Nimbus.StressTests.ThroughputTests.EventHandlers
 {
@@ -86,6 +87,8 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
 
         public static void WaitUntilDone(int expectedNumMessagesReceived, TimeSpan timeout)
         {
+            Log.Debug("Waiting until all messages are received.");
+
             var sw = Stopwatch.StartNew();
             while (true)
             {
@@ -106,7 +109,7 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
 
                          if (ActualNumMessagesReceived%10 == 0)
                          {
-                             Console.WriteLine("Seen {0} messages", ActualNumMessagesReceived);
+                             Log.Debug("Seen {MessageCount} messages", ActualNumMessagesReceived);
                          }
                      }).ConfigureAwaitFalse();
         }
@@ -114,7 +117,15 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
         public static void RecordResponseMessageReceipt(StressTestResponseMessage message)
         {
             message.WhenReceived = DateTimeOffset.UtcNow;
-            Task.Run(() => { ResponseMessages.Add(message); }).ConfigureAwaitFalse();
+            Task.Run(() =>
+                     {
+                         ResponseMessages.Add(message);
+                         var responseCount = ResponseMessages.Count;
+                         if (responseCount%10 == 0)
+                         {
+                             Log.Debug("Seen {ResponseCount} responses", responseCount);
+                         }
+                     }).ConfigureAwaitFalse();
         }
     }
 }

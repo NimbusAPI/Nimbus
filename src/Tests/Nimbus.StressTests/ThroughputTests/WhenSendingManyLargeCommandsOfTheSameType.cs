@@ -19,7 +19,7 @@ namespace Nimbus.StressTests.ThroughputTests
                                   SomeMessage = new string(Enumerable.Range(0, 32*1024).Select(j => '.').ToArray())
                               };
                 await bus.Send(command);
-                ExpectToReceiveMessages();
+                IncrementExpectedMessageCount();
             }
         }
     }
