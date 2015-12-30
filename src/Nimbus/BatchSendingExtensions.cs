@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 using Nimbus.MessageContracts;
 
 namespace Nimbus
@@ -14,7 +15,7 @@ namespace Nimbus
                                       {
                                           await bus.Send(c);
                                       }
-                                  });
+                                  }).ConfigureAwaitFalse();
         }
 
         public static Task PublishAll(this IBus bus, IEnumerable<IBusEvent> busEvents)
@@ -25,7 +26,7 @@ namespace Nimbus
                                       {
                                           await bus.Publish(e);
                                       }
-                                  });
+                                  }).ConfigureAwaitFalse();
         }
     }
 }
