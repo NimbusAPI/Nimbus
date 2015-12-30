@@ -6,7 +6,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
     internal class InProcess : IConfigurationScenario<TransportConfiguration>
     {
         public string Name { get; } = "InProcess";
-        public string[] Categories { get; } = {"InProcess", "Slow"};
+        public string[] Categories { get; } = {"InProcess"};
 
         public ScenarioInstance<TransportConfiguration> CreateInstance()
         {
