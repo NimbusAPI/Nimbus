@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -19,19 +20,29 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 
         public async Task Send(NimbusMessage message)
         {
+            await AddToCompetingSubscribersQueue(message);
+            await AddToMulticastSubscriberQueues(message);
+        }
+
+        private async Task AddToCompetingSubscribersQueue(NimbusMessage message)
+        {
             var clone = Clone(message);
             var topicQueue = _messageStore.GetMessageQueue(_topic.TopicPath);
             await topicQueue.Add(clone);
+        }
 
-            _topic.SubscriptionNames
-                  .Do(async subscriptionName =>
-                            {
-                                var messageClone = Clone(message);
-                                var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
-                                var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
-                                await subscriptionQueue.Add(messageClone);
-                            })
-                  .Done();
+        private async Task AddToMulticastSubscriberQueues(NimbusMessage message)
+        {
+            await _topic.SubscriptionNames
+                        .Select(subscriptionName =>
+                                {
+                                    var messageClone = Clone(message);
+                                    var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
+                                    var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
+                                    var task = subscriptionQueue.Add(messageClone);
+                                    return task;
+                                })
+                        .WhenAll();
         }
 
         private NimbusMessage Clone(NimbusMessage message)
