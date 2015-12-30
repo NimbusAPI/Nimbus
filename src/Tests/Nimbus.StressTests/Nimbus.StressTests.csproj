@@ -115,6 +115,14 @@
       <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
+      <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
+      <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
@@ -126,14 +134,6 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Transports\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
-      <Project>{49B432F5-093E-454F-9BF5-76AB28CFB396}</Project>
-      <Name>Nimbus.Transports.InProcess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
     <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
       <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>

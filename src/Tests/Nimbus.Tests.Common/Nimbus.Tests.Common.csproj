@@ -173,6 +173,14 @@
       <Project>{109fb118-fa9a-4eb2-88af-f66c973ce50f}</Project>
       <Name>Nimbus.Serializers.Json</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
+      <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
+      <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Unity\Nimbus.Unity.csproj">
       <Project>{c50bf581-4721-4447-8e8e-5263fb83a9a6}</Project>
       <Name>Nimbus.Unity</Name>
@@ -192,14 +200,6 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Transports\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
-      <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
-      <Name>Nimbus.Transports.InProcess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

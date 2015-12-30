@@ -60,6 +60,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
@@ -71,10 +75,6 @@
     <ProjectReference Include="..\..\..\Nimbus\Nimbus.csproj">
       <Project>{1b793c01-e824-4449-b93d-277626b1791f}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
     <ProjectReference Include="..\Pizza.Maker.Messages\Pizza.Maker.Messages.csproj">
       <Project>{86300BEC-7B51-41D5-8E0D-B2C85945329D}</Project>

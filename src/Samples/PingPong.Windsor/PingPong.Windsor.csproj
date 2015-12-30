@@ -85,6 +85,10 @@
       <Project>{109FB118-FA9A-4EB2-88AF-F66C973CE50F}</Project>
       <Name>Nimbus.Serializers.Json</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Windsor\Nimbus.Windsor.csproj">
       <Project>{7fcf3124-24ec-40ca-95fd-e30315d0dde2}</Project>
       <Name>Nimbus.Windsor</Name>
@@ -100,10 +104,6 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1b793c01-e824-4449-b93d-277626b1791f}</Project>
       <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Transports\WindowsServiceBus\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717C9174-B5F4-449C-A542-B8D7082A8D5D}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

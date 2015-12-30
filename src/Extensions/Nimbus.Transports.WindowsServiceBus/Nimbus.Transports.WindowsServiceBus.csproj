@@ -77,15 +77,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
+    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
+    <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Nimbus\Nimbus.csproj">
+    <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
       <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
       <Name>Nimbus</Name>
     </ProjectReference>
