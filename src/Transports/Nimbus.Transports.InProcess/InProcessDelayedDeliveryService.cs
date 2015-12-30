@@ -18,7 +18,7 @@ namespace Nimbus.Transports.InProcess
             _clock = clock;
         }
 
-        public Task DeliverAt(NimbusMessage message, DateTimeOffset deliveryTime)
+        public Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
             // Deliberately not awaiting this task. We want it to run in the background.
             Task.Run(async () =>

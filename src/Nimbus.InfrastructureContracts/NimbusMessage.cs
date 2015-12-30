@@ -31,7 +31,7 @@ namespace Nimbus
         public string From { get; set; }
         public string To { get; protected set; }
         public Guid? InReplyToMessageId { get; set; }
-        public DateTime ScheduledEnqueueTimeUtc { get; set; }
+        public DateTimeOffset DeliverAfter { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }
         public DateTimeOffset[] DeliveryAttempts { get; set; }
         public IDictionary<string, object> Properties { get; set; }

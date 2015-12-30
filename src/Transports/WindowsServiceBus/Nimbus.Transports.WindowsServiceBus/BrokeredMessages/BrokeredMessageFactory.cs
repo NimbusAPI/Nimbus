@@ -73,7 +73,7 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
                                       brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId.ToString();
                                       brokeredMessage.ReplyTo = message.From;
                                       brokeredMessage.TimeToLive = message.ExpiresAfter.Subtract(DateTimeOffset.UtcNow);
-                                      brokeredMessage.ScheduledEnqueueTimeUtc = message.ScheduledEnqueueTimeUtc;
+                                      brokeredMessage.ScheduledEnqueueTimeUtc = message.DeliverAfter.UtcDateTime;
 
                                       foreach (var property in message.Properties)
                                       {

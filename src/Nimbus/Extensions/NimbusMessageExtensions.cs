@@ -49,7 +49,7 @@ namespace Nimbus.Extensions
 
         internal static NimbusMessage WithScheduledEnqueueTime(this NimbusMessage message, DateTimeOffset scheduledEnqueueTimeOffset)
         {
-            message.ScheduledEnqueueTimeUtc = scheduledEnqueueTimeOffset.UtcDateTime;
+            message.DeliverAfter = scheduledEnqueueTimeOffset.UtcDateTime;
             return message;
         }
 

@@ -157,7 +157,7 @@ namespace Nimbus.Infrastructure
                                      message.MessageId,
                                      numDeliveryAttempts + 1,
                                      nextDeliveryTime);
-                        await _delayedDeliveryService.DeliverAt(message, nextDeliveryTime);
+                        await _delayedDeliveryService.DeliverAfter(message, nextDeliveryTime);
                     }
                     catch (Exception exc)
                     {

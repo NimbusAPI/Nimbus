@@ -14,7 +14,6 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
-using Nimbus.Transports.WindowsServiceBus.DevelopmentStubs;
 using Nimbus.Transports.WindowsServiceBus.Extensions;
 
 namespace Nimbus.Transports.WindowsServiceBus

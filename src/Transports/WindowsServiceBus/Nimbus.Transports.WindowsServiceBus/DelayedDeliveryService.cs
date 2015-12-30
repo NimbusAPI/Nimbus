@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 
-namespace Nimbus.Transports.WindowsServiceBus.DevelopmentStubs
+namespace Nimbus.Transports.WindowsServiceBus
 {
     internal class DelayedDeliveryService : IDelayedDeliveryService
     {
@@ -16,8 +16,9 @@ namespace Nimbus.Transports.WindowsServiceBus.DevelopmentStubs
             _brokeredMessageFactory = brokeredMessageFactory;
         }
 
-        public async Task DeliverAt(NimbusMessage message, DateTimeOffset deliveryTime)
+        public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
+            message.DeliverAfter = deliveryTime;
             var messageSender = await _queueManager.CreateMessageSender(message.To);
             var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
             await messageSender.SendAsync(brokeredMessage);
