@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using Nimbus.Infrastructure;
-using Nimbus.MessageContracts.ControlMessages;
 
 namespace Nimbus.Tests.Common.Stubs
 {
@@ -19,18 +18,23 @@ namespace Nimbus.Tests.Common.Stubs
             _namespaces = namespaces;
         }
 
-        protected override Type[] ScanAssembliesForInterestingTypes()
+        protected override Type[] ScanAssembliesForKnownTypes()
         {
-            var interestingTypes = base.ScanAssembliesForInterestingTypes();
+            var knownTypes = base.ScanAssembliesForKnownTypes();
 
-            var interestingTypesInFilteredNamespaces = interestingTypes
-                .Where(t => _namespaces.Any(ns => (t.Namespace ?? string.Empty).StartsWith(ns)))
+            var knownTypesInFilteredNamespace = knownTypes
+                .Where(IsInFilteredNamespace)
                 .Where(t => !t.Name.EndsWith("ThatIsNotReturedByTheTypeProvider"))
                 .ToArray();
 
-            var knownTypesForThisTest = interestingTypesInFilteredNamespaces.Union(new[] {typeof (HeartbeatEvent)}).ToArray();
+            return knownTypesInFilteredNamespace;
+        }
 
-            return knownTypesForThisTest;
+        private bool IsInFilteredNamespace(Type type)
+        {
+            if (NimbusAssemblies.Contains(type.Assembly)) return true;
+
+            return _namespaces.Any(ns => (type.Namespace ?? string.Empty).StartsWith(ns));
         }
     }
 }

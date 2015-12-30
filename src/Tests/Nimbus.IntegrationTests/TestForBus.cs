@@ -21,9 +21,14 @@ namespace Nimbus.IntegrationTests
             MethodCallCounter.Clear();
 
             Instance = scenario.CreateInstance();
+            Reconfigure();
 
             Bus = Instance.Configuration.Build();
             await Bus.Start();
+        }
+
+        protected virtual void Reconfigure()
+        {
         }
 
         protected abstract Task When();
