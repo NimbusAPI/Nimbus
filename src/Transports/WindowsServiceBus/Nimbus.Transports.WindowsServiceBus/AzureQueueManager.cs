@@ -31,7 +31,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
-        readonly Retry _retry;
+        private readonly Retry _retry;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
