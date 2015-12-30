@@ -14,6 +14,8 @@ namespace Nimbus.UnitTests
 
         private Stopwatch _sw;
 
+        protected TimeSpan ElapsedTime => _sw.Elapsed;
+
         [SetUp]
         public void SetUp()
         {
@@ -24,11 +26,6 @@ namespace Nimbus.UnitTests
             _sw.Stop();
 
             Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
-        }
-
-        protected TimeSpan ElapsedTime
-        {
-            get { return _sw.Elapsed; }
         }
 
         [TearDown]

@@ -6,7 +6,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.MulticastRequestResponseTests
 {
     [TestFixture]
-    internal class WhenTakingAThreeResponses : GivenAWrapperWithTwoResponses
+    internal class WhenTakingThreeResponses : GivenAWrapperWithTwoResponses
     {
         private readonly TimeSpan _timeout = TimeSpan.FromMilliseconds(100);
         private readonly TimeSpan _acceptableTime = TimeSpan.FromMilliseconds(200);
