@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
@@ -47,9 +48,8 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             try
             {
                 var messageReceiver = await GetMessageReceiver();
-
-                var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300));
-                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken);
+                var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
+                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken).ConfigureAwaitFalse();
 
                 await Task.WhenAny(receiveTask, cancellationTask);
                 if (cancellationTask.IsCompleted) return null;

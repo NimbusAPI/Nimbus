@@ -51,8 +51,8 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             {
                 var subscriptionClient = await GetSubscriptionClient();
 
-                var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300));
-                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken);
+                var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
+                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken).ConfigureAwaitFalse();
                 await Task.WhenAny(receiveTask, cancellationTask);
                 if (cancellationTask.IsCompleted) return null;
 
