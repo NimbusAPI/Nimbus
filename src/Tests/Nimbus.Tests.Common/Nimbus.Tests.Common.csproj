@@ -141,7 +141,6 @@
     <Compile Include="Stubs\TestHarnessTypeProvider.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllBusConfigurations.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderConfigurationSources.cs" />
-    <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\IoCContainerConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\LargeMessageStorageConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\RouterConfigurationSources.cs" />

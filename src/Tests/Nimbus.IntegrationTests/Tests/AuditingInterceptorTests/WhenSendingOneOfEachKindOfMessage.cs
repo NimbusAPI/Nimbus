@@ -31,7 +31,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
                 Bus.Send(new SomeCommand(42)),
                 Bus.SendAt(new SomeCommandSentViaDelay(), DateTimeOffset.UtcNow),
                 Bus.Request(new SomeRequest()),
-                Bus.MulticastRequest(new SomeMulticastRequest(), TimeSpan.FromSeconds(1)),
+                Bus.MulticastRequest(new SomeMulticastRequest(), TimeSpan.FromSeconds(TimeoutSeconds)),
                 Bus.Publish(new SomeEvent())
                 );
         }

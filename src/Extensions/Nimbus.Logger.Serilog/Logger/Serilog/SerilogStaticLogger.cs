@@ -20,6 +20,11 @@ namespace Nimbus.Logger.Serilog
             Log.Warning(format, args);
         }
 
+        public void Warn(Exception exc, string format, params object[] args)
+        {
+            Log.Warning(exc, format, args);
+        }
+
         public void Error(string format, params object[] args)
         {
             Log.Error(format, args);

@@ -1,6 +1,6 @@
 using System;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Extensions
 {
     internal static class FluentConfigurationExtensions
     {

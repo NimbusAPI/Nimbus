@@ -31,6 +31,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
+        readonly Retry _retry;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
@@ -55,6 +56,10 @@ namespace Nimbus.Transports.WindowsServiceBus
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
+
+            _retry = new Retry(5)
+                .Chain(r => r.TransientFailure += (s, e) => _logger.Warn(e, "A transient failure occurred."))
+                .Chain(r => r.PermanentFailure += (s, e) => _logger.Error(e, "A permanent failure occurred."));
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
@@ -82,8 +87,12 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureTopicExists(topicPath);
-                                var topicClient = _messagingFactory().CreateTopicClient(topicPath);
-                                return topicClient;
+
+                                return _retry.Do(() =>
+                                                 {
+                                                     var topicClient = _messagingFactory().CreateTopicClient(topicPath);
+                                                     return topicClient;
+                                                 });
                             }).ConfigureAwaitFalse();
         }
 
@@ -92,8 +101,13 @@ namespace Nimbus.Transports.WindowsServiceBus
             return Task.Run(() =>
                             {
                                 EnsureSubscriptionExists(topicPath, subscriptionName);
-                                var subscriptionClient = _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
-                                return subscriptionClient;
+
+                                return _retry.Do(() =>
+                                                 {
+                                                     var subscriptionClient = _messagingFactory()
+                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                                     return subscriptionClient;
+                                                 });
                             }).ConfigureAwaitFalse();
         }
 
@@ -109,66 +123,72 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private ConcurrentBag<string> FetchExistingTopics()
         {
-            _logger.Debug("Fetching existing topics...");
-            var topicsAsync = _namespaceManager().GetTopicsAsync();
-            if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+            return _retry.Do(() =>
+                             {
+                                 _logger.Debug("Fetching existing topics...");
+                                 var topicsAsync = _namespaceManager().GetTopicsAsync();
+                                 if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
-            var topics = topicsAsync.Result;
-            var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
+                                 var topics = topicsAsync.Result;
+                                 var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
 
-            return topicPaths;
+                                 return topicPaths;
+                             });
         }
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
         {
-            _logger.Debug("Fetching existing subscriptions...");
+            return _retry.Do(() =>
+                             {
+                                 _logger.Debug("Fetching existing subscriptions...");
 
-            var subscriptionTasks = _knownTopics.Value
-                                                .Where(WeHaveAHandler)
-                                                .Select(FetchExistingTopicSubscriptions)
-                                                .ToArray();
+                                 var subscriptionTasks = _knownTopics.Value
+                                                                     .Where(WeHaveAHandler)
+                                                                     .Select(FetchExistingTopicSubscriptions)
+                                                                     .ToArray();
 
-            Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
+                                 Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
 
-            var subscriptionKeys = subscriptionTasks
-                .SelectMany(t => t.Result)
-                .OrderBy(k => k)
-                .ToArray();
+                                 var subscriptionKeys = subscriptionTasks
+                                     .SelectMany(t => t.Result)
+                                     .OrderBy(k => k)
+                                     .ToArray();
 
-            return new ConcurrentBag<string>(subscriptionKeys);
-        }
-
-        private bool WeHaveAHandler(string topicPath)
-        {
-            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
-            return paths.Contains(topicPath);
+                                 return new ConcurrentBag<string>(subscriptionKeys);
+                             });
         }
 
         private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
         {
-            return Task.Run(async () =>
-                                  {
-                                      var subscriptions = await _namespaceManager().GetSubscriptionsAsync(topicPath);
+            return Task.Run(() =>
+                            {
+                                return _retry.DoAsync(async () =>
+                                                            {
+                                                                var subscriptions = await _namespaceManager().GetSubscriptionsAsync(topicPath);
 
-                                      return subscriptions
-                                          .Select(s => s.Name)
-                                          .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
-                                          .ToArray();
-                                  });
+                                                                return subscriptions
+                                                                    .Select(s => s.Name)
+                                                                    .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
+                                                                    .ToArray();
+                                                            });
+                            });
         }
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
-            _logger.Debug("Fetching existing queues...");
+            return _retry.Do(() =>
+                             {
+                                 _logger.Debug("Fetching existing queues...");
 
-            var queuesAsync = _namespaceManager().GetQueuesAsync();
-            if (!queuesAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+                                 var queuesAsync = _namespaceManager().GetQueuesAsync();
+                                 if (!queuesAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
-            var queues = queuesAsync.Result;
-            var queuePaths = queues.Select(q => q.Path)
-                                   .OrderBy(p => p)
-                                   .ToArray();
-            return new ConcurrentBag<string>(queuePaths);
+                                 var queues = queuesAsync.Result;
+                                 var queuePaths = queues.Select(q => q.Path)
+                                                        .OrderBy(p => p)
+                                                        .ToArray();
+                                 return new ConcurrentBag<string>(queuePaths);
+                             });
         }
 
         private void EnsureTopicExists(string topicPath)
@@ -189,25 +209,28 @@ namespace Nimbus.Transports.WindowsServiceBus
                                            AutoDeleteOnIdle = _autoDeleteOnIdle
                                        };
 
-                // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
-                // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-                // update its configuration in a minute anyway.  -andrewh 8/12/2013
-                try
-                {
-                    _namespaceManager().CreateTopic(topicDescription);
-                }
-                catch (MessagingEntityAlreadyExistsException)
-                {
-                }
-                catch (MessagingException exc)
-                {
-                    if (!exc.Message.Contains("SubCode=40901")) throw;
+                _retry.Do(() =>
+                          {
+                              // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
+                              // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                              // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                              try
+                              {
+                                  _namespaceManager().CreateTopic(topicDescription);
+                              }
+                              catch (MessagingEntityAlreadyExistsException)
+                              {
+                              }
+                              catch (MessagingException exc)
+                              {
+                                  if (!exc.Message.Contains("SubCode=40901")) throw;
 
-                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
-                    if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
-                }
+                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
+                                  if (!_namespaceManager().TopicExists(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+                              }
 
-                _knownTopics.Value.Add(topicPath);
+                              _knownTopics.Value.Add(topicPath);
+                          });
             }
         }
 
@@ -222,41 +245,39 @@ namespace Nimbus.Transports.WindowsServiceBus
 
                 EnsureTopicExists(topicPath);
 
-                _logger.Debug("Creating subscription '{0}'", subscriptionKey);
+                _retry.Do(() =>
+                          {
+                              _logger.Debug("Creating subscription '{0}'", subscriptionKey);
 
-                var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                              {
-                                                  MaxDeliveryCount = _maxDeliveryAttempts,
-                                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                                  EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
-                                                  EnableBatchedOperations = true,
-                                                  RequiresSession = false,
-                                                  AutoDeleteOnIdle = _autoDeleteOnIdle
-                                              };
+                              var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
+                                                            {
+                                                                MaxDeliveryCount = _maxDeliveryAttempts,
+                                                                DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                                                EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
+                                                                EnableBatchedOperations = true,
+                                                                RequiresSession = false,
+                                                                AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                            };
 
-                try
-                {
-                    _namespaceManager().CreateSubscription(subscriptionDescription);
-                }
-                catch (MessagingEntityAlreadyExistsException)
-                {
-                }
-                catch (MessagingException exc)
-                {
-                    if (!exc.Message.Contains("SubCode=40901")) throw;
+                              try
+                              {
+                                  _namespaceManager().CreateSubscription(subscriptionDescription);
+                              }
+                              catch (MessagingEntityAlreadyExistsException)
+                              {
+                              }
+                              catch (MessagingException exc)
+                              {
+                                  if (!exc.Message.Contains("SubCode=40901")) throw;
 
-                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
-                    if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
-                        throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
-                }
+                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
+                                  if (!_namespaceManager().SubscriptionExists(topicPath, subscriptionName))
+                                      throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+                              }
 
-                _knownSubscriptions.Value.Add(subscriptionKey);
+                              _knownSubscriptions.Value.Add(subscriptionKey);
+                          });
             }
-        }
-
-        private static string BuildSubscriptionKey(string topicPath, string subscriptionName)
-        {
-            return "{0}/{1}".FormatWith(topicPath, subscriptionName);
         }
 
         internal void EnsureQueueExists(string queuePath)
@@ -267,46 +288,61 @@ namespace Nimbus.Transports.WindowsServiceBus
             {
                 if (_knownQueues.Value.Contains(queuePath)) return;
 
-                _logger.Debug("Creating queue '{0}'", queuePath);
+                _retry.Do(() =>
+                          {
+                              _logger.Debug("Creating queue '{0}'", queuePath);
 
-                var queueDescription = new QueueDescription(queuePath)
-                                       {
-                                           MaxDeliveryCount = _maxDeliveryAttempts,
-                                           DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                           EnableDeadLetteringOnMessageExpiration = true,
-                                           EnableBatchedOperations = true,
-                                           RequiresDuplicateDetection = false,
-                                           RequiresSession = false,
-                                           SupportOrdering = false,
-                                           AutoDeleteOnIdle = _autoDeleteOnIdle
-                                       };
+                              var queueDescription = new QueueDescription(queuePath)
+                                                     {
+                                                         MaxDeliveryCount = _maxDeliveryAttempts,
+                                                         DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                                         EnableDeadLetteringOnMessageExpiration = true,
+                                                         EnableBatchedOperations = true,
+                                                         RequiresDuplicateDetection = false,
+                                                         RequiresSession = false,
+                                                         SupportOrdering = false,
+                                                         AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                     };
 
-                // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
-                // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-                // update its configuration in a minute anyway.  -andrewh 8/12/2013
-                try
-                {
-                    _namespaceManager().CreateQueue(queueDescription);
-                }
-                catch (MessagingEntityAlreadyExistsException)
-                {
-                }
-                catch (MessagingException exc)
-                {
-                    if (!exc.Message.Contains("SubCode=40901")) throw;
+                              // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
+                              // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                              // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                              try
+                              {
+                                  _namespaceManager().CreateQueue(queueDescription);
+                              }
+                              catch (MessagingEntityAlreadyExistsException)
+                              {
+                                  _namespaceManager().UpdateQueue(queueDescription);
+                              }
+                              catch (MessagingException exc)
+                              {
+                                  if (!exc.Message.Contains("SubCode=40901")) throw;
 
-                    // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
-                    if (!_namespaceManager().QueueExists(queuePath))
-                        throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
-                }
+                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
+                                  if (!_namespaceManager().QueueExists(queuePath))
+                                      throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
+                              }
 
-                _knownQueues.Value.Add(queuePath);
+                              _knownQueues.Value.Add(queuePath);
+                          });
             }
+        }
+
+        private bool WeHaveAHandler(string topicPath)
+        {
+            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
+            return paths.Contains(topicPath);
         }
 
         private object LockFor(string path)
         {
             return _locks.GetOrAdd(path, p => new object());
+        }
+
+        private static string BuildSubscriptionKey(string topicPath, string subscriptionName)
+        {
+            return "{0}/{1}".FormatWith(topicPath, subscriptionName);
         }
     }
 }

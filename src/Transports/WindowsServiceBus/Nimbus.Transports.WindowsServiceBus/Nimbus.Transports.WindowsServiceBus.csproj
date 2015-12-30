@@ -60,6 +60,7 @@
     <Compile Include="Extensions\MessagingExceptionExtensions.cs" />
     <Compile Include="Extensions\MessagingFactoryExtensions.cs" />
     <Compile Include="NamespaceCleanser.cs" />
+    <Compile Include="Retry.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusQueueMessageReceiver.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusQueueMessageSender.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusSubscriptionMessageReceiver.cs" />

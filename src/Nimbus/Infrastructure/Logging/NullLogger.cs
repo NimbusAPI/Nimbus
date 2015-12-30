@@ -16,6 +16,10 @@ namespace Nimbus.Infrastructure.Logging
         {
         }
 
+        public void Warn(Exception exc, string format, params object[] args)
+        {
+        }
+
         public void Error(string format, params object[] args)
         {
         }

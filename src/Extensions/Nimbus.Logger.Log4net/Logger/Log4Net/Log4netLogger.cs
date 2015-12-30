@@ -3,7 +3,7 @@ using log4net;
 
 namespace Nimbus.Logger.Log4net
 {
-    public class Log4NetLogger : Nimbus.ILogger
+    public class Log4NetLogger : ILogger
     {
         private readonly ILog _log;
 
@@ -27,6 +27,11 @@ namespace Nimbus.Logger.Log4net
             _log.WarnFormat(format, args);
         }
 
+        public void Warn(Exception exc, string format, params object[] args)
+        {
+            _log.Warn(string.Format(format, args), exc);
+        }
+
         public void Error(string format, params object[] args)
         {
             _log.ErrorFormat(format, args);
@@ -37,6 +42,5 @@ namespace Nimbus.Logger.Log4net
             var message = String.Format(format, args);
             _log.Error(message, exc);
         }
-
     }
 }

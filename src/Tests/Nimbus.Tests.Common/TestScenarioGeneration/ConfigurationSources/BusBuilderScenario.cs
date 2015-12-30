@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Transport;
+using Nimbus.Extensions;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.Routing;
