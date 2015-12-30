@@ -154,7 +154,6 @@
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\HappyBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\SlowBlackBallRequestHandler.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
-    <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowTwoResponders.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Tests\PoisonMessageTests\DeadLetterOfficeExtensions.cs" />
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
