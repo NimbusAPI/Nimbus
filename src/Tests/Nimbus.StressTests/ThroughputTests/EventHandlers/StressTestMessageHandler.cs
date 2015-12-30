@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
 
@@ -97,18 +98,23 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
         private static void RecordMessageReceipt(StressTestMessage message)
         {
             message.WhenReceived = DateTimeOffset.UtcNow;
-            Messages.Add(message);
 
-            if (ActualNumMessagesReceived%10 == 0)
-            {
-                Console.WriteLine("Seen {0} messages", ActualNumMessagesReceived);
-            }
+            // Don't block the actual test method. As long as receipt gets recorded sometime soon, we're fine.
+            Task.Run(() =>
+                     {
+                         Messages.Add(message);
+
+                         if (ActualNumMessagesReceived%10 == 0)
+                         {
+                             Console.WriteLine("Seen {0} messages", ActualNumMessagesReceived);
+                         }
+                     }).ConfigureAwaitFalse();
         }
 
         public static void RecordResponseMessageReceipt(StressTestResponseMessage message)
         {
             message.WhenReceived = DateTimeOffset.UtcNow;
-            ResponseMessages.Add(message);
+            Task.Run(() => { ResponseMessages.Add(message); }).ConfigureAwaitFalse();
         }
     }
 }
