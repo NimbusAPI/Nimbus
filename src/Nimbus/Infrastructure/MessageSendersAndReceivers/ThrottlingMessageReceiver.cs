@@ -90,26 +90,24 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     var message = await Fetch(_cancellationTokenSource.Token);
                     if (message == null) continue;
 
+                    await _localHandlerThrottle.WaitAsync(_cancellationTokenSource.Token);
                     await _globalHandlerThrottle.Wait(_cancellationTokenSource.Token);
-                    try
-                    {
-                        await _localHandlerThrottle.WaitAsync(_cancellationTokenSource.Token);
-                        try
-                        {
-                            GlobalMessageCounters.IncrementReceivedMessageCount(1);
+
 #pragma warning disable 4014
-                            Task.Run(() => callback(message)).ConfigureAwaitFalse();
+                    Task.Run(async () =>
+                                   {
+                                       try
+                                       {
+                                           await callback(message);
+                                           GlobalMessageCounters.IncrementReceivedMessageCount(1);
+                                       }
+                                       finally
+                                       {
+                                           _globalHandlerThrottle.Release();
+                                           _localHandlerThrottle.Release();
+                                       }
+                                   }).ConfigureAwaitFalse();
 #pragma warning restore 4014
-                        }
-                        finally
-                        {
-                            _localHandlerThrottle.Release();
-                        }
-                    }
-                    finally
-                    {
-                        _globalHandlerThrottle.Release();
-                    }
                 }
                 catch (OperationCanceledException)
                 {

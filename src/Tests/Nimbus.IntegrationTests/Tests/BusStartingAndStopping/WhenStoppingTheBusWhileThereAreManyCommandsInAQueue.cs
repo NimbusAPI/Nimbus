@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -18,44 +17,39 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
     [TestFixture]
     public class WhenStoppingTheBusWhileThereAreManyCommandsInAQueue : TestForBus
     {
-        private const int _totalCommands = 100;
-
-        private int _commandHandlerInvocationCount;
-        private int _additionalCommandHandlerInvocationCount;
+        private int _totalCommandsToSend;
+        private int _expectedNumberOfCommandsToBeSeenBeforeTheBusStops;
 
         protected override async Task When()
         {
-            Enumerable.Range(0, _totalCommands)
-                      .Select(i => Bus.Send(new SlowCommand()))
-                      .WaitAll();
-            await TimeSpan.FromSeconds(1).WaitUntil(() => MethodCallCounter.TotalReceivedCalls > 0);
+            var overallConcurrentHandlerLimit = Math.Min(Instance.Configuration.ConcurrentHandlerLimit.Value, Instance.Configuration.GlobalConcurrentHandlerLimit.Value);
+
+            _totalCommandsToSend = overallConcurrentHandlerLimit*2;
+            _expectedNumberOfCommandsToBeSeenBeforeTheBusStops = overallConcurrentHandlerLimit;
+
+            SlowCommandHandler.Reset();
+
+            await Enumerable.Range(0, _totalCommandsToSend)
+                            .Select(i => Bus.Send(new SlowCommand()))
+                            .WhenAll();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds)
+                          .WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count() >= _expectedNumberOfCommandsToBeSeenBeforeTheBusStops);
             await Bus.Stop();
-
-            _commandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
             Console.WriteLine("Bus has stopped.");
-            Console.WriteLine("Number of commands received immediately afterwards: {0}", _commandHandlerInvocationCount);
-            MethodCallCounter.Clear();
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
-        public async Task TheBusShouldStopBeforeAllTheCommandsAreHandled(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task TheNumberOfCommandsSeenShouldBeTheNumberOfConcurrentHandlers(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
 
-            Console.WriteLine("Observed a total of {0} command handler invocations", _commandHandlerInvocationCount);
-            _commandHandlerInvocationCount.ShouldBeLessThan(_totalCommands);
-        }
-
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
-        public async Task AtLeastSomeOfTheCommandsShouldHaveBeenHandled(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
-        {
-            await Given(scenario);
-            await When();
-
-            _commandHandlerInvocationCount.ShouldBeGreaterThan(0);
+            // The number of commands dispatched by the bus should have been the number of concurrent handlers, after which the throttling
+            // should have paused any further dispatching. Given that we only release the throttle after we've stopped the bus, the number of
+            // messages dispatched should exactly match the number of concurrent handlers.
+            MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count().ShouldBe(Instance.Configuration.ConcurrentHandlerLimit);
         }
 
         [Test]
@@ -65,12 +59,11 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
             await Given(scenario);
             await When();
 
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
-            MethodCallCounter.Stop();
-            _additionalCommandHandlerInvocationCount = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
-            Console.WriteLine("Number of commands received after that: {0}", _additionalCommandHandlerInvocationCount);
+            MethodCallCounter.Clear();
+            SlowCommandHandler.HandlerSemaphore.Release(_totalCommandsToSend);
+            await Task.Delay(TimeSpan.FromSeconds(0.25));
 
-            _additionalCommandHandlerInvocationCount.ShouldBe(0);
+            MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count().ShouldBe(0);
         }
     }
 }
