@@ -58,8 +58,10 @@ namespace Nimbus.Transports.WindowsServiceBus
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
 
             _retry = new Retry(5)
-                .Chain(r => r.TransientFailure += (s, e) => _logger.Warn(e, "A transient failure occurred."))
-                .Chain(r => r.PermanentFailure += (s, e) => _logger.Error(e, "A permanent failure occurred."));
+                .Chain(r => r.Started += (s, e) => _logger.Debug("{Action}...", e.ActionName))
+                .Chain(r => r.Success += (s, e) => _logger.Debug("{Action} completed successfully in {Elapsed}.", e.ActionName, e.ElapsedTime))
+                .Chain(r => r.TransientFailure += (s, e) => _logger.Warn(e.Exception, "A transient failure occurred in action {Action}.", e.ActionName))
+                .Chain(r => r.PermanentFailure += (s, e) => _logger.Error(e.Exception, "A permanent failure occurred in action {Action}.", e.ActionName));
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
@@ -92,7 +94,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                                                  {
                                                      var topicClient = _messagingFactory().CreateTopicClient(topicPath);
                                                      return topicClient;
-                                                 });
+                                                 },
+                                                 "Creating topic sender for " + topicPath);
                             }).ConfigureAwaitFalse();
         }
 
@@ -107,7 +110,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                                                      var subscriptionClient = _messagingFactory()
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
                                                      return subscriptionClient;
-                                                 });
+                                                 },
+                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName);
                             }).ConfigureAwaitFalse();
         }
 
@@ -125,7 +129,6 @@ namespace Nimbus.Transports.WindowsServiceBus
         {
             return _retry.Do(() =>
                              {
-                                 _logger.Debug("Fetching existing topics...");
                                  var topicsAsync = _namespaceManager().GetTopicsAsync();
                                  if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
@@ -133,15 +136,14 @@ namespace Nimbus.Transports.WindowsServiceBus
                                  var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
 
                                  return topicPaths;
-                             });
+                             },
+                             "Fetching existing topics");
         }
 
         private ConcurrentBag<string> FetchExistingSubscriptions()
         {
             return _retry.Do(() =>
                              {
-                                 _logger.Debug("Fetching existing subscriptions...");
-
                                  var subscriptionTasks = _knownTopics.Value
                                                                      .Where(WeHaveAHandler)
                                                                      .Select(FetchExistingTopicSubscriptions)
@@ -155,7 +157,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                                      .ToArray();
 
                                  return new ConcurrentBag<string>(subscriptionKeys);
-                             });
+                             },
+                             "Fetching existing subscriptions");
         }
 
         private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
@@ -170,16 +173,15 @@ namespace Nimbus.Transports.WindowsServiceBus
                                                                     .Select(s => s.Name)
                                                                     .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
                                                                     .ToArray();
-                                                            });
-                            });
+                                                            },
+                                                      "Fetching topic subscriptions for " + topicPath);
+                            }).ConfigureAwaitFalse();
         }
 
         private ConcurrentBag<string> FetchExistingQueues()
         {
             return _retry.Do(() =>
                              {
-                                 _logger.Debug("Fetching existing queues...");
-
                                  var queuesAsync = _namespaceManager().GetQueuesAsync();
                                  if (!queuesAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
 
@@ -188,7 +190,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                                                         .OrderBy(p => p)
                                                         .ToArray();
                                  return new ConcurrentBag<string>(queuePaths);
-                             });
+                             },
+                             "Fetching existing queues");
         }
 
         private void EnsureTopicExists(string topicPath)
@@ -197,8 +200,6 @@ namespace Nimbus.Transports.WindowsServiceBus
             lock (LockFor(topicPath))
             {
                 if (_knownTopics.Value.Contains(topicPath)) return;
-
-                _logger.Debug("Creating topic '{0}'", topicPath);
 
                 var topicDescription = new TopicDescription(topicPath)
                                        {
@@ -230,7 +231,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                               }
 
                               _knownTopics.Value.Add(topicPath);
-                          });
+                          },
+                          "Creating topic " + topicPath);
             }
         }
 
@@ -247,8 +249,6 @@ namespace Nimbus.Transports.WindowsServiceBus
 
                 _retry.Do(() =>
                           {
-                              _logger.Debug("Creating subscription '{0}'", subscriptionKey);
-
                               var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
                                                             {
                                                                 MaxDeliveryCount = _maxDeliveryAttempts,
@@ -276,7 +276,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                               }
 
                               _knownSubscriptions.Value.Add(subscriptionKey);
-                          });
+                          },
+                          "Creating subscription " + subscriptionName + " for topic " + topicPath);
             }
         }
 
@@ -290,8 +291,6 @@ namespace Nimbus.Transports.WindowsServiceBus
 
                 _retry.Do(() =>
                           {
-                              _logger.Debug("Creating queue '{0}'", queuePath);
-
                               var queueDescription = new QueueDescription(queuePath)
                                                      {
                                                          MaxDeliveryCount = _maxDeliveryAttempts,
@@ -325,7 +324,8 @@ namespace Nimbus.Transports.WindowsServiceBus
                               }
 
                               _knownQueues.Value.Add(queuePath);
-                          });
+                          },
+                          "Creating queue " + queuePath);
             }
         }
 
