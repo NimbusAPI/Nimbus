@@ -6,6 +6,7 @@ using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
@@ -102,9 +103,12 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
             byte[] compressedBytes;
 
             object blobId;
-            if (message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId))
+            string storageKey = null;
+            var isLargeMessage = message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId);
+            if (isLargeMessage)
             {
-                compressedBytes = await _largeMessageBodyStore.Retrieve((string) blobId);
+                storageKey = (string) blobId;
+                compressedBytes = await _largeMessageBodyStore.Retrieve(storageKey);
             }
             else
             {
@@ -114,7 +118,17 @@ namespace Nimbus.Transports.WindowsServiceBus.BrokeredMessages
             var serializedBytes = _compressor.Decompress(compressedBytes);
             var serializedString = Encoding.UTF8.GetString(serializedBytes);
             var deserialized = _serializer.Deserialize(serializedString, typeof (NimbusMessage));
-            return (NimbusMessage) deserialized;
+            var nimbusMessage = (NimbusMessage) deserialized;
+
+            if (!(nimbusMessage.Payload is IBusEvent))
+            {
+                if (isLargeMessage)
+                {
+                    await _largeMessageBodyStore.Delete(storageKey);
+                }
+            }
+
+            return nimbusMessage;
         }
     }
 }
