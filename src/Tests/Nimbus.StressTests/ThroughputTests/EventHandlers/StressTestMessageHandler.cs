@@ -85,7 +85,7 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
 
         public static int ActualNumMessagesReceived => Messages.Count;
 
-        public static void WaitUntilDone(int expectedNumMessagesReceived, TimeSpan timeout)
+        public static async Task WaitUntilDone(int expectedNumMessagesReceived, TimeSpan timeout)
         {
             Log.Debug("Waiting until all messages are received.");
 
@@ -94,7 +94,7 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
             {
                 if (sw.Elapsed >= timeout) return;
                 if (ActualNumMessagesReceived >= expectedNumMessagesReceived) return;
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
         }
 

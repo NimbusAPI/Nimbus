@@ -72,7 +72,7 @@ namespace Nimbus.StressTests.ThroughputTests
 
             Log.Information("Total of {NumMessagesSent} messages sent in {Elapsed}", _numMessagesSent, _sendingStopwatch.Elapsed);
 
-            StressTestMessageHandler.WaitUntilDone(_numMessagesSent, TimeSpan.FromSeconds(TimeoutSeconds));
+            await StressTestMessageHandler.WaitUntilDone(_numMessagesSent, TimeSpan.FromSeconds(TimeoutSeconds));
             _sendingAndReceivingStopwatch.Stop();
         }
 
