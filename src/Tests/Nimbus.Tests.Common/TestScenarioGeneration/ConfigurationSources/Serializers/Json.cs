@@ -5,7 +5,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serial
     internal class Json : IConfigurationScenario<ISerializer>
     {
         public string Name { get; } = "Json";
-        public string[] Categories { get; } = {"Json"};
+        public string[] Categories { get; } = {"Json", "SmokeTest"};
 
         public ScenarioInstance<ISerializer> CreateInstance()
         {

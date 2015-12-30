@@ -14,8 +14,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serial
 
         public IEnumerator<IConfigurationScenario<ISerializer>> GetEnumerator()
         {
-            yield return new DataContract(_typeProvider);
             yield return new Json();
+            yield return new DataContract(_typeProvider);
             //yield return new ProtoBuf(); //FIXME do we still want this?
         }
 

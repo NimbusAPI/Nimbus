@@ -6,7 +6,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Router
     internal class DestinationPerMessageType : IConfigurationScenario<IRouter>
     {
         public string Name { get; } = "DestinationPerMessageType";
-        public string[] Categories { get; } = {"DestinationPerMessageType"};
+        public string[] Categories { get; } = {"DestinationPerMessageType", "SmokeTest"};
 
         public ScenarioInstance<IRouter> CreateInstance()
         {

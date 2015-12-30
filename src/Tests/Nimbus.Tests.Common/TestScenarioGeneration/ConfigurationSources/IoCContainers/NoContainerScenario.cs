@@ -6,7 +6,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCCon
     public class NoContainerScenario : IConfigurationScenario<ContainerConfiguration>
     {
         public string Name { get; } = "NoContainer";
-        public string[] Categories { get; } = {"NoContainer"};
+        public string[] Categories { get; } = {"NoContainer", "SmokeTest"};
 
         public ScenarioInstance<ContainerConfiguration> CreateInstance()
         {
