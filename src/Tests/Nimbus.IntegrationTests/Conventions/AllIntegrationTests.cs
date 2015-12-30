@@ -13,9 +13,11 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
-    [Timeout(1*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class AllIntegrationTests
     {
+        protected const int TimeoutSeconds = 15;
+
         [Test]
         [TestCaseSource(typeof (TestCases))]
         public async Task ShouldReturnTask(MethodInfo testMethod)
