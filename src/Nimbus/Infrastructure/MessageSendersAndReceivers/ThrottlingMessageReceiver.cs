@@ -97,7 +97,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                         try
                         {
                             GlobalMessageCounters.IncrementReceivedMessageCount(1);
-                            Task.Run(() => callback(message)).ConfigureAwaitFalse(); // don't await
+#pragma warning disable 4014
+                            Task.Run(() => callback(message)).ConfigureAwaitFalse();
+#pragma warning restore 4014
                         }
                         finally
                         {
