@@ -5,11 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
+using Serilog;
 
 namespace Nimbus.StressTests.ThroughputTests
 {
@@ -19,20 +22,22 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         protected const int TimeoutSeconds = 60;
 
-        private Stopwatch _stopwatch;
+        private Stopwatch _sendingStopwatch;
+        private Stopwatch _sendingAndReceivingStopwatch;
+
         private int _numMessagesSent;
         private double _messagesPerSecond;
         private double _averageOneWayLatency;
-        private double _averageRequestResponseLatency;
+        private double? _averageRequestResponseLatency;
         private ScenarioInstance<BusBuilderConfiguration> _instance;
 
         protected Bus Bus { get; private set; }
 
         protected virtual TimeSpan SendMessagesFor { get; } = TimeSpan.FromSeconds(5);
 
-        protected void ExpectToReceiveMessages(int numMessages = 1)
+        static ThroughputSpecificationForBus()
         {
-            Interlocked.Add(ref _numMessagesSent, numMessages);
+            TestHarnessLoggerFactory.Create();
         }
 
         protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
@@ -57,36 +62,28 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected virtual async Task When()
         {
-            Console.WriteLine("Starting to send messages...");
+            Log.Information("Starting to send messages...");
             StressTestMessageHandler.Reset();
-            _stopwatch = Stopwatch.StartNew();
+            _sendingStopwatch = Stopwatch.StartNew();
+            _sendingAndReceivingStopwatch = Stopwatch.StartNew();
 
-            await Task.WhenAll(SendMessages(Bus));
+            await Enumerable.Range(0, 5)
+                            .Select(i => Task.Run(() => SendMessages(Bus)).ConfigureAwaitFalse())
+                            .WhenAll();
 
-            Console.WriteLine();
-            Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
+            _sendingStopwatch.Stop();
+
+            Log.Information("Total of {NumMessagesSent} messages sent in {Elapsed}", _numMessagesSent, _sendingStopwatch.Elapsed);
+
             StressTestMessageHandler.WaitUntilDone(_numMessagesSent, TimeSpan.FromSeconds(TimeoutSeconds));
-            _stopwatch.Stop();
+            _sendingAndReceivingStopwatch.Stop();
+        }
 
-            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, _numMessagesSent);
+        public abstract Task SendMessages(IBus bus);
 
-            _messagesPerSecond = StressTestMessageHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
-            Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
-
-            _averageOneWayLatency = StressTestMessageHandler.Messages
-                                                            .Select(m => m.WhenReceived - m.WhenSent)
-                                                            .Select(ts => ts.TotalMilliseconds)
-                                                            .Average();
-            Console.WriteLine("Average one-way latency: {0} milliseconds", _averageOneWayLatency);
-
-            if (StressTestMessageHandler.ResponseMessages.Any())
-            {
-                _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages
-                                                                         .Select(m => m.WhenReceived - m.RequestSentAt)
-                                                                         .Select(ts => ts.TotalMilliseconds)
-                                                                         .Average();
-                Console.WriteLine("Average request/response latency: {0} milliseconds", _averageRequestResponseLatency);
-            }
+        protected void ExpectToReceiveMessages(int numMessages = 1)
+        {
+            Interlocked.Add(ref _numMessagesSent, numMessages);
         }
 
         [Test]
@@ -95,9 +92,40 @@ namespace Nimbus.StressTests.ThroughputTests
         {
             await Given(scenario);
             await When();
+
+            _messagesPerSecond = StressTestMessageHandler.ActualNumMessagesReceived/_sendingAndReceivingStopwatch.Elapsed.TotalSeconds;
+            _averageOneWayLatency = StressTestMessageHandler.Messages
+                                                            .Select(m => m.WhenReceived - m.WhenSent)
+                                                            .Select(ts => ts.TotalMilliseconds)
+                                                            .Average();
+            _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages.Any()
+                ? StressTestMessageHandler.ResponseMessages
+                                          .Select(m => m.WhenReceived - m.RequestSentAt)
+                                          .Select(ts => ts.TotalMilliseconds)
+                                          .Average()
+                : default(double?);
+
+            Log.Information("Total of {NumMessagesSent} messages processed in {Elapsed}", _numMessagesSent, _sendingAndReceivingStopwatch.Elapsed);
+            Log.Information("Average throughput: {MessagesPerSecond} messages/second", _messagesPerSecond);
+            Log.Information("Average one-way latency: {AverageOneWayLatency}", TimeSpan.FromMilliseconds(_averageOneWayLatency));
+            Log.Information("Average request/response latency: {AverageRequestResponseLatency}",
+                            _averageRequestResponseLatency.HasValue
+                                ? (object) TimeSpan.FromMilliseconds(_averageRequestResponseLatency.Value)
+                                : "N/A");
+
+            RecordTeamCityStatistic(testName, "TotalMessages", _numMessagesSent);
+            RecordTeamCityStatistic(testName, "TotalElapsedMilliseconds", _sendingAndReceivingStopwatch.ElapsedMilliseconds);
+            RecordTeamCityStatistic(testName, "MessagesPerSecond", _messagesPerSecond);
+            RecordTeamCityStatistic(testName, "AverageOneWayLatencyInMilliseconds", _averageOneWayLatency);
+            RecordTeamCityStatistic(testName, "AverageRequestResponseLatencyInMilliseconds", _averageRequestResponseLatency);
         }
 
-        public abstract Task SendMessages(IBus bus);
+        private void RecordTeamCityStatistic(string testName, string key, double? value)
+        {
+            var fullKey = string.Join(".", GetType().Name, testName, key);
+            var message = "##teamcity[buildStatisticValue key='{0}' value='{1}']".FormatWith(fullKey, value);
+            Console.WriteLine(message);
+        }
 
         [TearDown]
         public void TearDown()

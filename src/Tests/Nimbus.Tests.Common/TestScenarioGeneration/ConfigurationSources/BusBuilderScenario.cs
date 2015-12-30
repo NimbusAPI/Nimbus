@@ -46,13 +46,10 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
                                                 .WithRouter(router.Configuration)
                                                 .WithSerializer(serializer.Configuration)
                                                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                                                .WithDefaultConcurrentHandlerLimit(2) // fewer of these just speeds up our tests as we have a lot of setup/teardown to do
                                                 .WithNames("MyTestSuite", Environment.MachineName)
                                                 .WithTypesFrom(_typeProvider)
-                                                .WithGlobalInboundInterceptorTypes(
-                                                    _typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                .WithGlobalOutboundInterceptorTypes(
-                                                    _typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                                .WithGlobalInboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                                .WithGlobalOutboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                                                 .WithLogger(_logger)
                                                 .WithDebugOptions(
