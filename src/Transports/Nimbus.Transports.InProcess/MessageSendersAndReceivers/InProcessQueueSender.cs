@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
@@ -19,7 +20,8 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
         public async Task Send(NimbusMessage message)
         {
             var messageClone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
-            var messageQueue = _messageStore.GetMessageQueue(_queue.QueuePath);
+            AsyncBlockingCollection<NimbusMessage> messageQueue;
+            if (!_messageStore.TryGetExistingMessageQueue(_queue.QueuePath, out messageQueue)) return;
             await messageQueue.Add(messageClone);
         }
     }

@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
@@ -27,7 +28,8 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
         private async Task AddToCompetingSubscribersQueue(NimbusMessage message)
         {
             var clone = Clone(message);
-            var topicQueue = _messageStore.GetMessageQueue(_topic.TopicPath);
+            AsyncBlockingCollection<NimbusMessage> topicQueue;
+            if (!_messageStore.TryGetExistingMessageQueue(_topic.TopicPath, out topicQueue)) return;
             await topicQueue.Add(clone);
         }
 
@@ -38,7 +40,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
                                 {
                                     var messageClone = Clone(message);
                                     var fullyQualifiedSubscriptionPath = InProcessTransport.FullyQualifiedSubscriptionPath(_topic.TopicPath, subscriptionName);
-                                    var subscriptionQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
+                                    var subscriptionQueue = _messageStore.GetOrCreateMessageQueue(fullyQualifiedSubscriptionPath);
                                     var task = subscriptionQueue.Add(messageClone);
                                     return task;
                                 })

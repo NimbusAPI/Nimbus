@@ -20,9 +20,22 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return _topics.GetOrAdd(topicPath, p => new Topic(topicPath));
         }
 
-        public AsyncBlockingCollection<NimbusMessage> GetMessageQueue(string path)
+        public AsyncBlockingCollection<NimbusMessage> GetOrCreateMessageQueue(string path)
         {
             return _messageQueues.GetOrAdd(path, p => new AsyncBlockingCollection<NimbusMessage>());
+        }
+
+        /// <summary>
+        ///     Returns the specified queue if it already exists but does not create one if it does not.
+        /// </summary>
+        /// <returns>True if the queue exists; false otherwise.</returns>
+        /// <remarks>
+        ///     Senders should use this so that we don't fill up in-memory queues with messages for which there are no handlers.
+        ///     Receivers should use GetOrCreateMessageQueue.
+        /// </remarks>
+        public bool TryGetExistingMessageQueue(string path, out AsyncBlockingCollection<NimbusMessage> queue)
+        {
+            return _messageQueues.TryGetValue(path, out queue);
         }
     }
 }

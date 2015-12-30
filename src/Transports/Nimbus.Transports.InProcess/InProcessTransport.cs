@@ -36,7 +36,7 @@ namespace Nimbus.Transports.InProcess
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
         {
-            var messageQueue = _messageStore.GetMessageQueue(queuePath);
+            var messageQueue = _messageStore.GetOrCreateMessageQueue(queuePath);
             return _container.ResolveWithOverrides<InProcessQueueReceiver>(queuePath, messageQueue);
         }
 
@@ -46,7 +46,7 @@ namespace Nimbus.Transports.InProcess
             topic.Subscribe(subscriptionName);
 
             var fullyQualifiedSubscriptionPath = FullyQualifiedSubscriptionPath(topicPath, subscriptionName);
-            var messageQueue = _messageStore.GetMessageQueue(fullyQualifiedSubscriptionPath);
+            var messageQueue = _messageStore.GetOrCreateMessageQueue(fullyQualifiedSubscriptionPath);
             return _container.ResolveWithOverrides<InProcessQueueReceiver>(fullyQualifiedSubscriptionPath, messageQueue);
         }
 
