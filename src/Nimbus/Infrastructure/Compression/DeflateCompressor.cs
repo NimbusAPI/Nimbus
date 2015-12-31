@@ -1,7 +1,7 @@
 using System.IO;
 using System.IO.Compression;
 
-namespace Nimbus.Infrastructure.BrokeredMessageServices.Compression
+namespace Nimbus.Infrastructure.Compression
 {
     public class DeflateCompressor : ICompressor
     {

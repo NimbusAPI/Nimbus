@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     public class GlobalHandlerThrottle : IGlobalHandlerThrottle, IDisposable
     {

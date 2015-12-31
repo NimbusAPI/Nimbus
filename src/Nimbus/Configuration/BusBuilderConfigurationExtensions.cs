@@ -1,10 +1,11 @@
 ﻿using System;
+using Nimbus.Configuration.Compression;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.Routing;

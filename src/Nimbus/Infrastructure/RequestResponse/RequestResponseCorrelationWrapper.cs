@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Exceptions;
+using Nimbus.Extensions;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {

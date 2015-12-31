@@ -1,4 +1,4 @@
-using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.Infrastructure.Serialization;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
 {

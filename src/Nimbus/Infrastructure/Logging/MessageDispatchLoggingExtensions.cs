@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Nimbus.Annotations;
+using Nimbus.Properties;
 
 namespace Nimbus.Infrastructure.Logging
 {

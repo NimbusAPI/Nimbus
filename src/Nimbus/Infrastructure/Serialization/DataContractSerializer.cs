@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using Nimbus.Extensions;
 
-namespace Nimbus.Infrastructure.BrokeredMessageServices.Serialization
+namespace Nimbus.Infrastructure.Serialization
 {
     public class DataContractSerializer : ISerializer
     {

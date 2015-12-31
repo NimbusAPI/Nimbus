@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.Compression;
 using NUnit.Framework;
 using Shouldly;
 

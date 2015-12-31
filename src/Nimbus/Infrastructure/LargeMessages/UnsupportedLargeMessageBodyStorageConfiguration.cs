@@ -2,7 +2,7 @@
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.PoorMansIocContainer;
 
-namespace Nimbus.Infrastructure.NimbusMessageServices.LargeMessages
+namespace Nimbus.Infrastructure.LargeMessages
 {
     public class UnsupportedLargeMessageBodyStorageConfiguration : LargeMessageStorageConfiguration
     {

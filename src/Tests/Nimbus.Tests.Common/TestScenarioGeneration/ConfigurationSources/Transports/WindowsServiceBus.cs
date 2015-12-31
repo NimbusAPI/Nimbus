@@ -1,6 +1,6 @@
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.Transport;
-using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
+using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Transports.WindowsServiceBus;
 

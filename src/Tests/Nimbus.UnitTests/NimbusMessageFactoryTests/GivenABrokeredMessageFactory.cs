@@ -2,7 +2,6 @@
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.NimbusMessageServices;
 using NSubstitute;
 
 namespace Nimbus.UnitTests.NimbusMessageFactoryTests

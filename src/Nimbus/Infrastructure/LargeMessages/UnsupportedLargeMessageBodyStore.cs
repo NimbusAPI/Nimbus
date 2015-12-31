@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Nimbus.Infrastructure.NimbusMessageServices.LargeMessages
+namespace Nimbus.Infrastructure.LargeMessages
 {
     internal class UnsupportedLargeMessageBodyStore : ILargeMessageBodyStore
     {

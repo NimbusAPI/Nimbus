@@ -2,15 +2,14 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.NimbusMessageServices;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Stubs;
 using NSubstitute;
 using NUnit.Framework;
-using DataContractSerializer = Nimbus.Infrastructure.BrokeredMessageServices.Serialization.DataContractSerializer;
+using DataContractSerializer = Nimbus.Infrastructure.Serialization.DataContractSerializer;
 
 namespace Nimbus.UnitTests.CompressionTests
 {

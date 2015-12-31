@@ -1,4 +1,4 @@
-﻿namespace Nimbus.Infrastructure.BrokeredMessageServices.Compression
+﻿namespace Nimbus.Infrastructure.Compression
 {
     public class NullCompressor : ICompressor
     {

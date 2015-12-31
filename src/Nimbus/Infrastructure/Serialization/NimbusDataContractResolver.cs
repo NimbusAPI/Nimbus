@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Xml;
 using Nimbus.Extensions;
 
-namespace Nimbus.Infrastructure.BrokeredMessageServices.Serialization
+namespace Nimbus.Infrastructure.Serialization
 {
     internal class NimbusDataContractResolver : DataContractResolver
     {

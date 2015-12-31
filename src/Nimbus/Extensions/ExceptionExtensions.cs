@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using Nimbus.Infrastructure;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Extensions
 {
     internal static class ExceptionExtensions
     {

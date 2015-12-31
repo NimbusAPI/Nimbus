@@ -5,7 +5,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using NullGuard;
 
-namespace Nimbus.Infrastructure.NimbusMessageServices
+namespace Nimbus.Infrastructure
 {
     internal class NimbusMessageFactory : INimbusMessageFactory
     {

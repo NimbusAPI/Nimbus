@@ -1,7 +1,6 @@
-using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
+using Nimbus.Infrastructure.Compression;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Configuration.Compression
 {
     public static class BusBuilderCompressionConfigurationExtensions
     {
