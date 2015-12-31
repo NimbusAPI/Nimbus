@@ -41,15 +41,15 @@
   <ItemGroup>
     <Compile Include="DeadLetterOffice\InProcessDeadLetterOffice.cs" />
     <Compile Include="DelayedDelivery\InProcessDelayedDeliveryService.cs" />
-    <Compile Include="MessageSendersAndReceivers\InProcessMessageStore.cs" />
     <Compile Include="InProcessTransport.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueReceiver.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueSender.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessTopicSender.cs" />
     <Compile Include="InProcessTransportConfiguration.cs" />
-    <Compile Include="MessageSendersAndReceivers\Queue.cs" />
-    <Compile Include="MessageSendersAndReceivers\Topic.cs" />
+    <Compile Include="QueueManagement\Queue.cs" />
+    <Compile Include="QueueManagement\Topic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueueManagement\InProcessMessageStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">

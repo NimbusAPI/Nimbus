@@ -1,4 +1,4 @@
-﻿namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
+﻿namespace Nimbus.Transports.InProcess.QueueManagement
 {
     internal class Queue
     {

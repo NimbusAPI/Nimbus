@@ -4,7 +4,9 @@ using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Transport;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
+using Nimbus.Transports.InProcess.QueueManagement;
 
 namespace Nimbus.Transports.InProcess
 {
@@ -20,6 +22,7 @@ namespace Nimbus.Transports.InProcess
             container.RegisterType<InProcessDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<InProcessDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<StubNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
+            container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof (ILargeMessageBodyStore));
             container.RegisterType<InProcessTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
         }
 

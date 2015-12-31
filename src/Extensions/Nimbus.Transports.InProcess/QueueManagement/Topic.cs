@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
+namespace Nimbus.Transports.InProcess.QueueManagement
 {
     internal class Topic
     {

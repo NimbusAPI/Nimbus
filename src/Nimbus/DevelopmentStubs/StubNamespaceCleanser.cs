@@ -3,7 +3,7 @@ using Nimbus.Configuration;
 
 namespace Nimbus.DevelopmentStubs
 {
-    internal class StubNamespaceCleanser: INamespaceCleanser
+    internal class StubNamespaceCleanser : INamespaceCleanser
     {
         public async Task RemoveAllExistingNamespaceElements()
         {

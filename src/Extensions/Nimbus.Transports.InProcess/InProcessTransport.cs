@@ -3,6 +3,7 @@ using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
+using Nimbus.Transports.InProcess.QueueManagement;
 
 namespace Nimbus.Transports.InProcess
 {
