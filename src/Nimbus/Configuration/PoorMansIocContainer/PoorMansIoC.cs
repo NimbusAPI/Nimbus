@@ -95,6 +95,11 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             if (matchingOverride != null) return matchingOverride;
 
             var registration = RegistrationForImplementedType(type);
+            if (registration == null)
+            {
+                throw new DependencyResolutionException("No registration for type")
+                    .WithData("RequestedType", type.FullName);
+            }
 
             try
             {
@@ -110,7 +115,8 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             }
             catch (Exception exc)
             {
-                throw new DependencyResolutionException("Could not resolve type: {0}".FormatWith(type.FullName), exc);
+                throw new DependencyResolutionException("Failed to construct type", exc)
+                    .WithData("RequestedType", type.FullName);
             }
         }
 
