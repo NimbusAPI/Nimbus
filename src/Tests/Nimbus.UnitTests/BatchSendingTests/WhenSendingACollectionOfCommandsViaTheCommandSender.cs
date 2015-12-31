@@ -6,9 +6,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.Infrastructure.Serialization;
 using Nimbus.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
@@ -26,19 +24,17 @@ namespace Nimbus.UnitTests.BatchSendingTests
         {
             _nimbusMessageSender = Substitute.For<INimbusMessageSender>();
 
-            var messagingFactory = Substitute.For<INimbusTransport>();
-            messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
+            var transport = Substitute.For<INimbusTransport>();
+            transport.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                    replyQueueNameSetting,
-                                                                    clock,
-                                                                    new DispatchContextManager());
+            var nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                replyQueueNameSetting,
+                                                                clock,
+                                                                new DispatchContextManager());
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();
@@ -48,9 +44,10 @@ namespace Nimbus.UnitTests.BatchSendingTests
             var busCommandSender = new BusCommandSender(dependencyResolver,
                                                         knownMessageTypeVerifier,
                                                         logger,
-                                                        brokeredMessageFactory,
-                                                        messagingFactory,
-                                                        outboundInterceptorFactory, router);
+                                                        nimbusMessageFactory,
+                                                        transport,
+                                                        outboundInterceptorFactory,
+                                                        router);
             return Task.FromResult(busCommandSender);
         }
 
