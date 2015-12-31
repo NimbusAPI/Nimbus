@@ -2,8 +2,9 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.DeadLetterOffice
 {
     internal class WindowsServiceBusDeadLetterOffice : IDeadLetterOffice
     {

@@ -49,7 +49,6 @@
     <Compile Include="IBus.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IDeadLetterOffice.cs" />
-    <Compile Include="IDeadLetterQueue.cs" />
     <Compile Include="Handlers\IHandleCommand.cs" />
     <Compile Include="Handlers\IHandleCompetingEvent.cs" />
     <Compile Include="Handlers\IHandleMulticastEvent.cs" />

@@ -123,6 +123,7 @@
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
+    <Compile Include="Infrastructure\Retry.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\SubsequentDispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />

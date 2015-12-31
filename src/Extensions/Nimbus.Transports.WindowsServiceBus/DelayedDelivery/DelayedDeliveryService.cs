@@ -2,8 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
 {
     internal class DelayedDeliveryService : IDelayedDeliveryService
     {

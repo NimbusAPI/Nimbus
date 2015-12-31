@@ -39,8 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InProcessDeadLetterOffice.cs" />
-    <Compile Include="InProcessDelayedDeliveryService.cs" />
+    <Compile Include="DeadLetterOffice\InProcessDeadLetterOffice.cs" />
+    <Compile Include="DelayedDelivery\InProcessDelayedDeliveryService.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessMessageStore.cs" />
     <Compile Include="InProcessTransport.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueReceiver.cs" />
@@ -68,6 +68,7 @@
   <ItemGroup>
     <None Include="Nimbus.Transports.InProcess.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

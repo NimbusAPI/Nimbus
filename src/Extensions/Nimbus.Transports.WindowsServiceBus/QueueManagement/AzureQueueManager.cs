@@ -10,7 +10,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.MessageContracts.Exceptions;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 {
     internal class AzureQueueManager : IQueueManager
     {

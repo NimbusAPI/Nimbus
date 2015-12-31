@@ -51,23 +51,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzureQueueManager.cs" />
+    <Compile Include="QueueManagement\AzureQueueManager.cs" />
     <Compile Include="BrokeredMessages\BrokeredMessageFactory.cs" />
-    <Compile Include="DeadLetterQueue.cs" />
     <Compile Include="BrokeredMessages\IBrokeredMessageFactory.cs" />
-    <Compile Include="IQueueManager.cs" />
-    <Compile Include="ITopicClientFactory.cs" />
+    <Compile Include="QueueManagement\IQueueManager.cs" />
     <Compile Include="Extensions\MessagingExceptionExtensions.cs" />
     <Compile Include="Extensions\MessagingFactoryExtensions.cs" />
-    <Compile Include="NamespaceCleanser.cs" />
-    <Compile Include="Retry.cs" />
+    <Compile Include="QueueManagement\NamespaceCleanser.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusQueueMessageReceiver.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusQueueMessageSender.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusSubscriptionMessageReceiver.cs" />
     <Compile Include="SendersAndRecievers\WindowsServiceBusTopicMessageSender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DelayedDeliveryService.cs" />
-    <Compile Include="WindowsServiceBusDeadLetterOffice.cs" />
+    <Compile Include="DelayedDelivery\DelayedDeliveryService.cs" />
+    <Compile Include="DeadLetterOffice\WindowsServiceBusDeadLetterOffice.cs" />
     <Compile Include="WindowsServiceBusTransport.cs" />
     <Compile Include="WindowsServiceBusTransportConfiguration.cs" />
   </ItemGroup>
@@ -90,6 +87,7 @@
       <Name>Nimbus</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

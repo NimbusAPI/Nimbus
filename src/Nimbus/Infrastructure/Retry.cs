@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Infrastructure
 {
     internal class RetryEventArgs : EventArgs
     {

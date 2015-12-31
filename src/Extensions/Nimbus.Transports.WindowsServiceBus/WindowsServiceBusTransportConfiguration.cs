@@ -14,7 +14,10 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.NimbusMessageServices.LargeMessages;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.DeadLetterOffice;
+using Nimbus.Transports.WindowsServiceBus.DelayedDelivery;
 using Nimbus.Transports.WindowsServiceBus.Extensions;
+using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {

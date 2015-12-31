@@ -7,6 +7,7 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 {

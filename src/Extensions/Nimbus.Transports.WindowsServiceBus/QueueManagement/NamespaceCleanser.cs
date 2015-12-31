@@ -5,7 +5,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 {
     public class NamespaceCleanser : INamespaceCleanser
     {
@@ -27,7 +27,6 @@ namespace Nimbus.Transports.WindowsServiceBus
         /// </summary>
         public async Task RemoveAllExistingNamespaceElements()
         {
-            _logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
 
             var queueDeletionTasks = _namespaceManager.Value.GetQueues()
                                                       .Select(q => q.Path)

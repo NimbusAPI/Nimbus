@@ -46,6 +46,7 @@ namespace Nimbus.Configuration
                                 var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
                                 if (removeAllExistingElements)
                                 {
+                                    logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
                                     var cleanser = container.Resolve<INamespaceCleanser>();
                                     cleanser.RemoveAllExistingNamespaceElements().Wait();
                                 }

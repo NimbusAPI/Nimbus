@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Nimbus.Transports.WindowsServiceBus
+namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 {
     internal interface IQueueManager
     {
