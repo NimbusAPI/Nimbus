@@ -78,7 +78,8 @@
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
-    <Compile Include="Infrastructure\GlobalHandlerThrottle.cs" />
+    <Compile Include="Infrastructure\INimbusTransport.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
@@ -100,6 +101,8 @@
     <Compile Include="Extensions\NimbusMessageExtensions.cs" />
     <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\IDelayedDeliveryService.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\NimbusMessageFactory.cs" />
     <Compile Include="Infrastructure\Compression\DeflateCompressor.cs" />
     <Compile Include="Infrastructure\Compression\GzipCompressor.cs" />
@@ -151,14 +154,13 @@
     <Compile Include="Configuration\PoorMansIocContainer\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\INimbusTransport.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\ThrottlingMessageReceiver.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IKnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />
     <Compile Include="Infrastructure\KnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
-    <Compile Include="Infrastructure\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Infrastructure\IMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
@@ -175,8 +177,6 @@
     <Compile Include="Configuration\Debug\DebugConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderDebuggingConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\PathFactory.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
