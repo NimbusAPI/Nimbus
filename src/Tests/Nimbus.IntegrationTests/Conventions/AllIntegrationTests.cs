@@ -14,6 +14,7 @@ namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]
+    [Category("Convention")]
     public class AllIntegrationTests
     {
         protected const int TimeoutSeconds = 15;

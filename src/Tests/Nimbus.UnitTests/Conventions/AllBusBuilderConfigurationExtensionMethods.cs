@@ -13,6 +13,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class AllBusBuilderConfigurationExtensionMethods
     {
         private readonly string _configurationExtensionsNamespace = typeof (BusBuilderConfigurationExtensions).Namespace;

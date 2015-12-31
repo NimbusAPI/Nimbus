@@ -11,6 +11,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class AllGenericTypeConstraintsInTheInfrastructureNamespace
     {
         [Test]
