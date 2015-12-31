@@ -80,7 +80,7 @@
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\GlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
+    <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
@@ -100,12 +100,12 @@
     <Compile Include="Extensions\NimbusMessageExtensions.cs" />
     <Compile Include="FodyTests.cs" />
     <Compile Include="Infrastructure\IDelayedDeliveryService.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\NimbusMessageFactory.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\Compression\DeflateCompressor.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\Compression\GzipCompressor.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\Compression\NullCompressor.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\NimbusMessageFactory.cs" />
+    <Compile Include="Infrastructure\Compression\DeflateCompressor.cs" />
+    <Compile Include="Infrastructure\Compression\GzipCompressor.cs" />
+    <Compile Include="Infrastructure\Compression\NullCompressor.cs" />
+    <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
     <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
@@ -120,7 +120,7 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
     <Compile Include="Infrastructure\Logging\TraceLogger.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
     <Compile Include="Infrastructure\Retry.cs" />
@@ -215,7 +215,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
-    <Compile Include="Infrastructure\NimbusMessageServices\Serialization\DataContractSerializer.cs" />
+    <Compile Include="Infrastructure\Serialization\DataContractSerializer.cs" />
     <Compile Include="Configuration\MessagePumpTypes.cs" />
     <Compile Include="Properties\NullGuard.cs" />
   </ItemGroup>

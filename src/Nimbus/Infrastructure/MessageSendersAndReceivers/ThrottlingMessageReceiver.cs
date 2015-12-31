@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {

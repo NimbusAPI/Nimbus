@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace Nimbus.Infrastructure.MessageSendersAndReceivers
+namespace Nimbus.Infrastructure.Heartbeat.PerformanceCounters
 {
     public static class GlobalMessageCounters
     {
