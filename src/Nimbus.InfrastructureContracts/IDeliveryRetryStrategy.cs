@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus
 {
     public interface IDeliveryRetryStrategy
     {

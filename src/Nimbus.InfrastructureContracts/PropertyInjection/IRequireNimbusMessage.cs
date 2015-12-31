@@ -1,7 +1,4 @@
-﻿
-using Nimbus.Infrastructure;
-
-namespace Nimbus.PropertyInjection
+﻿namespace Nimbus.PropertyInjection
 {
     public interface IRequireNimbusMessage
     {
