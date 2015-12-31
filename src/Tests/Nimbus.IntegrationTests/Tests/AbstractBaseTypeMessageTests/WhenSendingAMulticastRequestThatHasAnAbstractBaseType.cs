@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
-using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -19,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         protected override async Task When()
         {
             var request = new SomeConcreteRequestType();
-            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2)))
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds)))
                 .Take(1)
                 .ToArray();
         }
