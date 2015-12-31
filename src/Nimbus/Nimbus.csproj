@@ -58,7 +58,7 @@
     <Compile Include="ConcurrentCollections\RoundRobin.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeLazy.cs" />
-    <Compile Include="Configuration\Compression\BusBuilderCompressionConfigurationExtensions.cs" />
+    <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
     <Compile Include="Configuration\ComponentRegistrationExtensions.cs" />
     <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />

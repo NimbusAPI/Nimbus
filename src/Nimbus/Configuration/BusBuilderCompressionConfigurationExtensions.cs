@@ -1,6 +1,6 @@
 using Nimbus.Infrastructure.Compression;
 
-namespace Nimbus.Configuration.Compression
+namespace Nimbus.Configuration
 {
     public static class BusBuilderCompressionConfigurationExtensions
     {

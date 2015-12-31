@@ -8,7 +8,6 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Nimbus;
 using Nimbus.Configuration;
-using Nimbus.Configuration.Compression;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
 using Nimbus.Transports.WindowsServiceBus;

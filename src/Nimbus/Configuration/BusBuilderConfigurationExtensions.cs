@@ -1,10 +1,8 @@
 ﻿using System;
-using Nimbus.Configuration.Compression;
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Logging;
@@ -70,7 +68,7 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithDeliveryRetryStrategy(this BusBuilderConfiguration configuration, IDeliveryRetryStrategy deliveryRetryStrategy )
+        public static BusBuilderConfiguration WithDeliveryRetryStrategy(this BusBuilderConfiguration configuration, IDeliveryRetryStrategy deliveryRetryStrategy)
         {
             configuration.DeliveryRetryStrategy = deliveryRetryStrategy;
             return configuration;
