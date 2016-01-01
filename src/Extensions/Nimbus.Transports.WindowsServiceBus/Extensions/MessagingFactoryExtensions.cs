@@ -21,5 +21,17 @@ namespace Nimbus.Transports.WindowsServiceBus.Extensions
 
             return false;
         }
+
+        internal static void Dispose(this MessagingFactory messagingFactory)
+        {
+            try
+            {
+                messagingFactory.Close();
+            }
+            catch
+            {
+                // we don't care. It's already borked. We just want it to go away and release its connection.
+            }
+        }
     }
 }

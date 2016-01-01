@@ -12,7 +12,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
-using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using Nimbus.Transports.WindowsServiceBus.DeadLetterOffice;
 using Nimbus.Transports.WindowsServiceBus.DelayedDelivery;
@@ -62,8 +61,8 @@ namespace Nimbus.Transports.WindowsServiceBus
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
             container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
-            container.RegisterType<WindowsServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
-            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
+            container.RegisterType<WindowsServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
+            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
 
             container.Register(c =>
                                {
@@ -95,7 +94,7 @@ namespace Nimbus.Transports.WindowsServiceBus
                                            return messagingFactory;
                                        },
                                        mf => mf.IsBorked(),
-                                       mf => { });
+                                       mf => mf.Dispose());
 
                                    return messagingFactoryRoundRobin;
                                },

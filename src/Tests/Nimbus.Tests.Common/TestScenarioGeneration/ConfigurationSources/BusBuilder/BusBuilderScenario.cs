@@ -47,25 +47,24 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
             var compressor = _compressor.CreateInstance();
             var iocContainer = _iocContainer.CreateInstance();
 
-            var configuration = new Nimbus.Configuration.BusBuilder().Configure()
-                                                                     .WithTransport(transport.Configuration)
-                                                                     .WithRouter(router.Configuration)
-                                                                     .WithSerializer(serializer.Configuration)
-                                                                     .WithCompressor(compressor.Configuration)
-                                                                     .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                                                                     .WithNames("MyTestSuite", Environment.MachineName)
-                                                                     .WithTypesFrom(_typeProvider)
-                                                                     .WithGlobalInboundInterceptorTypes(
-                                                                         _typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                                     .WithGlobalOutboundInterceptorTypes(
-                                                                         _typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                                                     .WithHeartbeatInterval(TimeSpan.MaxValue)
-                                                                     .WithLogger(_logger)
-                                                                     .WithDebugOptions(
-                                                                         dc =>
-                                                                             dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                                                 "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                                                     .Chain(iocContainer.Configuration.ApplyContainerDefaults)
+            var configuration = new Nimbus.Configuration.BusBuilder()
+                .Configure()
+                .WithTransport(transport.Configuration)
+                .WithRouter(router.Configuration)
+                .WithSerializer(serializer.Configuration)
+                .WithCompressor(compressor.Configuration)
+                .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                .WithNames("MyTestSuite", Environment.MachineName)
+                .WithTypesFrom(_typeProvider)
+                .WithGlobalInboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                .WithGlobalOutboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
+                .WithHeartbeatInterval(TimeSpan.MaxValue)
+                .WithLogger(_logger)
+                .WithDebugOptions(
+                    dc =>
+                        dc.RemoveAllExistingNamespaceElementsOnStartup(
+                            "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                .Chain(iocContainer.Configuration.ApplyContainerDefaults)
                 ;
 
             return new ScenarioInstance<BusBuilderConfiguration>(configuration);

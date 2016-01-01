@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 
 namespace Nimbus.ConcurrentCollections
 {
-    public class RoundRobin<T>
+    public class RoundRobin<T>: IDisposable
     {
         private readonly int _poolSize;
         private readonly Func<T> _createItem;
@@ -88,6 +89,26 @@ namespace Nimbus.ConcurrentCollections
                                     }
                                 }
                             });
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            lock(_itemsMutex)
+            {
+                _items
+                    .Do(_disposeItem)
+                    .Done();
+
+                _items.Clear();
+            }
         }
     }
 }

@@ -11,16 +11,19 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
         private readonly InstanceNameSetting _instanceName;
         private readonly RedisConnectionString _connectionString;
         private readonly DefaultTimeoutSetting _timeout;
+        private readonly ILogger _logger;
 
         public ConnectionMultiplexerFactory(ApplicationNameSetting applicationName,
                                             InstanceNameSetting instanceName,
                                             RedisConnectionString connectionString,
-                                            DefaultTimeoutSetting timeout)
+                                            DefaultTimeoutSetting timeout,
+                                            ILogger logger)
         {
             _applicationName = applicationName;
             _instanceName = instanceName;
             _connectionString = connectionString;
             _timeout = timeout;
+            _logger = logger;
         }
 
         public async Task TestConnection()
@@ -29,8 +32,10 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
             configuration.AbortOnConnectFail = true;
             configuration.ConnectTimeout = (int) _timeout.Value.TotalMilliseconds;
 
-            using (await ConnectionMultiplexer.ConnectAsync(configuration))
+            using (var multiplexer = await ConnectionMultiplexer.ConnectAsync(configuration))
             {
+                var status = multiplexer.GetStatus();
+                _logger.Info("Redis connection status: {RedisConnectionStatus}", status);
             }
         }
 
