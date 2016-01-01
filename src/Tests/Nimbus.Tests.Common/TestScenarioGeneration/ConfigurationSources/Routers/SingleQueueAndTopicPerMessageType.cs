@@ -1,5 +1,6 @@
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Routing;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers
 {

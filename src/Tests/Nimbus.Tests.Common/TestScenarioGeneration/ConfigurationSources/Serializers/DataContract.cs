@@ -1,4 +1,5 @@
 using Nimbus.Infrastructure.Serialization;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
 {

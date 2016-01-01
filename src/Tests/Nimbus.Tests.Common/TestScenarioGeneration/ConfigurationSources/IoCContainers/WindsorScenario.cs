@@ -1,5 +1,6 @@
 using Castle.Windsor;
 using Nimbus.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Windsor.Configuration;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers

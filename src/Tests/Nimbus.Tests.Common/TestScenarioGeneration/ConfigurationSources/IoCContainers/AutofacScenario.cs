@@ -1,5 +1,6 @@
 using Autofac;
 using Nimbus.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {

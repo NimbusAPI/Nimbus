@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Routing;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers
 {

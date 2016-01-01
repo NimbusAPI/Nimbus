@@ -145,8 +145,7 @@
     <Compile Include="Tests\LargeMessageTests\MessageContracts\BigFatResponse.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenCreatingALargeMessageUsingTheUnsupportedMessageBodyStore.cs" />
     <Compile Include="Tests\LargeMessageTests\WhenPushingAndPullingDataFromAzureBlobStorage.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingAzureBlobStorage.cs" />
-    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequestUsingDiskStorage.cs" />
+    <Compile Include="Tests\LargeMessageTests\WhenSendingALargeRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallRequest.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\MessageContracts\BlackBallResponse.cs" />
     <Compile Include="Tests\MulticastRequestResponseTests\RequestHandlers\ApatheticBlackBallRequestHandler.cs" />

@@ -5,15 +5,15 @@ using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
 {
-    public class ConfigurationScenarioFilter
+    public class AtLeastOneOfEachTypeOfScenarioFilter: IScenarioFilter
     {
         private readonly HashSet<Type> _previouslySeenScenarios = new HashSet<Type>();
 
         private readonly Type[] _alwaysInclude = {typeof (InProcess), typeof (NoContainerScenario)};
 
-        public bool ShouldInclude(IConfigurationScenario scenario)
+        public virtual bool ShouldInclude(IConfigurationScenario scenario)
         {
             var composingScenarios = scenario.ComposedOf.ToArray();
             if (composingScenarios.Any(s => _alwaysInclude.Contains(s.GetType()))) return true;

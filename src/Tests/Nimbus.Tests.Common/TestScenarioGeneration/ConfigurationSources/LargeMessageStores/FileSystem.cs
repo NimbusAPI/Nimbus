@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores
 {

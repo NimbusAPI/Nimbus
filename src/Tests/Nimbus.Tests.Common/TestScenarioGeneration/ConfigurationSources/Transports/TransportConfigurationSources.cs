@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 {

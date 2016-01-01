@@ -1,5 +1,6 @@
 using Nimbus.Configuration;
 using Nimbus.Ninject.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Ninject;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers

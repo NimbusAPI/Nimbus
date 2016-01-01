@@ -1,6 +1,8 @@
-using System;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.Azure.Http;
+using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores
 {
@@ -8,8 +10,11 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeM
     {
         public override ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
         {
+            var uri = DefaultSettingsReader.Get<AzureBlobStorageContainerUri>();
+            var accessKey = DefaultSettingsReader.Get<AzureBlobStorageContainerSharedAccessSignature>();
+
             var configuration = new AzureBlobStorageHttpLargeMessageStorageConfiguration()
-                .UsingBlobStorageContainer(new Uri("http://fixme.example.com"), "FIXME");
+                .UsingBlobStorageContainer(uri, accessKey);
 
             var instance = new ScenarioInstance<LargeMessageStorageConfiguration>(configuration);
 

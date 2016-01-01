@@ -1,6 +1,7 @@
 using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.Redis;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports

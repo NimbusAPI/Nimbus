@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Serilog;

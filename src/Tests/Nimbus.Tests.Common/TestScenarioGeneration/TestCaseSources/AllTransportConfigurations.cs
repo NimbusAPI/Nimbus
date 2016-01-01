@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using NUnit.Framework;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources

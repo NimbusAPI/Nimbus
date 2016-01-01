@@ -3,6 +3,7 @@ using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.WindowsServiceBus;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports

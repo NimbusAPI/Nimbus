@@ -7,6 +7,7 @@ using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;

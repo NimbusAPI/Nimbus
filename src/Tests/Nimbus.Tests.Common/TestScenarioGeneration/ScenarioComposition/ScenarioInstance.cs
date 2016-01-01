@@ -1,6 +1,6 @@
 using System;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
 {
     public class ScenarioInstance<T> : IDisposable
     {

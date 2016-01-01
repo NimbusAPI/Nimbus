@@ -3,6 +3,7 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common.TestScenarioGeneration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 

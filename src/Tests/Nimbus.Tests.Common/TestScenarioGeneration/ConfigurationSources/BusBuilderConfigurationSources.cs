@@ -8,6 +8,7 @@ using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContain
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
