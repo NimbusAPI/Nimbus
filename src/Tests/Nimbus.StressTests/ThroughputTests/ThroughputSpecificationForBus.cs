@@ -1,110 +1,138 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Infrastructure;
-using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
-using Nimbus.StressTests.ThroughputTests.Infrastructure;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
-using Shouldly;
+using Serilog;
 
 namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
-    [Timeout(60*1000)]
-    public abstract class ThroughputSpecificationForBus : SpecificationForAsync<Bus>
+    [Timeout(TimeoutSeconds*1000)]
+    public abstract class ThroughputSpecificationForBus
     {
-        private TimeSpan _timeout;
-        private AssemblyScanningTypeProvider _typeProvider;
+        protected const int TimeoutSeconds = 300;
 
-        private FakeDependencyResolver _dependencyResolver;
-        private FakeHandler _fakeHandler;
-        private Stopwatch _stopwatch;
+        private Stopwatch _sendingStopwatch;
+        private Stopwatch _sendingAndReceivingStopwatch;
+
+        private int _numMessagesSent;
         private double _messagesPerSecond;
-        private ILogger _logger;
-        private string _largeMessageBodyTempPath;
+        private double _averageOneWayLatency;
+        private double? _averageRequestResponseLatency;
+        private ScenarioInstance<BusBuilderConfiguration> _instance;
 
-        protected virtual int NumMessagesToSend
+        protected Bus Bus { get; private set; }
+
+        protected virtual TimeSpan SendMessagesFor { get; } = TimeSpan.FromSeconds(5);
+
+        static ThroughputSpecificationForBus()
         {
-            get { return 8000; }
+            TestHarnessLoggerFactory.Create();
         }
 
-        protected abstract int ExpectedMessagesPerSecond { get; }
-
-        protected override async Task<Bus> Given()
+        protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
+            _instance = scenario.CreateInstance();
+            _numMessagesSent = 0;
 
-            _fakeHandler = new FakeHandler(NumMessagesToSend);
-            _dependencyResolver = new FakeDependencyResolver(_fakeHandler);
-            _timeout = TimeSpan.FromSeconds(300); //FIXME set to 30 seconds
-            _typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            var busBuilderConfiguration = _instance.Configuration;
 
-            _logger = TestHarnessLoggerFactory.Create();
-            //_logger = new NullLogger();
+            if (!Debugger.IsAttached)
+            {
+                busBuilderConfiguration.WithLogger(new NullLogger());
+            }
 
-            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
-                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
-                                                                        .WithLogger(_logger)
-                                                                        .Build();
-
-            var bus = new BusBuilder().Configure()
-                                      .WithNames("ThroughputTestSuite", Environment.MachineName)
-                                      .WithLogger(_logger)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                      .WithTypesFrom(_typeProvider)
-                                      .WithDependencyResolver(_dependencyResolver)
-                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
-                                                                     .WithMaxSmallMessageSize(4096))
-                                      .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                          "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                                      .Build();
-            await bus.Start();
-            return bus;
+            Bus = busBuilderConfiguration.Build();
+            Log.Debug("Starting bus...");
+            await Bus.Start();
+            Log.Debug("Bus started.");
         }
 
-        protected override async Task When()
+        protected virtual async Task When()
         {
-            Console.WriteLine("Starting to send messages...");
-            _stopwatch = Stopwatch.StartNew();
+            Log.Information("Starting to send messages...");
+            StressTestMessageHandler.Reset();
+            _sendingStopwatch = Stopwatch.StartNew();
+            _sendingAndReceivingStopwatch = Stopwatch.StartNew();
 
-            await Task.WhenAll(SendMessages(Subject));
+            await Enumerable.Range(0, 20)
+                            .Select(i => Task.Run(() => SendMessages(Bus)).ConfigureAwaitFalse())
+                            .WhenAll();
 
-            Console.WriteLine();
-            Console.WriteLine("Finished sending messages. Waiting for them to all find their way back...");
-            _fakeHandler.WaitUntilDone(_timeout);
-            _stopwatch.Stop();
+            _sendingStopwatch.Stop();
 
-            Console.WriteLine("All done. Took {0} milliseconds to process {1} messages", _stopwatch.ElapsedMilliseconds, NumMessagesToSend);
-            _messagesPerSecond = _fakeHandler.ActualNumMessagesReceived/_stopwatch.Elapsed.TotalSeconds;
-            Console.WriteLine("Average throughput: {0} messages/second", _messagesPerSecond);
+            Log.Information("Total of {NumMessagesSent} messages sent in {Elapsed}", _numMessagesSent, _sendingStopwatch.Elapsed);
+
+            await StressTestMessageHandler.WaitUntilDone(_numMessagesSent, TimeSpan.FromSeconds(TimeoutSeconds));
+            _sendingAndReceivingStopwatch.Stop();
         }
 
-        [TestFixtureTearDown]
-        public override void TestFixtureTearDown()
-        {
-            Subject.Stop().Wait();
-            _dependencyResolver = null;
-            base.TestFixtureTearDown();
-            if (Directory.Exists(_largeMessageBodyTempPath)) Directory.Delete(_largeMessageBodyTempPath, true);
-        }
+        public abstract Task SendMessages(IBus bus);
 
-        public abstract IEnumerable<Task> SendMessages(IBus bus);
-
-        [Test]
-        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
+        protected void IncrementExpectedMessageCount(int numMessages = 1)
         {
-            _fakeHandler.ActualNumMessagesReceived.ShouldBe(_fakeHandler.ExpectedNumMessagesReceived);
+            Interlocked.Add(ref _numMessagesSent, numMessages);
         }
 
         [Test]
-        public async Task WeShouldGetAcceptableThroughput()
+        [TestCaseSource(typeof (AllBusConfigurations<ThroughputSpecificationForBus>))]
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _messagesPerSecond.ShouldBeGreaterThan(ExpectedMessagesPerSecond);
+            await Given(scenario);
+            await When();
+
+            _messagesPerSecond = StressTestMessageHandler.ActualNumMessagesReceived/_sendingAndReceivingStopwatch.Elapsed.TotalSeconds;
+            _averageOneWayLatency = StressTestMessageHandler.Messages
+                                                            .Select(m => m.WhenReceived - m.WhenSent)
+                                                            .Select(ts => ts.TotalMilliseconds)
+                                                            .Average();
+            _averageRequestResponseLatency = StressTestMessageHandler.ResponseMessages.Any()
+                ? StressTestMessageHandler.ResponseMessages
+                                          .Select(m => m.WhenReceived - m.RequestSentAt)
+                                          .Select(ts => ts.TotalMilliseconds)
+                                          .Average()
+                : default(double?);
+
+            Log.Information("Total of {NumMessagesSent} messages processed in {Elapsed}", _numMessagesSent, _sendingAndReceivingStopwatch.Elapsed);
+            Log.Information("Average throughput: {MessagesPerSecond} messages/second", _messagesPerSecond);
+            Log.Information("Average one-way latency: {AverageOneWayLatency}", TimeSpan.FromMilliseconds(_averageOneWayLatency));
+            Log.Information("Average request/response latency: {AverageRequestResponseLatency}",
+                            _averageRequestResponseLatency.HasValue
+                                ? (object) TimeSpan.FromMilliseconds(_averageRequestResponseLatency.Value)
+                                : "N/A");
+
+            RecordTeamCityStatistic(testName, "TotalMessages", _numMessagesSent);
+            RecordTeamCityStatistic(testName, "TotalElapsedMilliseconds", _sendingAndReceivingStopwatch.ElapsedMilliseconds);
+            RecordTeamCityStatistic(testName, "MessagesPerSecond", _messagesPerSecond);
+            RecordTeamCityStatistic(testName, "AverageOneWayLatencyInMilliseconds", _averageOneWayLatency);
+            RecordTeamCityStatistic(testName, "AverageRequestResponseLatencyInMilliseconds", _averageRequestResponseLatency);
+        }
+
+        private void RecordTeamCityStatistic(string testName, string key, double? value)
+        {
+            var fullKey = string.Join(".", GetType().Name, testName, key);
+            var message = "##teamcity[buildStatisticValue key='{0}' value='{1}']".FormatWith(fullKey, value);
+            Console.WriteLine(message);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            var bus = Bus;
+            Bus = null;
+            bus?.Dispose();
+
+            _instance?.Dispose();
+            _instance = null;
         }
     }
 }

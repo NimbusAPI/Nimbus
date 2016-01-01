@@ -1,18 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
-using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
@@ -29,36 +24,28 @@ namespace Nimbus.UnitTests.BatchSendingTests
         {
             _nimbusMessageSender = Substitute.For<INimbusMessageSender>();
 
-            var messagingFactory = Substitute.For<INimbusMessagingFactory>();
-            messagingFactory.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
+            var transport = Substitute.For<INimbusTransport>();
+            transport.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var serializer = new DataContractSerializer(typeProvider);
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
-            var brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                    new MaxLargeMessageSizeSetting(),
-                                                                    new MaxSmallMessageSizeSetting(),
-                                                                    replyQueueNameSetting,
-                                                                    clock,
-                                                                    new NullCompressor(),
-                                                                    new DispatchContextManager(),
-                                                                    new UnsupportedLargeMessageBodyStore(),
-                                                                    serializer,
-                                                                    typeProvider);
+            var nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                                replyQueueNameSetting,
+                                                                clock,
+                                                                new DispatchContextManager());
             var logger = Substitute.For<ILogger>();
             var knownMessageTypeVerifier = Substitute.For<IKnownMessageTypeVerifier>();
             var router = new DestinationPerMessageTypeRouter();
             var dependencyResolver = new NullDependencyResolver();
             var outboundInterceptorFactory = new NullOutboundInterceptorFactory();
 
-            var busCommandSender = new BusCommandSender(brokeredMessageFactory,
-                                                        dependencyResolver,
+            var busCommandSender = new BusCommandSender(dependencyResolver,
                                                         knownMessageTypeVerifier,
                                                         logger,
-                                                        messagingFactory,
+                                                        nimbusMessageFactory,
+                                                        transport,
                                                         outboundInterceptorFactory,
                                                         router);
             return Task.FromResult(busCommandSender);

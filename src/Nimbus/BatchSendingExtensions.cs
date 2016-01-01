@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 using Nimbus.MessageContracts;
 
 namespace Nimbus
@@ -9,12 +9,24 @@ namespace Nimbus
     {
         public static Task SendAll(this IBus bus, IEnumerable<IBusCommand> busCommands)
         {
-            return Task.Run(async () => { await Task.WhenAll(busCommands.Select(e => bus.Send(e))); });
+            return Task.Run(async () =>
+                                  {
+                                      foreach (var c in busCommands)
+                                      {
+                                          await bus.Send(c);
+                                      }
+                                  }).ConfigureAwaitFalse();
         }
 
         public static Task PublishAll(this IBus bus, IEnumerable<IBusEvent> busEvents)
         {
-            return Task.Run(async () => { await Task.WhenAll(busEvents.Select(e => bus.Publish(e))); });
+            return Task.Run(async () =>
+                                  {
+                                      foreach (var e in busEvents)
+                                      {
+                                          await bus.Publish(e);
+                                      }
+                                  }).ConfigureAwaitFalse();
         }
     }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Exceptions</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.Exceptions.Destructurers.ExceptionEnricher">
+            <summary>
+            Enrich a <see cref="T:Serilog.Events.LogEvent"/> with details about an <see cref="P:Serilog.Events.LogEvent.Exception"/> if present.
+            https://groups.google.com/forum/#!searchin/getseq/enhance$20exception/getseq/rsAL4u3JpLM/PrszbPbtEb0J
+            </summary>
+        </member>
+    </members>
+</doc>

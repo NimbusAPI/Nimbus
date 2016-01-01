@@ -12,6 +12,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class NimbusCode
     {
         /// <summary>
@@ -35,6 +36,17 @@ namespace Nimbus.UnitTests.Conventions
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             fields.Where(f => f.FieldType.IsClosedTypeOf(typeof (Lazy<>))).ShouldBeEmpty();
+        }
+
+        /// <summary>
+        ///     BlockingCollection blocks the thread, which is a Bad Thing. Use AsyncBlockingCollection instead.
+        /// </summary>
+        [Test]
+        [TestCaseSource(typeof (TestCases))]
+        public async Task ShouldNeverUseBlockingCollection(Type type)
+        {
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            fields.Where(f => f.FieldType.IsClosedTypeOf(typeof (BlockingCollection<>))).ShouldBeEmpty();
         }
 
         internal class TestCases : IEnumerable<TestCaseData>

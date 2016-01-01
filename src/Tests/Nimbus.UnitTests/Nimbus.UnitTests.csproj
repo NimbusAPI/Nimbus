@@ -32,9 +32,9 @@
     <NoWarn>1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\..\packages\Castle.Core.3.2.2\lib\net45\Castle.Core.dll</HintPath>
@@ -43,8 +43,8 @@
       <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.3.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+      <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.4.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
@@ -55,9 +55,9 @@
     <Reference Include="NSubstitute">
       <HintPath>..\..\packages\NSubstitute.1.7.1.0\lib\NET40\NSubstitute.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly, Version=1.1.1.1, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -87,8 +87,9 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEvents.cs" />
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
-    <Compile Include="BrokeredMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
-    <Compile Include="BrokeredMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
+    <Compile Include="DateTimeOffsetTests\WhenAddingValuesToADateTime.cs" />
+    <Compile Include="NimbusMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
+    <Compile Include="NimbusMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />
     <Compile Include="CompressionTests\WhenUsingDeflateCompressor.cs" />
     <Compile Include="CompressionTests\WhenUsingGzipCompressor.cs" />
@@ -97,9 +98,7 @@
     <Compile Include="ConfigurationTests\WhenScanningAssembliesForHandledCommandTypes.cs" />
     <Compile Include="Conventions\AllAsyncUnitTests.cs" />
     <Compile Include="Conventions\AllBusBuilderConfigurationExtensionMethods.cs" />
-    <Compile Include="Conventions\AllComponentsThatCreateOtherComponents.cs" />
     <Compile Include="Conventions\AllExtensionMethodsNotOnPublicInterfaces.cs" />
-    <Compile Include="Conventions\AllFactories.cs" />
     <Compile Include="Conventions\AllGenericTypeConstraintsInTheInfrastructureNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureContractsNamespace.cs" />
     <Compile Include="Conventions\AllInterfacesInTheInfrastructureNamespace.cs" />
@@ -152,7 +151,6 @@
     <Compile Include="DispatcherTests\Handlers\SlowCommandHandler.cs" />
     <Compile Include="DispatcherTests\MessageContracts\FooCommand.cs" />
     <Compile Include="DispatcherTests\MessageContracts\SlowCommand.cs" />
-    <Compile Include="DispatcherTests\WhenDispatchingACommandToALongRunningHandler.cs" />
     <Compile Include="DispatcherTests\WhenDispatchingTwoCommands.cs" />
     <Compile Include="GlobalTestTimeout.cs" />
     <Compile Include="InfrastructureTests\MessageContracts\MyCommand.cs" />
@@ -175,8 +173,8 @@
     <Compile Include="DependencyResolverTests\AllComponentTypes\WhenResolvingComponentsFromADependencyResolver.cs" />
     <Compile Include="MulticastRequestResponseTests\WhenTakingASingleResponse.cs" />
     <Compile Include="MulticastRequestResponseTests\GivenAWrapperWithTwoResponses.cs" />
-    <Compile Include="MulticastRequestResponseTests\WhenTakingAThreeResponses.cs" />
-    <Compile Include="MulticastRequestResponseTests\WhenTakingATwoResponses.cs" />
+    <Compile Include="MulticastRequestResponseTests\WhenTakingThreeResponses.cs" />
+    <Compile Include="MulticastRequestResponseTests\WhenTakingTwoResponses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationFor.cs">
       <SubType>

@@ -4,7 +4,7 @@ using Pizza.Ordering.Messages;
 
 namespace Pizza.Maker.Handlers
 {
-    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>, ILongRunningTask
+    public class IncomingOrderHandler : IHandleCommand<OrderPizzaCommand>
     {
         private readonly IPizzaMaker _pizzaMaker;
 
@@ -16,11 +16,6 @@ namespace Pizza.Maker.Handlers
         public async Task Handle(OrderPizzaCommand busCommand)
         {
             await _pizzaMaker.MakePizzaForCustomer(busCommand.CustomerName);
-        }
-
-        public bool IsAlive
-        {
-            get { return true; }
         }
     }
 }

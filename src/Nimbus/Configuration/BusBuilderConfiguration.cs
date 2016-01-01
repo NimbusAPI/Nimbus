@@ -1,85 +1,105 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Nimbus.Configuration.Debug;
-using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
+using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
-using Nimbus.Extensions;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.DevelopmentStubs;
+using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Commands;
+using Nimbus.Infrastructure.Compression;
+using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Infrastructure.Serialization;
+using Nimbus.Interceptors.Inbound;
+using Nimbus.Interceptors.Outbound;
 using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
     public class BusBuilderConfiguration : INimbusConfiguration
     {
+        internal TransportConfiguration Transport { get; set; }
+        internal DebugConfiguration Debug { get; set; } = new DebugConfiguration();
+
         internal ITypeProvider TypeProvider { get; set; }
         internal IDependencyResolver DependencyResolver { get; set; }
-        internal ILogger Logger { get; set; }
+        internal ILogger Logger { get; set; } = new NullLogger();
         internal ISerializer Serializer { get; set; }
-        internal ICompressor Compressor { get; set; }
-        internal IRouter Router { get; set; }
-
-        internal BusBuilderDebuggingConfiguration Debugging { get; set; }
-        internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; }
+        internal ICompressor Compressor { get; set; } = new NullCompressor();
+        internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
+        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
-        internal ConnectionStringSetting ConnectionString { get; set; }
-        internal ServerConnectionCountSetting ServerConnectionCount { get; set; }
-        internal DefaultTimeoutSetting DefaultTimeout { get; set; }
-        internal DefaultMessageLockDurationSetting DefaultMessageLockDuration { get; set; }
-        internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; }
-        internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; }
-        internal AutoDeleteOnIdleSetting AutoDeleteOnIdle { get; set; }
-        internal EnableDeadLetteringOnMessageExpirationSetting EnableDeadLetteringOnMessageExpiration { get; set; }
-        internal HeartbeatIntervalSetting HeartbeatInterval { get; set; }
-        internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; }
-        internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; }
-
-        internal ConcurrentHandlerLimitSetting DefaultConcurrentHandlerLimit { get; set; }
-        internal MaximumThreadPoolThreadsSetting MaximumThreadPoolThreads { get; set; }
-        internal MinimumThreadPoolThreadsSetting MinimumThreadPoolThreads { get; set; }
-
-        internal BusBuilderConfiguration()
-        {
-            Debugging = new BusBuilderDebuggingConfiguration();
-            LargeMessageStorageConfiguration = new LargeMessageStorageConfiguration();
-            Router = new DestinationPerMessageTypeRouter();
-
-            Logger = new NullLogger();
-            Compressor = new NullCompressor();
-        }
+        internal DefaultTimeoutSetting DefaultTimeout { get; set; } = new DefaultTimeoutSetting();
+        internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; } = new MaxDeliveryAttemptSetting();
+        internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; } = new DefaultMessageTimeToLiveSetting();
+        internal AutoDeleteOnIdleSetting AutoDeleteOnIdle { get; set; } = new AutoDeleteOnIdleSetting();
+        internal EnableDeadLetteringOnMessageExpirationSetting EnableDeadLetteringOnMessageExpiration { get; set; } = new EnableDeadLetteringOnMessageExpirationSetting();
+        internal HeartbeatIntervalSetting HeartbeatInterval { get; set; } = new HeartbeatIntervalSetting();
+        internal GlobalInboundInterceptorTypesSetting GlobalInboundInterceptorTypes { get; set; } = new GlobalInboundInterceptorTypesSetting();
+        internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; } = new GlobalOutboundInterceptorTypesSetting();
+        internal ConcurrentHandlerLimitSetting ConcurrentHandlerLimit { get; set; } = new ConcurrentHandlerLimitSetting();
+        internal GlobalConcurrentHandlerLimitSetting GlobalConcurrentHandlerLimit { get; set; } = new GlobalConcurrentHandlerLimitSetting();
 
         public Bus Build()
-        {
-            AssertConfigurationIsValid();
-            return BusBuilder.Build(this);
-        }
-
-        private void AssertConfigurationIsValid()
         {
             if (Serializer == null && TypeProvider != null)
             {
                 Serializer = new DataContractSerializer(TypeProvider);
             }
 
-            var validatableComponents = GetType().GetProperties()
-                                                 .Select(p => p.GetValue(this))
-                                                 .OfType<IValidatableConfigurationSetting>()
-                                                 .ToArray();
+            return BusBuilder.Build(this);
+        }
 
-            var validationErrors = validatableComponents
-                .SelectMany(c => c.Validate())
-                .ToArray();
+        public void RegisterWith(PoorMansIoC container)
+        {
+            container.Register(TypeProvider, typeof (ITypeProvider));
+            container.Register(DependencyResolver, typeof (IDependencyResolver));
+            container.Register(Logger, typeof (ILogger));
+            container.Register(Serializer, typeof (ISerializer));
+            container.Register(Compressor, typeof (ICompressor));
+            container.Register(Router, typeof (IRouter));
+            container.Register(DeliveryRetryStrategy, typeof (IDeliveryRetryStrategy));
 
-            if (validationErrors.None()) return;
+            container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
+            container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
+            container.RegisterType<CommandMessagePumpsFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<RequestMessagePumpsFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<ResponseMessagePumpFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<MulticastRequestMessagePumpsFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<MulticastEventMessagePumpsFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<CompetingEventMessagePumpsFactory>(ComponentLifetime.SingleInstance);
+            container.RegisterType<SystemClock>(ComponentLifetime.SingleInstance, typeof (IClock));
+            container.RegisterType<DispatchContextManager>(ComponentLifetime.SingleInstance, typeof (IDispatchContextManager));
+            container.RegisterType<ResponseMessageDispatcher>(ComponentLifetime.SingleInstance);
+            container.RegisterType<HandlerMapper>(ComponentLifetime.SingleInstance, typeof (IHandlerMapper));
+            container.RegisterType<MessageDispatcherFactory>(ComponentLifetime.SingleInstance, typeof (IMessageDispatcherFactory));
+            container.RegisterType<InboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IInboundInterceptorFactory));
+            container.RegisterType<OutboundInterceptorFactory>(ComponentLifetime.SingleInstance, typeof (IOutboundInterceptorFactory));
+            container.RegisterType<PropertyInjector>(ComponentLifetime.SingleInstance, typeof (IPropertyInjector), typeof (PropertyInjector));
+            container.RegisterType<NimbusMessageFactory>(ComponentLifetime.SingleInstance, typeof (INimbusMessageFactory));
+            container.RegisterType<BusCommandSender>(ComponentLifetime.SingleInstance, typeof (ICommandSender));
+            container.RegisterType<BusRequestSender>(ComponentLifetime.SingleInstance, typeof (IRequestSender));
+            container.RegisterType<BusMulticastRequestSender>(ComponentLifetime.SingleInstance, typeof (IMulticastRequestSender));
+            container.RegisterType<BusEventSender>(ComponentLifetime.SingleInstance, typeof (IEventSender));
+            container.RegisterType<KnownMessageTypeVerifier>(ComponentLifetime.SingleInstance, typeof (IKnownMessageTypeVerifier));
+            container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
+            container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
+            container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<GlobalHandlerThrottle>(ComponentLifetime.SingleInstance, typeof(IGlobalHandlerThrottle));
+        }
 
-            var message = string.Join(Environment.NewLine, new[] {"Bus configuration is invalid:"}.Concat(validationErrors));
-            throw new BusException(message);
+        public IEnumerable<string> Validate()
+        {
+            if (Transport == null) yield return "You must specify a transport later.";
         }
     }
 }

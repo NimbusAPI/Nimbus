@@ -31,6 +31,15 @@ namespace Nimbus.Infrastructure.Logging
             }
         }
 
+        public void Warn(Exception exc, string format, params object[] args)
+        {
+            lock(_mutex)
+            {
+                OutputMessage(format, args);
+                Console.WriteLine(exc.ToString());
+            }
+        }
+
         public void Error(string format, params object[] args)
         {
             lock (_mutex)

@@ -3,15 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.LargeMessages.Settings;
-using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
-using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
+using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.LargeMessages;
+using Nimbus.Infrastructure.Serialization;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
@@ -21,30 +22,37 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         protected async Task<BrokeredMessageFactory> Given()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            return new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                              new MaxLargeMessageSizeSetting(),
-                                              new MaxSmallMessageSizeSetting {Value = 64*1024},
-                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "SomeApp"}, new InstanceNameSetting {Value = "SomeInstance"}),
-                                              new SystemClock(),
-                                              new NullCompressor(),
-                                              new DispatchContextManager(),
-                                              new UnsupportedLargeMessageBodyStore(),
-                                              new DataContractSerializer(typeProvider),
-                                              typeProvider);
+            return new BrokeredMessageFactory(
+                new MaxLargeMessageSizeSetting(),
+                new MaxSmallMessageSizeSetting {Value = 64*1024},
+                new SystemClock(),
+                new NullCompressor(),
+                new DispatchContextManager(),
+                new UnsupportedLargeMessageBodyStore(),
+                new DataContractSerializer(typeProvider),
+                typeProvider);
         }
 
         private async Task<BrokeredMessage> When(BrokeredMessageFactory brokeredMessageFactory)
         {
             var bigFatObject = new string(Enumerable.Range(0, 256*1024).Select(i => '.').ToArray());
-            return await brokeredMessageFactory.Create(bigFatObject);
+            var nimbusMessage = new NimbusMessage("noPath", bigFatObject);
+            return await brokeredMessageFactory.BuildBrokeredMessage(nimbusMessage);
         }
 
         [Test]
-        [ExpectedException(typeof (NotSupportedException), ExpectedMessage = UnsupportedLargeMessageBodyStore.FailureMessage)]
         public async Task MessageCreationShouldFail()
         {
             var brokeredMessageFactory = await Given();
-            var message = await When(brokeredMessageFactory);
+            try
+            {
+                await When(brokeredMessageFactory);
+                Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                e.ShouldBeTypeOf<NotSupportedException>();
+            }
         }
     }
 }

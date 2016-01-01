@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -8,7 +7,6 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 
@@ -16,37 +14,28 @@ namespace Nimbus.Infrastructure
 {
     internal class MessageDispatcherFactory : IMessageDispatcherFactory
     {
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
-        private readonly IClock _clock;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
         private readonly ILogger _logger;
-        private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
-        private readonly INimbusTaskFactory _taskFactory;
+        private readonly INimbusTransport _transport;
         private readonly IPropertyInjector _propertyInjector;
 
-        public MessageDispatcherFactory(DefaultMessageLockDurationSetting defaultMessageLockDuration,
-                                        IBrokeredMessageFactory brokeredMessageFactory,
-                                        IClock clock,
-                                        IDependencyResolver dependencyResolver,
+        public MessageDispatcherFactory(IDependencyResolver dependencyResolver,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
-                                        INimbusMessagingFactory messagingFactory,
-                                        INimbusTaskFactory taskFactory,
+                                        INimbusMessageFactory nimbusMessageFactory,
+                                        INimbusTransport transport,
                                         IOutboundInterceptorFactory outboundInterceptorFactory,
                                         IPropertyInjector propertyInjector)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
-            _clock = clock;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _dependencyResolver = dependencyResolver;
             _inboundInterceptorFactory = inboundInterceptorFactory;
             _logger = logger;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _outboundInterceptorFactory = outboundInterceptorFactory;
-            _defaultMessageLockDuration = defaultMessageLockDuration;
-            _taskFactory = taskFactory;
             _propertyInjector = propertyInjector;
         }
 
@@ -59,70 +48,52 @@ namespace Nimbus.Infrastructure
         {
             if (openGenericHandlerType == typeof (IHandleCommand<>))
             {
-                return new CommandMessageDispatcher(_brokeredMessageFactory,
-                                                    _clock,
-                                                    _dependencyResolver,
+                return new CommandMessageDispatcher(_dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _logger,
                                                     handlerMap,
-                                                    _defaultMessageLockDuration,
-                                                    _taskFactory,
                                                     _propertyInjector);
             }
 
             if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
             {
-                return new CompetingEventMessageDispatcher(_brokeredMessageFactory,
-                                                           _clock,
-                                                           _dependencyResolver,
+                return new CompetingEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
-                                                           _defaultMessageLockDuration,
-                                                           _taskFactory,
                                                            _propertyInjector,
                                                            _logger);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
             {
-                return new MulticastEventMessageDispatcher(_brokeredMessageFactory,
-                                                           _clock,
-                                                           _dependencyResolver,
+                return new MulticastEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
-                                                           _defaultMessageLockDuration,
-                                                           _taskFactory,
                                                            _propertyInjector,
                                                            _logger);
             }
 
             if (openGenericHandlerType == typeof (IHandleRequest<,>))
             {
-                return new RequestMessageDispatcher(_brokeredMessageFactory,
-                                                    _clock,
+                return new RequestMessageDispatcher(_nimbusMessageFactory,
                                                     _dependencyResolver,
                                                     _inboundInterceptorFactory,
                                                     _outboundInterceptorFactory,
                                                     _logger,
-                                                    _messagingFactory,
+                                                    _transport,
                                                     handlerMap,
-                                                    _defaultMessageLockDuration,
-                                                    _taskFactory,
                                                     _propertyInjector);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
             {
-                return new MulticastRequestMessageDispatcher(_brokeredMessageFactory,
-                                                             _clock,
+                return new MulticastRequestMessageDispatcher(_nimbusMessageFactory,
                                                              _dependencyResolver,
                                                              _inboundInterceptorFactory,
                                                              _logger,
-                                                             _messagingFactory,
+                                                             _transport,
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
-                                                             _defaultMessageLockDuration,
-                                                             _taskFactory,
                                                              _propertyInjector);
             }
 

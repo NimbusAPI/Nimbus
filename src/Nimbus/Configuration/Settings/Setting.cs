@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration.Settings
 {
-    public abstract class Setting<T>: IValidatableConfigurationSetting
+    public abstract class Setting<T>: IValidatableConfigurationSetting, ISetting
     {
         public T Value { get; set; }
 
@@ -26,9 +26,6 @@ namespace Nimbus.Configuration.Settings
             yield break;
         }
 
-        public virtual T Default
-        {
-            get { return default(T); }
-        }
+        public virtual T Default => default(T);
     }
 }

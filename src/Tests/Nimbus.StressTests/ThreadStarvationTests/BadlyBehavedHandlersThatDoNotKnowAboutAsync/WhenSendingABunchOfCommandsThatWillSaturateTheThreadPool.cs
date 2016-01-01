@@ -6,20 +6,18 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.Handlers;
 using Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNotKnowAboutAsync
 {
-    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool : SpecificationForAsync<Bus>
     {
-        private const int _timeoutSeconds = 180;
-        private static readonly TimeSpan _messageLockDuration = CommandThatWillBlockTheThreadHandler.SleepDuration.Add(TimeSpan.FromSeconds(1));
-
         private ILogger _logger;
         private int _numMessagesToSend;
 
@@ -30,19 +28,18 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                      .WithDefaultMessageLockDuration(_messageLockDuration)
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(_logger)
                                       .WithDebugOptions(
                                           dc =>
-                                          dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                              "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                                              dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                  "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
             await bus.Start();
 
@@ -51,7 +48,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task When()
         {
-            _numMessagesToSend = new MaximumThreadPoolThreadsSetting().Default*2;
+            _numMessagesToSend = new ConcurrentHandlerLimitSetting().Default;
 
             var commands = Enumerable.Range(0, _numMessagesToSend)
                                      .Select(j => new CommandThatWillBlockTheThread())
@@ -59,7 +56,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
             await Subject.SendAll(commands);
 
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
         }
 
         [Test]

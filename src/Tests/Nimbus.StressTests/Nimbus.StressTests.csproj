@@ -30,16 +30,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    <Reference Include="ConfigInjector, Version=2.0.392.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ConfigInjector.2.0.392.0\lib\net45\ConfigInjector.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.4.14\lib\net45\Serilog.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog.FullNetFx, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.4.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Serilog.Sinks.Seq, Version=1.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -58,6 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartupPerformanceTests\WhenCreatingABigBus.cs" />
+    <Compile Include="TestConfiguration.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingACommand.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingACommandHandler.cs" />
@@ -70,17 +77,10 @@
     <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingBHappenedEvent.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingBHappenedEventHandler.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\MessageContracts\CommandThatWillBlockTheThread.cs" />
-    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\MessageContracts\NoOpCommand.cs" />
-    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\Handlers\NoOpCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\MessageContracts\SmashTheBusCommand.cs" />
-    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\Handlers\SmashTheBusCommandHandler.cs" />
     <Compile Include="SpecificationForAsync.cs" />
-    <Compile Include="ThreadStarvationTests\CommandHandlersSendingOtherCommands\WhenACommandHandlerSmashesTheBusForMoreThanItsLockDuration.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool.cs" />
-    <Compile Include="ThroughputTests\EventHandlers\FakeHandler.cs" />
-    <Compile Include="ThroughputTests\Infrastructure\FakeChildScope.cs" />
-    <Compile Include="ThroughputTests\Infrastructure\FakeDependencyResolver.cs" />
+    <Compile Include="ThroughputTests\EventHandlers\StressTestMessageHandler.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BarCommand.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BarEvent.cs" />
     <Compile Include="ThroughputTests\MessageContracts\BazCommand.cs" />
@@ -91,15 +91,19 @@
     <Compile Include="ThroughputTests\MessageContracts\FooResponse.cs" />
     <Compile Include="ThroughputTests\MessageContracts\QuxCommand.cs" />
     <Compile Include="ThroughputTests\MessageContracts\QuxEvent.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\StressTestMessage.cs" />
+    <Compile Include="ThroughputTests\MessageContracts\StressTestResponseMessage.cs" />
     <Compile Include="ThroughputTests\ThroughputSpecificationForBus.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
+    <Compile Include="ThroughputTests\WhenSendingManyIndividualRequestsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
     <Compile Include="ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +114,14 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
       <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
       <Name>Nimbus.Logger.Serilog</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
+      <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
+      <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
+      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
+      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>

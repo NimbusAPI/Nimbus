@@ -1,8 +1,8 @@
 using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.PropertyInjection;
 
 namespace Nimbus.Interceptors.Outbound
@@ -18,12 +18,12 @@ namespace Nimbus.Interceptors.Outbound
             _propertyInjector = propertyInjector;
         }
 
-        public IOutboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, BrokeredMessage brokeredMessage)
+        public IOutboundInterceptor[] CreateInterceptors(IDependencyResolverScope scope, NimbusMessage nimbusMessage)
         {
             return _globalOutboundInterceptorTypes
                 .Value
                 .Select(t => (IOutboundInterceptor) scope.Resolve(t))
-                .Do(interceptor => _propertyInjector.Inject(interceptor, brokeredMessage))
+                .Do(interceptor => _propertyInjector.Inject(interceptor, nimbusMessage))
                 .ToArray();
         }
     }

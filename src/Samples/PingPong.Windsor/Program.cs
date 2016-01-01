@@ -10,6 +10,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Logger.Serilog;
+using Nimbus.Transports.WindowsServiceBus;
 using Nimbus.Windsor.Configuration;
 using Serilog;
 using ILogger = Nimbus.ILogger;
@@ -69,18 +70,20 @@ namespace PingPong.Windsor
 
             container.RegisterNimbus(typeProvider);
             container.Register(Component.For<IBus>().ImplementedBy<Bus>()
-                .UsingFactoryMethod<IBus>(() => new BusBuilder()
-                    .Configure()
-                    .WithConnectionString(connectionString)
-                    .WithNames("PingPong.Windsor", Environment.MachineName)
-                    .WithTypesFrom(typeProvider)
-                    .WithWindsorDefaults(container)
-                    .WithJsonSerializer()
-                    .WithDeflateCompressor()
-                    .Build())
-                .LifestyleSingleton()
-            );
-            Bus bus = (Bus)container.Resolve<IBus>();
+                                        .UsingFactoryMethod<IBus>(() => new BusBuilder()
+                                                                      .Configure()
+                                                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                                                         .WithConnectionString(connectionString)
+                                                                      )
+                                                                      .WithNames("PingPong.Windsor", Environment.MachineName)
+                                                                      .WithTypesFrom(typeProvider)
+                                                                      .WithWindsorDefaults(container)
+                                                                      .WithJsonSerializer()
+                                                                      .WithDeflateCompressor()
+                                                                      .Build())
+                                        .LifestyleSingleton()
+                );
+            Bus bus = (Bus) container.Resolve<IBus>();
             bus.Start().Wait();
         }
     }

@@ -10,6 +10,7 @@ using Shouldly;
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class AllSettingsClasses
     {
         private readonly string _referenceNamespace = typeof (Setting<>).Namespace;

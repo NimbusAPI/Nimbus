@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -12,25 +7,21 @@ using NUnit.Framework;
 
 namespace Nimbus.UnitTests.DispatcherTests
 {
-    public class WhenInboundInterceptorThrowsExceptionOnCommandHandlerExecuting
-        : MessageDispatcherTestBase
+    public class WhenInboundInterceptorThrowsExceptionOnCommandHandlerExecuting : MessageDispatcherTestBase
     {
         [Test]
         public void TheExceptionIsBubbledBackThroughTheInterceptors()
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             interceptor
-                .When(x => x.OnCommandHandlerExecuting(Arg.Any<EmptyCommand>(), Arg.Any<BrokeredMessage>()))
-                .Do(x =>
-                {
-                    throw new Exception("Ruh roh");
-                });
+                .When(x => x.OnCommandHandlerExecuting(Arg.Any<EmptyCommand>(), Arg.Any<NimbusMessage>()))
+                .Do(x => { throw new Exception("Ruh roh"); });
             var dispatcher = GetCommandMessageDispatcher<EmptyCommand, EmptyCommandHandler>(interceptor);
-            var brokeredMessage = BrokeredMessageFactory.Create(new EmptyCommand()).Result;
+            var nimbusMessage = NimbusMessageFactory.Create("someQueue", new EmptyCommand()).Result;
 
             try
             {
-                dispatcher.Dispatch(brokeredMessage).Wait();
+                dispatcher.Dispatch(nimbusMessage).Wait();
             }
             catch (AggregateException)
             {
@@ -39,7 +30,7 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             interceptor
                 .Received()
-                .OnCommandHandlerError(Arg.Any<EmptyCommand>(), brokeredMessage, Arg.Any<Exception>());
+                .OnCommandHandlerError(Arg.Any<EmptyCommand>(), nimbusMessage, Arg.Any<Exception>());
         }
     }
 }

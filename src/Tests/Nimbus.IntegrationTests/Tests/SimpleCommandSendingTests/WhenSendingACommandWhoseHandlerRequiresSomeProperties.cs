@@ -1,49 +1,68 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds*1000)]
     public class WhenSendingACommandWhoseHandlerRequiresSomeProperties : TestForBus
     {
-        private const int _timeoutSeconds = 5;
-
         protected override async Task When()
         {
             SomeOtherCommandHandler.Clear();
             var someCommand = new SomeOtherCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
-        public async Task TheCommandBrokerShouldReceiveThatCommand()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<SomeOtherCommand>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheDispatchContextShouldBeSet()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheDispatchContextShouldBeSet(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             SomeOtherCommandHandler.ReceivedDispatchContext.ShouldNotBe(null);
         }
 
         [Test]
-        public async Task TheMessagePropertiesShouldBeSet()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheMessagePropertiesShouldBeSet(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             SomeOtherCommandHandler.ReceivedMessageProperties.ShouldNotBe(null);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandWhoseHandlerRequiresSomeProperties>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
     }

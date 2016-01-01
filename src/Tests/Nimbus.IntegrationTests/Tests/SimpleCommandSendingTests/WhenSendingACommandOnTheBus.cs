@@ -1,35 +1,46 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
-    [Timeout(_timeoutSeconds * 1000)]
     public class WhenSendingACommandOnTheBus : TestForBus
     {
-        private const int _timeoutSeconds = 5;
         protected override async Task When()
         {
             var someCommand = new SomeCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(_timeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
         }
 
         [Test]
-        public async Task TheCommandBrokerShouldReceiveThatCommand()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
+        public async Task TheCommandBrokerShouldReceiveThatCommand(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<SomeCommand>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
     }

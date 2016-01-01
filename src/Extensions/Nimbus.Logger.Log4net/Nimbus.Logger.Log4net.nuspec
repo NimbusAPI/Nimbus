@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Logger.Log4net</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.Logger.Log4Net</title>
     <authors>Mustafa Arif</authors>
     <owners>Damian Maclennan</owners>

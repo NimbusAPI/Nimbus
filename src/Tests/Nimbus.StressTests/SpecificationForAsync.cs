@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests
 {
+    [TestFixture]
+    [Timeout(TimeoutSeconds * 1000)]
     public abstract class SpecificationForAsync<T> where T : class
     {
+        public const int TimeoutSeconds = 60;
+
         protected T Subject;
 
         protected abstract Task<T> Given();
@@ -33,7 +38,6 @@ namespace Nimbus.StressTests
                                    _sw.Stop();
 
                                    Console.WriteLine("Elapsed time: {0} seconds", _sw.Elapsed.TotalSeconds);
-                                   MethodCallCounter.Dump();
                                }
                            }).Wait();
         }
@@ -46,14 +50,15 @@ namespace Nimbus.StressTests
         [TearDown]
         public virtual void TearDown()
         {
+            TestLoggingExtensions.LogTestResult();
         }
 
         [TestFixtureTearDown]
         public virtual void TestFixtureTearDown()
         {
             var disposable = Subject as IDisposable;
-            if (disposable != null) disposable.Dispose();
             Subject = null;
+            disposable?.Dispose();
         }
     }
 }

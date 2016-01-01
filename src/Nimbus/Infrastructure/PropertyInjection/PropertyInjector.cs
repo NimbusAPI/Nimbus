@@ -1,5 +1,3 @@
-using System.Linq;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.PropertyInjection;
@@ -21,7 +19,7 @@ namespace Nimbus.Infrastructure.PropertyInjection
             _largeMessageBodyStore = largeMessageBodyStore;
         }
 
-        public void Inject(object handlerOrInterceptor, BrokeredMessage brokeredMessage)
+        public void Inject(object handlerOrInterceptor, NimbusMessage nimbusMessage)
         {
             var requireBus = handlerOrInterceptor as IRequireBus;
             if (requireBus != null)
@@ -35,10 +33,10 @@ namespace Nimbus.Infrastructure.PropertyInjection
                 requireDispatchContext.DispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
             }
 
-            var requireBrokeredMessage = handlerOrInterceptor as IRequireBrokeredMessage;
-            if (requireBrokeredMessage != null)
+            var requireNimbusMessage = handlerOrInterceptor as IRequireNimbusMessage;
+            if (requireNimbusMessage != null)
             {
-                requireBrokeredMessage.BrokeredMessage = brokeredMessage;
+                requireNimbusMessage.NimbusMessage = nimbusMessage;
             }
 
             var requireDateTime = handlerOrInterceptor as IRequireDateTime;
@@ -56,7 +54,7 @@ namespace Nimbus.Infrastructure.PropertyInjection
             var requireMessageProperties = handlerOrInterceptor as IRequireMessageProperties;
             if (requireMessageProperties != null)
             {
-                var properties = brokeredMessage.ExtractProperties();
+                var properties = nimbusMessage.ExtractProperties();
                 requireMessageProperties.MessageProperties = properties;
             }
         }

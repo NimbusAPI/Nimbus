@@ -28,7 +28,7 @@ namespace Nimbus.LargeMessages.FileSystem.Infrastructure
             return directoryInfo;
         }
 
-        public Task<string> Store(string id, byte[] bytes, DateTimeOffset expiresAfter)
+        public Task<string> Store(Guid id, byte[] bytes, DateTimeOffset expiresAfter)
         {
             return Task.Run(() =>
                             {

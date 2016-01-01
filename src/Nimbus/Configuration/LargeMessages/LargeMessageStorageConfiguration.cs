@@ -1,11 +1,34 @@
-﻿using Nimbus.Configuration.LargeMessages.Settings;
+using System.Collections.Generic;
+using Nimbus.Configuration.LargeMessages.Settings;
+using Nimbus.Configuration.PoorMansIocContainer;
 
 namespace Nimbus.Configuration.LargeMessages
 {
-    public class LargeMessageStorageConfiguration : INimbusConfiguration
+    public abstract class LargeMessageStorageConfiguration : INimbusConfiguration
     {
-        internal ILargeMessageBodyStore LargeMessageBodyStore { get; set; }
-        internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; }
-        internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; }
+        public MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
+        public MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
+
+        public LargeMessageStorageConfiguration WithMaxSmallMessageSize(int messageSize)
+        {
+            MaxSmallMessageSize = new MaxSmallMessageSizeSetting {Value = messageSize};
+            return this;
+        }
+
+        public LargeMessageStorageConfiguration WithMaxLargeMessageSize(int messageSize)
+        {
+            MaxLargeMessageSize = new MaxLargeMessageSizeSetting {Value = messageSize};
+            return this;
+        }
+
+        public void RegisterWith(PoorMansIoC container)
+        {
+            RegisterSupportingComponents(container);
+            Register<ILargeMessageBodyStore>(container);
+        }
+
+        public abstract void Register<TLargeMessageBodyStore>(PoorMansIoC container) where TLargeMessageBodyStore : ILargeMessageBodyStore;
+        public abstract void RegisterSupportingComponents(PoorMansIoC container);
+        public abstract IEnumerable<string> Validate();
     }
 }

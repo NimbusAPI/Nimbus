@@ -1,16 +1,14 @@
-﻿using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
+﻿using System.Collections.Generic;
+using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.PoorMansIocContainer;
+using Nimbus.LargeMessages.FileSystem.Configuration.Settings;
 using Nimbus.LargeMessages.FileSystem.Infrastructure;
 
 namespace Nimbus.LargeMessages.FileSystem.Configuration
 {
-    public class FileSystemStorageConfiguration
+    public class FileSystemStorageConfiguration : LargeMessageStorageConfiguration
     {
-        internal FileSystemStorageConfiguration()
-        {
-        }
-
         internal StorageDirectorySetting StorageDirectory { get; set; }
-        internal ILogger Logger { get; set; }
 
         public FileSystemStorageConfiguration WithStorageDirectory(string storageDirectory)
         {
@@ -18,15 +16,18 @@ namespace Nimbus.LargeMessages.FileSystem.Configuration
             return this;
         }
 
-        public FileSystemStorageConfiguration WithLogger(ILogger logger)
+        public override void Register<TLargeMessageBodyStore>(PoorMansIoC container)
         {
-            Logger = logger;
-            return this;
+            container.RegisterType<FileSystemLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof (ILargeMessageBodyStore));
         }
 
-        public ILargeMessageBodyStore Build()
+        public override void RegisterSupportingComponents(PoorMansIoC container)
         {
-            return new FileSystemLargeMessageBodyStore(StorageDirectory, Logger);
+        }
+
+        public override IEnumerable<string> Validate()
+        {
+            yield break;
         }
     }
 }

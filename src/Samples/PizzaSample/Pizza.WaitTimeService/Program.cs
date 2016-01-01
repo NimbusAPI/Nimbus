@@ -6,6 +6,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.Transports.WindowsServiceBus;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
@@ -46,12 +47,14 @@ namespace Pizza.WaitTimeService
 
             builder.RegisterNimbus(typeProvider);
             builder.Register(componentContext => new BusBuilder()
-                                                     .Configure()
-                                                     .WithConnectionString(connectionString)
-                                                     .WithNames("WaitTime", Environment.MachineName)
-                                                     .WithTypesFrom(typeProvider)
-                                                     .WithAutofacDefaults(componentContext)
-                                                     .Build())
+                                 .Configure()
+                                 .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                    .WithConnectionString(connectionString)
+                                 )
+                                 .WithNames("WaitTime", Environment.MachineName)
+                                 .WithTypesFrom(typeProvider)
+                                 .WithAutofacDefaults(componentContext)
+                                 .Build())
                    .As<IBus>()
                    .AutoActivate()
                    .OnActivated(c => c.Instance.Start().Wait())

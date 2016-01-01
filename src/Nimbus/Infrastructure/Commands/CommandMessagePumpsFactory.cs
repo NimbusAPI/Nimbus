@@ -1,48 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Commands
 {
-    internal class CommandMessagePumpsFactory : ICreateComponents
+    internal class CommandMessagePumpsFactory
     {
-        private readonly IClock _clock;
-        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILogger _logger;
         private readonly IHandlerMapper _handlerMapper;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
-        private readonly INimbusMessagingFactory _messagingFactory;
-        private readonly INimbusTaskFactory _taskFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly ITypeProvider _typeProvider;
+        private readonly PoorMansIoC _container;
 
-        private readonly GarbageMan _garbageMan = new GarbageMan();
-
-        public CommandMessagePumpsFactory(IClock clock,
-                                          IDispatchContextManager dispatchContextManager,
-                                          IHandlerMapper handlerMapper,
+        public CommandMessagePumpsFactory(IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
-                                          INimbusMessagingFactory messagingFactory,
-                                          INimbusTaskFactory taskFactory,
+                                          INimbusTransport transport,
                                           IRouter router,
-                                          ITypeProvider typeProvider)
+                                          ITypeProvider typeProvider,
+                                          PoorMansIoC container)
         {
-            _clock = clock;
-            _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _typeProvider = typeProvider;
-            _taskFactory = taskFactory;
+            _container = container;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -63,31 +53,14 @@ namespace Nimbus.Infrastructure.Commands
                 var messageTypes = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, binding.HandlerTypes).ToArray();
 
                 _logger.Debug("Creating message pump for command queue '{0}' handling {1}", binding.QueuePath, messageTypes.ToTypeNameSummary(selector: t => t.Name));
-                var messageReceiver = _messagingFactory.GetQueueReceiver(binding.QueuePath);
 
+                var messageReceiver = _transport.GetQueueReceiver(binding.QueuePath);
                 var handlerMap = _handlerMapper.GetHandlerMapFor(openGenericHandlerType, messageTypes);
-                var pump = new MessagePump(_clock,
-                                           _dispatchContextManager,
-                                           _logger,
-                                           _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                           messageReceiver,
-                                           _taskFactory);
-                _garbageMan.Add(pump);
+                var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
+                var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
                 yield return pump;
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-            _garbageMan.Dispose();
         }
     }
 }

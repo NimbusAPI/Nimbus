@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
@@ -13,10 +17,11 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
     [Timeout(TimeoutSeconds*1000)]
     public class WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning : TestForBus
     {
+        public new const int TimeoutSeconds = 60;
+
         private SlowCommand[] _commands;
         private Guid[] _sentCommandIds;
-        public const int TimeoutSeconds = 30;
-        private const int _totalCommands = 100;
+        private const int _totalCommands = 50;
 
         protected override async Task When()
         {
@@ -51,13 +56,12 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public async Task NothingShouldGoBang()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-        }
+            await Given(scenario);
+            await When();
 
-        [Test]
-        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler()
-        {
             AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler().ShouldBe(true);
         }
 

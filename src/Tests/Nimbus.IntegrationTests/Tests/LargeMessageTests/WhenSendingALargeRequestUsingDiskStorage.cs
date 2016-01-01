@@ -2,18 +2,22 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
+using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.LargeMessageTests.MessageContracts;
 using Nimbus.LargeMessages.FileSystem.Configuration;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     public class WhenSendingALargeRequestUsingDiskStorage : SpecificationForAsync<Bus>
     {
         private BigFatResponse _response;
@@ -28,21 +32,20 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
             var logger = TestHarnessLoggerFactory.Create();
 
             logger.Debug("Starting disk storage large message test at {0}", _largeMessageBodyTempPath);
-            
-            var largeMessageBodyStorage = new FileSystemStorageBuilder().Configure()
-                                                                        .WithStorageDirectory(_largeMessageBodyTempPath)
-                                                                        .WithLogger(logger)
-                                                                        .Build();
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
+                                                         .WithLargeMessageStorage(new FileSystemStorageConfiguration()
+                                                                                      .WithStorageDirectory(_largeMessageBodyTempPath)
+                                                                                      .WithMaxSmallMessageSize(64*1024)
+                                                                                      .WithMaxLargeMessageSize(10*1048576))
+                )
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(logger)
-                                      .WithLargeMessageStorage(c => c.WithLargeMessageBodyStore(largeMessageBodyStorage)
-                                                                     .WithMaxSmallMessageSize(64*1024)
-                                                                     .WithMaxLargeMessageSize(10*1048576))
                                       .WithDebugOptions(dc => dc.RemoveAllExistingNamespaceElementsOnStartup(
                                           "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
@@ -57,7 +60,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
             _busRequest = new BigFatRequest
                           {
-                              SomeBigQuestion = bigQuestion,
+                              SomeBigQuestion = bigQuestion
                           };
             _response = await Subject.Request(_busRequest);
         }

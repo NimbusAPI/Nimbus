@@ -53,6 +53,7 @@
       <Link>NullGuard.cs</Link>
     </Compile>
     <Compile Include="Configuration\BusBuilderConfigurationJsonSerializerExtensions.cs" />
+    <Compile Include="CustomContractResolver.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

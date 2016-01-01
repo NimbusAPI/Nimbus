@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.DependencyResolution
@@ -54,11 +53,12 @@ namespace Nimbus.Infrastructure.DependencyResolution
             catch (Exception exc)
             {
                 var message = (
-                                  "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters). " +
-                                  "If you'd like to use constructor injection on your handlers, have a look at the examples provided in the README about how to wire things up via an IoC container."
-                              ).FormatWith(GetType().Name);
+                    "The {0} can only broker messages to handlers that have default constructors (i.e. ones with no parameters). " +
+                    "If you'd like to use constructor injection on your handlers, have a look at the examples provided in the README about how to wire things up via an IoC container."
+                    ).FormatWith(GetType().Name);
 
-                throw new BusException(message, exc);
+                throw new BusException(message, exc)
+                    .WithData("ComponentType", componentType);
             }
         }
     }

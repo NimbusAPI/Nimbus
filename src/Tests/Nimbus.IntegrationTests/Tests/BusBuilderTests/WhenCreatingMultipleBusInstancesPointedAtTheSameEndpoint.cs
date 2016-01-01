@@ -2,93 +2,105 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
-using Nimbus.Tests.Common;
+using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Infrastructure.Routing;
+using Nimbus.Serializers.Json;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(120*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
+        protected const int TimeoutSeconds = 120;
+
         private Bus[] _buses;
+        private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
 
         [Test]
-        public async Task NoneOfThemShouldGoBang()
+        [TestCaseSource(typeof (AllTransportConfigurations))]
+        public async Task NoneOfThemShouldGoBang(string testName, IConfigurationScenario<TransportConfiguration> scenario)
         {
-            var tasks = Enumerable.Range(0, 5)
-                                  .Select(i => BuildMeABus())
-                                  .ToArray();
+            await ClearMeABus(scenario);
 
-            await Task.WhenAll(tasks);
-
-            _buses = tasks.Select(t => t.Result).ToArray();
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Task.Run(async () => { await ClearMeABus(); }).Wait();
+            _buses = await Enumerable.Range(0, 10)
+                                     .Select(i => Task.Run(async () => await BuildMeABus(scenario)))
+                                     .SelectResultsAsync();
         }
 
         [TearDown]
         public void TearDown()
         {
-            _buses
-                .AsParallel()
-                .Do(b => b.Dispose())
-                .Done();
+            _buses?.AsParallel()
+                   .Do(b => b.Dispose())
+                   .Done();
         }
 
-        private async Task ClearMeABus()
+        private async Task ClearMeABus(IConfigurationScenario<TransportConfiguration> scenario)
         {
-            // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-            // deleting queues and topics is slow.
-            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
-
-            var logger = TestHarnessLoggerFactory.Create();
-
-            var busBuilder = new BusBuilder().Configure()
-                                             .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                             .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                             .WithTypesFrom(typeProvider)
-                                             .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                             .WithLogger(logger)
-                                             .WithDebugOptions(
-                                                 dc =>
-                                                 dc.RemoveAllExistingNamespaceElementsOnStartup(
-                                                     "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
-                ;
-
-            using (var bus = busBuilder.Build())
+            using (var instance = scenario.CreateInstance())
             {
-                await bus.Start();
+                // We want a namespace that doesn't exist here so that all the queues and topics are removed.
+                var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {"Some.Namespace.That.Does.Not.Exist"});
+                var transportConfiguration = instance.Configuration;
+
+                var busBuilder = new BusBuilder().Configure()
+                                                 .WithTransport(transportConfiguration)
+                                                 .WithRouter(new DestinationPerMessageTypeRouter())
+                                                 .WithSerializer(new JsonSerializer())
+                                                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                 .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                 .WithNames("MyTestSuite", Environment.MachineName)
+                                                 .WithTypesFrom(typeProvider)
+                                                 .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
+                                                 .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                 .WithLogger(_logger)
+                                                 .WithDebugOptions(
+                                                     dc =>
+                                                         dc.RemoveAllExistingNamespaceElementsOnStartup(
+                                                             "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
+                    ;
+
+                using (var bus = busBuilder.Build())
+                {
+                    await bus.Start();
+                    await bus.Stop();
+                }
             }
         }
 
-        private Task<Bus> BuildMeABus()
+        private async Task<Bus> BuildMeABus(IConfigurationScenario<TransportConfiguration> scenario)
         {
-            return Task.Run(async () =>
-                                  {
-                                      // Filter types we care about to only our own test's namespace. It's a performance optimisation because creating and
-                                      // deleting queues and topics is slow.
-                                      var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
+            var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 
-                                      var logger = TestHarnessLoggerFactory.Create();
+            using (var instance = scenario.CreateInstance())
+            {
+                var transportConfiguration = instance.Configuration;
 
-                                      var bus = new BusBuilder().Configure()
-                                                                .WithNames("IntegrationTestHarness", Environment.MachineName)
-                                                                .WithConnectionString(CommonResources.ServiceBusConnectionString)
-                                                                .WithTypesFrom(typeProvider)
-                                                                .WithDefaultTimeout(TimeSpan.FromSeconds(10))
-                                                                .WithLogger(logger)
-                                                                .Build();
-                                      bus.ShouldNotBe(null);
-                                      await bus.Start();
-                                      return bus;
-                                  });
+                var configuration = new BusBuilder().Configure()
+                                                    .WithTransport(transportConfiguration)
+                                                    .WithRouter(new DestinationPerMessageTypeRouter())
+                                                    .WithSerializer(new JsonSerializer())
+                                                    .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                                                    .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                    .WithNames("MyTestSuite", Environment.MachineName)
+                                                    .WithTypesFrom(typeProvider)
+                                                    .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                                    .WithHeartbeatInterval(TimeSpan.MaxValue)
+                                                    .WithLogger(_logger)
+                    ;
+
+                var bus = configuration.Build();
+                await bus.Start();
+                await bus.Stop();
+                return bus;
+            }
         }
     }
 }

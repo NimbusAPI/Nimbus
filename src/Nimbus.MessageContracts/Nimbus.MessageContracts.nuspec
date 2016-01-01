@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.MessageContracts</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.MessageContracts</title>
     <authors>Damian Maclennan and Andrew Harcourt</authors>
     <owners>Damian Maclennan</owners>

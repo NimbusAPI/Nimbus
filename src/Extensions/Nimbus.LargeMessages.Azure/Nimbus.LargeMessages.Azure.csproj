@@ -41,9 +41,9 @@
     <Reference Include="Microsoft.Data.Services.Client, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Data.Services.Client.5.6.0\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.8.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=3.1.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,19 +71,19 @@
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
       <Link>Properties\NullGuard.cs</Link>
     </Compile>
+    <Compile Include="Http\AzureBlobStorageHttpLargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\AutoCreateBlobStorageContainerNameSetting.cs" />
     <Compile Include="Configuration\Settings\AzureBlobStorageContainerSharedAccessSignatureSetting.cs" />
     <Compile Include="Configuration\Settings\AzureBlobStorageContainerUriSetting.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
-    <Compile Include="Infrastructure\AzureBlobStorageLargeMessageBodyStore.cs" />
-    <Compile Include="Infrastructure\Http\AzureBlobStorageHttpLargeMessageBodyStore.cs" />
-    <Compile Include="Configuration\BlobStorageBuilder.cs" />
-    <Compile Include="Configuration\BlobStorageConfiguration.cs" />
+    <Compile Include="Client\AzureBlobStorageLargeMessageBodyStore.cs" />
+    <Compile Include="Http\AzureBlobStorageHttpLargeMessageBodyStore.cs" />
+    <Compile Include="Client\AzureBlobStorageLargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\AzureStorageAccountConnectionStringSetting.cs" />
-    <Compile Include="Infrastructure\Http\IAzureBlobStorageHttpClient.cs" />
-    <Compile Include="Infrastructure\Http\IUriFormatter.cs" />
-    <Compile Include="Infrastructure\Http\AzureBlobStorageHttpClient.cs" />
-    <Compile Include="Infrastructure\Http\UriFormatter.cs" />
+    <Compile Include="Http\IAzureBlobStorageHttpClient.cs" />
+    <Compile Include="Http\IUriFormatter.cs" />
+    <Compile Include="Http\AzureBlobStorageHttpClient.cs" />
+    <Compile Include="Http\UriFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

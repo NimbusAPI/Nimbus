@@ -8,6 +8,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.Transports.WindowsServiceBus;
 using Nimbus.Unity.Configuration;
 
 namespace PingPong.Unity
@@ -18,7 +19,7 @@ namespace PingPong.Unity
         {
             var container = new UnityContainer();
             container.RegisterType<IPinger, Pinger>();
-            
+
             SetUpBus(container);
 
             Console.WriteLine("Enter some text to have it ponged back at you. Type 'exit' to quit...");
@@ -58,7 +59,8 @@ namespace PingPong.Unity
             var typeProvider = new AssemblyScanningTypeProvider(Assembly.GetExecutingAssembly());
 
             var bus = new BusBuilder().Configure()
-                                      .WithConnectionString(connectionString)
+                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                         .WithConnectionString(connectionString))
                                       .WithNames("PingPong.Unity", Environment.MachineName)
                                       .WithTypesFrom(typeProvider)
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(5))

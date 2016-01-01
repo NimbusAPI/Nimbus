@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.TaskScheduling;
 
 namespace Nimbus.Configuration
 {
     internal class MessagePumpsManager : IMessagePumpsManager
     {
         private readonly IMessagePump _responseMessagePump;
-        private readonly INimbusTaskFactory _taskFactory;
         private readonly IMessagePump[] _requestMessagePumps;
         private readonly IMessagePump[] _commandMessagePumps;
         private readonly IMessagePump[] _multicastEventMessagePumps;
@@ -23,8 +21,7 @@ namespace Nimbus.Configuration
                                    IEnumerable<IMessagePump> commandMessagePumps,
                                    IEnumerable<IMessagePump> multicastRequestMessagePumps,
                                    IEnumerable<IMessagePump> multicastEventMessagePumps,
-                                   IEnumerable<IMessagePump> competingEventMessagePumps,
-                                   INimbusTaskFactory taskFactory)
+                                   IEnumerable<IMessagePump> competingEventMessagePumps)
         {
             _responseMessagePump = responseMessagePump;
             _commandMessagePumps = commandMessagePumps.ToArray();
@@ -32,7 +29,6 @@ namespace Nimbus.Configuration
             _multicastRequestMessagePumps = multicastRequestMessagePumps.ToArray();
             _multicastEventMessagePumps = multicastEventMessagePumps.ToArray();
             _competingEventMessagePumps = competingEventMessagePumps.ToArray();
-            _taskFactory = taskFactory;
         }
 
         public async Task Start(MessagePumpTypes messagePumpTypes)
@@ -52,23 +48,16 @@ namespace Nimbus.Configuration
             var messagePumpsToWaitFor = GetMessagePumps(waitForPumpTypes).ToArray();
             var messagePumpsToHandleInBackground = GetMessagePumps(typesToProcessInBackground).ToArray();
 
-            await messagePumpsToWaitFor
-                .Select(pump => _taskFactory.StartNew(async () => await action(pump), TaskContext.ControlMessagePump).Unwrap())
+            var tasksToWaitFor = messagePumpsToWaitFor
+                .Select(pump => Task.Run(() => action(pump)).ConfigureAwaitFalse())
+                .ToArray();
+
+            messagePumpsToHandleInBackground
+                .Select(pump => Task.Run(() => action(pump)).ConfigureAwaitFalse())
+                .Done();
+
+            await tasksToWaitFor
                 .WhenAll();
-
-#pragma warning disable 4014
-            Task.Run(async () =>
-                           {
-                               // pause for a tiny bit here so that if people want messages on the bus immediately then their
-                               // _bus.Send/Whatever(...) call can get into the threadpool queue before we flood it with potentially
-                               // thousands of other message pump creation tasks.
-                               await Task.Delay(100);
-
-                               await messagePumpsToHandleInBackground
-                                   .Select(pump => _taskFactory.StartNew(async () => await action(pump), TaskContext.ControlMessagePump).Unwrap())
-                                   .WhenAll();
-                           });
-#pragma warning restore 4014
         }
 
         private IEnumerable<IMessagePump> GetMessagePumps(MessagePumpTypes messagePumpTypes)

@@ -1,4 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Nimbus.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
@@ -16,8 +20,11 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        public async Task NothingShouldGoBang()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimes>))]
+        public async Task NothingShouldGoBang(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
         }
     }
 }

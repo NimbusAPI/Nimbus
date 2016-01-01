@@ -5,12 +5,14 @@ using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class AllExtensionMethodsNotOnPublicInterfaces
     {
         [Test]

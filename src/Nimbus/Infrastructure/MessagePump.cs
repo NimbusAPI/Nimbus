@@ -1,42 +1,50 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.TaskScheduling;
 
 namespace Nimbus.Infrastructure
 {
     [DebuggerDisplay("{_receiver}")]
     internal class MessagePump : IMessagePump
     {
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILogger _logger;
         private readonly IMessageDispatcher _messageDispatcher;
         private readonly INimbusMessageReceiver _receiver;
-        private readonly INimbusTaskFactory _taskFactory;
+        private readonly IDeadLetterOffice _deadLetterOffice;
+        private readonly IDelayedDeliveryService _delayedDeliveryService;
+        private readonly IDeliveryRetryStrategy _deliveryRetryStrategy;
 
         private bool _started;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
 
-        public MessagePump(
-            IClock clock,
-            IDispatchContextManager dispatchContextManager,
-            ILogger logger,
-            IMessageDispatcher messageDispatcher,
-            INimbusMessageReceiver receiver,
-            INimbusTaskFactory taskFactory)
+        public MessagePump(MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                           IClock clock,
+                           IDeadLetterOffice deadLetterOffice,
+                           IDelayedDeliveryService delayedDeliveryService,
+                           IDeliveryRetryStrategy deliveryRetryStrategy,
+                           IDispatchContextManager dispatchContextManager,
+                           ILogger logger,
+                           IMessageDispatcher messageDispatcher,
+                           INimbusMessageReceiver receiver)
         {
+            _maxDeliveryAttempts = maxDeliveryAttempts;
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
             _logger = logger;
             _messageDispatcher = messageDispatcher;
             _receiver = receiver;
-            _taskFactory = taskFactory;
+            _deadLetterOffice = deadLetterOffice;
+            _delayedDeliveryService = delayedDeliveryService;
+            _deliveryRetryStrategy = deliveryRetryStrategy;
         }
 
         public async Task Start()
@@ -48,9 +56,10 @@ namespace Nimbus.Infrastructure
                 if (_started) return;
                 _started = true;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} starting...", _receiver);
                 await _receiver.Start(Dispatch);
-                _logger.Debug("Message pump for {Receiver} started", _receiver);
+                _logger.Debug("Message pump for {Receiver} started in {Elapsed}", _receiver, sw.Elapsed);
             }
             finally
             {
@@ -67,9 +76,10 @@ namespace Nimbus.Infrastructure
                 if (!_started) return;
                 _started = false;
 
+                var sw = Stopwatch.StartNew();
                 _logger.Debug("Message pump for {Receiver} stopping...", _receiver);
                 await _receiver.Stop();
-                _logger.Debug("Message pump for {Receiver} stopped.", _receiver);
+                _logger.Debug("Message pump for {Receiver} stopped in {Elapsed}.", _receiver, sw.Elapsed);
             }
             finally
             {
@@ -77,74 +87,87 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private async Task Dispatch(BrokeredMessage message)
+        private async Task Dispatch(NimbusMessage message)
         {
             // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
             // bail - it will already have been picked up by someone else.
-            if (message.LockedUntilUtc <= _clock.UtcNow)
+            var now = _clock.UtcNow;
+            if (message.ExpiresAfter <= now)
             {
-                _logger.Debug("Lock for message {MessageId} appears to have already expired so we're not dispatching it. Watch out for clock drift between your service bus server and {MachineName}!", message.MessageId, Environment.MachineName);
+                _logger.Debug(
+                    "Message {MessageId} appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
+                    message.MessageId,
+                    message.ExpiresAfter,
+                    now);
+                await _deadLetterOffice.Post(message);
                 return;
             }
 
             try
             {
-                Exception exception = null;
-
                 try
                 {
                     LogInfo("Dispatching", message);
+                    message.RecordDeliveryAttempt(now);
                     using (_dispatchContextManager.StartNewDispatchContext(new SubsequentDispatchContext(message)))
                     {
-                        await _taskFactory.StartNew(() => _messageDispatcher.Dispatch(message), TaskContext.Dispatch).Unwrap();
+                        await _messageDispatcher.Dispatch(message);
                     }
                     LogDebug("Dispatched", message);
-
-                    LogDebug("Completing", message);
-                    message.Properties[MessagePropertyKeys.DispatchComplete] = true;
-                    await _taskFactory.StartNew(() => message.CompleteAsync(), TaskContext.CompleteOrAbandon).Unwrap();
-                    LogInfo("Completed", message);
-
                     return;
                 }
 
                 catch (Exception exc)
                 {
-                    if (exc is MessageLockLostException || (exc.InnerException is MessageLockLostException))
-                    {
-                        _logger.Error(exc,
-                                      "Message completion failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.ReplyTo,
-                                      message.MessageId,
-                                      message.CorrelationId);
-                        return;
-                    }
-
                     _logger.Error(exc,
                                   "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                                   message.SafelyGetBodyTypeNameOrDefault(),
-                                  message.ReplyTo,
+                                  message.From,
                                   message.MessageId,
                                   message.CorrelationId);
-
-                    exception = exc;
                 }
 
-                try
+                var numDeliveryAttempts = message.DeliveryAttempts.Count();
+                if (numDeliveryAttempts >= _maxDeliveryAttempts)
                 {
-                    LogDebug("Abandoning", message);
-                    await message.AbandonAsync(exception.ExceptionDetailsAsProperties(_clock.UtcNow));
-                    LogDebug("Abandoned", message);
+                    _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}. Posting it to the dead letter office.",
+                                  numDeliveryAttempts,
+                                  message.MessageId);
+
+                    try
+                    {
+                        await _deadLetterOffice.Post(message);
+                    }
+                    catch (Exception exc)
+                    {
+                        _logger.Error(exc,
+                                      "Failed to post message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.From,
+                                      message.MessageId,
+                                      message.CorrelationId);
+                    }
                 }
-                catch (Exception exc)
+                else
                 {
-                    _logger.Error(exc,
-                                  "Could not call Abandon() on message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}].",
-                                  message.SafelyGetBodyTypeNameOrDefault(),
-                                  message.MessageId,
-                                  message.CorrelationId,
-                                  message.ReplyTo);
+                    try
+                    {
+                        var nextDeliveryTime = _deliveryRetryStrategy.CalculateNextRetryTime(message);
+                        _logger.Info("Re-enqueuing message {MessageId} for attempt {DeliveryAttempts} at delivery at {DeliveryTime}",
+                                     message.MessageId,
+                                     numDeliveryAttempts + 1,
+                                     nextDeliveryTime);
+                        await _delayedDeliveryService.DeliverAfter(message, nextDeliveryTime);
+                    }
+                    catch (Exception exc)
+                    {
+                        _logger.Error(exc,
+                                      "Failed to re-enqueue message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] for re-delivery.",
+                                      message.SafelyGetBodyTypeNameOrDefault(),
+                                      message.From,
+                                      message.MessageId,
+                                      message.CorrelationId);
+                    }
                 }
             }
             catch (Exception exc)
@@ -153,22 +176,22 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        private void LogDebug(string activity, BrokeredMessage message)
+        private void LogDebug(string activity, NimbusMessage message)
         {
             _logger.Debug("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                           activity,
                           message.SafelyGetBodyTypeNameOrDefault(),
-                          message.ReplyTo,
+                          message.From,
                           message.MessageId,
                           message.CorrelationId);
         }
 
-        private void LogInfo(string activity, BrokeredMessage message)
+        private void LogInfo(string activity, NimbusMessage message)
         {
             _logger.Info("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                          activity,
                          message.SafelyGetBodyTypeNameOrDefault(),
-                         message.ReplyTo,
+                         message.From,
                          message.MessageId,
                          message.CorrelationId);
         }

@@ -6,6 +6,7 @@ using System.Reflection;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
 using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
 using NUnit.Framework;
 using Shouldly;

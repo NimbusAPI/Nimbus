@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ConfigInjector.QuickAndDirty;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
     {
         private const int _expectedTotalCallCount = 11; // 5 interceptors * 2 + 1 handler
-        public const int TimeoutSeconds = 15;
 
         protected override async Task<IBus> Given()
         {
@@ -28,11 +31,11 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
             var logger = TestHarnessLoggerFactory.Create();
 
             var bus = new BusBuilder().Configure()
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
-                                      .WithConnectionString(CommonResources.ServiceBusConnectionString)
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                      .WithDefaultTimeout(TimeSpan.FromSeconds(10))
+                                      .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithMaxDeliveryAttempts(1)
                                       .WithGlobalInboundInterceptorTypes(typeof (SomeGlobalInterceptor))
                                       .WithLogger(logger)

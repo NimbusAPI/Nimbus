@@ -2,7 +2,7 @@
 
 namespace Nimbus.StressTests.ThroughputTests.MessageContracts
 {
-    public class QuxCommand : IBusCommand
+    public class QuxCommand : StressTestMessage, IBusCommand
     {
     }
 }

@@ -1,30 +1,35 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class ResponseMessageDispatcher : IMessageDispatcher
     {
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly ILogger _logger;
 
-        public ResponseMessageDispatcher(IBrokeredMessageFactory brokeredMessageFactory, RequestResponseCorrelator requestResponseCorrelator)
+        public ResponseMessageDispatcher(ILogger logger, RequestResponseCorrelator requestResponseCorrelator)
         {
             _requestResponseCorrelator = requestResponseCorrelator;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _logger = logger;
         }
 
-        public async Task Dispatch(BrokeredMessage message)
+        public async Task Dispatch(NimbusMessage message)
         {
-            var requestId = Guid.Parse((string)message.Properties[MessagePropertyKeys.InReplyToRequestId]);
+            var requestId = (Guid)message.InReplyToMessageId;
+
             var responseCorrelationWrapper = _requestResponseCorrelator.TryGetWrapper(requestId);
-            if (responseCorrelationWrapper == null) return;
+            if (responseCorrelationWrapper == null)
+            {
+                _logger.Warn("Received a reply to request {MessageId} that had no corresponding request waiting for it.", requestId);
+                return;
+            }
 
             var success = (bool) message.Properties[MessagePropertyKeys.RequestSuccessful];
             if (success)
             {
-                var response = await _brokeredMessageFactory.GetBody(message);
+                var response = message.Payload;
                 responseCorrelationWrapper.Reply(response);
             }
             else

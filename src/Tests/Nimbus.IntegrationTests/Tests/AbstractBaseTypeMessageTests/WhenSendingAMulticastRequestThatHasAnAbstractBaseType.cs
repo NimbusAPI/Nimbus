@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
@@ -16,26 +18,38 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         protected override async Task When()
         {
             var request = new SomeConcreteRequestType();
-            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(2))).ToArray();
-
-            await TimeSpan.FromSeconds(5).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Any());
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds)))
+                .Take(1)
+                .ToArray();
         }
 
         [Test]
-        public async Task TheHandlerShouldReceiveThatRequest()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        public async Task TheHandlerShouldReceiveThatRequest(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.OfType<SomeConcreteRequestType>().Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheResponseShouldNotBeNull()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatHasAnAbstractBaseType>))]
+        public async Task TheResponseShouldNotBeNull(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             _response.ShouldNotBe(null);
         }
     }

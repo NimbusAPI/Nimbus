@@ -5,6 +5,7 @@ using Nimbus;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.Transports.WindowsServiceBus;
 using Pizza.Maker.Messages;
 using Pizza.Ordering.Messages;
 
@@ -34,7 +35,9 @@ namespace Pizza.RetailWeb.AutofacModules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                  .Configure()
-                                 .WithConnectionString(connectionString)
+                                 .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                                    .WithConnectionString(connectionString)
+                                 )
                                  .WithNames("MyApp", Environment.MachineName).WithTypesFrom(handlerTypesProvider)
                                  .WithAutofacDefaults(componentContext)
                                  .Build())

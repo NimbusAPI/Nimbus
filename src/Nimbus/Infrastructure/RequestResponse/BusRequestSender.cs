@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     public class BusRequestSender : IRequestSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -26,19 +27,19 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
         internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
-                                  IBrokeredMessageFactory brokeredMessageFactory,
                                   IClock clock,
                                   IDependencyResolver dependencyResolver,
                                   IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                   ILogger logger,
-                                  INimbusMessagingFactory messagingFactory,
+                                  INimbusMessageFactory nimbusMessageFactory,
+                                  INimbusTransport transport,
                                   IOutboundInterceptorFactory outboundInterceptorFactory,
                                   IRouter router,
                                   RequestResponseCorrelator requestResponseCorrelator)
         {
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _dependencyResolver = dependencyResolver;
@@ -64,14 +65,14 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
 
-            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
+            var brokeredMessage = (await _nimbusMessageFactory.Create(queuePath, busRequest))
                 .WithRequestTimeout(timeout)
-                .DestinedForQueue(queuePath)
                 ;
 
             var expiresAfter = _clock.UtcNow.Add(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordRequest<TResponse>(brokeredMessage.MessageId, expiresAfter);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -79,9 +80,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage, sw.Elapsed);
 
-                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
                     {
                         await interceptor.OnRequestSending(busRequest, brokeredMessage);
@@ -91,11 +92,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                     {
                         await interceptor.OnRequestSent(busRequest, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Waiting for response to", queuePath, brokeredMessage, sw.Elapsed);
                     var response = await responseCorrelationWrapper.WaitForResponse(timeout);
-                    _logger.LogDispatchAction("Received response to", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Received response to", queuePath, brokeredMessage, sw.Elapsed);
 
                     return response;
                 }
@@ -108,7 +109,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     await interceptor.OnRequestSendingError(busRequest, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+                _logger.LogDispatchError("sending", queuePath, brokeredMessage, sw.Elapsed, exception);
+                    //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return default(TResponse);

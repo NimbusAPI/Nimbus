@@ -8,7 +8,6 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class RequestResponseCorrelationWrapper<TResponse> : IRequestResponseCorrelationWrapper, IDisposable
     {
-        private readonly DateTimeOffset _expiresAfter;
         private readonly SemaphoreSlim _semaphore;
         private bool _requestWasSuccessful;
         private TResponse _response;
@@ -17,7 +16,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public RequestResponseCorrelationWrapper(DateTimeOffset expiresAfter)
         {
-            _expiresAfter = expiresAfter;
+            ExpiresAfter = expiresAfter;
             _semaphore = new SemaphoreSlim(0, int.MaxValue);
         }
 
@@ -36,10 +35,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _semaphore.Release();
         }
 
-        public DateTimeOffset ExpiresAfter
-        {
-            get { return _expiresAfter; }
-        }
+        public DateTimeOffset ExpiresAfter { get; }
 
         public Task<TResponse> WaitForResponse()
         {
@@ -51,11 +47,16 @@ namespace Nimbus.Infrastructure.RequestResponse
             var responseReceivedInTime = await _semaphore.WaitAsync(timeout);
 
             if (!responseReceivedInTime)
-                throw new TimeoutException("No response was received from the bus within the configured timeout. Expected a '{0}'."
-                    .FormatWith(typeof(TResponse)));
-            
+            {
+                throw new TimeoutException("No response was received within the configured timeout.")
+                    .WithData("ExpectedResponseType", typeof (TResponse))
+                    .WithData("Timeout", timeout);
+            }
+
             if (!_requestWasSuccessful)
+            {
                 throw new RequestFailedException(_exceptionMessage, _exceptionStackTrace);
+            }
 
             return _response;
         }

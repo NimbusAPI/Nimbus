@@ -6,12 +6,14 @@ using Nimbus.Configuration;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Extensions;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.UnitTests.Conventions
 {
     [TestFixture]
+    [Category("Convention")]
     public class AllBusBuilderConfigurationExtensionMethods
     {
         private readonly string _configurationExtensionsNamespace = typeof (BusBuilderConfigurationExtensions).Namespace;

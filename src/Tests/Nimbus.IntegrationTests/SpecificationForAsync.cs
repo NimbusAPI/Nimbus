@@ -1,12 +1,17 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests
 {
+    [TestFixture]
+    [Timeout(TimeoutSeconds * 1000)]
     public abstract class SpecificationForAsync<T> where T : class
     {
+        protected const int TimeoutSeconds = 30;
+
         protected T Subject;
 
         protected abstract Task<T> Given();
@@ -37,6 +42,7 @@ namespace Nimbus.IntegrationTests
         [TearDown]
         public virtual void TearDown()
         {
+            TestLoggingExtensions.LogTestResult();
         }
 
         [TestFixtureTearDown]

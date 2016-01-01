@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.StressTests.ThroughputTests.MessageContracts;
 using NUnit.Framework;
@@ -9,22 +8,17 @@ namespace Nimbus.StressTests.ThroughputTests
     [TestFixture]
     public class WhenSendingManyCommandsOfDifferentTypes : ThroughputSpecificationForBus
     {
-        protected override int ExpectedMessagesPerSecond
+        public override async Task SendMessages(IBus bus)
         {
-            get { return 150; }
-        }
-
-        public override IEnumerable<Task> SendMessages(IBus bus)
-        {
-            for (var i = 0; i < NumMessagesToSend/4; i++)
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed < SendMessagesFor)
             {
-                yield return bus.Send(new FooCommand());
-                yield return bus.Send(new BarCommand());
-                yield return bus.Send(new BazCommand());
-                yield return bus.Send(new QuxCommand());
-                Console.Write(".");
+                await bus.Send(new FooCommand());
+                await bus.Send(new BarCommand());
+                await bus.Send(new BazCommand());
+                await bus.Send(new QuxCommand());
+                IncrementExpectedMessageCount(4);
             }
-            Console.WriteLine();
         }
     }
 }

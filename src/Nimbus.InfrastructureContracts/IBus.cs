@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 
-// ReSharper disable CheckNamespace
-
 namespace Nimbus
-// ReSharper restore CheckNamespace
 {
     public interface IBus
     {
@@ -28,6 +25,6 @@ namespace Nimbus
 
         Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent;
 
-        IDeadLetterQueues DeadLetterQueues { get; }
+        IDeadLetterOffice DeadLetterOffice { get; }
     }
 }

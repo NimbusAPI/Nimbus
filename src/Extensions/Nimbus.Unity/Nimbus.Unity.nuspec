@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Unity</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.Unity</title>
     <authors>Stuart Blackler</authors>
     <owners>Stuart Blackler</owners>

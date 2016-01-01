@@ -2,7 +2,7 @@
 
 namespace Nimbus.Configuration
 {
-    internal interface IValidatableConfigurationSetting
+    public interface IValidatableConfigurationSetting
     {
         IEnumerable<string> Validate();
     }

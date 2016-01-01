@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Autofac;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
@@ -45,8 +44,8 @@ namespace Nimbus.UnitTests.InterceptorTests
                                                                                                      Substitute.For<IDispatchContextManager>(),
                                                                                                      Substitute.For<ILargeMessageBodyStore>()));
 
-                var dummyBrokeredMessage = new BrokeredMessage();
-                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyBrokeredMessage);
+                var dummyNimbusMessage = new NimbusMessage("nullQueue");
+                var interceptors = outboundInterceptorFactory.CreateInterceptors(scope, dummyNimbusMessage);
 
                 interceptors.Count().ShouldBe(1);
             }

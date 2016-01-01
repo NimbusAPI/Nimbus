@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nimbus.Infrastructure;
+using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Extensions
 {
@@ -10,7 +12,8 @@ namespace Nimbus.Extensions
         {
             Type[] handlerTypes;
             if (!handlerMap.TryGetValue(messageType, out handlerTypes) || !handlerTypes.Any())
-                throw new Exception("There is no handler registered for the message type {0}.".FormatWith(messageType));
+                throw new BusException("There is no handler registered for this message type.")
+                    .WithData("MessageType", messageType);
 
             return handlerTypes;
         }

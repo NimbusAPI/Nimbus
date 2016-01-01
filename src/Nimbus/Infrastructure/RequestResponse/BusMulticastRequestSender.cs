@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 {
     internal class BusMulticastRequestSender : IMulticastRequestSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly RequestResponseCorrelator _requestResponseCorrelator;
         private readonly IClock _clock;
         private readonly ILogger _logger;
@@ -24,19 +25,19 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusMulticastRequestSender(IBrokeredMessageFactory brokeredMessageFactory,
-                                         IClock clock,
+        public BusMulticastRequestSender(IClock clock,
                                          IDependencyResolver dependencyResolver,
                                          IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                          ILogger logger,
-                                         INimbusMessagingFactory messagingFactory,
+                                         INimbusMessageFactory nimbusMessageFactory,
+                                         INimbusTransport transport,
                                          IOutboundInterceptorFactory outboundInterceptorFactory,
                                          IRouter router,
                                          RequestResponseCorrelator requestResponseCorrelator)
         {
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
@@ -54,38 +55,39 @@ namespace Nimbus.Infrastructure.RequestResponse
 
             var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
 
-            var brokeredMessage = (await _brokeredMessageFactory.Create(busRequest))
+            var nimbusMessage = (await _nimbusMessageFactory.Create(topicPath, busRequest))
                 .WithRequestTimeout(timeout)
                 .DestinedForTopic(topicPath)
                 ;
             var expiresAfter = _clock.UtcNow.AddSafely(timeout);
-            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(Guid.Parse(brokeredMessage.MessageId), expiresAfter);
+            var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(nimbusMessage.MessageId, expiresAfter);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
 
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Sending", topicPath, nimbusMessage, sw.Elapsed);
 
-                    var sender = _messagingFactory.GetTopicSender(topicPath);
+                    var sender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
                     {
-                        await interceptor.OnMulticastRequestSending(busRequest, brokeredMessage);
+                        await interceptor.OnMulticastRequestSending(busRequest, nimbusMessage);
                     }
-                    await sender.Send(brokeredMessage);
+                    await sender.Send(nimbusMessage);
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnMulticastRequestSent(busRequest, brokeredMessage);
+                        await interceptor.OnMulticastRequestSent(busRequest, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Sent", topicPath, nimbusMessage, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Waiting for response to", topicPath, nimbusMessage, sw.Elapsed);
                     var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-                    _logger.LogDispatchAction("Received response to", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Received response to", topicPath, nimbusMessage, sw.Elapsed);
 
                     return response;
                 }
@@ -96,9 +98,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    await interceptor.OnMulticastRequestSendingError(busRequest, brokeredMessage, exception);
+                    await interceptor.OnMulticastRequestSendingError(busRequest, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", topicPath, brokeredMessage, exception);
+                _logger.LogDispatchError("sending", topicPath, nimbusMessage, sw.Elapsed, exception);
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return null;

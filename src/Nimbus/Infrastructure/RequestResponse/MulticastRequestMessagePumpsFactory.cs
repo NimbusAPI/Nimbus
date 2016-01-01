@@ -1,51 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Configuration;
+using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
-using Nimbus.Infrastructure.Dispatching;
-using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class MulticastRequestMessagePumpsFactory : ICreateComponents
+    internal class MulticastRequestMessagePumpsFactory
     {
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly ApplicationNameSetting _applicationName;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
-        private readonly IClock _clock;
-        private readonly IDispatchContextManager _dispatchContextManager;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
-
-        private readonly GarbageMan _garbageMan = new GarbageMan();
-        private readonly INimbusTaskFactory _taskFactory;
+        private readonly PoorMansIoC _container;
 
         public MulticastRequestMessagePumpsFactory(ApplicationNameSetting applicationName,
-                                                   IClock clock,
-                                                   IDispatchContextManager dispatchContextManager,
                                                    IHandlerMapper handlerMapper,
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
-                                                   INimbusMessagingFactory messagingFactory,
-                                                   INimbusTaskFactory taskFactory,
+                                                   INimbusTransport transport,
                                                    IRouter router,
-                                                   ITypeProvider typeProvider)
+                                                   ITypeProvider typeProvider,
+                                                   PoorMansIoC container)
         {
             _applicationName = applicationName;
-            _clock = clock;
-            _dispatchContextManager = dispatchContextManager;
             _handlerMapper = handlerMapper;
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _typeProvider = typeProvider;
-            _taskFactory = taskFactory;
+            _container = container;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
@@ -77,33 +67,15 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, handlerType);
 
                     _logger.Debug("Creating message pump for multicast request subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
-                    var messageReceiver = _messagingFactory.GetTopicReceiver(binding.TopicPath, subscriptionName);
 
+                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName);
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
-                    var pump = new MessagePump(_clock,
-                                               _dispatchContextManager,
-                                               _logger,
-                                               _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap),
-                                               messageReceiver,
-                                               _taskFactory);
-                    _garbageMan.Add(pump);
+                    var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
+                    var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
                     yield return pump;
                 }
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-
-            _garbageMan.Dispose();
         }
     }
 }

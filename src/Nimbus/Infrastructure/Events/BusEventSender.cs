@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
@@ -11,27 +12,27 @@ namespace Nimbus.Infrastructure.Events
 {
     internal class BusEventSender : IEventSender
     {
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
         private readonly ILogger _logger;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusEventSender(IBrokeredMessageFactory brokeredMessageFactory,
-                              IDependencyResolver dependencyResolver,
+        public BusEventSender(IDependencyResolver dependencyResolver,
                               IKnownMessageTypeVerifier knownMessageTypeVerifier,
                               ILogger logger,
-                              INimbusMessagingFactory messagingFactory,
+                              INimbusMessageFactory nimbusMessageFactory,
+                              INimbusTransport transport,
                               IOutboundInterceptorFactory outboundInterceptorFactory,
                               IRouter router)
         {
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _logger = logger;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
         }
@@ -42,9 +43,10 @@ namespace Nimbus.Infrastructure.Events
 
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
-            var brokeredMessage = await _brokeredMessageFactory.Create(busEvent);
             var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
+            var brokeredMessage = await _nimbusMessageFactory.Create(topicPath, busEvent);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
@@ -52,9 +54,9 @@ namespace Nimbus.Infrastructure.Events
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage, sw.Elapsed);
 
-                    var topicSender = _messagingFactory.GetTopicSender(topicPath);
+                    var topicSender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
                     {
                         await interceptor.OnEventPublishing(busEvent, brokeredMessage);
@@ -64,7 +66,7 @@ namespace Nimbus.Infrastructure.Events
                     {
                         await interceptor.OnEventPublished(busEvent, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage);
+                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage, sw.Elapsed);
 
                     return;
                 }
@@ -77,7 +79,7 @@ namespace Nimbus.Infrastructure.Events
                 {
                     await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, exception);
+                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, sw.Elapsed, exception);
             }
         }
     }

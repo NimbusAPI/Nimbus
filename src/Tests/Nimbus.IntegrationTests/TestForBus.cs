@@ -1,50 +1,57 @@
-﻿using System;
-using System.Threading.Tasks;
-using Nimbus.Tests.Common;
+﻿using System.Threading.Tasks;
+using Nimbus.Configuration;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
+        protected const int TimeoutSeconds = 60;
+
+        protected ScenarioInstance<BusBuilderConfiguration> Instance { get; private set; }
         protected Bus Bus { get; private set; }
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            Task.Run(async () =>
-            {
-                MethodCallCounter.Clear();
+            MethodCallCounter.Clear();
 
-                Bus = await new TestHarnessBusFactory(GetType()).CreateAndStart();
-                Console.WriteLine();
-                Console.WriteLine();
+            Instance = scenario.CreateInstance();
+            Reconfigure();
 
-                await Given();
-                Console.WriteLine();
-                Console.WriteLine();
-
-                await When();
-                MethodCallCounter.Stop();
-                Console.WriteLine();
-                Console.WriteLine();
-            }).Wait();
+            Bus = Instance.Configuration.Build();
+            await Bus.Start();
         }
 
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Console.WriteLine();
-            Console.WriteLine();
-            Bus.Dispose();
-        }
-
-        protected virtual async Task Given()
+        protected virtual void Reconfigure()
         {
         }
 
         protected abstract Task When();
+
+        [SetUp]
+        public void SetUp()
+        {
+            TestLoggingExtensions.LogTestStart();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            var bus = Bus;
+            Bus = null;
+
+            bus?.Stop().Wait();
+            bus?.Dispose();
+
+            Instance?.Dispose();
+            Instance = null;
+
+            TestLoggingExtensions.LogTestResult();
+        }
     }
 }

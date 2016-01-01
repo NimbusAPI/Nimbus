@@ -37,13 +37,6 @@
     <CodeAnalysisRuleSet>..\Nimbus.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WindowsAzure.ServiceBus.2.1.3.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="NullGuard">
       <HintPath>..\packages\NullGuard.Fody.1.2.0.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
       <Private>False</Private>
@@ -61,22 +54,35 @@
   <ItemGroup>
     <Compile Include="BackwardCompatibilityAdaptorExtensions.cs" />
     <Compile Include="BatchSendingExtensions.cs" />
+    <Compile Include="ConcurrentCollections\AsyncBlockingCollection.cs" />
     <Compile Include="ConcurrentCollections\RoundRobin.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeDictionary.cs" />
     <Compile Include="ConcurrentCollections\ThreadSafeLazy.cs" />
     <Compile Include="Configuration\BusBuilderCompressionConfigurationExtensions.cs" />
-    <Compile Include="Configuration\BusBuilderLargeMessageConfigurationExtensions.cs" />
     <Compile Include="Configuration\BusBuilderSerializationConfigurationExtensions.cs" />
+    <Compile Include="Configuration\ComponentRegistrationExtensions.cs" />
+    <Compile Include="Configuration\Debug\Settings\RemoveAllExistingNamespaceElementsSetting.cs" />
+    <Compile Include="Configuration\INamespaceCleanser.cs" />
+    <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\FactoryRegistration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\IComponentRegistration.cs" />
+    <Compile Include="Configuration\Settings\GlobalConcurrentHandlerLimitSetting.cs" />
+    <Compile Include="Configuration\Settings\ISetting.cs" />
+    <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\TypedRegistration.cs" />
     <Compile Include="Configuration\IMessagePumpsManager.cs" />
     <Compile Include="Configuration\MessagePumpsManager.cs" />
     <Compile Include="Configuration\INimbusConfiguration.cs" />
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
-    <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
-    <Compile Include="Configuration\MessagingFactoryExtensions.cs" />
-    <Compile Include="Configuration\NamespaceCleanser.cs" />
+    <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
+    <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
+    <Compile Include="Infrastructure\INimbusTransport.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />
+    <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
+    <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
     <Compile Include="Configuration\Settings\ConcurrentHandlerLimitSetting.cs" />
-    <Compile Include="Configuration\Settings\DefaultMessageLockDurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxLargeMessageSizeSetting.cs" />
     <Compile Include="Configuration\LargeMessages\Settings\MaxSmallMessageSizeSetting.cs" />
     <Compile Include="Configuration\Settings\EnableDeadLetteringOnMessageExpirationSetting.cs" />
@@ -84,19 +90,25 @@
     <Compile Include="Configuration\Settings\GlobalOutboundInterceptorTypesSetting.cs" />
     <Compile Include="Configuration\Settings\HeartbeatInterval.cs" />
     <Compile Include="Configuration\Settings\ServerConnectionCountSetting.cs" />
-    <Compile Include="Configuration\Settings\SubscriptionAutoDeleteOnIdleSetting.cs" />
+    <Compile Include="Configuration\Settings\AutoDeleteOnIdleSetting.cs" />
     <Compile Include="Configuration\Settings\SubscriptionDefaultMessageTimeToLiveSetting.cs" />
+    <Compile Include="Configuration\Transport\TransportConfiguration.cs" />
     <Compile Include="DelayedSendingExtensions.cs" />
+    <Compile Include="DevelopmentStubs\StubDeliveryRetryStrategy.cs" />
     <Compile Include="Exceptions\DispatchFailedException.cs" />
     <Compile Include="Extensions\DateTimeOffsetExtensions.cs" />
     <Compile Include="Extensions\HandlerMapExtensions.cs" />
+    <Compile Include="Extensions\NimbusMessageExtensions.cs" />
     <Compile Include="FodyTests.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\BrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\Compression\DeflateCompressor.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\Compression\GzipCompressor.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\Compression\NullCompressor.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\NimbusDataContractResolver.cs" />
+    <Compile Include="Infrastructure\IDelayedDeliveryService.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
+    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
+    <Compile Include="Infrastructure\NimbusMessageFactory.cs" />
+    <Compile Include="Infrastructure\Compression\DeflateCompressor.cs" />
+    <Compile Include="Infrastructure\Compression\GzipCompressor.cs" />
+    <Compile Include="Infrastructure\Compression\NullCompressor.cs" />
+    <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
     <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
@@ -111,10 +123,10 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalCpuUsage.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\System\TotalRamUsage.cs" />
     <Compile Include="Infrastructure\Logging\TraceLogger.cs" />
-    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapper.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalMessageCounters.cs" />
+    <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
+    <Compile Include="Infrastructure\Retry.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\SubsequentDispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />
@@ -124,13 +136,9 @@
     <Compile Include="Infrastructure\IHandlerMapper.cs" />
     <Compile Include="Infrastructure\IMessageDispatcherFactory.cs" />
     <Compile Include="Infrastructure\MessageDispatcherFactory.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\MessagingExceptionExtensions.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Routing\SingleQueueAndTopicPerMessageTypeRouter.cs" />
     <Compile Include="Bus.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\INimbusTaskFactory.cs" />
-    <Compile Include="Configuration\Settings\MaximumThreadPoolThreadsSetting.cs" />
-    <Compile Include="Configuration\Settings\MinimumThreadPoolThreadsSetting.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />
@@ -140,27 +148,19 @@
     <Compile Include="Infrastructure\DependencyResolution\TrackingScope.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Events\EventMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\IBrokeredMessageFactory.cs" />
-    <Compile Include="Infrastructure\LongRunningTasks\LongRunningTaskWrapperBase.cs" />
+    <Compile Include="Infrastructure\INimbusMessageFactory.cs" />
     <Compile Include="Infrastructure\Events\CompetingEventMessagePumpsFactory.cs" />
-    <Compile Include="Configuration\GarbageMan.cs" />
-    <Compile Include="Configuration\ICreateComponents.cs" />
-    <Compile Include="Configuration\DependencyResolutionException.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\GarbageMan.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\DependencyResolutionException.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessageDispatcher.cs" />
-    <Compile Include="Infrastructure\INimbusMessagingFactory.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\BatchingMessageSender.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\ThrottlingMessageReceiver.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageSender.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusSubscriptionMessageReceiver.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusTopicMessageSender.cs" />
-    <Compile Include="Infrastructure\NimbusMessagingFactory.cs" />
     <Compile Include="Infrastructure\Events\MulticastEventMessageDispatcher.cs" />
     <Compile Include="Infrastructure\IKnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\IMulticastRequestSender.cs" />
     <Compile Include="Infrastructure\KnownMessageTypeVerifier.cs" />
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessagePumpsFactory.cs" />
-    <Compile Include="Infrastructure\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Infrastructure\IMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
@@ -170,15 +170,13 @@
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
     <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />
-    <Compile Include="Configuration\PoorMansIoC.cs" />
+    <Compile Include="Configuration\PoorMansIocContainer\PoorMansIoC.cs" />
     <Compile Include="Configuration\Settings\ReplyQueueNameSetting.cs" />
     <Compile Include="Configuration\Settings\Setting.cs" />
     <Compile Include="Infrastructure\AssemblyScanningTypeProvider.cs" />
-    <Compile Include="Configuration\Debug\BusBuilderDebuggingConfiguration.cs" />
+    <Compile Include="Configuration\Debug\DebugConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderDebuggingConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\PathFactory.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageReceiver.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\INimbusMessageSender.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessageDispatcher.cs" />
     <Compile Include="Infrastructure\RequestResponse\ResponseMessagePumpFactory.cs" />
     <Compile Include="Infrastructure\SystemClock.cs" />
@@ -194,17 +192,11 @@
     <Compile Include="Interceptors\OutboundAuditingInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\OutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptorFactory.cs" />
-    <Compile Include="Interceptors\LargeMessageBodyCleanupInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\IOutboundInterceptor.cs" />
     <Compile Include="Interceptors\Outbound\OutboundInterceptorFactory.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskFactory.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\NimbusTaskScheduler.cs" />
     <Compile Include="Infrastructure\Logging\StructuredLoggingNormalizer.cs" />
-    <Compile Include="PoisonMessages\DeadLetterQueue.cs" />
-    <Compile Include="PoisonMessages\DeadLetterQueues.cs" />
     <Compile Include="Infrastructure\Logging\ConsoleLogger.cs" />
     <Compile Include="Infrastructure\Logging\NullLogger.cs" />
-    <Compile Include="Extensions\BrokeredMessageExtensions.cs" />
     <Compile Include="Configuration\BusBuilder.cs" />
     <Compile Include="Configuration\BusBuilderConfiguration.cs" />
     <Compile Include="Configuration\BusBuilderConfigurationExtensions.cs" />
@@ -215,21 +207,16 @@
     <Compile Include="Infrastructure\Commands\ICommandSender.cs" />
     <Compile Include="Infrastructure\Events\IEventSender.cs" />
     <Compile Include="Infrastructure\IMessagePump.cs" />
-    <Compile Include="Infrastructure\IQueueManager.cs" />
     <Compile Include="Infrastructure\RequestResponse\IRequestResponseCorrelationWrapper.cs" />
     <Compile Include="Infrastructure\RequestResponse\IRequestSender.cs" />
-    <Compile Include="Infrastructure\ITopicClientFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\BusRequestSender.cs" />
     <Compile Include="Infrastructure\MessagePump.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelator.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Infrastructure\AzureQueueManager.cs" />
-    <Compile Include="Infrastructure\MessageSendersAndReceivers\NimbusQueueMessageReceiver.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestResponseCorrelationWrapper.cs" />
-    <Compile Include="Infrastructure\BrokeredMessageServices\Serialization\DataContractSerializer.cs" />
+    <Compile Include="Infrastructure\Serialization\DataContractSerializer.cs" />
     <Compile Include="Configuration\MessagePumpTypes.cs" />
-    <Compile Include="Infrastructure\TaskScheduling\TaskContext.cs" />
     <Compile Include="Properties\NullGuard.cs" />
   </ItemGroup>
   <ItemGroup>

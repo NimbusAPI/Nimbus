@@ -11,7 +11,7 @@ namespace Nimbus.Configuration
         {
             return configuration
                 .WithDependencyResolver(kernel.Get<IDependencyResolver>())
-                .WithLogger(kernel.Get<ILogger>());
+                .WithTypesFrom(kernel.Get<ITypeProvider>());
         }
     }
 }

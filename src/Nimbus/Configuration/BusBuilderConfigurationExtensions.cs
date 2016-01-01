@@ -1,25 +1,34 @@
 ﻿using System;
-using System.IO;
 using Nimbus.Configuration.Debug;
-using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Settings;
+using Nimbus.Configuration.Transport;
 using Nimbus.DependencyResolution;
+using Nimbus.Infrastructure.Compression;
+using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Infrastructure.Logging;
+using Nimbus.Infrastructure.Routing;
 using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
+    [Obsolete("We should be able to inline these now.")]
     public static class BusBuilderConfigurationExtensions
     {
-        public static BusBuilderConfiguration WithConnectionString(this BusBuilderConfiguration configuration, string connectionString)
+        public static BusBuilderConfiguration WithDefaults(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
-            configuration.ConnectionString = new ConnectionStringSetting {Value = connectionString};
-            return configuration;
+            return configuration
+                .WithTypesFrom(typeProvider)
+                .WithDependencyResolver(new DependencyResolver(typeProvider))
+                .WithRouter(new DestinationPerMessageTypeRouter())
+                .WithCompressor(new NullCompressor())
+                .WithLogger(new NullLogger())
+                ;
         }
 
-        public static BusBuilderConfiguration WithConnectionStringFromFile(this BusBuilderConfiguration configuration, string filename)
+        public static BusBuilderConfiguration WithTransport(this BusBuilderConfiguration configuration, TransportConfiguration transportConfiguration)
         {
-            var connectionString = File.ReadAllText(filename).Trim();
-            return configuration.WithConnectionString(connectionString);
+            configuration.Transport = transportConfiguration;
+            return configuration;
         }
 
         /// <summary>
@@ -53,21 +62,15 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithLargeMessageStorage(this BusBuilderConfiguration configuration, Action<LargeMessageStorageConfiguration> configurationAction)
-        {
-            configurationAction(configuration.LargeMessageStorageConfiguration);
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithRouter(this BusBuilderConfiguration configuration, IRouter router)
         {
             configuration.Router = router;
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithServerConnectionCount(this BusBuilderConfiguration configuration, int serverConnectionCount)
+        public static BusBuilderConfiguration WithDeliveryRetryStrategy(this BusBuilderConfiguration configuration, IDeliveryRetryStrategy deliveryRetryStrategy)
         {
-            configuration.ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
+            configuration.DeliveryRetryStrategy = deliveryRetryStrategy;
             return configuration;
         }
 
@@ -77,27 +80,9 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
-        public static BusBuilderConfiguration WithDefaultMessageLockDuration(this BusBuilderConfiguration configuration, TimeSpan defaultLockDuration)
-        {
-            configuration.DefaultMessageLockDuration = new DefaultMessageLockDurationSetting {Value = defaultLockDuration};
-            return configuration;
-        }
-
         public static BusBuilderConfiguration WithDefaultConcurrentHandlerLimit(this BusBuilderConfiguration configuration, int defaultConcurrentHandlerLimit)
         {
-            configuration.DefaultConcurrentHandlerLimit = new ConcurrentHandlerLimitSetting {Value = defaultConcurrentHandlerLimit};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithMaximumThreadPoolThreads(this BusBuilderConfiguration configuration, int maximumThreadPoolThreads)
-        {
-            configuration.MaximumThreadPoolThreads = new MaximumThreadPoolThreadsSetting {Value = maximumThreadPoolThreads};
-            return configuration;
-        }
-
-        public static BusBuilderConfiguration WithMinimumThreadPoolThreads(this BusBuilderConfiguration configuration, int minimumThreadPoolThreads)
-        {
-            configuration.MinimumThreadPoolThreads = new MinimumThreadPoolThreadsSetting {Value = minimumThreadPoolThreads};
+            configuration.ConcurrentHandlerLimit = new ConcurrentHandlerLimitSetting {Value = defaultConcurrentHandlerLimit};
             return configuration;
         }
 
@@ -109,25 +94,25 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithDefaultMessageTimeToLive(this BusBuilderConfiguration configuration, TimeSpan timeToLive)
         {
-            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting { Value = timeToLive };
+            configuration.DefaultMessageTimeToLive = new DefaultMessageTimeToLiveSetting {Value = timeToLive};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithAutoDeleteOnIdle(this BusBuilderConfiguration configuration, TimeSpan autoDeleteOnIdle)
         {
-            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting { Value = autoDeleteOnIdle };
+            configuration.AutoDeleteOnIdle = new AutoDeleteOnIdleSetting {Value = autoDeleteOnIdle};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithEnableDeadLetteringOnMessageExpiration(this BusBuilderConfiguration configuration, bool enableDeadLettering)
         {
-            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting { Value = enableDeadLettering };
+            configuration.EnableDeadLetteringOnMessageExpiration = new EnableDeadLetteringOnMessageExpirationSetting {Value = enableDeadLettering};
             return configuration;
         }
 
         public static BusBuilderConfiguration WithHeartbeatInterval(this BusBuilderConfiguration configuration, TimeSpan heartbeatInterval)
         {
-            configuration.HeartbeatInterval = new HeartbeatIntervalSetting { Value = heartbeatInterval };
+            configuration.HeartbeatInterval = new HeartbeatIntervalSetting {Value = heartbeatInterval};
             return configuration;
         }
 
@@ -150,9 +135,9 @@ namespace Nimbus.Configuration
         }
 
         public static BusBuilderConfiguration WithDebugOptions(this BusBuilderConfiguration configuration,
-                                                               Func<BusBuilderDebuggingConfiguration, BusBuilderDebuggingConfiguration> debugConfiguration)
+                                                               Func<DebugConfiguration, DebugConfiguration> debugConfiguration)
         {
-            debugConfiguration(configuration.Debugging);
+            debugConfiguration(configuration.Debug);
             return configuration;
         }
     }

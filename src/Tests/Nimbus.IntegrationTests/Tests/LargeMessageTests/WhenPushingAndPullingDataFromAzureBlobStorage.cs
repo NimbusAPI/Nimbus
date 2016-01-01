@@ -2,20 +2,20 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Tests.StartupPerformanceTests;
+using ConfigInjector.QuickAndDirty;
+using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.LargeMessages.Azure.Configuration.Settings;
-using Nimbus.LargeMessages.Azure.Infrastructure;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Configuration;
+using Nimbus.Tests.Common.Stubs;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     internal class WhenPushingAndPullingDataFromAzureBlobStorage : SpecificationForAsync<AzureBlobStorageLargeMessageBodyStore>
     {
-        private string _id;
+        private Guid _id;
         private DateTimeOffset _expiresAfter;
         private byte[] _bytes;
         private string _storageKey;
@@ -24,40 +24,29 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
         {
             var logger = TestHarnessLoggerFactory.Create();
             return new AzureBlobStorageLargeMessageBodyStore(
-                new AzureStorageAccountConnectionStringSetting {Value = CommonResources.BlobStorageConnectionString},
+                new AzureStorageAccountConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureBlobStorageConnectionString>()},
                 new AutoCreateBlobStorageContainerNameSetting(),
                 logger);
         }
 
         protected override async Task When()
         {
-            _id = Guid.NewGuid().ToString();
+            _id = Guid.NewGuid();
             _bytes = Encoding.UTF8.GetBytes(Enumerable.Range(0, 1024).Select(i => '.').ToArray());
             _expiresAfter = DateTimeOffset.UtcNow.AddDays(1);
 
-            using (new AssertingStopwatch("Store", TimeSpan.FromSeconds(10)))
-            {
-                _storageKey = await Subject.Store(_id, _bytes, _expiresAfter);
-            }
-            Console.WriteLine();
-            Console.WriteLine();
+            _storageKey = await Subject.Store(_id, _bytes, _expiresAfter);
         }
 
         [Test]
         public async Task TheRetrievedValueShouldBeTheSameAsTheStoredValue()
         {
-            using (new AssertingStopwatch("Retrieve", TimeSpan.FromSeconds(10)))
-            {
-                var retrieved = await Subject.Retrieve(_storageKey);
-                retrieved.ShouldBe(_bytes);
-            }
+            var retrieved = await Subject.Retrieve(_storageKey);
+            retrieved.ShouldBe(_bytes);
         }
 
         public override void TearDown()
         {
-            Console.WriteLine();
-            Console.WriteLine();
-
             Subject.Delete(_storageKey).Wait();
 
             base.TearDown();

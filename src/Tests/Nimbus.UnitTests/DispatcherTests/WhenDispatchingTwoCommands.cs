@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.BrokeredMessageServices;
-using Nimbus.Infrastructure.BrokeredMessageServices.Compression;
-using Nimbus.Infrastructure.BrokeredMessageServices.LargeMessages;
-using Nimbus.Infrastructure.BrokeredMessageServices.Serialization;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.PropertyInjection;
-using Nimbus.Infrastructure.TaskScheduling;
+using Nimbus.Infrastructure.Serialization;
 using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 using NSubstitute;
@@ -27,7 +24,7 @@ namespace Nimbus.UnitTests.DispatcherTests
     [TestFixture]
     internal class WhenDispatchingTwoCommands : SpecificationForAsync<CommandMessageDispatcher>
     {
-        private BrokeredMessageFactory _brokeredMessageFactory;
+        private NimbusMessageFactory _nimbusMessageFactory;
 
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
@@ -46,25 +43,15 @@ namespace Nimbus.UnitTests.DispatcherTests
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
 
-            _brokeredMessageFactory = new BrokeredMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                                                 new MaxLargeMessageSizeSetting(),
-                                                                 new MaxSmallMessageSizeSetting(),
-                                                                 replyQueueNameSetting,
-                                                                 clock,
-                                                                 new NullCompressor(),
-                                                                 new DispatchContextManager(),
-                                                                 new UnsupportedLargeMessageBodyStore(),
-                                                                 serializer,
-                                                                 typeProvider);
+            _nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
+                                                             replyQueueNameSetting,
+                                                             clock,
+                                                             new DispatchContextManager());
 
-            return new CommandMessageDispatcher(_brokeredMessageFactory,
-                                                new SystemClock(),
-                                                new DependencyResolver(typeProvider),
+            return new CommandMessageDispatcher(new DependencyResolver(typeProvider),
                                                 new NullInboundInterceptorFactory(),
                                                 new NullLogger(),
                                                 handlerMap,
-                                                new DefaultMessageLockDurationSetting(),
-                                                new NimbusTaskFactory(new MaximumThreadPoolThreadsSetting(), new MinimumThreadPoolThreadsSetting(), logger),
                                                 Substitute.For<IPropertyInjector>());
         }
 
@@ -75,8 +62,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var command1 = new FooCommand(_id1);
             var command2 = new FooCommand(_id2);
 
-            await Subject.Dispatch(await _brokeredMessageFactory.Create(command1));
-            await Subject.Dispatch(await _brokeredMessageFactory.Create(command2));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create("nullQueue", command1));
+            await Subject.Dispatch(await _nimbusMessageFactory.Create("nullQueue", command2));
 
             MethodCallCounter.Stop();
         }

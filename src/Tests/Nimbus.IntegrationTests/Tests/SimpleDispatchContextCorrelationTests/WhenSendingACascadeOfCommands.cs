@@ -1,81 +1,111 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
-using Nimbus.Infrastructure;
+using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
-    [Timeout(15*1000)]
     public class WhenSendingACascadeOfCommands : TestForBus
     {
         private const int _numExpectedMessages = 3;
 
         private IDispatchContext[] _dispatchContexts;
-        private BrokeredMessage[] _brokeredMessages;
+        private NimbusMessage[] _nimbusMessages;
 
-        protected override async Task Given()
+        protected override Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await base.Given();
             TestInterceptor.Clear();
+
+            return base.Given(scenario);
         }
 
         protected override async Task When()
         {
             var someCommand = new FirstCommand();
             await Bus.Send(someCommand);
-            await TimeSpan.FromSeconds(10).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _numExpectedMessages);
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= _numExpectedMessages);
 
             _dispatchContexts = TestInterceptor.DispatchContexts.ToArray();
-            _brokeredMessages = TestInterceptor.BrokeredMessages.ToArray();
+            _nimbusMessages = TestInterceptor.NimbusMessages.ToArray();
         }
 
         [Test]
-        public async Task TheCorrectNumberOfBrokeredMessagesShouldHaveBeenObserved()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _brokeredMessages.Count().ShouldBe(_numExpectedMessages);
+            await Given(scenario);
+            await When();
+
+            _nimbusMessages.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task WeShouldObserveOneDispatchContextPerMessage()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task WeShouldObserveOneDispatchContextPerMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             _dispatchContexts.Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task AllParentMessageIdsShouldBeDifferent()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task AllParentMessageIdsShouldBeDifferent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             _dispatchContexts.GroupBy(x => x.ResultOfMessageId).Count().ShouldBe(_numExpectedMessages);
         }
 
         [Test]
-        public async Task TheCorrelationIdsShouldAllBeTheSame()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheCorrelationIdsShouldAllBeTheSame(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
+            await Given(scenario);
+            await When();
+
             _dispatchContexts.GroupBy(x => x.CorrelationId).Count().ShouldBe(1);
         }
 
         [Test]
-        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheThirdMessageShouldBeCausedByTheSecondMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _brokeredMessages[1].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_brokeredMessages[0].MessageId);
+            await Given(scenario);
+            await When();
+
+            _nimbusMessages[1].PrecedingMessageId.ShouldBe(_nimbusMessages[0].MessageId);
         }
 
         [Test]
-        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheSecondMessageShouldBeCausedByTheFirstMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _brokeredMessages[2].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(_brokeredMessages[1].MessageId);
+            await Given(scenario);
+            await When();
+
+            _nimbusMessages[2].PrecedingMessageId.ShouldBe(_nimbusMessages[1].MessageId);
         }
 
         [Test]
-        public async Task TheFirstMessageShouldBeTheInitialMessage()
+        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACascadeOfCommands>))]
+        public async Task TheFirstMessageShouldBeTheInitialMessage(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            _brokeredMessages[0].Properties[MessagePropertyKeys.PrecedingMessageId].ShouldBe(null);
+            await Given(scenario);
+            await When();
+
+            _nimbusMessages[0].PrecedingMessageId.ShouldBe(null);
         }
     }
 }

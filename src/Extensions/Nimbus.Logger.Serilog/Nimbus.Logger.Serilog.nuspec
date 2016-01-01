@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Nimbus.Logger.Serilog</id>
-    <version>$version$</version>
+    <version>$version$$nugetPackageSuffix$</version>
     <title>Nimbus.Logger.Serilog</title>
     <authors>Nicholas Blumhardt</authors>
     <owners>Damian Maclennan</owners>

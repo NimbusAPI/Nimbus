@@ -12,7 +12,7 @@ namespace Nimbus.Configuration
         {
             return configuration
                 .WithDependencyResolver(container.Resolve<IDependencyResolver>())
-                .WithLogger(container.Resolve<ILogger>());
+                .WithTypesFrom(container.Resolve<ITypeProvider>());
         }
     }
 }

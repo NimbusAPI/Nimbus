@@ -1,34 +1,20 @@
 using System;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Nimbus.Infrastructure.Dispatching
 {
     internal class SubsequentDispatchContext : IDispatchContext
     {
-        private readonly string _dispatchId;
-        private readonly string _correlationId;
-        private readonly string _resultOfMessageId;
+        private readonly Guid _resultOfMessageId;
 
-        public SubsequentDispatchContext(BrokeredMessage brokeredMessage)
+        public SubsequentDispatchContext(NimbusMessage nimbusMessage)
         {
-            _dispatchId = Guid.NewGuid().ToString("N");
-            _correlationId = brokeredMessage.CorrelationId;
-            _resultOfMessageId = brokeredMessage.MessageId;
+            DispatchId = Guid.NewGuid();
+            CorrelationId = nimbusMessage.CorrelationId;
+            _resultOfMessageId = nimbusMessage.MessageId;
         }
 
-        public string DispatchId
-        {
-            get { return _dispatchId; }
-        }
-
-        public string ResultOfMessageId
-        {
-            get { return _resultOfMessageId; }
-        }
-
-        public string CorrelationId
-        {
-            get { return _correlationId; }
-        }
+        public Guid DispatchId { get; }
+        public Guid CorrelationId { get; }
+        public Guid? ResultOfMessageId => _resultOfMessageId;
     }
 }

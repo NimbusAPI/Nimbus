@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
@@ -14,26 +13,26 @@ namespace Nimbus.Infrastructure.Commands
 {
     internal class BusCommandSender : ICommandSender
     {
-        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly ILogger _logger;
-        private readonly INimbusMessagingFactory _messagingFactory;
+        private readonly INimbusMessageFactory _nimbusMessageFactory;
+        private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
 
-        public BusCommandSender(IBrokeredMessageFactory brokeredMessageFactory,
-                                IDependencyResolver dependencyResolver,
+        public BusCommandSender(IDependencyResolver dependencyResolver,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
                                 ILogger logger,
-                                INimbusMessagingFactory messagingFactory,
+                                INimbusMessageFactory nimbusMessageFactory,
+                                INimbusTransport transport,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
                                 IRouter router)
         {
-            _brokeredMessageFactory = brokeredMessageFactory;
+            _nimbusMessageFactory = nimbusMessageFactory;
             _knownMessageTypeVerifier = knownMessageTypeVerifier;
             _logger = logger;
-            _messagingFactory = messagingFactory;
+            _transport = transport;
             _router = router;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
@@ -44,7 +43,8 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = await _brokeredMessageFactory.Create(busCommand);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var message = await _nimbusMessageFactory.Create(destinationPath, busCommand);
 
             await Deliver(busCommand, commandType, message);
         }
@@ -54,37 +54,39 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var message = (await _brokeredMessageFactory.Create(busCommand)).WithScheduledEnqueueTime(whenToSend);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var message = (await _nimbusMessageFactory.Create(destinationPath, busCommand)).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(busCommand, commandType, message);
         }
 
-        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, BrokeredMessage brokeredMessage) where TBusCommand : IBusCommand
+        private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, NimbusMessage nimbusMessage) where TBusCommand : IBusCommand
         {
             var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
-            brokeredMessage.DestinedForQueue(queuePath);
+            nimbusMessage.DestinedForQueue(queuePath);
 
+            var sw = Stopwatch.StartNew();
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 Exception exception;
 
-                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
+                var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sending", queuePath, nimbusMessage, sw.Elapsed);
 
-                    var sender = _messagingFactory.GetQueueSender(queuePath);
+                    var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
                     {
-                        await interceptor.OnCommandSending(busCommand, brokeredMessage);
+                        await interceptor.OnCommandSending(busCommand, nimbusMessage);
                     }
-                    await sender.Send(brokeredMessage);
+                    await sender.Send(nimbusMessage);
                     foreach (var interceptor in interceptors.Reverse())
                     {
-                        await interceptor.OnCommandSent(busCommand, brokeredMessage);
+                        await interceptor.OnCommandSent(busCommand, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", queuePath, brokeredMessage);
+                    _logger.LogDispatchAction("Sent", queuePath, nimbusMessage, sw.Elapsed);
                     return;
                 }
                 catch (Exception exc)
@@ -94,9 +96,9 @@ namespace Nimbus.Infrastructure.Commands
 
                 foreach (var interceptor in interceptors.Reverse())
                 {
-                    await interceptor.OnCommandSendingError(busCommand, brokeredMessage, exception);
+                    await interceptor.OnCommandSendingError(busCommand, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, brokeredMessage, exception);
+                _logger.LogDispatchError("sending", queuePath, nimbusMessage, sw.Elapsed, exception);
             }
         }
     }
