@@ -1,4 +1,6 @@
-﻿using Nimbus.Logger.Serilog;
+﻿using System.Diagnostics;
+using Nimbus.Extensions;
+using Nimbus.Logger.Serilog;
 using Serilog;
 using Serilog.Exceptions;
 
@@ -14,7 +16,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.With<TestNameEnricher>()
                 .Enrich.WithExceptionDetails()
                 .WriteTo.Seq("http://localhost:5341")
-                .WriteTo.Trace()
+                .Chain(l => { if (Debugger.IsAttached) l.WriteTo.Trace(); })
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 
