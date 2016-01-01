@@ -5,12 +5,9 @@ using Nimbus.Tests.Common.Configuration;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores
 {
-    internal class AzureBlobStorage : IConfigurationScenario<LargeMessageStorageConfiguration>
+    internal class AzureBlobStorage : ConfigurationScenario<LargeMessageStorageConfiguration>
     {
-        public string Name { get; } = "AzureBlobStorage";
-        public string[] Categories { get; } = {"AzureBlobStorage"};
-
-        public ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
+        public override ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
         {
             var azureBlobStorageConnectionString = DefaultSettingsReader.Get<AzureBlobStorageConnectionString>();
             var configuration = new AzureBlobStorageLargeMessageStorageConfiguration()

@@ -2,17 +2,6 @@ using System;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
 {
-    public interface IConfigurationScenario
-    {
-        string Name { get; }
-        string[] Categories { get; }
-    }
-
-    public interface IConfigurationScenario<T> : IConfigurationScenario
-    {
-        ScenarioInstance<T> CreateInstance();
-    }
-
     public class ScenarioInstance<T> : IDisposable
     {
         public EventHandler<EventArgs> Disposing;

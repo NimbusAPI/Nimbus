@@ -10,7 +10,10 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
     {
         public IEnumerator<TestCaseData> GetEnumerator()
         {
+            var filter = new ConfigurationScenarioFilter();
+
             var testCases = new BusBuilderConfigurationSources(typeof (TTestType))
+                .Where(filter.ShouldInclude)
                 .Select(scenario => scenario.BuildTestCase())
                 .OrderBy(tc => tc.TestName)
                 .ToArray();

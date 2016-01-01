@@ -5,12 +5,9 @@ using Nimbus.Transports.Redis;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 {
-    internal class Redis : IConfigurationScenario<TransportConfiguration>
+    internal class Redis : ConfigurationScenario<TransportConfiguration>
     {
-        public string Name { get; } = "Redis";
-        public string[] Categories { get; } = {"Redis"};
-
-        public ScenarioInstance<TransportConfiguration> CreateInstance()
+        public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
             var connectionString = DefaultSettingsReader.Get<RedisConnectionString>();
 

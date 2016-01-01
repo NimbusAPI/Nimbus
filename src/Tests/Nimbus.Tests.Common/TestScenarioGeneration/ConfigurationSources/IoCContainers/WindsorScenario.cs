@@ -4,12 +4,9 @@ using Nimbus.Windsor.Configuration;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
-    internal class WindsorScenario : IConfigurationScenario<ContainerConfiguration>
+    internal class WindsorScenario : ConfigurationScenario<ContainerConfiguration>
     {
-        public string Name { get; } = "Windsor";
-        public string[] Categories { get; } = {"Windsor"};
-
-        public ScenarioInstance<ContainerConfiguration> CreateInstance()
+        public override ScenarioInstance<ContainerConfiguration> CreateInstance()
         {
             var windsorContainer = new WindsorContainer();
 

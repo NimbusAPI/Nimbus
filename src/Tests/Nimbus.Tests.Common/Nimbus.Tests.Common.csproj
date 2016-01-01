@@ -107,10 +107,12 @@
     <Compile Include="Configuration\RedisConnectionString.cs" />
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\ConfigurationScenarioFilter.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\IConfigurationScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\AutofacScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeConfigurationScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\CompositeScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\ContainerConfiguration.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NinjectScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NoContainerScenario.cs" />
@@ -119,9 +121,10 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorage.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorageViaHttp.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\FileSystem.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialTestScenarioExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\PartialTestScenarioExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\DestinationPerMessageType.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\SingleQueueAndTopicPerMessageType.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\ScenarioInstance.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\DataContract.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\Json.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\ProtoBuf.cs" />

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 {
@@ -10,17 +11,11 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
         {
             yield return new InProcess();
             yield return new Redis();
-            yield return new WindowsServiceBus();
 
-            //FIXME: how many levels of nesting would we like? :)
-            //foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
-            //{
-            //    yield return new PartialConfigurationScenario<TransportConfiguration>(
-            //        PartialConfigurationScenario.Combine(nameof(WindowsServiceBusTransportConfiguration), largeMessageStorage.Name),
-            //        new WindowsServiceBusTransportConfiguration()
-            //            .WithConnectionString(DefaultSettingsReader.Get<AzureServiceBusConnectionString>())
-            //            .WithLargeMessageStorage(largeMessageStorage.Configuration));
-            //}
+            foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
+            {
+                yield return new WindowsServiceBus(largeMessageStorage);
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

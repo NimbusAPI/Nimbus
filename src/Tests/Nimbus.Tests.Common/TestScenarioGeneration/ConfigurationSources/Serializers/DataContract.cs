@@ -2,7 +2,7 @@ using Nimbus.Infrastructure.Serialization;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
 {
-    internal class DataContract : IConfigurationScenario<ISerializer>
+    internal class DataContract : ConfigurationScenario<ISerializer>
     {
         private readonly ITypeProvider _typeProvider;
 
@@ -11,10 +11,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serial
             _typeProvider = typeProvider;
         }
 
-        public string Name { get; } = "DataContract";
-        public string[] Categories { get; } = {"DataContract"};
-
-        public ScenarioInstance<ISerializer> CreateInstance()
+        public override ScenarioInstance<ISerializer> CreateInstance()
         {
             var serializer = new DataContractSerializer(_typeProvider);
             var instance = new ScenarioInstance<ISerializer>(serializer);

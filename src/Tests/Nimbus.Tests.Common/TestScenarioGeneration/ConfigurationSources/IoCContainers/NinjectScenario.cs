@@ -4,13 +4,9 @@ using Ninject;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
-    internal class NinjectScenario : IConfigurationScenario<ContainerConfiguration>
+    internal class NinjectScenario : ConfigurationScenario<ContainerConfiguration>
     {
-        public string Name => "Ninject";
-
-        public string[] Categories => new[] {"Ninject"};
-
-        public ScenarioInstance<ContainerConfiguration> CreateInstance()
+        public override ScenarioInstance<ContainerConfiguration> CreateInstance()
         {
             var kernel = new StandardKernel();
 

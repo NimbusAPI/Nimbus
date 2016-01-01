@@ -4,12 +4,9 @@ using Nimbus.LargeMessages.Azure.Http;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores
 {
-    internal class AzureBlobStorageViaHttp : IConfigurationScenario<LargeMessageStorageConfiguration>
+    internal class AzureBlobStorageViaHttp : ConfigurationScenario<LargeMessageStorageConfiguration>
     {
-        public string Name { get; } = "AzureBlobStorageViaHttp";
-        public string[] Categories { get; } = {"AzureBlobStorageViaHttp"};
-
-        public ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
+        public override ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
         {
             var configuration = new AzureBlobStorageHttpLargeMessageStorageConfiguration()
                 .UsingBlobStorageContainer(new Uri("http://fixme.example.com"), "FIXME");
