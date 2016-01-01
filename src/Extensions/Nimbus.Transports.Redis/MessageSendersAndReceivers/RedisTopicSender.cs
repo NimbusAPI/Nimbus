@@ -26,12 +26,10 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                   {
                                       var serialized = _serializer.Serialize(message);
                                       var database = _databaseFunc();
-
-                                      database.ListRightPush(_topicPath, serialized);
-                                      database.Publish(_topicPath, string.Empty);
-
                                       var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
-                                      var subscribers = database.SetMembers(subscribersRedisKey).Cast<string>().ToArray();
+                                      var subscribers = database.SetMembers(subscribersRedisKey)
+                                                                .Select(s => s.ToString())
+                                                                .ToArray();
 
                                       await subscribers
                                           .Select(s => Task.Run(() =>

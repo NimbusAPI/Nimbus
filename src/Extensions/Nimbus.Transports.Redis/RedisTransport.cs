@@ -2,6 +2,7 @@
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.Redis.ConnectionManagement;
 using Nimbus.Transports.Redis.MessageSendersAndReceivers;
 
 namespace Nimbus.Transports.Redis
@@ -9,15 +10,17 @@ namespace Nimbus.Transports.Redis
     internal class RedisTransport : INimbusTransport
     {
         private readonly PoorMansIoC _container;
+        private readonly ConnectionMultiplexerFactory _connectionMultiplexerFactory;
 
-        public RedisTransport(PoorMansIoC container)
+        public RedisTransport(PoorMansIoC container, ConnectionMultiplexerFactory connectionMultiplexerFactory)
         {
             _container = container;
+            _connectionMultiplexerFactory = connectionMultiplexerFactory;
         }
 
         public Task TestConnection()
         {
-            return Task.Delay(0);
+            return _connectionMultiplexerFactory.TestConnection();
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)

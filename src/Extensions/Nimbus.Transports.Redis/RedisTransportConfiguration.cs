@@ -43,7 +43,7 @@ namespace Nimbus.Transports.Redis
                                                                           multiplexer => multiplexer.Dispose()),
                                ComponentLifetime.SingleInstance);
             container.Register<Func<ConnectionMultiplexer>>(c => c.Resolve<RoundRobin<ConnectionMultiplexer>>().GetNext, ComponentLifetime.InstancePerDependency);
-            container.Register<Func<IDatabase>>(c => () => c.Resolve<Func<ConnectionMultiplexer>>()().GetDatabase(0), ComponentLifetime.InstancePerDependency);
+            container.Register<Func<IDatabase>>(c => () => c.Resolve<Func<ConnectionMultiplexer>>()().GetDatabase(), ComponentLifetime.InstancePerDependency);
             container.RegisterType<RedisMessageSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<RedisMessageReceiver>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<RedisTopicSender>(ComponentLifetime.InstancePerDependency);
