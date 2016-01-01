@@ -13,6 +13,7 @@ namespace Nimbus.Infrastructure
     [DebuggerDisplay("{_receiver}")]
     internal class MessagePump : IMessagePump
     {
+        private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
@@ -26,7 +27,8 @@ namespace Nimbus.Infrastructure
         private bool _started;
         private readonly SemaphoreSlim _startStopSemaphore = new SemaphoreSlim(1, 1);
 
-        public MessagePump(MaxDeliveryAttemptSetting maxDeliveryAttempts,
+        public MessagePump(EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+                           MaxDeliveryAttemptSetting maxDeliveryAttempts,
                            IClock clock,
                            IDeadLetterOffice deadLetterOffice,
                            IDelayedDeliveryService delayedDeliveryService,
@@ -36,6 +38,7 @@ namespace Nimbus.Infrastructure
                            IMessageDispatcher messageDispatcher,
                            INimbusMessageReceiver receiver)
         {
+            _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
@@ -99,7 +102,9 @@ namespace Nimbus.Infrastructure
                     message.MessageId,
                     message.ExpiresAfter,
                     now);
-                await _deadLetterOffice.Post(message);
+
+                await PostToDeadLetterOffice(message);
+
                 return;
             }
 
@@ -119,7 +124,7 @@ namespace Nimbus.Infrastructure
 
                 catch (Exception exc)
                 {
-                    _logger.Error(exc,
+                    _logger.Warn(exc,
                                   "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
                                   message.SafelyGetBodyTypeNameOrDefault(),
                                   message.From,
@@ -130,23 +135,11 @@ namespace Nimbus.Infrastructure
                 var numDeliveryAttempts = message.DeliveryAttempts.Count();
                 if (numDeliveryAttempts >= _maxDeliveryAttempts)
                 {
-                    _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}. Posting it to the dead letter office.",
+                    _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}.",
                                   numDeliveryAttempts,
                                   message.MessageId);
 
-                    try
-                    {
-                        await _deadLetterOffice.Post(message);
-                    }
-                    catch (Exception exc)
-                    {
-                        _logger.Error(exc,
-                                      "Failed to post message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.From,
-                                      message.MessageId,
-                                      message.CorrelationId);
-                    }
+                    await PostToDeadLetterOffice(message);
                 }
                 else
                 {
@@ -173,6 +166,31 @@ namespace Nimbus.Infrastructure
             catch (Exception exc)
             {
                 _logger.Error(exc, "Unhandled exception in message pump");
+            }
+        }
+
+        private async Task PostToDeadLetterOffice(NimbusMessage message)
+        {
+            if (!_enableDeadLetteringOnMessageExpiration) return;
+
+            _logger.Debug("Posting message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
+                          message.SafelyGetBodyTypeNameOrDefault(),
+                          message.From,
+                          message.MessageId,
+                          message.CorrelationId);
+
+            try
+            {
+                await _deadLetterOffice.Post(message);
+            }
+            catch (Exception exc)
+            {
+                _logger.Error(exc,
+                              "Failed to post message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
+                              message.SafelyGetBodyTypeNameOrDefault(),
+                              message.From,
+                              message.MessageId,
+                              message.CorrelationId);
             }
         }
 

@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
 using Nimbus.Transports.InProcess.QueueManagement;
 
-namespace Nimbus.Transports.InProcess
+namespace Nimbus.Transports.InProcess.DelayedDelivery
 {
     internal class InProcessDelayedDeliveryService : IDelayedDeliveryService
     {

@@ -14,6 +14,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.With<TestNameEnricher>()
                 .Enrich.WithExceptionDetails()
                 .WriteTo.Seq("http://localhost:5341")
+                .WriteTo.Trace()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 

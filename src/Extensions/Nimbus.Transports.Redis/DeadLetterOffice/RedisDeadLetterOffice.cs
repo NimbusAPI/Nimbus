@@ -1,28 +1,57 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.DeadLetterOffice
 {
-    internal class RedisDeadLetterOffice:IDeadLetterOffice
+    internal class RedisDeadLetterOffice : IDeadLetterOffice
     {
-        public Task<NimbusMessage> Peek()
+        private const string _deadLetterOfficeRedisKey = "deadletteroffice";
+
+        private readonly Func<IDatabase> _databaseFunc;
+        private readonly ISerializer _serializer;
+
+        public RedisDeadLetterOffice(Func<IDatabase> databaseFunc, ISerializer serializer)
         {
-            throw new NotImplementedException();
+            _databaseFunc = databaseFunc;
+            _serializer = serializer;
         }
 
-        public Task<NimbusMessage> Pop()
+        public async Task<NimbusMessage> Peek()
         {
-            throw new NotImplementedException();
+            var database = _databaseFunc();
+            var redisValues = await database.ListRangeAsync(_deadLetterOfficeRedisKey, 0, 1);
+
+            var redisValue = redisValues.FirstOrDefault();
+            if (!redisValue.HasValue) return null;
+
+            var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+            return message;
         }
 
-        public Task Post(NimbusMessage message)
+        public async Task<NimbusMessage> Pop()
         {
-            throw new NotImplementedException();
+            var database = _databaseFunc();
+            var redisValue = await database.ListLeftPopAsync(_deadLetterOfficeRedisKey);
+            if (!redisValue.HasValue) return null;
+
+            var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+            return message;
         }
 
-        public Task<int> Count()
+        public async Task Post(NimbusMessage message)
         {
-            throw new NotImplementedException();
+            var database = _databaseFunc();
+            var serialized = _serializer.Serialize(message);
+            await database.ListRightPushAsync(_deadLetterOfficeRedisKey, serialized);
+        }
+
+        public async Task<int> Count()
+        {
+            var database = _databaseFunc();
+            var count = await database.ListLengthAsync(_deadLetterOfficeRedisKey);
+            return (int) count;
         }
     }
 }

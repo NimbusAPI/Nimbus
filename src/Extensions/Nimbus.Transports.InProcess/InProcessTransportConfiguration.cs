@@ -5,6 +5,8 @@ using Nimbus.Configuration.Transport;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
+using Nimbus.Transports.InProcess.DeadLetterOffice;
+using Nimbus.Transports.InProcess.DelayedDelivery;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
 using Nimbus.Transports.InProcess.QueueManagement;
 

@@ -20,25 +20,22 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _databaseFunc = databaseFunc;
         }
 
-        public Task Send(NimbusMessage message)
+        public async Task Send(NimbusMessage message)
         {
-            return Task.Run(async () =>
-                                  {
-                                      var serialized = _serializer.Serialize(message);
-                                      var database = _databaseFunc();
-                                      var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
-                                      var subscribers = database.SetMembers(subscribersRedisKey)
-                                                                .Select(s => s.ToString())
-                                                                .ToArray();
+            var serialized = _serializer.Serialize(message);
+            var database = _databaseFunc();
+            var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
+            var subscribers = (await database.SetMembersAsync(subscribersRedisKey))
+                .Select(s => s.ToString())
+                .ToArray();
 
-                                      await subscribers
-                                          .Select(s => Task.Run(() =>
-                                                                {
-                                                                    database.ListRightPush(s, serialized);
-                                                                    database.Publish(s, string.Empty);
-                                                                }).ConfigureAwaitFalse())
-                                          .WhenAll();
-                                  }).ConfigureAwaitFalse();
+            await subscribers
+                .Select(s => Task.Run(async () =>
+                                            {
+                                                await database.ListRightPushAsync(s, serialized);
+                                                await database.PublishAsync(s, string.Empty);
+                                            }).ConfigureAwaitFalse())
+                .WhenAll();
         }
     }
 }

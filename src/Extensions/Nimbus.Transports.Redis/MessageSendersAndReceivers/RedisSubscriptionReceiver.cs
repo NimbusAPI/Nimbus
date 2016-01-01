@@ -31,11 +31,10 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _databaseFunc = databaseFunc;
         }
 
-        protected override Task WarmUp()
+        protected override async Task WarmUp()
         {
-            _databaseFunc().SetAdd(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey);
-
-            return base.WarmUp();
+            await _databaseFunc().SetAddAsync(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey);
+            await base.WarmUp();
         }
     }
 }
