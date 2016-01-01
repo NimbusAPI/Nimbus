@@ -7,7 +7,6 @@ namespace Nimbus.ConcurrentCollections
         private readonly Func<T> _valueFunc;
         private readonly object _mutex = new object();
         private T _value;
-        private bool _isValueCreated;
 
         public ThreadSafeLazy(Func<T> valueFunc)
         {
@@ -18,22 +17,19 @@ namespace Nimbus.ConcurrentCollections
         {
             get
             {
-                if (_isValueCreated) return _value;
+                if (IsValueCreated) return _value;
 
                 lock (_mutex)
                 {
-                    if (_isValueCreated) return _value;
+                    if (IsValueCreated) return _value;
 
                     _value = _valueFunc();
-                    _isValueCreated = true;
+                    IsValueCreated = true;
                     return _value;
                 }
             }
         }
 
-        public bool IsValueCreated
-        {
-            get { return _isValueCreated; }
-        }
+        public bool IsValueCreated { get; private set; }
     }
 }

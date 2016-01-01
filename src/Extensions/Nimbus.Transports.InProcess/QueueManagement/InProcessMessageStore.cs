@@ -37,5 +37,12 @@ namespace Nimbus.Transports.InProcess.QueueManagement
         {
             return _messageQueues.TryGetValue(path, out queue);
         }
+
+        internal void Clear()
+        {
+            _queues.Clear();
+            _topics.Clear();
+            _messageQueues.Clear();
+        }
     }
 }

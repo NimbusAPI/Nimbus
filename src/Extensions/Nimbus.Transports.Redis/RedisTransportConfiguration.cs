@@ -13,6 +13,7 @@ using Nimbus.Transports.Redis.ConnectionManagement;
 using Nimbus.Transports.Redis.DeadLetterOffice;
 using Nimbus.Transports.Redis.DelayedDelivery;
 using Nimbus.Transports.Redis.MessageSendersAndReceivers;
+using Nimbus.Transports.Redis.QueueManagement;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis
@@ -51,7 +52,7 @@ namespace Nimbus.Transports.Redis
 
             container.RegisterType<RedisDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<RedisDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-            container.RegisterType<StubNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
+            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof (ILargeMessageBodyStore));
 
             container.RegisterType<RedisTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));

@@ -44,9 +44,12 @@
     <Compile Include="InProcessTransport.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueReceiver.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessQueueSender.cs" />
+    <Compile Include="MessageSendersAndReceivers\InProcessSubscriptionReceiver.cs" />
     <Compile Include="MessageSendersAndReceivers\InProcessTopicSender.cs" />
     <Compile Include="InProcessTransportConfiguration.cs" />
+    <Compile Include="QueueManagement\NamespaceCleanser.cs" />
     <Compile Include="QueueManagement\Queue.cs" />
+    <Compile Include="QueueManagement\Subscription.cs" />
     <Compile Include="QueueManagement\Topic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueManagement\InProcessMessageStore.cs" />

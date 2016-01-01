@@ -43,12 +43,8 @@ namespace Nimbus.Transports.InProcess
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
         {
-            var topic = _messageStore.GetTopic(topicPath);
-            topic.Subscribe(subscriptionName);
-
-            var fullyQualifiedSubscriptionPath = FullyQualifiedSubscriptionPath(topicPath, subscriptionName);
-            var messageQueue = _messageStore.GetOrCreateMessageQueue(fullyQualifiedSubscriptionPath);
-            return _container.ResolveWithOverrides<InProcessQueueReceiver>(fullyQualifiedSubscriptionPath, messageQueue);
+            var subscription = new Subscription(topicPath, subscriptionName);
+            return _container.ResolveWithOverrides<InProcessSubscriptionReceiver>(subscription);
         }
 
         public static string FullyQualifiedSubscriptionPath(string topicPath, string subscriptionName)

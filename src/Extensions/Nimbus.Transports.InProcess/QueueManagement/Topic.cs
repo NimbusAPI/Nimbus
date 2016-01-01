@@ -4,12 +4,13 @@ namespace Nimbus.Transports.InProcess.QueueManagement
 {
     internal class Topic
     {
-        private readonly string _topicPath;
         private readonly List<string> _subscriptionNames = new List<string>();
+
+        public string TopicPath { get; }
 
         public Topic(string topicPath)
         {
-            _topicPath = topicPath;
+            TopicPath = topicPath;
         }
 
         public void Subscribe(string subscriptionName)
@@ -20,11 +21,6 @@ namespace Nimbus.Transports.InProcess.QueueManagement
 
                 _subscriptionNames.Add(subscriptionName);
             }
-        }
-
-        public string TopicPath
-        {
-            get { return _topicPath; }
         }
 
         public string[] SubscriptionNames
