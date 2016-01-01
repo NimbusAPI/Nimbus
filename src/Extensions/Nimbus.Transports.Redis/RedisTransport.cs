@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.Redis.MessageSendersAndReceivers;
-using Nimbus.Transports.Redis.QueueManagement;
 
 namespace Nimbus.Transports.Redis
 {
@@ -24,24 +22,23 @@ namespace Nimbus.Transports.Redis
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
-            var queue = new Queue(queuePath);
-            return _container.ResolveWithOverrides<RedisMessageSender>(queue);
+            return _container.ResolveWithOverrides<RedisMessageSender>(queuePath);
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
         {
-            var queue = new Queue(queuePath);
-            return _container.ResolveWithOverrides<RedisMessageReceiver>(queue);
+            return _container.ResolveWithOverrides<RedisMessageReceiver>(queuePath);
         }
 
         public INimbusMessageSender GetTopicSender(string topicPath)
         {
-            throw new NotImplementedException();
+            return _container.ResolveWithOverrides<RedisTopicSender>(topicPath);
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
         {
-            throw new NotImplementedException();
+            var subscription = new Subscription(topicPath, subscriptionName);
+            return _container.ResolveWithOverrides<RedisSubscriptionReceiver>(subscription);
         }
     }
 }

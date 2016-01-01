@@ -46,6 +46,8 @@ namespace Nimbus.Transports.Redis
             container.Register<Func<IDatabase>>(c => () => c.Resolve<Func<ConnectionMultiplexer>>()().GetDatabase(0), ComponentLifetime.InstancePerDependency);
             container.RegisterType<RedisMessageSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<RedisMessageReceiver>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<RedisTopicSender>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<RedisSubscriptionReceiver>(ComponentLifetime.InstancePerDependency);
 
             container.RegisterType<RedisDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<RedisDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
