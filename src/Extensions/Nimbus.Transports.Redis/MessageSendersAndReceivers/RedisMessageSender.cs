@@ -26,7 +26,9 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                             {
                                 var serialized = _serializer.Serialize(message);
                                 var database = _databaseFunc();
-                                database.ListRightPush(serialized, _queue.QueuePath);
+                                database.ListRightPush(_queue.QueuePath, serialized);
+
+                                database.Publish(_queue.QueuePath, string.Empty);
                             }).ConfigureAwaitFalse();
         }
     }

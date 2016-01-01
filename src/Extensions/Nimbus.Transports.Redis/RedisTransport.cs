@@ -30,7 +30,8 @@ namespace Nimbus.Transports.Redis
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
         {
-            throw new NotImplementedException();
+            var queue = new Queue(queuePath);
+            return _container.ResolveWithOverrides<RedisMessageReceiver>(queue);
         }
 
         public INimbusMessageSender GetTopicSender(string topicPath)

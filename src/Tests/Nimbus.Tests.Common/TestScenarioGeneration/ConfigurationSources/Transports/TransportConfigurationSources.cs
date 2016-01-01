@@ -9,6 +9,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
         public IEnumerator<IConfigurationScenario<TransportConfiguration>> GetEnumerator()
         {
             yield return new InProcess();
+            yield return new Redis();
             yield return new WindowsServiceBus();
 
             //FIXME: how many levels of nesting would we like? :)

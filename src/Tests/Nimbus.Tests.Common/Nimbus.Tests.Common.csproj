@@ -104,6 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\RedisConnectionString.cs" />
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\AutofacScenario.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\Json.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\ProtoBuf.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\InProcess.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Redis.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\WindowsServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
@@ -176,6 +178,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
       <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
       <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj">
+      <Project>{e7dbdb7e-f73e-48b1-a48f-2cddb6134d86}</Project>
+      <Name>Nimbus.Transports.Redis</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
       <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
