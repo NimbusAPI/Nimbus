@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Nimbus.Configuration;
 using Nimbus.Tests.Common.Stubs;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressors;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder
 {
     public class BusBuilderConfigurationSources : IEnumerable<IConfigurationScenario<BusBuilderConfiguration>>
     {
@@ -35,7 +36,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
                     {
                         foreach (var iocContainer in new IoCContainerConfigurationSources())
                         {
-                            yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, iocContainer);
+                            foreach (var compressor in new CompressorScenariosSource())
+                            yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer);
                         }
                     }
                 }

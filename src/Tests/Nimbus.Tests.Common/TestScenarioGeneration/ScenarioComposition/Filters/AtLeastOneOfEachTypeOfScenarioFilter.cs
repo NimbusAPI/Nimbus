@@ -7,7 +7,7 @@ using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
 {
-    public class AtLeastOneOfEachTypeOfScenarioFilter: IScenarioFilter
+    public class AtLeastOneOfEachTypeOfScenarioFilter : IScenarioFilter
     {
         private readonly HashSet<Type> _previouslySeenScenarios = new HashSet<Type>();
 
