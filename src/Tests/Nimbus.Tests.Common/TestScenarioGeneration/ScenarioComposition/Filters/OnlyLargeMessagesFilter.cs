@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
@@ -16,15 +16,22 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
                 .ToArray();
         }
 
-        public override bool ShouldInclude(IConfigurationScenario scenario)
+        public override IEnumerable<IConfigurationScenario<T>> Filter<T>(IEnumerable<IConfigurationScenario<T>> scenarios)
+        {
+            var onlyLargeMessageScenarios = scenarios.Where(ShouldInclude).ToArray();
+            var baseResults = base.Filter(onlyLargeMessageScenarios);
+            return baseResults;
+        }
+
+        private bool ShouldInclude(IConfigurationScenario scenario)
         {
             var composedOfTypes = scenario.ComposedOf
                                           .Select(c => c.GetType())
                                           .ToArray();
 
-            if (composedOfTypes.None(component => _largeMessageScenarioTypes.Contains(component))) return false;
-
-            return base.ShouldInclude(scenario);
+            return composedOfTypes
+                .Where(component => _largeMessageScenarioTypes.Contains(component))
+                .Any();
         }
     }
 }

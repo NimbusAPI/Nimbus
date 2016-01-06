@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
@@ -22,7 +23,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
                 : new AtLeastOneOfEachTypeOfScenarioFilter();
 
             var testCases = new BusBuilderConfigurationSources(testFixtureType)
-                .Where(filter.ShouldInclude)
+                .ToArray()
+                .Pipe(filter.Filter)
                 .Select(scenario => scenario.BuildTestCase())
                 .OrderBy(tc => tc.TestName)
                 .ToArray();

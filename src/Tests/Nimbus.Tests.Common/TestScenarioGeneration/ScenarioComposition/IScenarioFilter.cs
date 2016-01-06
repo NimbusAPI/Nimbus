@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
 {
     public interface IScenarioFilter
     {
-        bool ShouldInclude(IConfigurationScenario scenario);
+        IEnumerable<IConfigurationScenario<T>> Filter<T>(IEnumerable<IConfigurationScenario<T>> scenarios);
     }
 }
