@@ -9,7 +9,6 @@ namespace Nimbus.UnitTests.MulticastRequestResponseTests
     internal class WhenTakingASingleResponse : GivenAWrapperWithTwoResponses
     {
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
-        private readonly TimeSpan _acceptableTime = TimeSpan.FromMilliseconds(100);
 
         private string[] _result;
 
@@ -19,9 +18,9 @@ namespace Nimbus.UnitTests.MulticastRequestResponseTests
         }
 
         [Test]
-        public void TheElapsedTimeShouldBeMuchLessThanTheTimeout()
+        public void TheElapsedTimeShouldBeLessThanTheTimeout()
         {
-            ElapsedTime.ShouldBeLessThan(_acceptableTime);
+            ElapsedTime.ShouldBeLessThan(_timeout);
         }
 
         [Test]
