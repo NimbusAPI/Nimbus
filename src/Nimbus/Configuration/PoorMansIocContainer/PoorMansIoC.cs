@@ -153,10 +153,10 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             if (componentLifetime == ComponentLifetime.SingleInstance)
             {
                 _singleInstanceComponents.Add(instance);
-            }
 
-            var disposable = instance as IDisposable;
-            if (disposable != null) _garbageMan.Add(disposable);
+                var disposable = instance as IDisposable;
+                if (disposable != null) _garbageMan.Add(disposable);
+            }
 
             return instance;
         }
