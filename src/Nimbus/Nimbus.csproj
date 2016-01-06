@@ -77,6 +77,7 @@
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
+    <Compile Include="Extensions\ConcurrentBagExtensions.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\INimbusTransport.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />

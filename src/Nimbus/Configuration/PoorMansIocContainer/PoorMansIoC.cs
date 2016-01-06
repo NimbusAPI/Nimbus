@@ -177,7 +177,12 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+
             _garbageMan.Dispose();
+
+            // we have circular references in these. By clearing them we reduce the likelihood of a Gen2 promotion.
+            _singleInstanceComponents.Clear();
+            _registrations.Clear();
         }
     }
 }
