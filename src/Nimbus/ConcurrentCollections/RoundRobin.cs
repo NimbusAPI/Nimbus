@@ -6,7 +6,7 @@ using Nimbus.Extensions;
 
 namespace Nimbus.ConcurrentCollections
 {
-    public class RoundRobin<T>: IDisposable
+    public class RoundRobin<T> : IDisposable
     {
         private readonly int _poolSize;
         private readonly Func<T> _createItem;
@@ -17,6 +17,8 @@ namespace Nimbus.ConcurrentCollections
         private readonly List<T> _items = new List<T>();
         private readonly object _itemsMutex = new object();
         private readonly object _repopulationMutex = new object();
+
+        private bool _isDisposed;
 
         public RoundRobin(int poolSize, Func<T> createItem, Func<T, bool> isBorked, Action<T> disposeItem)
         {
@@ -32,6 +34,8 @@ namespace Nimbus.ConcurrentCollections
 
         public T GetNext()
         {
+            if (_isDisposed) throw new ObjectDisposedException("This RoundRobin has already been disposed.");
+
             while (true)
             {
                 // we nest loop/lock/loop so that if we toss out all of our items we'll still have released the lock
@@ -65,6 +69,8 @@ namespace Nimbus.ConcurrentCollections
             // slow (locks on the same mutex) but will work for now.
             return Task.Run(() =>
                             {
+                                if (_isDisposed) return;
+
                                 lock (_repopulationMutex)
                                 {
                                     int numItemsRequired;
@@ -100,8 +106,11 @@ namespace Nimbus.ConcurrentCollections
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+            if (_isDisposed) return;
 
-            lock(_itemsMutex)
+            _isDisposed = true;
+
+            lock (_itemsMutex)
             {
                 _items
                     .Do(_disposeItem)
