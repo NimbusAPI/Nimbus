@@ -120,6 +120,8 @@ namespace Nimbus.StressTests.ThroughputTests
 
         private void RecordTeamCityStatistic(string testName, string key, double? value)
         {
+            if (!value.HasValue) return;
+
             var fullKey = string.Join(".", GetType().Name, testName, key);
             var message = "##teamcity[buildStatisticValue key='{0}' value='{1}']".FormatWith(fullKey, value);
             Console.WriteLine(message);
