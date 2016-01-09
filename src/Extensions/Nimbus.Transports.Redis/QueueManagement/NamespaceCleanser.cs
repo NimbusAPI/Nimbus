@@ -21,8 +21,9 @@ namespace Nimbus.Transports.Redis.QueueManagement
             var multiplexer = _multiplexerFunc();
             var configuration = ConfigurationOptions.Parse(multiplexer.Configuration);
 
+            var database = configuration.DefaultDatabase ?? 0;
             await configuration.EndPoints
-                               .Select(server => multiplexer.GetServer(server).FlushDatabaseAsync())
+                               .Select(server => multiplexer.GetServer(server).FlushDatabaseAsync(database))
                                .WhenAll();
         }
     }
