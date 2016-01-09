@@ -15,6 +15,7 @@ using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.Infrastructure.Retries;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Infrastructure.Serialization;
 using Nimbus.Interceptors.Inbound;
@@ -95,6 +96,7 @@ namespace Nimbus.Configuration
             container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
             container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<GlobalHandlerThrottle>(ComponentLifetime.SingleInstance, typeof(IGlobalHandlerThrottle));
+            container.RegisterType<DefaultRetry>(ComponentLifetime.InstancePerDependency, typeof(IRetry));
         }
 
         public IEnumerable<string> Validate()

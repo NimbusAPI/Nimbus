@@ -8,6 +8,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Retries;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
@@ -23,7 +24,6 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly DefaultTimeoutSetting _defaultTimeout;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
-        private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
@@ -31,12 +31,12 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
-        private readonly Retry _retry;
+        private readonly IRetry _retry;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
-                                 ILogger logger,
+                                 IRetry retry,
                                  ITypeProvider typeProvider,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
@@ -46,7 +46,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
-            _logger = logger;
+            _retry = retry;
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
             _autoDeleteOnIdle = autoDeleteOnIdle;
@@ -56,12 +56,6 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
             _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
             _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
-
-            _retry = new Retry(5)
-                .Chain(r => r.Started += (s, e) => _logger.Debug("{Action}...", e.ActionName))
-                .Chain(r => r.Success += (s, e) => _logger.Debug("{Action} completed successfully in {Elapsed}.", e.ActionName, e.ElapsedTime))
-                .Chain(r => r.TransientFailure += (s, e) => _logger.Warn(e.Exception, "A transient failure occurred in action {Action}.", e.ActionName))
-                .Chain(r => r.PermanentFailure += (s, e) => _logger.Error(e.Exception, "A permanent failure occurred in action {Action}.", e.ActionName));
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)

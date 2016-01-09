@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
+using Nimbus.Infrastructure.Retries;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
@@ -10,6 +11,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
     {
         private readonly Subscription _subscription;
         private readonly Func<IDatabase> _databaseFunc;
+        private readonly IRetry _retry;
 
         public RedisSubscriptionReceiver(Subscription subscription,
                                          Func<ConnectionMultiplexer> connectionMultiplexerFunc,
@@ -17,7 +19,8 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                          ISerializer serializer,
                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                          IGlobalHandlerThrottle globalHandlerThrottle,
-                                         ILogger logger)
+                                         ILogger logger,
+                                         IRetry retry)
             : base(
                 subscription.SubscriptionMessagesRedisKey,
                 connectionMultiplexerFunc,
@@ -25,16 +28,18 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                 serializer,
                 concurrentHandlerLimit,
                 globalHandlerThrottle,
-                logger)
+                logger,
+                retry)
         {
             _subscription = subscription;
             _databaseFunc = databaseFunc;
+            _retry = retry;
         }
 
         protected override async Task WarmUp()
         {
             var database = _databaseFunc();
-            await database.SetAddAsync(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey);
+            await _retry.DoAsync(() => database.SetAddAsync(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey));
             await base.WarmUp();
         }
     }

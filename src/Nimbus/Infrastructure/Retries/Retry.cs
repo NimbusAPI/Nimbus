@@ -1,34 +1,14 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 
-namespace Nimbus.Infrastructure
+namespace Nimbus.Infrastructure.Retries
 {
-    internal class RetryEventArgs : EventArgs
-    {
-        public string ActionName { get; }
-        public TimeSpan ElapsedTime { get; }
-
-        public RetryEventArgs(string actionName, TimeSpan elapsedTime)
-        {
-            ActionName = actionName;
-            ElapsedTime = elapsedTime;
-        }
-    }
-
-    internal class RetryFailureEventArgs : RetryEventArgs
-    {
-        public Exception Exception { get; }
-
-        public RetryFailureEventArgs(string actionName, TimeSpan elapsedTime, Exception exception) : base(actionName, elapsedTime)
-        {
-            Exception = exception;
-        }
-    }
-
-    internal class Retry
+    internal class Retry : IRetry
     {
         private readonly int _numAttempts;
+        private Func<RetryFailureEventArgs, Task> _backoff = args => Task.Delay(0).ConfigureAwaitFalse();
 
         public EventHandler<RetryEventArgs> Started;
         public EventHandler<RetryEventArgs> Success;
@@ -40,7 +20,13 @@ namespace Nimbus.Infrastructure
             _numAttempts = numAttempts;
         }
 
-        internal void Do(Action action, string actionName = "")
+        internal TRetry WithBackoff<TRetry>(Func<RetryFailureEventArgs, Task> backoff) where TRetry : Retry
+        {
+            _backoff = backoff;
+            return (TRetry) this;
+        }
+
+        public void Do(Action action, string actionName = "")
         {
             var sw = Stopwatch.StartNew();
             Started?.Invoke(this, new RetryEventArgs(actionName, TimeSpan.Zero));
@@ -58,20 +44,22 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
+                    var eventArgs = new RetryFailureEventArgs(actionName, attempt, sw.Elapsed, exc);
                     if (attempt < _numAttempts)
                     {
-                        TransientFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        TransientFailure?.Invoke(this, eventArgs);
+                        _backoff(eventArgs).Wait();
                     }
                     else
                     {
-                        PermanentFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        PermanentFailure?.Invoke(this, eventArgs);
                         throw;
                     }
                 }
             }
         }
 
-        internal T Do<T>(Func<T> func, string actionName = "")
+        public T Do<T>(Func<T> func, string actionName = "")
         {
             var sw = Stopwatch.StartNew();
             Started?.Invoke(this, new RetryEventArgs(actionName, TimeSpan.Zero));
@@ -89,20 +77,22 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
+                    var eventArgs = new RetryFailureEventArgs(actionName, attempt, sw.Elapsed, exc);
                     if (attempt < _numAttempts)
                     {
-                        TransientFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        TransientFailure?.Invoke(this, eventArgs);
+                        _backoff(eventArgs).Wait();
                     }
                     else
                     {
-                        PermanentFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        PermanentFailure?.Invoke(this, eventArgs);
                         throw;
                     }
                 }
             }
         }
 
-        internal async Task DoAsync(Func<Task> action, string actionName = "")
+        public async Task DoAsync(Func<Task> action, string actionName = "")
         {
             var sw = Stopwatch.StartNew();
             Started?.Invoke(this, new RetryEventArgs(actionName, TimeSpan.Zero));
@@ -120,20 +110,22 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
+                    var eventArgs = new RetryFailureEventArgs(actionName, attempt, sw.Elapsed, exc);
                     if (attempt < _numAttempts)
                     {
-                        TransientFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        TransientFailure?.Invoke(this, eventArgs);
+                        await _backoff(eventArgs);
                     }
                     else
                     {
-                        PermanentFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        PermanentFailure?.Invoke(this, eventArgs);
                         throw;
                     }
                 }
             }
         }
 
-        internal async Task<T> DoAsync<T>(Func<Task<T>> func, string actionName = "")
+        public async Task<T> DoAsync<T>(Func<Task<T>> func, string actionName = "")
         {
             var sw = Stopwatch.StartNew();
             Started?.Invoke(this, new RetryEventArgs(actionName, TimeSpan.Zero));
@@ -151,13 +143,15 @@ namespace Nimbus.Infrastructure
                 }
                 catch (Exception exc)
                 {
+                    var eventArgs = new RetryFailureEventArgs(actionName, attempt, sw.Elapsed, exc);
                     if (attempt < _numAttempts)
                     {
-                        TransientFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        TransientFailure?.Invoke(this, eventArgs);
+                        await _backoff(eventArgs);
                     }
                     else
                     {
-                        PermanentFailure?.Invoke(this, new RetryFailureEventArgs(actionName, sw.Elapsed, exc));
+                        PermanentFailure?.Invoke(this, eventArgs);
                         throw;
                     }
                 }

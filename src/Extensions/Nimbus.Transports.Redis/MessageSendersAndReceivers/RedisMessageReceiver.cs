@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.Retries;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
@@ -16,6 +16,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         private readonly Func<IDatabase> _databaseFunc;
         private readonly ISerializer _serializer;
         private readonly ILogger _logger;
+        private readonly IRetry _retry;
 
         private ISubscriber _subscriber;
         readonly SemaphoreSlim _receiveSemaphore = new SemaphoreSlim(0, int.MaxValue);
@@ -27,22 +28,24 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                     ISerializer serializer,
                                     ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                     IGlobalHandlerThrottle globalHandlerThrottle,
-                                    ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
+                                    ILogger logger,
+                                    IRetry retry) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _redisKey = redisKey;
             _connectionMultiplexerFunc = connectionMultiplexerFunc;
             _databaseFunc = databaseFunc;
             _serializer = serializer;
             _logger = logger;
+            _retry = retry;
         }
 
-        protected override Task WarmUp()
+        protected override async Task WarmUp()
         {
-            return Task.Run(() =>
-                            {
-                                _subscriber = _connectionMultiplexerFunc().GetSubscriber();
-                                _subscriber.SubscribeAsync(_redisKey, OnNotificationReceived);
-                            }).ConfigureAwaitFalse();
+            await _retry.DoAsync(async () =>
+                                       {
+                                           _subscriber = _connectionMultiplexerFunc().GetSubscriber();
+                                           await _subscriber.SubscribeAsync(_redisKey, OnNotificationReceived);
+                                       });
         }
 
         protected override void Dispose(bool disposing)

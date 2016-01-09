@@ -7,6 +7,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.Retries;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 using Nimbus.Transports.WindowsServiceBus.SendersAndRecievers;
@@ -27,16 +28,19 @@ namespace Nimbus.Transports.WindowsServiceBus
         private readonly ThreadSafeDictionary<string, INimbusMessageSender> _topicMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private readonly IRetry _retry;
 
         public WindowsServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                           IBrokeredMessageFactory brokeredMessageFactory,
                                           IGlobalHandlerThrottle globalHandlerThrottle,
                                           ILogger logger,
                                           IQueueManager queueManager,
-                                          Func<NamespaceManager> namespaceManager)
+                                          Func<NamespaceManager> namespaceManager,
+                                          IRetry retry)
         {
             _queueManager = queueManager;
             _namespaceManager = namespaceManager;
+            _retry = retry;
             _brokeredMessageFactory = brokeredMessageFactory;
             _globalHandlerThrottle = globalHandlerThrottle;
             _concurrentHandlerLimit = concurrentHandlerLimit;
@@ -72,7 +76,7 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
         {
-            var sender = new WindowsServiceBusQueueMessageSender(_brokeredMessageFactory, _queueManager, queuePath, _logger);
+            var sender = new WindowsServiceBusQueueMessageSender(_brokeredMessageFactory, _logger, _queueManager, _retry, queuePath);
             _garbageMan.Add(sender);
             return sender;
         }
@@ -91,7 +95,7 @@ namespace Nimbus.Transports.WindowsServiceBus
 
         private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            var sender = new WindowsServiceBusTopicMessageSender(_brokeredMessageFactory, _queueManager, topicPath, _logger);
+            var sender = new WindowsServiceBusTopicMessageSender(_brokeredMessageFactory, _logger, _queueManager, _retry, topicPath);
             _garbageMan.Add(sender);
             return sender;
         }
