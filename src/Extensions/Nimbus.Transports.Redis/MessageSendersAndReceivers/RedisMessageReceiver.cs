@@ -69,6 +69,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             var redisValue = await database.ListLeftPopAsync(_redisKey);
             if (!redisValue.HasValue)
             {
+                _logger.Debug("No waiting messages.");
                 _haveFetchedAllPreExistingMessages = true;
                 return null;
             }
