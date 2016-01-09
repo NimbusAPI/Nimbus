@@ -8,15 +8,17 @@ namespace Nimbus.Enrichers
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
+            const string prefix = "NimbusMessage.";
+
             var message = DispatchLoggingContext.NimbusMessage;
             if (message == null) return;
 
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("MessageType", message.Payload?.GetType().FullName));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty($"{prefix}MessageType", message.Payload?.GetType().FullName));
             foreach (var property in typeof (NimbusMessage).GetProperties())
             {
                 if (property.Name == nameof(NimbusMessage.Payload)) continue;
 
-                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(property.Name, property.GetValue(message)));
+                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty($"{prefix}{property.Name}", property.GetValue(message)));
             }
         }
     }

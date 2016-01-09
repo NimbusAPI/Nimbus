@@ -76,7 +76,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             //FIXME debugging hack. Remove.
             if (!successfullyAwaitedForSemaphore)
             {
-                _logger.Warn("Uh oh. We dropped through our semaphore on a timeout but still somehow receive a waiting message. This isn't supposed to happen.");
+                _logger.Warn("Uh oh. We dropped through our semaphore on a timeout but still somehow received a waiting message. This isn't supposed to happen.");
             }
 
             var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
