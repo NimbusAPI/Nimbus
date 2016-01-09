@@ -100,7 +100,7 @@ namespace Nimbus.Infrastructure
             var now = _clock.UtcNow;
             if (message.ExpiresAfter <= now)
             {
-                _logger.Debug(
+                _logger.Warn(
                     "Message appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
                     message.ExpiresAfter,
                     now);
