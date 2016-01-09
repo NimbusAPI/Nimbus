@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -22,15 +21,14 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         protected override async Task When()
         {
             SlowBlackBallRequestHandler.Reset();
+            SlowBlackBallRequestHandler.HandlerThrottle.Release(1);
 
             var request = new BlackBallRequest
                           {
                               ProspectiveMemberName = "Fred Flintstone"
                           };
 
-            var requestTask = Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds));
-            SlowBlackBallRequestHandler.HandlerThrottle.Release(1);
-            _response = (await requestTask)
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds)))
                 .Take(3)
                 .ToArray();
         }

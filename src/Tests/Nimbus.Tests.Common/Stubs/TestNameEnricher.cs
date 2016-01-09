@@ -13,7 +13,7 @@ namespace Nimbus.Tests.Common.Stubs
                 var testName = TestContext.CurrentContext?.Test.FullName;
                 if (testName == null) return;
 
-                logEvent.AddOrUpdateProperty(new LogEventProperty("TestName", new ScalarValue(testName)));
+                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("TestName", new ScalarValue(testName)));
             }
             catch
             {

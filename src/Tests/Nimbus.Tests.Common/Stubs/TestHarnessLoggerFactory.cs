@@ -22,6 +22,7 @@ namespace Nimbus.Tests.Common.Stubs
             var log = new LoggerConfiguration()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
+                .Enrich.With<TestIdEnricher>()
                 .Enrich.With<TestNameEnricher>()
                 .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()

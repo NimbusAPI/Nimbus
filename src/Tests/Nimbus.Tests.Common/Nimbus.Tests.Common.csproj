@@ -108,6 +108,7 @@
     <Compile Include="Configuration\AzureBlobStorageContainerUri.cs" />
     <Compile Include="Configuration\RedisConnectionString.cs" />
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
+    <Compile Include="Stubs\TestIdEnricher.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\CompressorScenariosSource.cs" />

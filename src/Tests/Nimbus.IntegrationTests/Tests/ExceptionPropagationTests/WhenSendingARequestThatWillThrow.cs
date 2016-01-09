@@ -70,6 +70,16 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
         }
 
         [Test]
+        [TestCaseSource(typeof(AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
+        public async Task TheInnerExceptionShouldBeADemonstrationException(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        {
+            await Given(scenario);
+            await When();
+
+            _exception.InnerException.ShouldBeTypeOf<DemonstrationException>();
+        }
+
+        [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
         public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {

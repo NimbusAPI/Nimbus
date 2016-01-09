@@ -2,25 +2,26 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.DelayedDelivery
 {
     internal class RedisDelayedDeliveryService : IDelayedDeliveryService
     {
         private readonly IClock _clock;
-        private readonly Func<IDatabase> _databaseFunc;
-        private readonly ISerializer _serializer;
+        private readonly INimbusTransport _transport;
+        private readonly ILogger _logger;
 
-        public RedisDelayedDeliveryService(IClock clock, Func<IDatabase> databaseFunc, ISerializer serializer)
+        public RedisDelayedDeliveryService(IClock clock, INimbusTransport transport, ILogger logger)
         {
             _clock = clock;
-            _databaseFunc = databaseFunc;
-            _serializer = serializer;
+            _transport = transport;
+            _logger = logger;
         }
 
         public Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
+            _logger.Debug("Enqueuing {MessageId} for re-delivery at {DeliverAt}", message.MessageId, deliveryTime);
+
             // Deliberately not awaiting this task. We want it to run in the background.
             Task.Run(async () =>
                            {
@@ -28,9 +29,9 @@ namespace Nimbus.Transports.Redis.DelayedDelivery
                                if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                                await Task.Delay(delay);
 
-                               var database = _databaseFunc();
-                               var serialized = _serializer.Serialize(message);
-                               await database.ListRightPushAsync(message.To, serialized);
+                               _logger.Debug("Re-delivering {MessageId} (attempt {Attempt})", message.MessageId, message.DeliveryAttempts.Length);
+                               var sender = _transport.GetQueueSender(message.To);
+                               await sender.Send(message);
                            }).ConfigureAwaitFalse();
 
             return Task.Delay(0);
