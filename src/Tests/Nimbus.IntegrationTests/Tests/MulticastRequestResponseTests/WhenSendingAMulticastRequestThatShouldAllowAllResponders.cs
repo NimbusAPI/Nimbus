@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers;
+using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
@@ -50,6 +51,8 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
         {
             await Given(scenario);
             await When();
+
+            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
 
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
