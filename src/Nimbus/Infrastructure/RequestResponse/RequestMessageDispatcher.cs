@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -85,6 +86,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     _logger.Info("Dispatched to {HandlerType}", handler.GetType().Name);
 
                     var responseMessage = await _nimbusMessageFactory.CreateSuccessfulResponse(replyQueueName, response, nimbusMessage);
+                    DispatchLoggingContext.NimbusMessage = responseMessage;
 
                     var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                     foreach (var interceptor in outboundInterceptors.Reverse())
