@@ -26,10 +26,10 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             var database = _databaseFunc();
 
             var pushResult = await database.ListRightPushAsync(_redisKey, serialized);
-            _logger.Debug($"Redis {nameof(database.ListRightPushAsync)} returned {{RedisReturnCode}}", pushResult);
+            _logger.Debug($"Redis {nameof(database.ListRightPushAsync)} to {{RedisKey}} returned {{RedisReturnCode}}", _redisKey, pushResult);
 
             var publishResult = await database.PublishAsync(_redisKey, string.Empty);
-            _logger.Debug($"Redis {nameof(database.PublishAsync)} returned {{RedisReturnCode}}", publishResult);
+            _logger.Debug($"Redis {nameof(database.PublishAsync)} to {{RedisKey}} returned {{RedisReturnCode}}", _redisKey, publishResult);
         }
     }
 }
