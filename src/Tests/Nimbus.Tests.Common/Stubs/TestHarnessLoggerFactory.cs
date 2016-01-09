@@ -17,6 +17,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.With<TestNameEnricher>()
                 .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()
+                .WriteTo.RollingFile(@"C:\Temp\Nimbus\IntegrationTests-{Date}.txt", retainedFileCountLimit: 1)
                 .WriteTo.Seq("http://localhost:5341")
                 .Chain(l => { if (Debugger.IsAttached) l.WriteTo.Trace(); })
                 .MinimumLevel.Verbose()
