@@ -106,8 +106,6 @@ namespace Nimbus.Infrastructure.RequestResponse
                         await interceptor.OnResponseSent(response, responseMessage);
                         _logger.Info("Executed OnResponseSent for {InterceptorType}", interceptor.GetType().Name);
                     }
-
-                    _logger.Info("Sent successful response message");
                 }
                 catch (Exception exc)
                 {
@@ -146,17 +144,15 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         internal static MethodInfo GetGenericDispatchMethodFor(object request)
         {
-            var closedGenericHandlerType =
-                request.GetType()
-                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
-                       .Single();
+            var closedGenericHandlerType = request.GetType()
+                                                  .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                                                  .Single();
 
             var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch",
-                                                                                BindingFlags.NonPublic | BindingFlags.Instance);
+            var openGenericMethod = typeof (RequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(requestType, responseType);
             return closedGenericMethod;
         }
