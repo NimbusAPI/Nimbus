@@ -38,27 +38,24 @@ namespace Nimbus.Infrastructure
             return Task.FromResult(nimbusMessage);
         }
 
-        public Task<NimbusMessage> CreateSuccessfulResponse(string destinationPath, object responsePayload, NimbusMessage originalRequest)
+        public async Task<NimbusMessage> CreateSuccessfulResponse(string destinationPath, object responsePayload, NimbusMessage originalRequest)
         {
-            return Task.Run(async () =>
-                                  {
-                                      var responseMessage = (await Create(destinationPath, responsePayload)).WithReplyToRequestId(originalRequest.MessageId);
-                                      responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = true;
+            var responseMessage = (await Create(destinationPath, responsePayload))
+                .WithReplyToRequestId(originalRequest.MessageId)
+                .WithProperty(MessagePropertyKeys.RequestSuccessful, true);
 
-                                      return responseMessage;
-                                  });
+            return responseMessage;
         }
 
-        public Task<NimbusMessage> CreateFailedResponse(string destinationPath, NimbusMessage originalRequest, Exception exception)
+        public async Task<NimbusMessage> CreateFailedResponse(string destinationPath, NimbusMessage originalRequest, Exception exception)
         {
-            return Task.Run(async () =>
-                                  {
-                                      var responseMessage = (await Create(destinationPath, null)).WithReplyToRequestId(originalRequest.MessageId);
-                                      responseMessage.Properties[MessagePropertyKeys.RequestSuccessful] = false;
-                                      foreach (var prop in exception.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
+            var responseMessage = (await Create(destinationPath, null))
+                .WithReplyToRequestId(originalRequest.MessageId)
+                .WithProperty(MessagePropertyKeys.RequestSuccessful, false);
 
-                                      return responseMessage;
-                                  });
+            foreach (var prop in exception.ExceptionDetailsAsProperties(_clock.UtcNow)) responseMessage.Properties.Add(prop.Key, prop.Value);
+
+            return responseMessage;
         }
     }
 }
