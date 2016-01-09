@@ -20,7 +20,7 @@ namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
         public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
             message.DeliverAfter = deliveryTime;
-            var messageSender = await _queueManager.CreateMessageSender(message.To);
+            var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
             var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
             await messageSender.SendAsync(brokeredMessage);
         }

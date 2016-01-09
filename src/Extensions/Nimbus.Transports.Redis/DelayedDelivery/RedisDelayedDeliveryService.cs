@@ -30,7 +30,7 @@ namespace Nimbus.Transports.Redis.DelayedDelivery
                                await Task.Delay(delay);
 
                                _logger.Debug("Re-delivering {MessageId} (attempt {Attempt})", message.MessageId, message.DeliveryAttempts.Length);
-                               var sender = _transport.GetQueueSender(message.To);
+                               var sender = _transport.GetQueueSender(message.DeliverTo);
                                await sender.Send(message);
                            }).ConfigureAwaitFalse();
 

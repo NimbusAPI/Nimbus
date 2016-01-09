@@ -22,19 +22,22 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         public async Task Send(NimbusMessage message)
         {
-            var serialized = _serializer.Serialize(message);
             var database = _databaseFunc();
+
             var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
             var subscribers = (await database.SetMembersAsync(subscribersRedisKey))
                 .Select(s => s.ToString())
                 .ToArray();
 
             await subscribers
-                .Select(s => Task.Run(async () =>
-                                            {
-                                                await database.ListRightPushAsync(s, serialized);
-                                                await database.PublishAsync(s, string.Empty);
-                                            }).ConfigureAwaitFalse())
+                .Select(subscriberPath => Task.Run(async () =>
+                                                         {
+                                                             var clone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
+                                                             clone.DeliverTo = subscriberPath;
+                                                             var serialized = _serializer.Serialize(clone);
+                                                             await database.ListRightPushAsync(subscriberPath, serialized);
+                                                             await database.PublishAsync(subscriberPath, string.Empty);
+                                                         }).ConfigureAwaitFalse())
                 .WhenAll();
         }
     }

@@ -27,7 +27,7 @@ namespace Nimbus.Transports.InProcess.DelayedDelivery
                                if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                                await Task.Delay(delay);
                                AsyncBlockingCollection<NimbusMessage> queue;
-                               if (!_messageStore.TryGetExistingMessageQueue(message.To, out queue)) return;
+                               if (!_messageStore.TryGetExistingMessageQueue(message.DeliverTo, out queue)) return;
                                await queue.Add(message);
                            }).ConfigureAwaitFalse();
 
