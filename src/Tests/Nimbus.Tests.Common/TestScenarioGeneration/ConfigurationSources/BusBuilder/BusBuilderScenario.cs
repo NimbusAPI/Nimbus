@@ -56,8 +56,6 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                 .WithNames("MyTestSuite", Environment.MachineName)
                 .WithTypesFrom(_typeProvider)
-                .WithGlobalInboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                .WithGlobalOutboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                 .WithLogger(_logger)
                 .WithDebugOptions(

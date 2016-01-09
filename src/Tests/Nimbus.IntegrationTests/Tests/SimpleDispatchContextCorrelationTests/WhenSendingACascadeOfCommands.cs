@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -27,6 +26,14 @@ namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
             TestInterceptor.Clear();
 
             return base.Given(scenario);
+        }
+
+        protected override void Reconfigure()
+        {
+            Instance.Configuration
+                    .WithGlobalInboundInterceptorTypes(typeof (TestInterceptor));
+
+            base.Reconfigure();
         }
 
         protected override async Task When()
