@@ -50,7 +50,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         protected override void Dispose(bool disposing)
         {
-            _subscriber?.UnsubscribeAll();
+            _subscriber?.UnsubscribeAsync(_redisKey, OnNotificationReceived);
             base.Dispose(disposing);
         }
 
