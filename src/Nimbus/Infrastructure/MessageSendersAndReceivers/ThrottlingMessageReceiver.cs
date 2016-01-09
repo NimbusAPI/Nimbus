@@ -89,10 +89,21 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 try
                 {
                     var message = await Fetch(_cancellationTokenSource.Token);
-                    if (message == null) continue;
 
+                    if (message == null)
+                    {
+                        if (!_cancellationTokenSource.IsCancellationRequested)
+                        {
+                            // if we're shutting down, we're fine if we received a null message - we asked to quit, after all...
+                            _logger.Debug($"Call to {nameof(Fetch)} returned null on {{QueueOrTopic}}. Retrying...", ToString());
+                        }
+                        continue;
+                    }
+
+                    _logger.Debug("Waiting for handler semaphores...");
                     await _localHandlerThrottle.WaitAsync(_cancellationTokenSource.Token);
                     await _globalHandlerThrottle.Wait(_cancellationTokenSource.Token);
+                    _logger.Debug("Acquired handler semaphores...");
 
 #pragma warning disable 4014
                     Task.Run(async () =>
