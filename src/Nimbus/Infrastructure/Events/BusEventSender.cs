@@ -54,7 +54,7 @@ namespace Nimbus.Infrastructure.Events
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, brokeredMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Publishing", topicPath, brokeredMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Publishing", topicPath, sw.Elapsed);
 
                     var topicSender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
@@ -66,7 +66,7 @@ namespace Nimbus.Infrastructure.Events
                     {
                         await interceptor.OnEventPublished(busEvent, brokeredMessage);
                     }
-                    _logger.LogDispatchAction("Published", topicPath, brokeredMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Published", topicPath, sw.Elapsed);
 
                     return;
                 }
@@ -79,7 +79,7 @@ namespace Nimbus.Infrastructure.Events
                 {
                     await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
                 }
-                _logger.LogDispatchError("publishing", topicPath, brokeredMessage, sw.Elapsed, exception);
+                _logger.LogDispatchError("publishing", topicPath, sw.Elapsed, exception);
             }
         }
     }

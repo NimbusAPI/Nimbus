@@ -63,138 +63,79 @@ namespace Nimbus.Infrastructure.RequestResponse
             var replyQueueName = nimbusMessage.From;
             var replyQueueClient = _transport.GetQueueSender(replyQueueName);
 
-            Exception exception = null;
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = (IHandleRequest<TBusRequest, TBusResponse>) scope.Resolve(handlerType);
                 _propertyInjector.Inject(handler, nimbusMessage);
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, nimbusMessage);
 
+                Exception exception = null;
                 try
                 {
                     foreach (var interceptor in inboundInterceptors)
                     {
-                        _logger.Debug("Executing OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Debug("Executing OnRequestHandlerExecuting for {InterceptorType}", interceptor.GetType().Name);
                         await interceptor.OnRequestHandlerExecuting(busRequest, nimbusMessage);
-                        _logger.Debug("Executed OnRequestHandlerExecuting on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Info("Executed OnRequestHandlerExecuting for {InterceptorType}", interceptor.GetType().Name);
                     }
 
+                    _logger.Debug("Dispatching to {HandlerType}", handler.GetType().Name);
                     var handlerTask = handler.Handle(busRequest);
                     var response = await handlerTask;
+                    _logger.Info("Dispatched to {HandlerType}", handler.GetType().Name);
 
                     var responseMessage = await _nimbusMessageFactory.CreateSuccessfulResponse(replyQueueName, response, nimbusMessage);
 
                     var outboundInterceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                     foreach (var interceptor in outboundInterceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnResponseSending on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
-
+                        _logger.Debug("Executing OnResponseSending for {InterceptorType}", interceptor.GetType().Name);
                         await interceptor.OnResponseSending(response, responseMessage);
-
-                        _logger.Debug("Executed OnResponseSending on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Info("Executed OnResponseSending for {InterceptorType}", interceptor.GetType().Name);
                     }
 
-                    _logger.Debug("Sending successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                  responseMessage.SafelyGetBodyTypeNameOrDefault(),
-                                  replyQueueName,
-                                  nimbusMessage.MessageId,
-                                  nimbusMessage.CorrelationId);
+                    _logger.Debug("Sending successful response message");
                     await replyQueueClient.Send(responseMessage);
+                    _logger.Info("Sent successful response message");
 
                     foreach (var interceptor in outboundInterceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnResponseSent on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
-
+                        _logger.Debug("Executing OnResponseSent for {InterceptorType}", interceptor.GetType().Name);
                         await interceptor.OnResponseSent(response, responseMessage);
-
-                        _logger.Debug("Executed OnResponseSent on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Info("Executed OnResponseSent for {InterceptorType}", interceptor.GetType().Name);
                     }
 
-                    _logger.Info("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                 nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                 replyQueueName,
-                                 nimbusMessage.MessageId,
-                                 nimbusMessage.CorrelationId);
+                    _logger.Info("Sent successful response message");
                 }
                 catch (Exception exc)
                 {
                     // Capture any exception so we can send a failed response outside the catch block
                     exception = exc;
+                    _logger.Warn(exc, "Request message dispatch failed.");
                 }
                 if (exception == null)
                 {
                     foreach (var interceptor in inboundInterceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
-
+                        _logger.Debug("Executing OnRequestHandlerSuccess for {InterceptorType}", interceptor.GetType().Name);
                         await interceptor.OnRequestHandlerSuccess(busRequest, nimbusMessage);
-
-                        _logger.Debug("Executed OnRequestHandlerSuccess on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Info("Executed OnRequestHandlerSuccess for {InterceptorType}", interceptor.GetType().Name);
                     }
                 }
                 else
                 {
                     foreach (var interceptor in inboundInterceptors.Reverse())
                     {
-                        _logger.Debug("Executing OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
-
+                        _logger.Debug("Executing OnRequestHandlerError for {InterceptorType}", interceptor.GetType().Name);
                         await interceptor.OnRequestHandlerError(busRequest, nimbusMessage, exception);
-
-                        _logger.Debug("Executed OnRequestHandlerError on {0} for message [MessageType:{1}, MessageId:{2}, CorrelationId:{3}]",
-                                      interceptor.GetType().FullName,
-                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                      nimbusMessage.MessageId,
-                                      nimbusMessage.CorrelationId);
+                        _logger.Info("Executed OnRequestHandlerError for {InterceptorType}", interceptor.GetType().Name);
                     }
 
                     var failedResponseMessage = (await _nimbusMessageFactory.CreateFailedResponse(replyQueueName, nimbusMessage, exception));
 
-                    _logger.Warn("Sending failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
-                                 replyQueueName,
-                                 exception.Message,
-                                 nimbusMessage.MessageId,
-                                 nimbusMessage.CorrelationId);
+                    _logger.Debug("Sending failed response message");
                     await replyQueueClient.Send(failedResponseMessage);
-                    _logger.Info("Sent failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
-                                 replyQueueName,
-                                 nimbusMessage.MessageId,
-                                 nimbusMessage.CorrelationId);
+                    _logger.Info("Sent failed response message");
                 }
             }
         }

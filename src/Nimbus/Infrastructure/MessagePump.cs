@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
@@ -92,14 +93,15 @@ namespace Nimbus.Infrastructure
 
         private async Task Dispatch(NimbusMessage message)
         {
+            DispatchLoggingContext.NimbusMessage = message;
+
             // Early exit: have we pre-fetched this message and had our lock already expire? If so, just
             // bail - it will already have been picked up by someone else.
             var now = _clock.UtcNow;
             if (message.ExpiresAfter <= now)
             {
                 _logger.Debug(
-                    "Message {MessageId} appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
-                    message.MessageId,
+                    "Message appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
                     message.ExpiresAfter,
                     now);
 
@@ -112,33 +114,24 @@ namespace Nimbus.Infrastructure
             {
                 try
                 {
-                    LogInfo("Dispatching", message);
+                    _logger.Debug("Dispatching message");
                     message.RecordDeliveryAttempt(now);
                     using (_dispatchContextManager.StartNewDispatchContext(new SubsequentDispatchContext(message)))
                     {
                         await _messageDispatcher.Dispatch(message);
                     }
-                    LogDebug("Dispatched", message);
+                    _logger.Info("Dispatched message");
                     return;
                 }
-
                 catch (Exception exc)
                 {
-                    _logger.Warn(exc,
-                                  "Message dispatch failed for {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
-                                  message.SafelyGetBodyTypeNameOrDefault(),
-                                  message.From,
-                                  message.MessageId,
-                                  message.CorrelationId);
+                    _logger.Warn(exc, "Message dispatch failed");
                 }
 
                 var numDeliveryAttempts = message.DeliveryAttempts.Count();
                 if (numDeliveryAttempts >= _maxDeliveryAttempts)
                 {
-                    _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}.",
-                                  numDeliveryAttempts,
-                                  message.MessageId);
-
+                    _logger.Error("Too many delivery attempts ({DeliveryAttempts}) for message {MessageId}.", numDeliveryAttempts, message.MessageId);
                     await PostToDeadLetterOffice(message);
                 }
                 else
@@ -154,12 +147,7 @@ namespace Nimbus.Infrastructure
                     }
                     catch (Exception exc)
                     {
-                        _logger.Error(exc,
-                                      "Failed to re-enqueue message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] for re-delivery.",
-                                      message.SafelyGetBodyTypeNameOrDefault(),
-                                      message.From,
-                                      message.MessageId,
-                                      message.CorrelationId);
+                        _logger.Error(exc, "Failed to re-enqueue message for re-delivery.");
                     }
                 }
             }
@@ -173,11 +161,7 @@ namespace Nimbus.Infrastructure
         {
             if (!_enableDeadLetteringOnMessageExpiration) return;
 
-            _logger.Debug("Posting message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          message.From,
-                          message.MessageId,
-                          message.CorrelationId);
+            _logger.Debug("Posting message to dead letter office.");
 
             try
             {
@@ -185,33 +169,8 @@ namespace Nimbus.Infrastructure
             }
             catch (Exception exc)
             {
-                _logger.Error(exc,
-                              "Failed to post message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}] to dead letter office.",
-                              message.SafelyGetBodyTypeNameOrDefault(),
-                              message.From,
-                              message.MessageId,
-                              message.CorrelationId);
+                _logger.Error(exc, "Failed to post message to dead letter office.");
             }
-        }
-
-        private void LogDebug(string activity, NimbusMessage message)
-        {
-            _logger.Debug("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
-                          activity,
-                          message.SafelyGetBodyTypeNameOrDefault(),
-                          message.From,
-                          message.MessageId,
-                          message.CorrelationId);
-        }
-
-        private void LogInfo(string activity, NimbusMessage message)
-        {
-            _logger.Info("{MessagePumpAction} message {Type} from {QueuePath} [MessageId:{MessageId}, CorrelationId:{CorrelationId}]",
-                         activity,
-                         message.SafelyGetBodyTypeNameOrDefault(),
-                         message.From,
-                         message.MessageId,
-                         message.CorrelationId);
         }
 
         public void Dispose()

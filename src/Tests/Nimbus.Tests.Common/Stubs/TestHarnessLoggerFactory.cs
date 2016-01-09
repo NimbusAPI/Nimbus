@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Nimbus.Enrichers;
 using Nimbus.Extensions;
 using Nimbus.Logger.Serilog;
 using Serilog;
@@ -14,6 +15,7 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .Enrich.With<TestNameEnricher>()
+                .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()
                 .WriteTo.Seq("http://localhost:5341")
                 .Chain(l => { if (Debugger.IsAttached) l.WriteTo.Trace(); })

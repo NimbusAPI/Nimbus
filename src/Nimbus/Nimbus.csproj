@@ -80,6 +80,7 @@
     <Compile Include="Extensions\ConcurrentBagExtensions.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\INimbusTransport.cs" />
+    <Compile Include="Infrastructure\Logging\MessageLoggingExtensions.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
@@ -111,7 +112,7 @@
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
     <Compile Include="Infrastructure\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
-    <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
+    <Compile Include="Infrastructure\Logging\DispatchLoggingContext.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
     <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
     <Compile Include="Infrastructure\Heartbeat\IHeartbeat.cs" />

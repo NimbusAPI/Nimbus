@@ -67,6 +67,7 @@
       <Link>Properties\NullGuard.cs</Link>
     </Compile>
     <Compile Include="Configuration\BusBuilderConfigurationSerilogExtensions.cs" />
+    <Compile Include="Enrichers\NimbusMessageEnricher.cs" />
     <Compile Include="Logger\Serilog\SerilogStaticLogger.cs" />
     <Compile Include="Logger\Serilog\SerilogLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
