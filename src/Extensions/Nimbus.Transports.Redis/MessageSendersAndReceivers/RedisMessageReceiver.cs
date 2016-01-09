@@ -56,7 +56,11 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
+            if (_haveFetchedAllPreExistingMessages)
+            {
+                //FIXME this timeout is here as a debugging fix to see if we're somehow missing incoming message notifications
+                await _receiveSemaphore.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
+            }
 
             var database = _databaseFunc();
             var redisValue = await database.ListLeftPopAsync(_redisKey);
