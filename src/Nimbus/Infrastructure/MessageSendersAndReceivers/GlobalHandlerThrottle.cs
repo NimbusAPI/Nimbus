@@ -17,11 +17,15 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         public Task Wait(CancellationToken cancellationToken)
         {
+            if (_isDisposed) throw new ObjectDisposedException($"{nameof(GlobalHandlerThrottle)} is already disposed.");
+
             return _semaphore.WaitAsync(cancellationToken);
         }
 
         public void Release()
         {
+            if (_isDisposed) return;
+
             _semaphore.Release();
         }
 
@@ -34,7 +38,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            if (_isDisposed) throw new ObjectDisposedException("Object already disposed");
+            if (_isDisposed) throw new ObjectDisposedException($"{nameof(GlobalHandlerThrottle)} is already disposed.");
+
             _isDisposed = true;
 
             _semaphore.Dispose();
