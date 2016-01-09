@@ -61,26 +61,14 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            var successfullyAwaitedForSemaphore = true;
-            if (_haveFetchedAllPreExistingMessages)
-            {
-                //FIXME this timeout is here as a debugging fix to see if we're somehow missing incoming message notifications
-                successfullyAwaitedForSemaphore = await _receiveSemaphore.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
-            }
+            if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
 
             var database = _databaseFunc();
             var redisValue = await database.ListLeftPopAsync(_redisKey);
             if (!redisValue.HasValue)
             {
-                _logger.Debug("No waiting messages.");
                 _haveFetchedAllPreExistingMessages = true;
                 return null;
-            }
-
-            //FIXME debugging hack. Remove.
-            if (!successfullyAwaitedForSemaphore)
-            {
-                _logger.Warn("Uh oh. We dropped through our semaphore on a timeout but still somehow received a waiting message. This isn't supposed to happen.");
             }
 
             var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
