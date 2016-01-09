@@ -7,8 +7,8 @@ namespace Nimbus.ConcurrentCollections
 {
     internal class AsyncBlockingCollection<T> : IDisposable
     {
-        readonly SemaphoreSlim _itemsSemaphore = new SemaphoreSlim(0, int.MaxValue);
-        readonly ConcurrentQueue<T> _items = new ConcurrentQueue<T>();
+        private readonly SemaphoreSlim _itemsSemaphore = new SemaphoreSlim(0, int.MaxValue);
+        private readonly ConcurrentQueue<T> _items = new ConcurrentQueue<T>();
 
         public Task<T> TryTake(TimeSpan timeout, CancellationToken cancellationToken)
         {
