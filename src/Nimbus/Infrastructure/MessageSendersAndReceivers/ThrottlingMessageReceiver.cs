@@ -81,18 +81,20 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         private async Task Worker(Func<NimbusMessage, Task> callback)
         {
+            var cancellationTokenSource = _cancellationTokenSource;
+
             while (true)
             {
                 if (!_running) break;
-                if (_cancellationTokenSource.IsCancellationRequested) break;
+                if (cancellationTokenSource.IsCancellationRequested) break;
 
                 try
                 {
-                    var message = await Fetch(_cancellationTokenSource.Token);
+                    var message = await Fetch(cancellationTokenSource.Token);
 
                     if (message == null)
                     {
-                        if (!_cancellationTokenSource.IsCancellationRequested)
+                        if (!cancellationTokenSource.IsCancellationRequested)
                         {
                             // if we're shutting down, we're fine if we received a null message - we asked to quit, after all...
                             _logger.Debug($"Call to {nameof(Fetch)} returned null on {{QueueOrTopic}}. Retrying...", ToString());
@@ -101,8 +103,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     }
 
                     _logger.Debug("Waiting for handler semaphores...");
-                    await _localHandlerThrottle.WaitAsync(_cancellationTokenSource.Token);
-                    await _globalHandlerThrottle.Wait(_cancellationTokenSource.Token);
+                    await _localHandlerThrottle.WaitAsync(cancellationTokenSource.Token);
+                    await _globalHandlerThrottle.Wait(cancellationTokenSource.Token);
                     _logger.Debug("Acquired handler semaphores...");
 
 #pragma warning disable 4014
