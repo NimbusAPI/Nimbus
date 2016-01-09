@@ -15,6 +15,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         private readonly Func<ConnectionMultiplexer> _connectionMultiplexerFunc;
         private readonly Func<IDatabase> _databaseFunc;
         private readonly ISerializer _serializer;
+        private readonly ILogger _logger;
 
         private ISubscriber _subscriber;
         readonly SemaphoreSlim _receiveSemaphore = new SemaphoreSlim(0, int.MaxValue);
@@ -32,6 +33,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _connectionMultiplexerFunc = connectionMultiplexerFunc;
             _databaseFunc = databaseFunc;
             _serializer = serializer;
+            _logger = logger;
         }
 
         protected override Task WarmUp()
@@ -56,10 +58,11 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
+            var successfullyAwaitedForSemaphore = true;
             if (_haveFetchedAllPreExistingMessages)
             {
                 //FIXME this timeout is here as a debugging fix to see if we're somehow missing incoming message notifications
-                await _receiveSemaphore.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
+                successfullyAwaitedForSemaphore = await _receiveSemaphore.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
             }
 
             var database = _databaseFunc();
@@ -68,6 +71,12 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             {
                 _haveFetchedAllPreExistingMessages = true;
                 return null;
+            }
+
+            //FIXME debugging hack. Remove.
+            if (!successfullyAwaitedForSemaphore)
+            {
+                _logger.Warn("Uh oh. We dropped through our semaphore on a timeout but still somehow receive a waiting message. This isn't supposed to happen.");
             }
 
             var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
