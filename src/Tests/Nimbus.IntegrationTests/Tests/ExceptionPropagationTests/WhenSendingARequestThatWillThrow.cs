@@ -4,7 +4,6 @@ using Nimbus.Configuration;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -67,16 +66,6 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
             await When();
 
             _exception.ShouldBeTypeOf<RequestFailedException>();
-        }
-
-        [Test]
-        [TestCaseSource(typeof(AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheInnerExceptionShouldBeADemonstrationException(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
-        {
-            await Given(scenario);
-            await When();
-
-            _exception.InnerException.ShouldBeTypeOf<DemonstrationException>();
         }
 
         [Test]
