@@ -31,5 +31,18 @@ namespace Nimbus.ConcurrentCollections
         }
 
         public bool IsValueCreated { get; private set; }
+
+        public void EnsureValueCreated()
+        {
+            if (IsValueCreated) return;
+
+            lock (_mutex)
+            {
+                if (IsValueCreated) return;
+
+                _value = _valueFunc();
+                IsValueCreated = true;
+            }
+        }
     }
 }

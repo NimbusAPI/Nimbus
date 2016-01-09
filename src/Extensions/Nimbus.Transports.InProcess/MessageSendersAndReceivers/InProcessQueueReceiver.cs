@@ -34,7 +34,7 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 
         protected override Task WarmUp()
         {
-            return Task.Delay(0);
+            return Task.Run(() => _messageQueue.EnsureValueCreated());
         }
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
