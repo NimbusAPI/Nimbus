@@ -1,10 +1,7 @@
 using System;
-using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
-using Nimbus.Interceptors.Inbound;
-using Nimbus.Interceptors.Outbound;
 using Nimbus.Routing;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
@@ -56,8 +53,6 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                 .WithNames("MyTestSuite", Environment.MachineName)
                 .WithTypesFrom(_typeProvider)
-                .WithGlobalInboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                .WithGlobalOutboundInterceptorTypes(_typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                 .WithLogger(_logger)
                 .WithDebugOptions(
