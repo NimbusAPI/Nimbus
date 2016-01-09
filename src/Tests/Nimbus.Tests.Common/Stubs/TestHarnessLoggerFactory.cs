@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Enrichers;
 using Nimbus.Extensions;
 using Nimbus.Logger.Serilog;
@@ -9,7 +10,14 @@ namespace Nimbus.Tests.Common.Stubs
 {
     public class TestHarnessLoggerFactory
     {
-        public static ILogger Create()
+        private static readonly ThreadSafeLazy<ILogger> _logger;
+
+        static TestHarnessLoggerFactory()
+        {
+            _logger = new ThreadSafeLazy<ILogger>(CreateLogger);
+        }
+
+        private static ILogger CreateLogger()
         {
             var log = new LoggerConfiguration()
                 .Enrich.WithProcessId()
@@ -27,6 +35,11 @@ namespace Nimbus.Tests.Common.Stubs
 
             var logger = new SerilogLogger(log);
             return logger;
+        }
+
+        public static ILogger Create()
+        {
+            return _logger.Value;
         }
     }
 }
