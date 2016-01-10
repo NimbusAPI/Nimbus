@@ -34,7 +34,7 @@ namespace Nimbus.ConcurrentCollections
 
         public T GetNext()
         {
-            if (_isDisposed) throw new ObjectDisposedException("This RoundRobin has already been disposed.");
+            if (_isDisposed) throw new ObjectDisposedException($"This {nameof(RoundRobin<T>)} has already been disposed.");
 
             while (true)
             {
@@ -86,8 +86,7 @@ namespace Nimbus.ConcurrentCollections
                                         .Range(0, numItemsRequired)
                                         .AsParallel()
                                         .Select(i => _createItem())
-                                        .ToArray()
-                                        ;
+                                        .ToArray();
 
                                     lock (_itemsMutex)
                                     {
