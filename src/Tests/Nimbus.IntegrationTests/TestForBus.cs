@@ -73,8 +73,9 @@ namespace Nimbus.IntegrationTests
             Instance?.Dispose();
             Instance = null;
 
-            if (!_thenWasInvoked) Assert.Fail("It looks like we forgot to call our Then() method.");
             TestLoggingExtensions.LogTestResult();
+
+            if (!_thenWasInvoked) Assert.Fail($"Test completed without calling {nameof(Then)} method.");
         }
     }
 }
