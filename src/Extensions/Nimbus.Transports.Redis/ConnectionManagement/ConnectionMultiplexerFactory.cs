@@ -55,7 +55,6 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
             configuration.AbortOnConnectFail = false;
             configuration.AllowAdmin = true;
             configuration.ClientName = $"{_applicationName}.{_instanceName}";
-            configuration.DefaultDatabase = 0;
             return configuration;
         }
     }
