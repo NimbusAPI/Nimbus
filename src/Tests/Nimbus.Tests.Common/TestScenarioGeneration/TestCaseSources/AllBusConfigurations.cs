@@ -25,8 +25,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
             var testCases = new BusBuilderConfigurationSources(testFixtureType)
                 .ToArray()
                 .Pipe(filter.Filter)
+                .OrderBy(scenario => scenario.Name)
                 .Select(scenario => scenario.BuildTestCase())
-                .OrderBy(tc => tc.TestName)
                 .ToArray();
 
             return testCases.AsEnumerable().GetEnumerator();
