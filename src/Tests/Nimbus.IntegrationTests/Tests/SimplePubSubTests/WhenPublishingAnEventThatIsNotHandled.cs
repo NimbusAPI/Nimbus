@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -29,11 +28,16 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatIsNotHandled>))]
-        public async Task NoExceptionIsThrown(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task NoExceptionIsThrown()
+        {
             _exception.ShouldBe(null);
         }
     }

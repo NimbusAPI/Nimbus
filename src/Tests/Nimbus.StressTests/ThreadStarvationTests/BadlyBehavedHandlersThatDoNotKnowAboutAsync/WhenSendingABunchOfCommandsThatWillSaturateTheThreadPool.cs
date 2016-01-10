@@ -56,7 +56,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
             await Subject.SendAll(commands);
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _numMessagesToSend);
         }
 
         [Test]

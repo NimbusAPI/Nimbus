@@ -5,7 +5,6 @@ using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -36,13 +35,13 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
 
             _sentCommandIds = _commands.Select(c => c.SomeId).ToArray();
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Any());
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Any());
 
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
             await HaveYouTriedTurningItOffAndOnAgain();
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler);
+            await Timeout.WaitUntil(AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler);
 
             await Bus.Stop();
         }
@@ -58,11 +57,16 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
-        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task AllOfTheCommandsThatWereSentShouldHaveBeenReceivedAtLeastOnceByTheHandler()
+        {
             AllOfTheCommandsThatWereSentHaveBeenReceivedAtLeastOnceByTheHandler().ShouldBe(true);
         }
 

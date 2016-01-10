@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -34,38 +33,35 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _goBangCommand = new GoBangCommand(_someContent);
 
             await Bus.Send(_goBangCommand);
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
 
             _deadLetterMessages = await Bus.DeadLetterOffice.PopAll(1, TimeSpan.FromSeconds(TimeoutSeconds));
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
-        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task ThereShouldBeExactlyOneMessageOnTheDeadLetterQueue()
+        {
             _deadLetterMessages.Count().ShouldBe(1);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
-        public async Task ThePayloadOfTheMessageShouldBeTheOriginalCommandThatWentBang(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task ThePayloadOfTheMessageShouldBeTheOriginalCommandThatWentBang()
         {
-            await Given(scenario);
-            await When();
-
             ((GoBangCommand) _deadLetterMessages.Single().Payload).SomeContent.ShouldBe(_someContent);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
-        public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts()
         {
-            await Given(scenario);
-            await When();
-
             var nimbusMessage = _deadLetterMessages.Single();
             nimbusMessage.DeliveryAttempts.Count().ShouldBe(_maxDeliveryAttempts);
         }

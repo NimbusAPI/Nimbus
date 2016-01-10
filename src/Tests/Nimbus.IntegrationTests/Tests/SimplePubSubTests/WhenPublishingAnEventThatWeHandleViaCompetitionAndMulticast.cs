@@ -1,13 +1,9 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -25,53 +21,46 @@ namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
         {
             await Bus.Publish(new SomeEventWeHandleViaMulticastAndCompetition());
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 2);
         }
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
-        public async Task TheCompetingEventBrokerShouldReceiveTheEvent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task TheCompetingEventBrokerShouldReceiveTheEvent()
+        {
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeCompetingEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
-        public async Task TheMulticastEventBrokerShouldReceiveTheEvent(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheMulticastEventBrokerShouldReceiveTheEvent()
         {
-            await Given(scenario);
-            await When();
-
             MethodCallCounter.ReceivedCallsWithAnyArg<SomeMulticastEventHandler>(mb => mb.Handle((SomeEventWeHandleViaMulticastAndCompetition) null))
                              .Count()
                              .ShouldBe(1);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
-        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheCorrectNumberOfEventsOfThisTypeShouldHaveBeenObserved()
         {
-            await Given(scenario);
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .OfType<SomeEventWeHandleViaMulticastAndCompetition>()
                              .Count()
                              .ShouldBe(2);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given(scenario);
-            await When();
-
             MethodCallCounter.AllReceivedMessages
                              .Count()
                              .ShouldBe(2);

@@ -32,11 +32,16 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingALargeRequest>))]
-        public async Task TheResponseShouldReturnUnscathed(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task TheResponseShouldReturnUnscathed()
+        {
             _response.SomeBigAnswer.Length.ShouldBe(BigFatRequestHandler.MessageSize);
         }
     }

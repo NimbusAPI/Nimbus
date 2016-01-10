@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -22,11 +21,16 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestOnTheBus>))]
-        public async Task WeShouldGetSomethingNiceBack(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task WeShouldGetSomethingNiceBack()
+        {
             _response.ShouldNotBe(null);
         }
     }

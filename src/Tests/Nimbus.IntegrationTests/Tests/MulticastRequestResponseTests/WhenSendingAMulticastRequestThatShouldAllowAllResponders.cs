@@ -35,22 +35,23 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowAllResponders>))]
-        public async Task WeShouldReceiveThreeResponses(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task WeShouldReceiveThreeResponses()
+        {
             _response.Count().ShouldBe(3);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingAMulticastRequestThatShouldAllowAllResponders>))]
-        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task AllHandlersShouldHaveAtLeastReceivedTheRequest()
         {
-            await Given(scenario);
-            await When();
-
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count() == 4);
 
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }

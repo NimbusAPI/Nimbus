@@ -6,7 +6,6 @@ using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
@@ -20,6 +19,8 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
     {
         private int _totalCommandsToSend;
         private int _expectedNumberOfCommandsToBeSeenBeforeTheBusStops;
+        private int _messagesReceivedBeforeTheBusWasStopped;
+        private int _messagesReceivedAfterTheBusWasStopped;
 
         protected override async Task When()
         {
@@ -36,35 +37,37 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
 
             await TimeSpan.FromSeconds(TimeoutSeconds)
                           .WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count() >= _expectedNumberOfCommandsToBeSeenBeforeTheBusStops);
+            _messagesReceivedBeforeTheBusWasStopped = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
             await Bus.Stop();
-            Console.WriteLine("Bus has stopped.");
-        }
-
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
-        public async Task TheNumberOfCommandsSeenShouldBeTheNumberOfConcurrentHandlers(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
-        {
-            await Given(scenario);
-            await When();
-
-            // The number of commands dispatched by the bus should have been the number of concurrent handlers, after which the throttling
-            // should have paused any further dispatching. Given that we only release the throttle after we've stopped the bus, the number of
-            // messages dispatched should exactly match the number of concurrent handlers.
-            MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count().ShouldBe(Instance.Configuration.ConcurrentHandlerLimit);
-        }
-
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
-        public async Task NoMoreHandlerInvocationsShouldHaveOccurredAfterTheBusWasStopped(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
-        {
-            await Given(scenario);
-            await When();
 
             MethodCallCounter.Clear();
             SlowCommandHandler.HandlerSemaphore.Release(_totalCommandsToSend);
             await Task.Delay(TimeSpan.FromSeconds(0.25));
+            _messagesReceivedAfterTheBusWasStopped = MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count();
+        }
 
-            MethodCallCounter.AllReceivedMessages.OfType<SlowCommand>().Count().ShouldBe(0);
+        [Test]
+        [TestCaseSource(typeof (AllBusConfigurations<WhenStoppingTheBusWhileThereAreManyCommandsInAQueue>))]
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        {
+            await Given(scenario);
+            await When();
+            await Then();
+        }
+
+        [Then]
+        public async Task TheNumberOfCommandsSeenShouldBeTheNumberOfConcurrentHandlers()
+        {
+            // The number of commands dispatched by the bus should have been the number of concurrent handlers, after which the throttling
+            // should have paused any further dispatching. Given that we only release the throttle after we've stopped the bus, the number of
+            // messages dispatched should exactly match the number of concurrent handlers.
+            _messagesReceivedBeforeTheBusWasStopped.ShouldBe(Instance.Configuration.ConcurrentHandlerLimit);
+        }
+
+        [Then]
+        public async Task NoMoreHandlerInvocationsShouldHaveOccurredAfterTheBusWasStopped()
+        {
+            _messagesReceivedAfterTheBusWasStopped.ShouldBe(0);
         }
     }
 }

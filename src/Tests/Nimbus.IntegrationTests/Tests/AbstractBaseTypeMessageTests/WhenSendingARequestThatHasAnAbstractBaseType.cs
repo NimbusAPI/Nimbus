@@ -23,31 +23,28 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatHasAnAbstractBaseType>))]
-        public async Task TheHandlerShouldReceiveThatRequest(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task TheHandlerShouldReceiveThatRequest()
+        {
             MethodCallCounter.AllReceivedMessages.OfType<SomeConcreteRequestType>().Count().ShouldBe(1);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatHasAnAbstractBaseType>))]
-        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheCorrectNumberOfTotalMessagesShouldHaveBeenObserved()
         {
-            await Given(scenario);
-            await When();
-
             MethodCallCounter.AllReceivedMessages.Count().ShouldBe(1);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatHasAnAbstractBaseType>))]
-        public async Task TheResponseShouldNotBeNull(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheResponseShouldNotBeNull()
         {
-            await Given(scenario);
-            await When();
-
             _response.ShouldNotBe(null);
         }
     }
