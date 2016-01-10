@@ -8,7 +8,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Commands
 {
-    internal class CommandMessagePumpsFactory
+    internal class CommandMessagePumpsFactory: MessagePumpFactory
     {
         private readonly ILogger _logger;
         private readonly IHandlerMapper _handlerMapper;
@@ -59,6 +59,7 @@ namespace Nimbus.Infrastructure.Commands
                 var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
                 var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
+                GarbageMan.Add(pump);
                 yield return pump;
             }
         }

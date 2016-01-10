@@ -94,9 +94,10 @@ namespace Nimbus.Configuration
             container.RegisterType<KnownMessageTypeVerifier>(ComponentLifetime.SingleInstance, typeof (IKnownMessageTypeVerifier));
             container.RegisterType<Heartbeat>(ComponentLifetime.SingleInstance, typeof (IHeartbeat));
             container.RegisterType<Bus>(ComponentLifetime.SingleInstance);
+            container.RegisterType<GlobalHandlerThrottle>(ComponentLifetime.SingleInstance, typeof (IGlobalHandlerThrottle));
+
             container.RegisterType<MessagePump>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<GlobalHandlerThrottle>(ComponentLifetime.SingleInstance, typeof(IGlobalHandlerThrottle));
-            container.RegisterType<DefaultRetry>(ComponentLifetime.InstancePerDependency, typeof(IRetry));
+            container.RegisterType<DefaultRetry>(ComponentLifetime.InstancePerDependency, typeof (IRetry));
         }
 
         public IEnumerable<string> Validate()

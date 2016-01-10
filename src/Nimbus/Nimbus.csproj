@@ -110,6 +110,7 @@
     <Compile Include="Infrastructure\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\MessagePumpFactory.cs" />
     <Compile Include="Infrastructure\Retries\DefaultRetry.cs" />
     <Compile Include="Infrastructure\Retries\IRetry.cs" />
     <Compile Include="Infrastructure\Retries\RetryEventArgs.cs" />
