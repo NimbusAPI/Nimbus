@@ -29,8 +29,7 @@ namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
         {
             await Given(scenario);
             await When();
-
-            _response.ShouldNotBe(null);
+            await Then();
         }
 
         [Then]
