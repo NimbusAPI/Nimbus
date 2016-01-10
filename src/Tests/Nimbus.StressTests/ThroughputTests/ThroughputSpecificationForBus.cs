@@ -8,7 +8,6 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -22,6 +21,9 @@ namespace Nimbus.StressTests.ThroughputTests
     {
         protected const int TimeoutSeconds = 300;
 
+        private static readonly TimeSpan _maxMessageSendingDuration = TimeSpan.FromSeconds(5); // stop sending after we've spent this much time doing it
+        private const int _maxMessageSendingCount = 50000; // stop sending after we've sent this many messages
+
         private Stopwatch _sendingStopwatch;
         private Stopwatch _sendingAndReceivingStopwatch;
 
@@ -32,8 +34,6 @@ namespace Nimbus.StressTests.ThroughputTests
         private ScenarioInstance<BusBuilderConfiguration> _instance;
 
         protected Bus Bus { get; private set; }
-
-        protected virtual TimeSpan SendMessagesFor { get; } = TimeSpan.FromSeconds(5);
 
         static ThroughputSpecificationForBus()
         {
@@ -66,7 +66,7 @@ namespace Nimbus.StressTests.ThroughputTests
             _sendingAndReceivingStopwatch = Stopwatch.StartNew();
 
             await Enumerable.Range(0, 20)
-                            .Select(i => Task.Run(() => SendMessages(Bus)).ConfigureAwaitFalse())
+                            .Select(i => Task.Run(() => SendMessages(Bus, ShouldKeepSending)).ConfigureAwaitFalse())
                             .WhenAll();
 
             _sendingStopwatch.Stop();
@@ -77,7 +77,15 @@ namespace Nimbus.StressTests.ThroughputTests
             _sendingAndReceivingStopwatch.Stop();
         }
 
-        public abstract Task SendMessages(IBus bus);
+        private bool ShouldKeepSending()
+        {
+            if (_numMessagesSent > _maxMessageSendingCount) return false;
+            if (_sendingStopwatch.Elapsed >= _maxMessageSendingDuration) return false;
+
+            return true;
+        }
+
+        public abstract Task SendMessages(IBus bus, Func<bool> shouldKeepSending);
 
         protected void IncrementExpectedMessageCount(int numMessages = 1)
         {
