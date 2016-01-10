@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Extensions;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
@@ -48,12 +49,9 @@ namespace Nimbus.IntegrationTests
                                             .Where(m => m.HasAttribute<ThenAttribute>())
                                             .ToArray();
 
-            foreach (var method in assertionMethods)
-            {
-                var result = method.Invoke(this, new object[0]);
-                var task = result as Task;
-                if (task != null) await task;
-            }
+            await assertionMethods
+                .Select(m => (Task) m.Invoke(this, new object[0]))
+                .WhenAll();
         }
 
         [SetUp]
