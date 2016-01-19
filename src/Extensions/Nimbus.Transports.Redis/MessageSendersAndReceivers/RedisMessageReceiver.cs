@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
@@ -57,27 +56,24 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         private void OnNotificationReceived(RedisChannel redisChannel, RedisValue redisValue)
         {
-            _logger.Debug("Redis notification received in receiver for {RedisKey} for {RedisChannel}: {RedisValue}", _redisKey, redisChannel, redisValue);
+            _logger.Debug("Redis notification received in receiver for {RedisKey} for {RedisChannel} (Value: {RedisValue})", _redisKey, redisChannel, redisValue);
             _receiveSemaphore.Release();
         }
 
-        protected override Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            return Task.Run(async () =>
-                                  {
-                                      if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
+            if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
 
-                                      var database = _databaseFunc();
-                                      var redisValue = await database.ListLeftPopAsync(_redisKey);
-                                      if (!redisValue.HasValue)
-                                      {
-                                          _haveFetchedAllPreExistingMessages = true;
-                                          return null;
-                                      }
+            var database = _databaseFunc();
+            var redisValue = await database.ListLeftPopAsync(_redisKey);
+            if (!redisValue.HasValue)
+            {
+                _haveFetchedAllPreExistingMessages = true;
+                return null;
+            }
 
-                                      var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
-                                      return message;
-                                  }, cancellationToken).ConfigureAwaitFalse();
+            var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
+            return message;
         }
     }
 }
