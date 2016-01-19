@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
@@ -16,7 +15,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
 
         protected override async Task When()
         {
-            _response = await Bus.Request(new SomeRequest(), TimeSpan.FromSeconds(TimeoutSeconds));
+            _response = await Bus.Request(new SomeRequest(), Timeout);
         }
 
         [Test]
@@ -31,7 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
         [Then]
         public async Task WeShouldGetSomethingNiceBack()
         {
-            _response.ShouldNotBe(null);
+            _response.ShouldBeTypeOf<SomeResponse>();
         }
     }
 }
