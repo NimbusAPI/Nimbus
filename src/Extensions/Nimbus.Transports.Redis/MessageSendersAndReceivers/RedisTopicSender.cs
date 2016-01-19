@@ -36,11 +36,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                                              clone.DeliverTo = subscriberPath;
                                                              var serialized = _serializer.Serialize(clone);
                                                              await database.ListRightPushAsync(subscriberPath, serialized);
-                                                             while (true)
-                                                             {
-                                                                 var publishResult = await database.PublishAsync(subscriberPath, string.Empty);
-                                                                 if (publishResult > 0) break;
-                                                             }
+                                                             await database.PublishAsync(subscriberPath, string.Empty);
                                                          }).ConfigureAwaitFalse())
                 .WhenAll();
         }
