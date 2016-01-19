@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 
 namespace Nimbus.ConcurrentCollections
 {
@@ -26,7 +27,7 @@ namespace Nimbus.ConcurrentCollections
                                           return default(T);
                                       }
                                   },
-                            cancellationToken);
+                            cancellationToken).ConfigureAwaitFalse();
         }
 
         public Task<T> Take(CancellationToken cancellationToken)
@@ -41,7 +42,7 @@ namespace Nimbus.ConcurrentCollections
                             {
                                 _items.Enqueue(item);
                                 _itemsSemaphore.Release();
-                            });
+                            }).ConfigureAwaitFalse();
         }
 
         public void Dispose()
