@@ -55,5 +55,11 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
 
             MethodCallCounter.AllReceivedMessages.OfType<BlackBallRequest>().Count().ShouldBe(4);
         }
+
+        [Then]
+        public async Task ThereShouldBeNoMessagesInTheDeadLetterOffice()
+        {
+            (await Bus.DeadLetterOffice.Count()).ShouldBe(0);
+        }
     }
 }
