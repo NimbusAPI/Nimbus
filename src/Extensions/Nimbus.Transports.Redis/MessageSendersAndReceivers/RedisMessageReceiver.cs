@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
@@ -64,7 +65,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
 
             var database = _databaseFunc();
-            var redisValue = await database.ListLeftPopAsync(_redisKey);
+            var redisValue = await database.ListLeftPopAsync(_redisKey).ConfigureAwaitFalse();
             if (!redisValue.HasValue)
             {
                 _haveFetchedAllPreExistingMessages = true;
