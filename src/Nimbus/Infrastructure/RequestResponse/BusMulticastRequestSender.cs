@@ -87,11 +87,9 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                     _logger.LogDispatchAction("Sent", topicPath, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", topicPath, sw.Elapsed);
-                    var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-                    _logger.LogDispatchAction("Received response to", topicPath, sw.Elapsed);
-
-                    return response;
+                    _logger.LogDispatchAction("Waiting for responses to", topicPath, sw.Elapsed);
+                    var responsesEnumerable = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
+                    return responsesEnumerable;
                 }
                 catch (Exception exc)
                 {
