@@ -30,14 +30,14 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                 .ToArray();
 
             await subscribers
-                .Select(subscriberPath => Task.Run(async () =>
-                                                         {
-                                                             var clone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
-                                                             clone.DeliverTo = subscriberPath;
-                                                             var serialized = _serializer.Serialize(clone);
-                                                             await database.ListRightPushAsync(subscriberPath, serialized);
-                                                             await database.PublishAsync(subscriberPath, string.Empty);
-                                                         }).ConfigureAwaitFalse())
+                .Select(subscriberPath => Task.Run(() =>
+                                                   {
+                                                       var clone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
+                                                       clone.DeliverTo = subscriberPath;
+                                                       var serialized = _serializer.Serialize(clone);
+                                                       database.ListRightPush(subscriberPath, serialized);
+                                                       database.Publish(subscriberPath, string.Empty);
+                                                   }).ConfigureAwaitFalse())
                 .WhenAll();
         }
     }

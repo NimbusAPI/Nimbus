@@ -68,7 +68,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                       if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
 
                                       var database = _databaseFunc();
-                                      var redisValue = await database.ListLeftPopAsync(_redisKey);
+                                      var redisValue = database.ListLeftPop(_redisKey);
                                       if (!redisValue.HasValue)
                                       {
                                           _haveFetchedAllPreExistingMessages = true;

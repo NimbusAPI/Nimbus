@@ -21,13 +21,13 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         public Task Send(NimbusMessage message)
         {
-            return Task.Run(async () =>
-                                  {
-                                      var serialized = _serializer.Serialize(message);
-                                      var database = _databaseFunc();
-                                      await database.ListRightPushAsync(_redisKey, serialized);
-                                      await database.PublishAsync(_redisKey, string.Empty);
-                                  }).ConfigureAwaitFalse();
+            return Task.Run(() =>
+                            {
+                                var serialized = _serializer.Serialize(message);
+                                var database = _databaseFunc();
+                                database.ListRightPush(_redisKey, serialized);
+                                database.Publish(_redisKey, string.Empty);
+                            }).ConfigureAwaitFalse();
         }
     }
 }
