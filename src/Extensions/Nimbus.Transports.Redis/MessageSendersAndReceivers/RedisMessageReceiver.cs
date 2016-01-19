@@ -57,6 +57,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         private void OnNotificationReceived(RedisChannel redisChannel, RedisValue redisValue)
         {
+            _logger.Debug("Redis notification received in receiver for {RedisKey} for {RedisChannel}: {RedisValue}", _redisKey, redisChannel, redisValue);
             _receiveSemaphore.Release();
         }
 
@@ -76,7 +77,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
                                       var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
                                       return message;
-                                  }).ConfigureAwaitFalse();
+                                  }, cancellationToken).ConfigureAwaitFalse();
         }
     }
 }
