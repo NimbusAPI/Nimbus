@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using StackExchange.Redis;
 
@@ -18,12 +19,15 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _databaseFunc = databaseFunc;
         }
 
-        public async Task Send(NimbusMessage message)
+        public Task Send(NimbusMessage message)
         {
-            var serialized = _serializer.Serialize(message);
-            var database = _databaseFunc();
-            await database.ListRightPushAsync(_redisKey, serialized);
-            await database.PublishAsync(_redisKey, string.Empty);
+            return Task.Run(async () =>
+                                  {
+                                      var serialized = _serializer.Serialize(message);
+                                      var database = _databaseFunc();
+                                      await database.ListRightPushAsync(_redisKey, serialized);
+                                      await database.PublishAsync(_redisKey, string.Empty);
+                                  }).ConfigureAwaitFalse();
         }
     }
 }

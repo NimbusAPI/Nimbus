@@ -60,20 +60,23 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _receiveSemaphore.Release();
         }
 
-        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
+        protected override Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
+            return Task.Run(async () =>
+                                  {
+                                      if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
 
-            var database = _databaseFunc();
-            var redisValue = await database.ListLeftPopAsync(_redisKey).ConfigureAwaitFalse();
-            if (!redisValue.HasValue)
-            {
-                _haveFetchedAllPreExistingMessages = true;
-                return null;
-            }
+                                      var database = _databaseFunc();
+                                      var redisValue = await database.ListLeftPopAsync(_redisKey);
+                                      if (!redisValue.HasValue)
+                                      {
+                                          _haveFetchedAllPreExistingMessages = true;
+                                          return null;
+                                      }
 
-            var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
-            return message;
+                                      var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
+                                      return message;
+                                  }).ConfigureAwaitFalse();
         }
     }
 }
