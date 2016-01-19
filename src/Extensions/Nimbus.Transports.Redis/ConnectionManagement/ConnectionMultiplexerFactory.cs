@@ -46,7 +46,19 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
             var multiplexer = ConnectionMultiplexer.Connect(configuration);
             multiplexer.PreserveAsyncOrder = true;
             multiplexer.IncludeDetailInExceptions = true;
+            multiplexer.ErrorMessage += OnErrorMessage;
+            multiplexer.InternalError += OnInternalError;
             return multiplexer;
+        }
+
+        private void OnInternalError(object sender, InternalErrorEventArgs e)
+        {
+            _logger.Warn(e.Exception, "An internal error occurred in the StackExchange.Redis library ({Origin})", e.Origin);
+        }
+
+        private void OnErrorMessage(object sender, RedisErrorEventArgs e)
+        {
+            _logger.Warn("An error message was received from the Redis server at {Endpoint}: {Message}", e.EndPoint, e.Message);
         }
 
         private ConfigurationOptions ConstructConfigurationOptions()
