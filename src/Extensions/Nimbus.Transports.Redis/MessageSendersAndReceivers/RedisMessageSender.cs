@@ -23,7 +23,12 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             var serialized = _serializer.Serialize(message);
             var database = _databaseFunc();
             await database.ListRightPushAsync(_redisKey, serialized);
-            await database.PublishAsync(_redisKey, string.Empty);
+
+            while (true)
+            {
+                var publishResult = await database.PublishAsync(_redisKey, string.Empty);
+                if (publishResult > 0) break;
+            }
         }
     }
 }
