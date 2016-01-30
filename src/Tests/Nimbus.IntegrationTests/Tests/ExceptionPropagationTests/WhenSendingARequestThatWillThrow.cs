@@ -27,14 +27,17 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         protected override async Task When()
         {
-            try
+            using (new SingleThreadedSynchronizationContext())
             {
-                var request = new RequestThatWillThrow();
-                _response = await Bus.Request(request);
-            }
-            catch (RequestFailedException exc)
-            {
-                _exception = exc;
+                try
+                {
+                    var request = new RequestThatWillThrow();
+                    _response = await Bus.Request(request);
+                }
+                catch (RequestFailedException exc)
+                {
+                    _exception = exc;
+                }
             }
         }
 
