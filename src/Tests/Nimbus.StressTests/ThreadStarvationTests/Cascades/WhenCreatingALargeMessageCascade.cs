@@ -61,7 +61,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
             await Subject.SendAll(commands);
 
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count() >= _expectedMessageCount);
         }
 
         [Test]

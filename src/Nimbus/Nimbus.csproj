@@ -77,8 +77,10 @@
     <Compile Include="Configuration\IValidatableConfigurationSetting.cs" />
     <Compile Include="Configuration\LargeMessages\DefaultStorageKeyGenerator.cs" />
     <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
+    <Compile Include="Extensions\ConcurrentBagExtensions.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\INimbusTransport.cs" />
+    <Compile Include="Infrastructure\Logging\MessageLoggingExtensions.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\IGlobalHandlerThrottle.cs" />
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStorageConfiguration.cs" />
@@ -108,9 +110,14 @@
     <Compile Include="Infrastructure\Compression\GzipCompressor.cs" />
     <Compile Include="Infrastructure\Compression\NullCompressor.cs" />
     <Compile Include="Infrastructure\LargeMessages\UnsupportedLargeMessageBodyStore.cs" />
+    <Compile Include="Infrastructure\MessagePumpFactory.cs" />
+    <Compile Include="Infrastructure\Retries\DefaultRetry.cs" />
+    <Compile Include="Infrastructure\Retries\IRetry.cs" />
+    <Compile Include="Infrastructure\Retries\RetryEventArgs.cs" />
+    <Compile Include="Infrastructure\Retries\RetryFailureEventArgs.cs" />
     <Compile Include="Infrastructure\Serialization\NimbusDataContractResolver.cs" />
     <Compile Include="Infrastructure\IClock.cs" />
-    <Compile Include="Infrastructure\Logging\MessageDispatchLoggingExtensions.cs" />
+    <Compile Include="Infrastructure\Logging\DispatchLoggingContext.cs" />
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\Custom\NimbusPerformanceCounterBase.cs" />
     <Compile Include="Infrastructure\Heartbeat\Heartbeat.cs" />
     <Compile Include="Infrastructure\Heartbeat\IHeartbeat.cs" />
@@ -126,7 +133,7 @@
     <Compile Include="Infrastructure\Heartbeat\PerformanceCounters\GlobalMessageCounters.cs" />
     <Compile Include="Infrastructure\PropertyInjection\IPropertyInjector.cs" />
     <Compile Include="Infrastructure\PropertyInjection\PropertyInjector.cs" />
-    <Compile Include="Infrastructure\Retry.cs" />
+    <Compile Include="Infrastructure\Retries\Retry.cs" />
     <Compile Include="Infrastructure\Routing\DestinationPerMessageTypeRouter.cs" />
     <Compile Include="Infrastructure\Dispatching\SubsequentDispatchContext.cs" />
     <Compile Include="Infrastructure\Dispatching\DispatchContextManager.cs" />

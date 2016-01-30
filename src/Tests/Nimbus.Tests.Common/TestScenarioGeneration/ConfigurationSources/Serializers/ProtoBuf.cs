@@ -1,13 +1,11 @@
 using System;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
 {
-    internal class ProtoBuf : IConfigurationScenario<ISerializer>
+    internal class ProtoBuf : ConfigurationScenario<ISerializer>
     {
-        public string Name { get; } = "ProtoBuf";
-        public string[] Categories { get; } = {"ProtoBuf"};
-
-        public ScenarioInstance<ISerializer> CreateInstance()
+        public override ScenarioInstance<ISerializer> CreateInstance()
         {
             throw new NotImplementedException();
             //var serializer = new ProtoBufSerializer();

@@ -7,10 +7,11 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds * 1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class SpecificationForAsync<T> where T : class
     {
         protected const int TimeoutSeconds = 30;
+        protected readonly TimeSpan Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
         protected T Subject;
 

@@ -1,14 +1,12 @@
 using Autofac;
 using Nimbus.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
-    internal class AutofacScenario : IConfigurationScenario<ContainerConfiguration>
+    internal class AutofacScenario : ConfigurationScenario<ContainerConfiguration>
     {
-        public string Name => "Autofac";
-        public string[] Categories => new[] {"Autofac"};
-
-        public ScenarioInstance<ContainerConfiguration> CreateInstance()
+        public override ScenarioInstance<ContainerConfiguration> CreateInstance()
         {
             var container = new ContainerBuilder().Build();
 

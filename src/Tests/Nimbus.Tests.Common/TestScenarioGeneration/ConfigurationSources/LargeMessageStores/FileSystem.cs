@@ -2,15 +2,13 @@ using System;
 using System.IO;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.LargeMessages.FileSystem.Configuration;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores
 {
-    internal class FileSystem : IConfigurationScenario<LargeMessageStorageConfiguration>
+    internal class FileSystem : ConfigurationScenario<LargeMessageStorageConfiguration>
     {
-        public string Name { get; } = "FileSystem";
-        public string[] Categories { get; } = {"FileSystem"};
-
-        public ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
+        public override ScenarioInstance<LargeMessageStorageConfiguration> CreateInstance()
         {
             var largeMessageBodyTempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                                         "Nimbus Integration Test Suite",

@@ -52,7 +52,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
         protected override async Task When()
         {
             await Subject.Send(new FooCommand());
-            await TimeSpan.FromSeconds(TimeoutSeconds).WaitUntil(() => MethodCallCounter.TotalReceivedCalls >= _expectedTotalCallCount);
+            await Timeout.WaitUntil(() => MethodCallCounter.TotalReceivedCalls >= _expectedTotalCallCount);
 
             MethodCallCounter.Stop();
             MethodCallCounter.Dump();

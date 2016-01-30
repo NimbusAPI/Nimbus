@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using Nimbus.Serializers.Json;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
 {
-    internal class Json : IConfigurationScenario<ISerializer>
+    internal class Json : ConfigurationScenario<ISerializer>
     {
-        public string Name { get; } = "Json";
-        public string[] Categories { get; } = {"Json", "SmokeTest"};
+        protected override IEnumerable<string> AdditionalCategories
+        {
+            get { yield return "SmokeTest"; }
+        }
 
-        public ScenarioInstance<ISerializer> CreateInstance()
+        public override ScenarioInstance<ISerializer> CreateInstance()
         {
             var serializer = new JsonSerializer();
             var instance = new ScenarioInstance<ISerializer>(serializer);

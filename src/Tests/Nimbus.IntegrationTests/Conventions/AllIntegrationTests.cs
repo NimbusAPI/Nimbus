@@ -45,7 +45,7 @@ namespace Nimbus.IntegrationTests.Conventions
             Assert.Fail();
         }
 
-        internal class TestCases : IEnumerable<TestCaseData>
+        private class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {

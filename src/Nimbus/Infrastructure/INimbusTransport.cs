@@ -12,5 +12,7 @@ namespace Nimbus.Infrastructure
 
         INimbusMessageSender GetTopicSender(string topicPath);
         INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName);
+
+        //FIXME add remaining transport-level functionality here and stop exposing it via the container
     }
 }

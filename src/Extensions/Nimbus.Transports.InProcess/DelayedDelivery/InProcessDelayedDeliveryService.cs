@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
-using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
 using Nimbus.Transports.InProcess.QueueManagement;
 
-namespace Nimbus.Transports.InProcess
+namespace Nimbus.Transports.InProcess.DelayedDelivery
 {
     internal class InProcessDelayedDeliveryService : IDelayedDeliveryService
     {
@@ -28,7 +27,7 @@ namespace Nimbus.Transports.InProcess
                                if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                                await Task.Delay(delay);
                                AsyncBlockingCollection<NimbusMessage> queue;
-                               if (!_messageStore.TryGetExistingMessageQueue(message.To, out queue)) return;
+                               if (!_messageStore.TryGetExistingMessageQueue(message.DeliverTo, out queue)) return;
                                await queue.Add(message);
                            }).ConfigureAwaitFalse();
 

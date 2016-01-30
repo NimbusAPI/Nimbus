@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
@@ -59,6 +60,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 .WithRequestTimeout(timeout)
                 .DestinedForTopic(topicPath)
                 ;
+            DispatchLoggingContext.NimbusMessage = nimbusMessage;
             var expiresAfter = _clock.UtcNow.AddSafely(timeout);
             var responseCorrelationWrapper = _requestResponseCorrelator.RecordMulticastRequest<TResponse>(nimbusMessage.MessageId, expiresAfter);
 
@@ -70,7 +72,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", topicPath, nimbusMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Sending", topicPath, sw.Elapsed);
 
                     var sender = _transport.GetTopicSender(topicPath);
                     foreach (var interceptor in interceptors)
@@ -83,13 +85,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                         await interceptor.OnMulticastRequestSent(busRequest, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", topicPath, nimbusMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Sent", topicPath, sw.Elapsed);
 
-                    _logger.LogDispatchAction("Waiting for response to", topicPath, nimbusMessage, sw.Elapsed);
-                    var response = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
-                    _logger.LogDispatchAction("Received response to", topicPath, nimbusMessage, sw.Elapsed);
-
-                    return response;
+                    _logger.LogDispatchAction("Waiting for responses to", topicPath, sw.Elapsed);
+                    var responsesEnumerable = responseCorrelationWrapper.ReturnResponsesOpportunistically(timeout);
+                    return responsesEnumerable;
                 }
                 catch (Exception exc)
                 {
@@ -100,7 +100,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     await interceptor.OnMulticastRequestSendingError(busRequest, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", topicPath, nimbusMessage, sw.Elapsed, exception);
+                _logger.LogDispatchError("sending", topicPath, sw.Elapsed, exception);
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return null;

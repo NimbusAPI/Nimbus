@@ -18,10 +18,10 @@ namespace Nimbus.Extensions
         internal static void Done<T>(this IEnumerable<T> items)
         {
             // just force enumeration so that any chained .Do(...) calls are executed
-
-            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            items.ToArray();
-            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+            var enumerator = items.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+            }
         }
 
         internal static bool None<T>(this IEnumerable<T> items)

@@ -1,7 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using System.Reflection;
+using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using NUnit.Framework;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
@@ -10,9 +15,18 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
     {
         public IEnumerator<TestCaseData> GetEnumerator()
         {
-            var testCases = new BusBuilderConfigurationSources(typeof (TTestType))
+            var testFixtureType = typeof (TTestType);
+
+            var filterAttribute = testFixtureType.GetCustomAttribute<FilterTestCasesByAttribute>();
+            var filter = filterAttribute != null
+                ? (IScenarioFilter) Activator.CreateInstance(filterAttribute.Type)
+                : new AtLeastOneOfEachTypeOfScenarioFilter();
+
+            var testCases = new BusBuilderConfigurationSources(testFixtureType)
+                .ToArray()
+                .Pipe(filter.Filter)
+                .OrderBy(scenario => scenario.Name)
                 .Select(scenario => scenario.BuildTestCase())
-                .OrderBy(tc => tc.TestName)
                 .ToArray();
 
             return testCases.AsEnumerable().GetEnumerator();

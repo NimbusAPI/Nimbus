@@ -4,22 +4,27 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Transports.InProcess.QueueManagement;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 {
     internal class InProcessQueueReceiver : ThrottlingMessageReceiver
     {
         private readonly string _queuePath;
-        private readonly AsyncBlockingCollection<NimbusMessage> _messageQueue;
+        private readonly InProcessMessageStore _messageStore;
+
+        private readonly ThreadSafeLazy<AsyncBlockingCollection<NimbusMessage>> _messageQueue;
 
         public InProcessQueueReceiver(string queuePath,
-                                      AsyncBlockingCollection<NimbusMessage> messageQueue,
                                       ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                      InProcessMessageStore messageStore,
                                       IGlobalHandlerThrottle globalHandlerThrottle,
                                       ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queuePath = queuePath;
-            _messageQueue = messageQueue;
+            _messageStore = messageStore;
+
+            _messageQueue = new ThreadSafeLazy<AsyncBlockingCollection<NimbusMessage>>(() => _messageStore.GetOrCreateMessageQueue(_queuePath));
         }
 
         public override string ToString()
@@ -29,12 +34,12 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
 
         protected override Task WarmUp()
         {
-            return Task.Delay(0);
+            return Task.Run(() => _messageQueue.EnsureValueCreated());
         }
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            var nimbusMessage = await _messageQueue.Take(cancellationToken);
+            var nimbusMessage = await _messageQueue.Value.Take(cancellationToken);
             return nimbusMessage;
         }
     }

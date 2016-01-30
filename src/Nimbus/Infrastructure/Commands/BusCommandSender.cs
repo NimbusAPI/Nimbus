@@ -73,7 +73,7 @@ namespace Nimbus.Infrastructure.Commands
                 var interceptors = _outboundInterceptorFactory.CreateInterceptors(scope, nimbusMessage);
                 try
                 {
-                    _logger.LogDispatchAction("Sending", queuePath, nimbusMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Sending", queuePath, sw.Elapsed);
 
                     var sender = _transport.GetQueueSender(queuePath);
                     foreach (var interceptor in interceptors)
@@ -86,7 +86,7 @@ namespace Nimbus.Infrastructure.Commands
                         await interceptor.OnCommandSent(busCommand, nimbusMessage);
                     }
 
-                    _logger.LogDispatchAction("Sent", queuePath, nimbusMessage, sw.Elapsed);
+                    _logger.LogDispatchAction("Sent", queuePath, sw.Elapsed);
                     return;
                 }
                 catch (Exception exc)
@@ -98,7 +98,7 @@ namespace Nimbus.Infrastructure.Commands
                 {
                     await interceptor.OnCommandSendingError(busCommand, nimbusMessage, exception);
                 }
-                _logger.LogDispatchError("sending", queuePath, nimbusMessage, sw.Elapsed, exception);
+                _logger.LogDispatchError("sending", queuePath, sw.Elapsed, exception);
             }
         }
     }

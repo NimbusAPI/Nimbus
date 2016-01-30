@@ -8,7 +8,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class MulticastRequestMessagePumpsFactory
+    internal class MulticastRequestMessagePumpsFactory: MessagePumpFactory
     {
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
@@ -73,6 +73,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
                     var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
+                    GarbageMan.Add(pump);
                     yield return pump;
                 }
             }

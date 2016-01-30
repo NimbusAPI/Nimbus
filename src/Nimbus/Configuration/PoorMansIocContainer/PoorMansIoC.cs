@@ -153,10 +153,10 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             if (componentLifetime == ComponentLifetime.SingleInstance)
             {
                 _singleInstanceComponents.Add(instance);
-            }
 
-            var disposable = instance as IDisposable;
-            if (disposable != null) _garbageMan.Add(disposable);
+                var disposable = instance as IDisposable;
+                if (disposable != null) _garbageMan.Add(disposable);
+            }
 
             return instance;
         }
@@ -177,7 +177,12 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+
             _garbageMan.Dispose();
+
+            // we have circular references in these. By clearing them we reduce the likelihood of a Gen2 promotion.
+            _singleInstanceComponents.Clear();
+            _registrations.Clear();
         }
     }
 }

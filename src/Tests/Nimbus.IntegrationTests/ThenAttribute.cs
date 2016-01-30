@@ -1,8 +1,9 @@
-﻿using NUnit.Framework;
+﻿using System;
 
 namespace Nimbus.IntegrationTests
 {
-    public class ThenAttribute : TestAttribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class ThenAttribute : Attribute
     {
     }
 }

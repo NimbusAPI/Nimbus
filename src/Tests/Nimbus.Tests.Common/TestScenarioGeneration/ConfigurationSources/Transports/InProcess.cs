@@ -1,14 +1,18 @@
+using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.InProcess;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 {
-    internal class InProcess : IConfigurationScenario<TransportConfiguration>
+    internal class InProcess : ConfigurationScenario<TransportConfiguration>
     {
-        public string Name { get; } = "InProcess";
-        public string[] Categories { get; } = {"InProcess", "SmokeTest"};
+        protected override IEnumerable<string> AdditionalCategories
+        {
+            get { yield return "SmokeTest"; }
+        }
 
-        public ScenarioInstance<TransportConfiguration> CreateInstance()
+        public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
             var configuration = new InProcessTransportConfiguration();
 

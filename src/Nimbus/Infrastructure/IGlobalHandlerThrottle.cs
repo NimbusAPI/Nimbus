@@ -5,7 +5,7 @@ namespace Nimbus.Infrastructure
 {
     internal interface IGlobalHandlerThrottle
     {
-        Task Wait(CancellationToken ct);
+        Task Wait(CancellationToken cancellationToken);
         void Release();
     }
 }

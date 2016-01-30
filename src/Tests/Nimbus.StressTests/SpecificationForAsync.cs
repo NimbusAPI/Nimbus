@@ -8,10 +8,11 @@ using NUnit.Framework;
 namespace Nimbus.StressTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds * 1000)]
+    [Timeout(TimeoutSeconds*1000)]
     public abstract class SpecificationForAsync<T> where T : class
     {
-        public const int TimeoutSeconds = 60;
+        protected const int TimeoutSeconds = 60;
+        protected TimeSpan Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
         protected T Subject;
 

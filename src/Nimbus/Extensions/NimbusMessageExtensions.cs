@@ -81,9 +81,7 @@ namespace Nimbus.Extensions
 
         internal static string SafelyGetBodyTypeNameOrDefault(this NimbusMessage message)
         {
-            return message.Payload != null
-                ? message.Payload.GetType().FullName
-                : null;
+            return message.Payload?.GetType().FullName;
         }
     }
 }

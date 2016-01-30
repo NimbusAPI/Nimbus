@@ -14,6 +14,7 @@ namespace Nimbus
         public NimbusMessage(string to)
         {
             To = to;
+            DeliverTo = to;
             MessageId = Guid.NewGuid();
             Properties = new Dictionary<string, object>();
             DeliveryAttempts = new DateTimeOffset[0];
@@ -30,6 +31,7 @@ namespace Nimbus
         public Guid? PrecedingMessageId { get; set; }
         public string From { get; set; }
         public string To { get; protected set; }
+        public string DeliverTo { get; set; }
         public Guid? InReplyToMessageId { get; set; }
         public DateTimeOffset DeliverAfter { get; set; }
         public DateTimeOffset ExpiresAfter { get; set; }

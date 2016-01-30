@@ -2,8 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.Infrastructure.Retries;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
 using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 
@@ -13,24 +13,19 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
     {
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
-        private readonly string _queuePath;
         private readonly ILogger _logger;
+        private readonly IRetry _retry;
+        private readonly string _queuePath;
 
         private MessageSender _messageSender;
-        private readonly Retry _retry;
 
-        public WindowsServiceBusQueueMessageSender(IBrokeredMessageFactory brokeredMessageFactory, IQueueManager queueManager, string queuePath, ILogger logger)
+        public WindowsServiceBusQueueMessageSender(IBrokeredMessageFactory brokeredMessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string queuePath)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _queueManager = queueManager;
+            _retry = retry;
             _queuePath = queuePath;
             _logger = logger;
-
-            _retry = new Retry(5)
-                .Chain(r => r.Started += (s, e) => _logger.Debug("{Action}...", e.ActionName))
-                .Chain(r => r.Success += (s, e) => _logger.Debug("{Action} completed successfully in {Elapsed}.", e.ActionName, e.ElapsedTime))
-                .Chain(r => r.TransientFailure += (s, e) => _logger.Warn(e.Exception, "A transient failure occurred in action {Action}.", e.ActionName))
-                .Chain(r => r.PermanentFailure += (s, e) => _logger.Error(e.Exception, "A permanent failure occurred in action {Action}.", e.ActionName));
         }
 
         public async Task Send(NimbusMessage message)

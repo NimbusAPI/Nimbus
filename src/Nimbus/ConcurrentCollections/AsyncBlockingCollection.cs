@@ -2,13 +2,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 
 namespace Nimbus.ConcurrentCollections
 {
     internal class AsyncBlockingCollection<T> : IDisposable
     {
-        readonly SemaphoreSlim _itemsSemaphore = new SemaphoreSlim(0, int.MaxValue);
-        readonly ConcurrentQueue<T> _items = new ConcurrentQueue<T>();
+        private readonly SemaphoreSlim _itemsSemaphore = new SemaphoreSlim(0, int.MaxValue);
+        private readonly ConcurrentQueue<T> _items = new ConcurrentQueue<T>();
 
         public Task<T> TryTake(TimeSpan timeout, CancellationToken cancellationToken)
         {
@@ -26,7 +27,7 @@ namespace Nimbus.ConcurrentCollections
                                           return default(T);
                                       }
                                   },
-                            cancellationToken);
+                            cancellationToken).ConfigureAwaitFalse();
         }
 
         public Task<T> Take(CancellationToken cancellationToken)
@@ -41,7 +42,7 @@ namespace Nimbus.ConcurrentCollections
                             {
                                 _items.Enqueue(item);
                                 _itemsSemaphore.Release();
-                            });
+                            }).ConfigureAwaitFalse();
         }
 
         public void Dispose()

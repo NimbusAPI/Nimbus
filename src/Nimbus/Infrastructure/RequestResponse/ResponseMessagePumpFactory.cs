@@ -3,7 +3,7 @@ using Nimbus.Configuration.Settings;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class ResponseMessagePumpFactory
+    internal class ResponseMessagePumpFactory : MessagePumpFactory
     {
         private readonly PoorMansIoC _container;
         private readonly ReplyQueueNameSetting _replyQueueName;
@@ -24,6 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         public IMessagePump Create()
         {
             var pump = _container.ResolveWithOverrides<MessagePump>(_transport.GetQueueReceiver(_replyQueueName), _responseMessageDispatcher);
+            GarbageMan.Add(pump);
             return pump;
         }
     }

@@ -4,7 +4,7 @@ using Nimbus.Configuration;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
@@ -40,41 +40,34 @@ namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
 
         [Test]
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheResponseShouldNotBeSet(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
             await When();
+            await Then();
+        }
 
+        [Then]
+        public async Task TheResponseShouldNotBeSet()
+        {
             _response.ShouldBe(null);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task AnExceptionShouldBeReThrownOnTheClient(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task AnExceptionShouldBeReThrownOnTheClient()
         {
-            await Given(scenario);
-            await When();
-
             _exception.ShouldNotBe(null);
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheExceptionShouldBeARequestFailedException(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheExceptionShouldBeARequestFailedException()
         {
-            await Given(scenario);
-            await When();
-
             _exception.ShouldBeTypeOf<RequestFailedException>();
         }
 
-        [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingARequestThatWillThrow>))]
-        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
+        [Then]
+        public async Task TheExceptionShouldContainTheMessageThatWasThrownOnTheServer()
         {
-            await Given(scenario);
-            await When();
-
             _exception.Message.ShouldContain(RequestThatWillThrowHandler.ExceptionMessage);
         }
     }

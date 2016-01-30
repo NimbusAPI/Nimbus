@@ -46,6 +46,8 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Nimbus.Windsor")]
 [assembly: InternalsVisibleTo("Nimbus.LargeMessages.Azure")]
 [assembly: InternalsVisibleTo("Nimbus.LargeMessages.FileSystem")]
+[assembly: InternalsVisibleTo("Nimbus.Logger.Serilog")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.InProcess")]
+[assembly: InternalsVisibleTo("Nimbus.Transports.Redis")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.WindowsServiceBus")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2", AllInternalsVisible = true)]

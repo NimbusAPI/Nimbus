@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Configuration;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -8,7 +7,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {
-    internal class RequestMessagePumpsFactory
+    internal class RequestMessagePumpsFactory : MessagePumpFactory
     {
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
@@ -59,7 +58,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
                 var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
-
+                GarbageMan.Add(pump);
                 yield return pump;
             }
         }

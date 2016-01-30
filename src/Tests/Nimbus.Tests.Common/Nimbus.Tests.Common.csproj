@@ -104,13 +104,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\AzureBlobStorageContainerSharedAccessSignature.cs" />
+    <Compile Include="Configuration\AzureBlobStorageContainerUri.cs" />
+    <Compile Include="Configuration\RedisConnectionString.cs" />
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
+    <Compile Include="Stubs\TestIdEnricher.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\CompressorScenariosSource.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\DeflateCompressorScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\GzipCompressorScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\NullCompressorScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\AtLeastOneOfEachTypeOfScenarioFilter.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\FilterTestCasesByAttribute.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\IConfigurationScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\AutofacScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeConfigurationScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\CompositeScenario.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\ContainerConfiguration.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilder\BusBuilderScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\CompositeScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\ContainerConfiguration.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NinjectScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\NoContainerScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\UnityScenario.cs" />
@@ -118,13 +129,17 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorage.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\AzureBlobStorageViaHttp.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\FileSystem.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\PartialTestScenarioExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\IScenarioFilter.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\OnlyLargeMessagesFilter.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\PartialTestScenarioExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\DestinationPerMessageType.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\SingleQueueAndTopicPerMessageType.cs" />
+    <Compile Include="TestScenarioGeneration\ScenarioComposition\ScenarioInstance.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\DataContract.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\Json.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\ProtoBuf.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\InProcess.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Redis.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\WindowsServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
@@ -140,7 +155,7 @@
     <Compile Include="Stubs\ImmediateRetryDeliveryStrategy.cs" />
     <Compile Include="Stubs\TestHarnessTypeProvider.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllBusConfigurations.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilderConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\BusBuilder\BusBuilderConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\IoCContainers\IoCContainerConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\LargeMessageStores\LargeMessageStorageConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Routers\RouterConfigurationSources.cs" />
@@ -176,6 +191,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
       <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
       <Name>Nimbus.Transports.InProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj">
+      <Project>{e7dbdb7e-f73e-48b1-a48f-2cddb6134d86}</Project>
+      <Name>Nimbus.Transports.Redis</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
       <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>

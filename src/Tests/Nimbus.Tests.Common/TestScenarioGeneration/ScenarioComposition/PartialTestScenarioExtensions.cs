@@ -1,7 +1,7 @@
 using Nimbus.Extensions;
 using NUnit.Framework;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
 {
     internal static class PartialTestScenarioExtensions
     {

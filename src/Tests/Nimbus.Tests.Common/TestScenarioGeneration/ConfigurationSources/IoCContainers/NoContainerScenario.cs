@@ -1,14 +1,18 @@
+using System.Collections.Generic;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
-    public class NoContainerScenario : IConfigurationScenario<ContainerConfiguration>
+    public class NoContainerScenario : ConfigurationScenario<ContainerConfiguration>
     {
-        public string Name { get; } = "NoContainer";
-        public string[] Categories { get; } = {"NoContainer", "SmokeTest"};
+        protected override IEnumerable<string> AdditionalCategories
+        {
+            get { yield return "SmokeTest"; }
+        }
 
-        public ScenarioInstance<ContainerConfiguration> CreateInstance()
+        public override ScenarioInstance<ContainerConfiguration> CreateInstance()
         {
             var configuration = new ContainerConfiguration
                                 {

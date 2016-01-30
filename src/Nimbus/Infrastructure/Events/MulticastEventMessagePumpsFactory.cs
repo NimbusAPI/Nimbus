@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Configuration;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
@@ -9,7 +8,7 @@ using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Events
 {
-    internal class MulticastEventMessagePumpsFactory
+    internal class MulticastEventMessagePumpsFactory : MessagePumpFactory
     {
         private readonly ApplicationNameSetting _applicationName;
         private readonly InstanceNameSetting _instanceName;
@@ -77,7 +76,7 @@ namespace Nimbus.Infrastructure.Events
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 
                     var pump = _container.ResolveWithOverrides<MessagePump>(messageReceiver, messageDispatcher);
-
+                    GarbageMan.Add(pump);
                     yield return pump;
                 }
             }
