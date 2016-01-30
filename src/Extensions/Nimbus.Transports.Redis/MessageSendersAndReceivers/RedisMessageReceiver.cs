@@ -5,7 +5,6 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Infrastructure.Retries;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
@@ -17,11 +16,11 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         private readonly Func<IDatabase> _databaseFunc;
         private readonly ISerializer _serializer;
         private readonly ILogger _logger;
-        private readonly IRetry _retry;
 
         private ISubscriber _subscriber;
         readonly SemaphoreSlim _receiveSemaphore = new SemaphoreSlim(0, int.MaxValue);
         private bool _haveFetchedAllPreExistingMessages;
+        private readonly TimeSpan _redisPollInterval = TimeSpan.FromSeconds(10);
 
         public RedisMessageReceiver(string redisKey,
                                     Func<ConnectionMultiplexer> connectionMultiplexerFunc,
@@ -29,15 +28,13 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                     ISerializer serializer,
                                     ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                     IGlobalHandlerThrottle globalHandlerThrottle,
-                                    ILogger logger,
-                                    IRetry retry) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
+                                    ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _redisKey = redisKey;
             _connectionMultiplexerFunc = connectionMultiplexerFunc;
             _databaseFunc = databaseFunc;
             _serializer = serializer;
             _logger = logger;
-            _retry = retry;
         }
 
         protected override Task WarmUp()
@@ -65,7 +62,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         {
             return Task.Run(async () =>
                                   {
-                                      if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(cancellationToken);
+                                      if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(_redisPollInterval, cancellationToken);
 
                                       var database = _databaseFunc();
                                       var redisValue = database.ListLeftPop(_redisKey);
@@ -74,8 +71,6 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                           _haveFetchedAllPreExistingMessages = true;
                                           return null;
                                       }
-
-                                      _haveFetchedAllPreExistingMessages = false;
 
                                       var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
                                       return message;

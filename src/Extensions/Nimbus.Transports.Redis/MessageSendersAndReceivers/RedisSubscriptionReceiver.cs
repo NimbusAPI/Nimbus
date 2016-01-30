@@ -28,8 +28,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                 serializer,
                 concurrentHandlerLimit,
                 globalHandlerThrottle,
-                logger,
-                retry)
+                logger)
         {
             _subscription = subscription;
             _databaseFunc = databaseFunc;
