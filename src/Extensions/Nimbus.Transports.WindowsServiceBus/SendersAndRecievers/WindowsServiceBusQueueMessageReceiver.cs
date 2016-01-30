@@ -44,22 +44,38 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             await GetMessageReceiver();
         }
 
+        private async Task CancellationTask(SemaphoreSlim cancellationSemaphore, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await cancellationSemaphore.WaitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             try
             {
-                var messageReceiver = await GetMessageReceiver();
-                var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
-                var cancellationTask = Task.Run(() => { cancellationToken.WaitHandle.WaitOne(); }, cancellationToken).ConfigureAwaitFalse();
+                using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
+                {
+                    var messageReceiver = await GetMessageReceiver();
+                    var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
+                    var cancellationTask = Task.Run(async () => await CancellationTask(cancellationSemaphore, cancellationToken), cancellationToken).ConfigureAwaitFalse();
 
-                await Task.WhenAny(receiveTask, cancellationTask);
-                if (cancellationTask.IsCompleted) return null;
+                    await Task.WhenAny(receiveTask, cancellationTask);
+                    if (!receiveTask.IsCompleted) return null;
 
-                var brokeredMessage = await receiveTask;
-                if (brokeredMessage == null) return null;
+                    cancellationSemaphore.Release();
 
-                var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
-                return nimbusMessage;
+                    var brokeredMessage = await receiveTask;
+                    if (brokeredMessage == null) return null;
+
+                    var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
+                    return nimbusMessage;
+                }
             }
             catch (Exception exc)
             {
