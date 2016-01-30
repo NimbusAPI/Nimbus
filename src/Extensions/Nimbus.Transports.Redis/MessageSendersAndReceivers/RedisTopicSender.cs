@@ -25,9 +25,9 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             var database = _databaseFunc();
 
             var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
-            var subscribers = (await database.SetMembersAsync(subscribersRedisKey))
-                .Select(s => s.ToString())
-                .ToArray();
+            var subscribers = database.SetMembers(subscribersRedisKey)
+                                      .Select(s => s.ToString())
+                                      .ToArray();
 
             await subscribers
                 .Select(subscriberPath => Task.Run(() =>

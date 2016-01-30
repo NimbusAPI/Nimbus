@@ -40,18 +40,18 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _retry = retry;
         }
 
-        protected override async Task WarmUp()
+        protected override Task WarmUp()
         {
-            await _retry.DoAsync(async () =>
-                                       {
-                                           _subscriber = _connectionMultiplexerFunc().GetSubscriber();
-                                           await _subscriber.SubscribeAsync(_redisKey, OnNotificationReceived);
-                                       });
+            return Task.Run(() =>
+                            {
+                                _subscriber = _connectionMultiplexerFunc().GetSubscriber();
+                                _subscriber.Subscribe(_redisKey, OnNotificationReceived);
+                            }).ConfigureAwaitFalse();
         }
 
         protected override void Dispose(bool disposing)
         {
-            _subscriber?.UnsubscribeAsync(_redisKey, OnNotificationReceived);
+            _subscriber?.Unsubscribe(_redisKey, OnNotificationReceived);
             base.Dispose(disposing);
         }
 
