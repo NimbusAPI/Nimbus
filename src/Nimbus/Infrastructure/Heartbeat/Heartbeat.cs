@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Nimbus.ConcurrentCollections;
@@ -10,12 +11,15 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
 using Nimbus.MessageContracts.ControlMessages;
+using Timer = System.Timers.Timer;
 
 namespace Nimbus.Infrastructure.Heartbeat
 {
     internal class Heartbeat : IHeartbeat, IDisposable
     {
+        private readonly ApplicationNameSetting _applicationName;
         private readonly HeartbeatIntervalSetting _heartbeatInterval;
+        private readonly InstanceNameSetting _instanceName;
         private readonly IEventSender _eventSender;
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -29,7 +33,7 @@ namespace Nimbus.Infrastructure.Heartbeat
                                                                                                                                      .Select(ti => ti.AsType())
                                                                                                                                      .Where(
                                                                                                                                          t =>
-                                                                                                                                         typeof (PerformanceCounterBase)
+                                                                                                                                             typeof (PerformanceCounterBase)
                                                                                                                                              .IsAssignableFrom(t))
                                                                                                                                      .Where(t => !t.IsAbstract)
                                                                                                                                      .ToArray());
@@ -39,9 +43,16 @@ namespace Nimbus.Infrastructure.Heartbeat
         private bool _isRunning;
         private int _heartbeatExecuting;
 
-        public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender, ILogger logger)
+        public Heartbeat(ApplicationNameSetting applicationName,
+                         HeartbeatIntervalSetting heartbeatInterval,
+                         InstanceNameSetting instanceName,
+                         IClock clock,
+                         IEventSender eventSender,
+                         ILogger logger)
         {
+            _applicationName = applicationName;
             _heartbeatInterval = heartbeatInterval;
+            _instanceName = instanceName;
             _eventSender = eventSender;
             _logger = logger;
             _clock = clock;
@@ -49,7 +60,7 @@ namespace Nimbus.Infrastructure.Heartbeat
 
         private void OnCollectTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            Task.Run(() => Collect());
+            Task.Run(async () => await Collect()).ConfigureAwaitFalse();
         }
 
         private async Task Collect()
@@ -68,7 +79,7 @@ namespace Nimbus.Infrastructure.Heartbeat
         private async void OnHeartbeatTimerElapsed(object sender, ElapsedEventArgs e)
         {
             // Prevent overlapping execution of heartbeats
-            if (System.Threading.Interlocked.CompareExchange(ref _heartbeatExecuting, 1, 0) == 0)
+            if (Interlocked.CompareExchange(ref _heartbeatExecuting, 1, 0) == 0)
             {
                 try
                 {
@@ -177,6 +188,8 @@ namespace Nimbus.Infrastructure.Heartbeat
             var heartbeatEvent = new HeartbeatEvent
                                  {
                                      Timestamp = _clock.UtcNow,
+                                     ApplicationName = _applicationName,
+                                     InstanceName = _instanceName,
                                      ProcessId = process.Id,
                                      ProcessName = process.ProcessName,
                                      MachineName = Environment.MachineName,
