@@ -101,7 +101,8 @@ namespace Nimbus.Infrastructure
             if (message.ExpiresAfter <= now)
             {
                 _logger.Warn(
-                    "Message appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
+                    "Message {MessageId} appears to have already expired (expires after {ExpiresAfter} and it is now {Now}) so we're not dispatching it. Watch out for clock drift between your hosts!",
+                    message.MessageId,
                     message.ExpiresAfter,
                     now);
 
@@ -114,18 +115,18 @@ namespace Nimbus.Infrastructure
             {
                 try
                 {
-                    _logger.Debug("Dispatching message");
+                    _logger.Debug("Dispatching message {MessageId}", message.MessageId);
                     message.RecordDeliveryAttempt(now);
                     using (_dispatchContextManager.StartNewDispatchContext(new SubsequentDispatchContext(message)))
                     {
                         await _messageDispatcher.Dispatch(message);
                     }
-                    _logger.Info("Dispatched message");
+                    _logger.Info("Dispatched message {MessageId}", message.MessageId);
                     return;
                 }
                 catch (Exception exc)
                 {
-                    _logger.Warn(exc, "Message dispatch failed");
+                    _logger.Warn(exc, "Dispatch failed for message {MessageId}", message.MessageId);
                 }
 
                 var numDeliveryAttempts = message.DeliveryAttempts.Count();
@@ -147,7 +148,7 @@ namespace Nimbus.Infrastructure
                     }
                     catch (Exception exc)
                     {
-                        _logger.Error(exc, "Failed to re-enqueue message for re-delivery.");
+                        _logger.Error(exc, "Failed to re-enqueue message {MessageId} for re-delivery.", message.MessageId);
                     }
                 }
             }
