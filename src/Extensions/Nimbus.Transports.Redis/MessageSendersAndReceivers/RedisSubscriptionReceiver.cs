@@ -39,7 +39,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         protected override async Task WarmUp()
         {
             var database = _databaseFunc();
-            await _retry.DoAsync(() => database.SetAddAsync(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey));
+            _retry.Do(() => database.SetAdd(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey));
             await base.WarmUp();
         }
     }
