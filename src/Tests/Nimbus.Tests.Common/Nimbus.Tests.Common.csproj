@@ -108,6 +108,10 @@
     <Compile Include="Configuration\AzureBlobStorageContainerUri.cs" />
     <Compile Include="Configuration\RedisConnectionString.cs" />
     <Compile Include="Extensions\TestLoggingExtensions.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SingleThreadedSyncContext.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SyncContextConfiguration.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SynchronizationContextConfigurationSources.cs" />
+    <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
     <Compile Include="Stubs\TestIdEnricher.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
@@ -115,6 +119,7 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\DeflateCompressorScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\GzipCompressorScenario.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\NullCompressorScenario.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\NullSyncContext.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\AtLeastOneOfEachTypeOfScenarioFilter.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\FilterTestCasesByAttribute.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\IConfigurationScenario.cs" />

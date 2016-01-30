@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
-using Nimbus.Interceptors.Inbound;
-using Nimbus.Interceptors.Outbound;
 using Nimbus.Routing;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder
@@ -21,6 +19,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
         private readonly IConfigurationScenario<ISerializer> _serializer;
         private readonly IConfigurationScenario<ICompressor> _compressor;
         private readonly IConfigurationScenario<ContainerConfiguration> _iocContainer;
+        private readonly IConfigurationScenario<SyncContextConfiguration> _syncContext;
 
         public BusBuilderScenario(TestHarnessTypeProvider typeProvider,
                                   ILogger logger,
@@ -28,7 +27,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                                   IConfigurationScenario<IRouter> router,
                                   IConfigurationScenario<ISerializer> serializer,
                                   IConfigurationScenario<ICompressor> compressor,
-                                  IConfigurationScenario<ContainerConfiguration> iocContainer) : base(transport, router, serializer, compressor, iocContainer)
+                                  IConfigurationScenario<ContainerConfiguration> iocContainer,
+                                  IConfigurationScenario<SyncContextConfiguration> syncContext) : base(transport, router, serializer, compressor, iocContainer, syncContext)
         {
             _typeProvider = typeProvider;
             _logger = logger;
@@ -37,6 +37,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
             _serializer = serializer;
             _compressor = compressor;
             _iocContainer = iocContainer;
+            _syncContext = syncContext;
         }
 
         public ScenarioInstance<BusBuilderConfiguration> CreateInstance()
@@ -46,6 +47,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
             var serializer = _serializer.CreateInstance();
             var compressor = _compressor.CreateInstance();
             var iocContainer = _iocContainer.CreateInstance();
+            var syncContext = _syncContext.CreateInstance();
 
             var configuration = new Nimbus.Configuration.BusBuilder()
                 .Configure()
@@ -65,7 +67,10 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                 .Chain(iocContainer.Configuration.ApplyContainerDefaults)
                 ;
 
-            return new ScenarioInstance<BusBuilderConfiguration>(configuration);
+            var instance = new ScenarioInstance<BusBuilderConfiguration>(configuration);
+            instance.Disposing += (s, e) => syncContext.Dispose();
+
+            return instance;
         }
     }
 }

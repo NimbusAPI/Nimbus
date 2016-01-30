@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Common.TestUtilities
 {
     public sealed class SingleThreadedSynchronizationContext : SynchronizationContext, IDisposable
     {

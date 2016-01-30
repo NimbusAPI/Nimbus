@@ -8,6 +8,7 @@ using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressor
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
@@ -37,7 +38,12 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                         foreach (var iocContainer in new IoCContainerConfigurationSources())
                         {
                             foreach (var compressor in new CompressorScenariosSource())
-                            yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer);
+                            {
+                                foreach (var syncContext in new SynchronizationContextConfigurationSources())
+                                {
+                                    yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer, syncContext);
+                                }
+                            }
                         }
                     }
                 }

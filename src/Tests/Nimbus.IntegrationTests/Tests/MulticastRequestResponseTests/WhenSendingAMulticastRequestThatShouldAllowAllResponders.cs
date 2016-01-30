@@ -28,12 +28,9 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests
                               ProspectiveMemberName = "Fred Flintstone"
                           };
 
-            using (new SingleThreadedSynchronizationContext())
-            {
-                _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds)))
-                    .Take(3)
-                    .ToArray();
-            }
+            _response = (await Bus.MulticastRequest(request, TimeSpan.FromSeconds(TimeoutSeconds)))
+                .Take(3)
+                .ToArray();
         }
 
         [Test]
