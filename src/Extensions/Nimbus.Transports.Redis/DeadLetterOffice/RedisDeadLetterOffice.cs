@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Nimbus.Extensions;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.DeadLetterOffice
@@ -18,40 +19,52 @@ namespace Nimbus.Transports.Redis.DeadLetterOffice
             _serializer = serializer;
         }
 
-        public async Task<NimbusMessage> Peek()
+        public Task<NimbusMessage> Peek()
         {
-            var database = _databaseFunc();
-            var redisValues = await database.ListRangeAsync(_deadLetterOfficeRedisKey, 0, 1);
+            return Task.Run(() =>
+                            {
+                                var database = _databaseFunc();
+                                var redisValues = database.ListRange(_deadLetterOfficeRedisKey, 0, 1);
 
-            var redisValue = redisValues.FirstOrDefault();
-            if (!redisValue.HasValue) return null;
+                                var redisValue = redisValues.FirstOrDefault();
+                                if (!redisValue.HasValue) return null;
 
-            var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
-            return message;
+                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+                                return message;
+                            }).ConfigureAwaitFalse();
         }
 
-        public async Task<NimbusMessage> Pop()
+        public Task<NimbusMessage> Pop()
         {
-            var database = _databaseFunc();
-            var redisValue = await database.ListLeftPopAsync(_deadLetterOfficeRedisKey);
-            if (!redisValue.HasValue) return null;
+            return Task.Run(() =>
+                            {
+                                var database = _databaseFunc();
+                                var redisValue = database.ListLeftPop(_deadLetterOfficeRedisKey);
+                                if (!redisValue.HasValue) return null;
 
-            var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
-            return message;
+                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+                                return message;
+                            }).ConfigureAwaitFalse();
         }
 
-        public async Task Post(NimbusMessage message)
+        public Task Post(NimbusMessage message)
         {
-            var database = _databaseFunc();
-            var serialized = _serializer.Serialize(message);
-            await database.ListRightPushAsync(_deadLetterOfficeRedisKey, serialized);
+            return Task.Run(() =>
+                            {
+                                var database = _databaseFunc();
+                                var serialized = _serializer.Serialize(message);
+                                database.ListRightPush(_deadLetterOfficeRedisKey, serialized);
+                            }).ConfigureAwaitFalse();
         }
 
-        public async Task<int> Count()
+        public Task<int> Count()
         {
-            var database = _databaseFunc();
-            var count = await database.ListLengthAsync(_deadLetterOfficeRedisKey);
-            return (int) count;
+            return Task.Run(() =>
+                            {
+                                var database = _databaseFunc();
+                                var count = database.ListLength(_deadLetterOfficeRedisKey);
+                                return (int) count;
+                            }).ConfigureAwaitFalse();
         }
     }
 }

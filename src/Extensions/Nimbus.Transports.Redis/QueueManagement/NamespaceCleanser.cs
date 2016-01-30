@@ -16,15 +16,19 @@ namespace Nimbus.Transports.Redis.QueueManagement
             _multiplexerFunc = multiplexerFunc;
         }
 
-        public async Task RemoveAllExistingNamespaceElements()
+        public Task RemoveAllExistingNamespaceElements()
         {
-            var multiplexer = _multiplexerFunc();
-            var configuration = ConfigurationOptions.Parse(multiplexer.Configuration);
+            return Task.Run(() =>
+                            {
+                                var multiplexer = _multiplexerFunc();
+                                var configuration = ConfigurationOptions.Parse(multiplexer.Configuration);
 
-            var database = configuration.DefaultDatabase ?? 0;
-            await configuration.EndPoints
-                               .Select(server => multiplexer.GetServer(server).FlushDatabaseAsync(database))
-                               .WhenAll();
+                                var database = configuration.DefaultDatabase ?? 0;
+                                configuration.EndPoints
+                                             .AsParallel()
+                                             .Do(server => multiplexer.GetServer(server).FlushDatabase(database))
+                                             .Done();
+                            }).ConfigureAwaitFalse();
         }
     }
 }
