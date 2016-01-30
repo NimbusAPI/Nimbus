@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
@@ -89,12 +88,21 @@ namespace Nimbus.StressTests.ThroughputTests.EventHandlers
         {
             Log.Debug("Waiting until all messages are received.");
 
+            var logAtEachMessageChunk = Math.Max(1, expectedNumMessagesReceived/10);
+            var lastCount = ActualNumMessagesReceived;
             var sw = Stopwatch.StartNew();
             while (true)
             {
+                var thisCount = ActualNumMessagesReceived;
+                if (thisCount != lastCount && expectedNumMessagesReceived%logAtEachMessageChunk == 0)
+                {
+                    Log.Debug("Observed {MessageCount} messages of {TotalExpectedMessages} so far", thisCount, expectedNumMessagesReceived);
+                }
+                lastCount = thisCount;
+
                 if (sw.Elapsed >= timeout) return;
-                if (ActualNumMessagesReceived >= expectedNumMessagesReceived) return;
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
+                if (thisCount >= expectedNumMessagesReceived) return;
+                await Task.Delay(TimeSpan.FromMilliseconds(1000));
             }
         }
 
