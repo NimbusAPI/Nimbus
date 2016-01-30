@@ -75,6 +75,8 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                           return null;
                                       }
 
+                                      _haveFetchedAllPreExistingMessages = false;
+
                                       var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
                                       return message;
                                   },

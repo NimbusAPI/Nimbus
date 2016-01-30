@@ -37,7 +37,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                 _logger.Debug("Received successful response");
 
                 var response = message.Payload;
-                responseCorrelationWrapper.Reply(response);
+                await responseCorrelationWrapper.Reply(response);
             }
             else
             {
@@ -45,7 +45,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                 var exceptionMessage = (string) message.Properties[MessagePropertyKeys.ExceptionMessage];
                 var exceptionStackTrace = (string) message.Properties[MessagePropertyKeys.ExceptionStackTrace];
-                responseCorrelationWrapper.Throw(exceptionMessage, exceptionStackTrace);
+                await responseCorrelationWrapper.Throw(exceptionMessage, exceptionStackTrace);
             }
         }
     }

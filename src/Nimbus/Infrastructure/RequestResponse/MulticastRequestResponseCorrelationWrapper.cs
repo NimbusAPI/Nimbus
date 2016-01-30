@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure.RequestResponse
@@ -17,12 +18,12 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public DateTimeOffset ExpiresAfter { get; }
 
-        public void Reply(object response)
+        public async Task Reply(object response)
         {
-            _responses.Add((TResponse) response);
+            await _responses.Add((TResponse) response);
         }
 
-        public void Throw(string exceptionMessage, string exceptionStackTrace)
+        public async Task Throw(string exceptionMessage, string exceptionStackTrace)
         {
             // don't care.
         }

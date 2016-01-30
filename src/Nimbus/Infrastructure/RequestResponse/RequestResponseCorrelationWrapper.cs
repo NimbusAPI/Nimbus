@@ -20,14 +20,14 @@ namespace Nimbus.Infrastructure.RequestResponse
             _semaphore = new SemaphoreSlim(0, int.MaxValue);
         }
 
-        public void Reply(object response)
+        public async Task Reply(object response)
         {
             _requestWasSuccessful = true;
             _response = (TResponse) response;
             _semaphore.Release();
         }
 
-        public void Throw(string exceptionMessage, string exceptionStackTrace)
+        public async Task Throw(string exceptionMessage, string exceptionStackTrace)
         {
             _requestWasSuccessful = false;
             _exceptionStackTrace = exceptionStackTrace;
