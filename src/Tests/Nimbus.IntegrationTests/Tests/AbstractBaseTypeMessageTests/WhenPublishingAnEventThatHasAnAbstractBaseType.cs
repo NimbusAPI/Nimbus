@@ -5,6 +5,7 @@ using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -12,6 +13,8 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 {
+    [TestFixture]
+    [FilterTestCasesBy(typeof(InProcessScenariosFilter))]
     public class WhenPublishingAnEventThatHasAnAbstractBaseType : TestForBus
     {
         protected override async Task When()

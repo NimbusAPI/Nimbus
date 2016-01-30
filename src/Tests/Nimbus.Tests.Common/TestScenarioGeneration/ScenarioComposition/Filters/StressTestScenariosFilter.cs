@@ -6,9 +6,9 @@ using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
 {
-    public class MandatoryScenariosFilter: IScenarioFilter
+    public class StressTestScenariosFilter : IScenarioFilter
     {
-        private readonly Type[] _alwaysInclude = {typeof (InProcess), typeof (NoContainerScenario)};
+        private readonly Type[] _alwaysInclude = {typeof (InProcess), typeof(NoContainerScenario)};
 
         public IEnumerable<IConfigurationScenario<T>> Filter<T>(IEnumerable<IConfigurationScenario<T>> scenarios)
         {

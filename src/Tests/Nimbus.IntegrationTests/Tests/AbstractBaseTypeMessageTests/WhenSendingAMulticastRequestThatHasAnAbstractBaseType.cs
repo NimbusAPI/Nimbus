@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
@@ -11,6 +12,8 @@ using Shouldly;
 
 namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests
 {
+    [TestFixture]
+    [FilterTestCasesBy(typeof(InProcessScenariosFilter))]
     public class WhenSendingAMulticastRequestThatHasAnAbstractBaseType : TestForBus
     {
         private SomeConcreteResponseType[] _response;
