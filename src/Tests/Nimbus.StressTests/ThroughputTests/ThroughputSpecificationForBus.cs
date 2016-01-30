@@ -9,6 +9,7 @@ using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Serilog;
@@ -17,6 +18,7 @@ namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]
+    [FilterTestCasesBy(typeof (MandatoryScenariosFilter))]
     public abstract class ThroughputSpecificationForBus
     {
         protected const int TimeoutSeconds = 300;

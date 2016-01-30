@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Nimbus.Extensions;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
 {
+    [DebuggerDisplay("{Name}")]
     internal abstract class CompositeScenario : IConfigurationScenario
     {
         private readonly IConfigurationScenario[] _scenarios;

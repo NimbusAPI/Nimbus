@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AppDomainScanner.cs" />
     <Compile Include="Conventions\AllTestsForBus.cs" />
+    <Compile Include="Conventions\ThereShouldBeASensibleNumberOfBusConfigurationScenarios.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
     <Compile Include="SpecificationFor.cs" />
     <Compile Include="SpecificationForAsync.cs" />
