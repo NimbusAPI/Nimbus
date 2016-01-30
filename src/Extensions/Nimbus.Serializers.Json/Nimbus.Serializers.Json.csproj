@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
-      <Link>NullGuard.cs</Link>
+      <Link>Properties\NullGuard.cs</Link>
     </Compile>
     <Compile Include="Configuration\BusBuilderConfigurationJsonSerializerExtensions.cs" />
     <Compile Include="CustomContractResolver.cs" />
