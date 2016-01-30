@@ -314,7 +314,8 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 
                                   // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
                                   if (!_namespaceManager().QueueExists(queuePath))
-                                      throw new BusException("Queue creation for '{0}' failed".FormatWith(queuePath), exc);
+                                      throw new BusException($"Queue creation for '{queuePath}' failed due to a conflicting operation and that queue does not already exist.", exc)
+                                          .WithData("QueuePath", queuePath);
                               }
 
                               _knownQueues.Value.Add(queuePath);
