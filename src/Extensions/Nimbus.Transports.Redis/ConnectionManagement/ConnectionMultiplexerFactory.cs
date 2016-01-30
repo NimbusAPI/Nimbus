@@ -44,7 +44,7 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
             var configuration = ConstructConfigurationOptions();
 
             var multiplexer = ConnectionMultiplexer.Connect(configuration);
-            multiplexer.PreserveAsyncOrder = true;
+            multiplexer.PreserveAsyncOrder = false;
             multiplexer.IncludeDetailInExceptions = true;
             multiplexer.ErrorMessage += OnErrorMessage;
             multiplexer.InternalError += OnInternalError;
