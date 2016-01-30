@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Nimbus.Extensions;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
 {
@@ -18,7 +19,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
         protected CompositeScenario(params IConfigurationScenario[] scenarios)
         {
             _scenarios = scenarios;
-            Name = string.Join(".", new[] {GetType().Name}.Union(ComposedOf.Select(s => s.Name)));
+            Name = string.Join(".", new[] {GetType().Name}.Union(ComposedOf.Select(s => s.Name)).NotNull());
 
             var categories = scenarios
                 .SelectMany(s => s.Categories)
