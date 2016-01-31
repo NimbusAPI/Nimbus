@@ -82,6 +82,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private async Task Worker(Func<NimbusMessage, Task> callback)
         {
             var cancellationTokenSource = _cancellationTokenSource;
+            var consecutiveExceptionCount = 0;
 
             while (true)
             {
@@ -101,6 +102,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                         }
                         continue;
                     }
+
+                    consecutiveExceptionCount = 0;
 
                     _logger.Debug("Waiting for handler semaphores...");
                     await _localHandlerThrottle.WaitAsync(cancellationTokenSource.Token);
@@ -130,9 +133,31 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, this);
+                    consecutiveExceptionCount++;
+                    var delay = CalculateDelayFor(consecutiveExceptionCount);
+
+                    _logger.Error(exc,
+                                  "Worker exception ({ConsecutiveExceptionCount} consecutive) in {Type} for {QueueOrSubscriptionPath}. Delaying for {Duration}.",
+                                  consecutiveExceptionCount,
+                                  GetType().Name,
+                                  this,
+                                  delay);
+
+                    try
+                    {
+                        await Task.Delay(delay, cancellationTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
                 }
             }
+        }
+
+        private static TimeSpan CalculateDelayFor(int consecutiveExceptionCount)
+        {
+            var delayFor = TimeSpan.FromMilliseconds(Math.Max(consecutiveExceptionCount*100, 1000));
+            return delayFor;
         }
 
         public void Dispose()
