@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusModule.cs" />
     <Compile Include="Handlers\IncomingOrderHandler.cs" />
     <Compile Include="IPizzaMaker.cs" />
     <Compile Include="PizzaMaker.cs" />
