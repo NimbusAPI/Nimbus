@@ -1,6 +1,5 @@
 ﻿using System;
 using log4net;
-using Nimbus.Infrastructure.Logging;
 
 namespace Nimbus.Logger.Log4net
 {
@@ -15,32 +14,32 @@ namespace Nimbus.Logger.Log4net
 
         public void Debug(string format, params object[] args)
         {
-            _log.DebugFormat(format.NormalizeToStringFormat(), args);
+            _log.DebugFormat(format, args);
         }
 
         public void Info(string format, params object[] args)
         {
-            _log.InfoFormat(format.NormalizeToStringFormat(), args);
+            _log.InfoFormat(format, args);
         }
 
         public void Warn(string format, params object[] args)
         {
-            _log.WarnFormat(format.NormalizeToStringFormat(), args);
+            _log.WarnFormat(format, args);
         }
 
         public void Warn(Exception exc, string format, params object[] args)
         {
-            _log.Warn(string.Format(format.NormalizeToStringFormat(), args), exc);
+            _log.Warn(string.Format(format, args), exc);
         }
 
         public void Error(string format, params object[] args)
         {
-            _log.ErrorFormat(format.NormalizeToStringFormat(), args);
+            _log.ErrorFormat(format, args);
         }
 
         public void Error(Exception exc, string format, params object[] args)
         {
-            var message = string.Format(format.NormalizeToStringFormat(), args);
+            var message = String.Format(format, args);
             _log.Error(message, exc);
         }
     }
