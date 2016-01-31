@@ -39,6 +39,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                                            {
                                                await messageSender.SendAsync(brokeredMessage);
                                            }
+                                           catch (MessagingEntityNotFoundException exc)
+                                           {
+                                               _logger.Error(exc, "The referenced queue {QueuePath} no longer exists", _queuePath);
+                                               await _queueManager.MarkQueueAsNonExistent(_queuePath);
+                                               DiscardMessageSender();
+                                               throw;
+                                           }
                                            catch (Exception)
                                            {
                                                DiscardMessageSender();

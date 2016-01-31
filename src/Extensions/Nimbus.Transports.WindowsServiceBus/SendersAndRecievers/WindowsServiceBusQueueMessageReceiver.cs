@@ -77,6 +77,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                     return nimbusMessage;
                 }
             }
+            catch (MessagingEntityNotFoundException exc)
+            {
+                _logger.Error(exc, "The referenced queue {QueuePath} no longer exists", _queuePath);
+                await _queueManager.MarkQueueAsNonExistent(_queuePath);
+                DiscardMessageReceiver();
+                throw;
+            }
             catch (Exception exc)
             {
                 _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");

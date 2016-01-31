@@ -39,6 +39,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                                            {
                                                await topicClient.SendAsync(brokeredMessage);
                                            }
+                                           catch (MessagingEntityNotFoundException exc)
+                                           {
+                                               _logger.Error(exc, "The referenced topic path {TopicPath} no longer exists", _topicPath);
+                                               await _queueManager.MarkTopicAsNonExistent(_topicPath);
+                                               DiscardTopicClient();
+                                               throw;
+                                           }
                                            catch (Exception)
                                            {
                                                DiscardTopicClient();

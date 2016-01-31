@@ -80,6 +80,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                     return nimbusMessage;
                 }
             }
+            catch (MessagingEntityNotFoundException exc)
+            {
+                _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
+                await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
+                DiscardSubscriptionClient();
+                throw;
+            }
             catch (Exception exc)
             {
                 _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");

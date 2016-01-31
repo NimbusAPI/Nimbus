@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
@@ -25,9 +24,9 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         private readonly DefaultTimeoutSetting _defaultTimeout;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
 
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownTopics;
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownSubscriptions;
-        private readonly ThreadSafeLazy<ConcurrentBag<string>> _knownQueues;
+        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
+        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
+        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownQueues;
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
@@ -53,9 +52,9 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
             _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
 
-            _knownTopics = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingTopics);
-            _knownSubscriptions = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingSubscriptions);
-            _knownQueues = new ThreadSafeLazy<ConcurrentBag<string>>(FetchExistingQueues);
+            _knownTopics = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingTopics);
+            _knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingSubscriptions);
+            _knownQueues = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingQueues);
         }
 
         public Task<MessageSender> CreateMessageSender(string queuePath)
@@ -109,6 +108,27 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                             }).ConfigureAwaitFalse();
         }
 
+        public Task MarkQueueAsNonExistent(string queuePath)
+        {
+            return Task.Run(() => _knownQueues.Value.Remove(queuePath)).ConfigureAwaitFalse();
+        }
+
+        public Task MarkTopicAsNonExistent(string topicPath)
+        {
+            return Task.Run(() => _knownTopics.Value.Remove(topicPath)).ConfigureAwaitFalse();
+        }
+
+        public Task MarkSubscriptionAsNonExistent(string topicPath, string subscriptionName)
+        {
+            return Task.Run(() =>
+                            {
+                                _knownSubscriptions.Value
+                                                   .Where(path => path.StartsWith(topicPath))
+                                                   .Do(key => _knownSubscriptions.Value.Remove(key))
+                                                   .Done();
+                            }).ConfigureAwaitFalse();
+        }
+
         public Task<MessageSender> CreateDeadQueueMessageSender()
         {
             return CreateMessageSender(DeadLetterQueuePath);
@@ -119,7 +139,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
             return CreateMessageReceiver(DeadLetterQueuePath);
         }
 
-        private ConcurrentBag<string> FetchExistingTopics()
+        private ConcurrentSet<string> FetchExistingTopics()
         {
             return _retry.Do(() =>
                              {
@@ -127,14 +147,14 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                                  if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
                                  var topics = topicsAsync.Result;
-                                 var topicPaths = new ConcurrentBag<string>(topics.Select(t => t.Path));
+                                 var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path));
 
                                  return topicPaths;
                              },
                              "Fetching existing topics");
         }
 
-        private ConcurrentBag<string> FetchExistingSubscriptions()
+        private ConcurrentSet<string> FetchExistingSubscriptions()
         {
             return _retry.Do(() =>
                              {
@@ -150,7 +170,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                                      .OrderBy(k => k)
                                      .ToArray();
 
-                                 return new ConcurrentBag<string>(subscriptionKeys);
+                                 return new ConcurrentSet<string>(subscriptionKeys);
                              },
                              "Fetching existing subscriptions");
         }
@@ -172,7 +192,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                             }).ConfigureAwaitFalse();
         }
 
-        private ConcurrentBag<string> FetchExistingQueues()
+        private ConcurrentSet<string> FetchExistingQueues()
         {
             return _retry.Do(() =>
                              {
@@ -183,7 +203,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                                  var queuePaths = queues.Select(q => q.Path)
                                                         .OrderBy(p => p)
                                                         .ToArray();
-                                 return new ConcurrentBag<string>(queuePaths);
+                                 return new ConcurrentSet<string>(queuePaths);
                              },
                              "Fetching existing queues");
         }

@@ -63,6 +63,7 @@
     <Compile Include="QueueManagement\AzureQueueManager.cs" />
     <Compile Include="BrokeredMessages\BrokeredMessageFactory.cs" />
     <Compile Include="BrokeredMessages\IBrokeredMessageFactory.cs" />
+    <Compile Include="QueueManagement\ConcurrentSet.cs" />
     <Compile Include="QueueManagement\IQueueManager.cs" />
     <Compile Include="Extensions\MessagingExceptionExtensions.cs" />
     <Compile Include="Extensions\MessagingFactoryExtensions.cs" />
