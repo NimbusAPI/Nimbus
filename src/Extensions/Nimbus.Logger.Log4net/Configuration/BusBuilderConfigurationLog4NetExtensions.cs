@@ -4,7 +4,7 @@ using log4net;
 namespace Nimbus.Configuration
 {
     /// <summary>
-    ///     Extends <see cref="BusBuilderConfiguration" /> with support for the Serilog logging framework.
+    ///     Extends <see cref="BusBuilderConfiguration" /> with support for the Log4net logging framework.
     /// </summary>
     public static class BusBuilderConfigurationLog4NetExtensions
     {
