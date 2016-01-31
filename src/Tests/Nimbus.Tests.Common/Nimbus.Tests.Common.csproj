@@ -112,7 +112,6 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SyncContextConfiguration.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SynchronizationContextConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\InProcessScenariosFilter.cs" />
-    <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\StressTestScenariosFilter.cs" />
     <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
     <Compile Include="Stubs\TestIdEnricher.cs" />
     <Compile Include="Stubs\TestNameEnricher.cs" />

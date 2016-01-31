@@ -23,12 +23,13 @@ namespace Nimbus.IntegrationTests.Conventions
         [Test]
         public async Task ThereShouldBeASensibleNumberOfBusConfigurationScenarios()
         {
-            var mandatory = new AllBusConfigurations<ScanForInProcessConfigurationScenarios>().ToArray();
+            var inProcess = new AllBusConfigurations<ScanForInProcessConfigurationScenarios>().ToArray();
             var complete = new AllBusConfigurations<ScanForAllConfigurationScenarios>().ToArray();
 
-            mandatory.ShouldNotBeEmpty();
+            inProcess.ShouldNotBeEmpty();
             complete.ShouldNotBeEmpty();
-            mandatory.Length.ShouldNotBe(complete.Length);
+
+            inProcess.Length.ShouldBeLessThan(complete.Length);
         }
     }
 }

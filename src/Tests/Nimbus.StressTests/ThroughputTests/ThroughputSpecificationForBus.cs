@@ -18,7 +18,6 @@ namespace Nimbus.StressTests.ThroughputTests
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]
-    [FilterTestCasesBy(typeof (StressTestScenariosFilter))]
     public abstract class ThroughputSpecificationForBus
     {
         protected const int TimeoutSeconds = 300;

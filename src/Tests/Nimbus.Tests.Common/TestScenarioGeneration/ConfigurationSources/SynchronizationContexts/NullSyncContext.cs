@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
@@ -6,6 +6,11 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Synchr
 {
     public class NullSyncContext : ConfigurationScenario<SyncContextConfiguration>
     {
+        protected override IEnumerable<string> AdditionalCategories
+        {
+            get { yield return "SmokeTest"; }
+        }
+
         public override ScenarioInstance<SyncContextConfiguration> CreateInstance()
         {
             var instance = new ScenarioInstance<SyncContextConfiguration>(new SyncContextConfiguration());
