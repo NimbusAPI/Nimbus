@@ -1,4 +1,5 @@
-﻿using Nimbus.Infrastructure.Logging;
+﻿using Nimbus.Extensions;
+using Nimbus.Infrastructure.Logging;
 using NUnit.Framework;
 using Shouldly;
 
