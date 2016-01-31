@@ -8,6 +8,7 @@ using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Compression;
+using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
@@ -52,9 +53,17 @@ namespace Nimbus.Configuration
 
         public Bus Build()
         {
-            if (Serializer == null && TypeProvider != null)
+            if (TypeProvider != null)
             {
-                Serializer = new DataContractSerializer(TypeProvider);
+                if (Serializer == null)
+                {
+                    Serializer = new DataContractSerializer(TypeProvider);
+                }
+
+                if (DependencyResolver == null)
+                {
+                    DependencyResolver = new DependencyResolver(TypeProvider);
+                }
             }
 
             return BusBuilder.Build(this);
@@ -102,7 +111,17 @@ namespace Nimbus.Configuration
 
         public IEnumerable<string> Validate()
         {
-            if (Transport == null) yield return "You must specify a transport later.";
+            if (ApplicationName == null) yield return "You must specify an application name.";
+            if (InstanceName == null) yield return "You must specify an instance name.";
+
+            if (Transport == null) yield return "You must specify a transport layer.";
+            if (TypeProvider == null) yield return "You must specify a type provider.";
+            if (DependencyResolver == null) yield return "You must specify a dependency resolver.";
+            if (Logger == null) yield return "You must specify a logger.";
+            if (Serializer == null) yield return "You must specify a serializer.";
+            if (Compressor == null) yield return "You must specify a compressor.";
+            if (Router == null) yield return "You must specify a router.";
+            if (DeliveryRetryStrategy == null) yield return "You must specify a delivery retry strategy.";
         }
     }
 }
