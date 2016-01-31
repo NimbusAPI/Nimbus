@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Nimbus\FodyTests.cs">
+      <Link>FodyTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
       <Link>NullGuard.cs</Link>
     </Compile>
