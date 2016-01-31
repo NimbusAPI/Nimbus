@@ -31,7 +31,7 @@ namespace Nimbus.Infrastructure.Logging
             for (var i = 0; i < matches.Length; i++)
             {
                 var match = matches[i];
-                var replaceWith = string.Format("{{{0}}}", i);
+                var replaceWith = $"{{{i}}}";
                 output = output.Replace(match.Captures[0].Value, replaceWith);
             }
 
