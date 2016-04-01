@@ -50,7 +50,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         public async Task TestConnection()
         {
             var version = await _namespaceManager().GetVersionInfoAsync();
-            _logger.Info("Windows Service Bus transport is online with API version {ApiVersion}", version);
+            _logger.Debug("Windows Service Bus transport is online with API version {ApiVersion}", version);
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)

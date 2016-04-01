@@ -35,7 +35,7 @@ namespace Nimbus.Transports.Redis.ConnectionManagement
             using (var multiplexer = await ConnectionMultiplexer.ConnectAsync(configuration))
             {
                 var status = multiplexer.GetStatus();
-                _logger.Info("Redis connection status: {RedisConnectionStatus}", status);
+                _logger.Debug("Redis connection status: {RedisConnectionStatus}", status);
             }
         }
 
