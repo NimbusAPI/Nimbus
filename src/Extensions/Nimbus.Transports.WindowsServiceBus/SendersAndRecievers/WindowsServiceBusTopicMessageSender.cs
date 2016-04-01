@@ -73,7 +73,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
 
             try
             {
-                _logger.Info("Discarding message sender for {TopicPath}", _topicPath);
+                _logger.Debug("Discarding message sender for {TopicPath}", _topicPath);
                 topicClient.Close();
             }
             catch (Exception exc)

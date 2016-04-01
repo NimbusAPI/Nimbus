@@ -121,7 +121,7 @@ namespace Nimbus.Infrastructure
                     {
                         await _messageDispatcher.Dispatch(message);
                     }
-                    _logger.Info("Dispatched message {MessageId}", message.MessageId);
+                    _logger.Debug("Dispatched message {MessageId}", message.MessageId);
                     return;
                 }
                 catch (Exception exc)
@@ -140,7 +140,7 @@ namespace Nimbus.Infrastructure
                     try
                     {
                         var nextDeliveryTime = _deliveryRetryStrategy.CalculateNextRetryTime(message);
-                        _logger.Info("Re-enqueuing message {MessageId} for attempt {DeliveryAttempts} at delivery at {DeliveryTime}",
+                        _logger.Debug("Re-enqueuing message {MessageId} for attempt {DeliveryAttempts} at delivery at {DeliveryTime}",
                                      message.MessageId,
                                      numDeliveryAttempts + 1,
                                      nextDeliveryTime);
