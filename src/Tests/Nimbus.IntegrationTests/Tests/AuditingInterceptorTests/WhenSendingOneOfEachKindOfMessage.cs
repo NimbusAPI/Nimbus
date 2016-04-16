@@ -33,7 +33,8 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
             await Task.WhenAll(
                 Bus.Send(new SomeCommand(42)),
                 Bus.SendAt(new SomeCommandSentViaDelay(), DateTimeOffset.UtcNow),
-                Bus.Publish(new SomeEvent())
+                Bus.Publish(new SomeEvent()),
+                Bus.PublishAt(new SomeEventSentViaDelay(), DateTimeOffset.UtcNow)
                 );
 
             _response = await Bus.Request(new SomeRequest());
@@ -115,17 +116,24 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         }
 
         [Then]
-        public async Task ThereShouldBeATotalOfSevenAuditRecords()
+        public async Task ThereShouldBeAnAuditRecordForSomeEventSentViaDelay()
         {
-            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
-            MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(7);
+            await Timeout.WaitUntil(() => AllAuditedMessages().OfType<SomeEventSentViaDelay>().Count() == 1);
+            AllAuditedMessages().OfType<SomeEventSentViaDelay>().Count().ShouldBe(1);
         }
 
         [Then]
-        public async Task ThereShouldBeATotalOfSevenRecordedHandlerCalls()
+        public async Task ThereShouldBeATotalOfEightAuditRecords()
         {
-            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 7);
-            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 8);
+            MethodCallCounter.AllReceivedMessages.OfType<AuditEvent>().Count().ShouldBe(8);
+        }
+
+        [Then]
+        public async Task ThereShouldBeATotalOfEightRecordedHandlerCalls()
+        {
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedMessages.Count() >= 8);
+            MethodCallCounter.AllReceivedCalls.Count().ShouldBe(8);
         }
 
         private static object[] AllAuditedMessages()

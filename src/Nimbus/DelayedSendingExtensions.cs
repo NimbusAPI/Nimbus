@@ -19,5 +19,11 @@ namespace Nimbus
             var deliveryTime = _clock.UtcNow.Add(delay);
             return bus.SendAt(busCommand, deliveryTime);
         }
+
+        public static Task PublishAfter<TBusEvent>(this IBus bus, TBusEvent busEvent, TimeSpan delay) where TBusEvent : IBusEvent
+        {
+            var deliveryTime = _clock.UtcNow.Add(delay);
+            return bus.PublishAt(busEvent, deliveryTime);
+        }
     }
 }
