@@ -158,8 +158,11 @@
     <Compile Include="Tests\MulticastRequestResponseTests\WhenSendingAMulticastRequestThatShouldAllowAllResponders.cs" />
     <Compile Include="Tests\PoisonMessageTests\CommandHandlers\GoBangCommandHandler.cs" />
     <Compile Include="Tests\PoisonMessageTests\DeadLetterOfficeExtensions.cs" />
+    <Compile Include="Tests\PoisonMessageTests\EventHandlers\GoBangEventHandler.cs" />
     <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangCommand.cs" />
+    <Compile Include="Tests\PoisonMessageTests\MessageContracts\GoBangEvent.cs" />
     <Compile Include="Tests\PoisonMessageTests\WhenACommandFailsToBeHandledMoreThanNTimes.cs" />
+    <Compile Include="Tests\PoisonMessageTests\WhenAnEventFailsToBeHandledMoreThanNTimes.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\CommandHandlers\SomeOtherCommandHandler.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeOtherCommand.cs" />
     <Compile Include="Tests\SimpleCommandSendingTests\MessageContracts\SomeCommandThatHasNoHandler.cs" />

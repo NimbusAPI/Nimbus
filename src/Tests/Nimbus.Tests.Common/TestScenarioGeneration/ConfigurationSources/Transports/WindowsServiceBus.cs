@@ -18,6 +18,11 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
             _largeMessageScenario = largeMessageScenario;
         }
 
+        public WindowsServiceBus()
+        {
+            _largeMessageScenario = null;
+        }
+
         protected override IEnumerable<string> AdditionalCategories
         {
             get { yield return "Slow"; }
@@ -25,12 +30,15 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
 
         public ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            var largeMessageStorageInstance = _largeMessageScenario.CreateInstance();
-
             var azureServiceBusConnectionString = DefaultSettingsReader.Get<AzureServiceBusConnectionString>();
             var configuration = new WindowsServiceBusTransportConfiguration()
-                .WithConnectionString(azureServiceBusConnectionString)
-                .WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
+                .WithConnectionString(azureServiceBusConnectionString);
+
+            if(_largeMessageScenario != null)
+            {
+                var largeMessageStorageInstance = _largeMessageScenario.CreateInstance();
+                configuration.WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
+            }
 
             var instance = new ScenarioInstance<TransportConfiguration>(configuration);
 
