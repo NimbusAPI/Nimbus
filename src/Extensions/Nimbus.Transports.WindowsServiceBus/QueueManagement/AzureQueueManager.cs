@@ -208,6 +208,22 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                              "Fetching existing queues");
         }
 
+        public Task<bool> ExistingTopic(string topicPath)
+        {
+            return Task.Run(() =>
+            {
+                return _knownTopics.Value.Contains(topicPath);
+            }).ConfigureAwaitFalse();
+        }
+
+        public Task<bool> ExistingQueue(string queuePath)
+        {
+            return Task.Run(() =>
+            {
+                return _knownQueues.Value.Contains(queuePath);
+            }).ConfigureAwaitFalse();
+        }
+
         private void EnsureTopicExists(string topicPath)
         {
             if (_knownTopics.Value.Contains(topicPath)) return;
