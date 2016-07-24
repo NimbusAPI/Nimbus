@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.File</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.FileLoggerConfigurationExtensions">
+            <summary>Extends <see cref="T:Serilog.LoggerConfiguration"/> with methods to add file sinks.</summary>
+        </member>
+        <member name="M:Serilog.FileLoggerConfigurationExtensions.File(Serilog.Configuration.LoggerSinkConfiguration,System.String,Serilog.Events.LogEventLevel,System.String,System.IFormatProvider,System.Nullable{System.Int64},Serilog.Core.LoggingLevelSwitch,System.Boolean)">
+            <summary>
+            Write log events to the specified file.
+            </summary>
+            <param name="sinkConfiguration">Logger sink configuration.</param>
+            <param name="path">Path to the file.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.
+            the default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="fileSizeLimitBytes">The maximum size, in bytes, to which a log file will be allowed to grow.
+            For unrestricted growth, pass null. The default is 1 GB.</param>
+            <param name="buffered">Indicates if flushing to the output file can be buffered or not. The default
+            is false.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+            <remarks>The file will be written using the UTF-8 character set.</remarks>
+        </member>
+        <member name="T:Serilog.Sinks.File.FileSink">
+            <summary>
+            Write log events to a disk file.
+            </summary>
+        </member>
+        <member name="M:Serilog.Sinks.File.FileSink.#ctor(System.String,Serilog.Formatting.ITextFormatter,System.Nullable{System.Int64},System.Text.Encoding,System.Boolean)">
+            <summary>Construct a <see cref="T:Serilog.Sinks.File.FileSink"/>.</summary>
+            <param name="path">Path to the file.</param>
+            <param name="textFormatter">Formatter used to convert log events to text.</param>
+            <param name="fileSizeLimitBytes">The maximum size, in bytes, to which a log file will be allowed to grow.
+            For unrestricted growth, pass null. The default is 1 GB.</param>
+            <param name="encoding">Character encoding used to write the text file. The default is UTF-8.</param>
+            <param name="buffered">Indicates if flushing to the output file can be buffered or not. The default
+            is false.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+            <remarks>The file will be written using the UTF-8 character set.</remarks>
+            <exception cref="T:System.IO.IOException"></exception>
+        </member>
+        <member name="M:Serilog.Sinks.File.FileSink.Emit(Serilog.Events.LogEvent)">
+            <summary>
+            Emit the provided log event to the sink.
+            </summary>
+            <param name="logEvent">The log event to write.</param>
+        </member>
+        <member name="M:Serilog.Sinks.File.FileSink.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or
+            resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Serilog.Sinks.File.NullSink">
+            <summary>
+            An instance of this sink may be substituted when an instance of the
+            <see cref="T:Serilog.Sinks.File.FileSink"/> is unable to be constructed.
+            </summary>
+        </member>
+    </members>
+</doc>
