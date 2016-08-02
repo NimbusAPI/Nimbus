@@ -8,9 +8,8 @@ using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.Infrastructure.Serialization;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using NUnit.Framework;
 using Shouldly;
 

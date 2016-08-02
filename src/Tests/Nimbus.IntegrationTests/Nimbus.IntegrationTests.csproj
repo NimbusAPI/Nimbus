@@ -217,6 +217,10 @@
       <Project>{b4162aa1-5f41-4ffd-90fb-4d7093955f6d}</Project>
       <Name>Nimbus.Serializers.ProtoBuf</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj">
+      <Project>{78C6284D-129E-4283-889E-B94679C36A4F}</Project>
+      <Name>Nimbus.Transports.AzureServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
       <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
       <Name>Nimbus.Transports.InProcess</Name>
