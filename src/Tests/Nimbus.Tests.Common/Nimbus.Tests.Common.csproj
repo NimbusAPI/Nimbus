@@ -42,8 +42,8 @@
       <HintPath>..\..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ConfigInjector, Version=2.0.392.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ConfigInjector.2.0.392.0\lib\net45\ConfigInjector.dll</HintPath>
+    <Reference Include="ConfigInjector, Version=2.1.1058.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ConfigInjector.2.1.1058.0\lib\net45\ConfigInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -62,12 +62,9 @@
       <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.4.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WindowsAzure.ServiceBus.3.3.2\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
@@ -132,6 +129,7 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SingleThreadedSyncContext.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SyncContextConfiguration.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SynchronizationContextConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\AzureServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\InProcessScenariosFilter.cs" />
     <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
     <Compile Include="Stubs\TestIdEnricher.cs" />
@@ -167,7 +165,6 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\ProtoBuf.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\InProcess.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Redis.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\WindowsServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\TestCaseSources\AllTransportConfigurations.cs" />
     <Compile Include="Configuration\AzureBlobStorageConnectionString.cs" />
     <Compile Include="Configuration\AzureServiceBusConnectionString.cs" />
@@ -215,6 +212,10 @@
       <Project>{109fb118-fa9a-4eb2-88af-f66c973ce50f}</Project>
       <Name>Nimbus.Serializers.Json</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj">
+      <Project>{78C6284D-129E-4283-889E-B94679C36A4F}</Project>
+      <Name>Nimbus.Transports.AzureServiceBus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
       <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
       <Name>Nimbus.Transports.InProcess</Name>
@@ -222,10 +223,6 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj">
       <Project>{e7dbdb7e-f73e-48b1-a48f-2cddb6134d86}</Project>
       <Name>Nimbus.Transports.Redis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Unity\Nimbus.Unity.csproj">
       <Project>{c50bf581-4721-4447-8e8e-5263fb83a9a6}</Project>

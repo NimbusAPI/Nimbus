@@ -15,7 +15,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
 
             foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
             {
-                yield return new WindowsServiceBus(largeMessageStorage);
+                //yield return new WindowsServiceBus(largeMessageStorage);  //FIXME reinstate when we have separate app domains
+                yield return new AzureServiceBus(largeMessageStorage);
             }
         }
 
