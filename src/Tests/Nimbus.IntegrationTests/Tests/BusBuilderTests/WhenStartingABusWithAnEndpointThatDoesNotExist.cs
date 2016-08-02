@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.MessageContracts.Exceptions;
 using Nimbus.Tests.Common.Stubs;
+using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.WindowsServiceBus;
 using NUnit.Framework;
 using Shouldly;
@@ -24,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
             var bus = new BusBuilder().Configure()
                                       .WithDefaults(typeProvider)
-                                      .WithTransport(new WindowsServiceBusTransportConfiguration()
+                                      .WithTransport(new AzureServiceBusTransportConfiguration()
                                                          .WithConnectionString(
                                                              @"Endpoint=sb://shouldnotexist.example.com/;SharedAccessKeyName=IntegrationTestHarness;SharedAccessKey=borkborkbork=")
                 )

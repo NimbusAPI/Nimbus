@@ -81,6 +81,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.WindowsSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.Redis", "Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj", "{E7DBDB7E-F73E-48B1-A48F-2CDDB6134D86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.AzureServiceBus", "Extensions\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj", "{78C6284D-129E-4283-889E-B94679C36A4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -215,6 +217,10 @@ Global
 		{E7DBDB7E-F73E-48B1-A48F-2CDDB6134D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7DBDB7E-F73E-48B1-A48F-2CDDB6134D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7DBDB7E-F73E-48B1-A48F-2CDDB6134D86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78C6284D-129E-4283-889E-B94679C36A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78C6284D-129E-4283-889E-B94679C36A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78C6284D-129E-4283-889E-B94679C36A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78C6284D-129E-4283-889E-B94679C36A4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,5 +256,6 @@ Global
 		{49B432F5-093E-454F-9BF5-76AB28CFB396} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{717C9174-B5F4-449C-A542-B8D7082A8D5D} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 		{E7DBDB7E-F73E-48B1-A48F-2CDDB6134D86} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
+		{78C6284D-129E-4283-889E-B94679C36A4F} = {96EF7BBF-8E5A-4FCB-9C47-FC38DDB3A1C6}
 	EndGlobalSection
 EndGlobal

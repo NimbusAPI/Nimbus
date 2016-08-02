@@ -38,12 +38,12 @@
       <HintPath>..\..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ConfigInjector, Version=2.0.392.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ConfigInjector.2.0.392.0\lib\net45\ConfigInjector.dll</HintPath>
+    <Reference Include="ConfigInjector, Version=2.1.1058.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ConfigInjector.2.1.1058.0\lib\net45\ConfigInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ServiceBus, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WindowsAzure.ServiceBus.2.1.4.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WindowsAzure.ServiceBus.3.3.2\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -191,7 +191,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +216,10 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.ProtoBuf\Nimbus.Serializers.ProtoBuf.csproj">
       <Project>{b4162aa1-5f41-4ffd-90fb-4d7093955f6d}</Project>
       <Name>Nimbus.Serializers.ProtoBuf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj">
+      <Project>{78C6284D-129E-4283-889E-B94679C36A4F}</Project>
+      <Name>Nimbus.Transports.AzureServiceBus</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
       <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
