@@ -54,6 +54,7 @@
     <Compile Include="IBusMulticastResponse.cs" />
     <Compile Include="IBusRequest.cs" />
     <Compile Include="IBusResponse.cs" />
+    <Compile Include="FilterProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

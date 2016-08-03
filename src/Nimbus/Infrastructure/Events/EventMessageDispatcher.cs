@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
+using Nimbus.Filtering;
+using Nimbus.Filtering.Attributes;
+using Nimbus.Infrastructure.SubscriptionFiltering;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
@@ -49,6 +53,17 @@ namespace Nimbus.Infrastructure.Events
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = CreateHandlerFromScope(scope, busEvent, handlerType, nimbusMessage);
+
+                var subscriptionFilterAttribute = handlerType.GetCustomAttribute(typeof(SubscriptionFilterAttribute)) as SubscriptionFilterAttribute;
+                if (subscriptionFilterAttribute != null)
+                {
+                    var subscriptionFilter = (ISubscriptionFilter)scope.Resolve(subscriptionFilterAttribute.FilterType);
+                    if (!nimbusMessage.MatchesFilter(subscriptionFilter))
+                    {
+                        _logger.Debug("Message {MessageId} does not match the subscription filter for {HandlerType}. Dropping it immediately.", nimbusMessage.MessageId, handlerType);
+                        return;
+                    }
+                }
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busEvent, nimbusMessage);
 
                 Exception exception;

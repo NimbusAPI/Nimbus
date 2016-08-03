@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Nimbus.IntegrationTests.Extensions
+namespace Nimbus.Extensions
 {
-    public static class MemberInfoExtensions
+    internal static class MemberInfoExtensions
     {
         public static bool HasAttribute<TAttr>(this MemberInfo memberInfo) where TAttr : Attribute
         {
