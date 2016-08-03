@@ -1,16 +1,22 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
+using Nimbus.DependencyResolution;
+using Nimbus.Extensions;
+using Nimbus.Filtering;
+using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
+using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 using Nimbus.Transports.AzureServiceBus.SendersAndRecievers;
-using Nimbus.Extensions;
 
 namespace Nimbus.Transports.AzureServiceBus
 {
@@ -29,18 +35,24 @@ namespace Nimbus.Transports.AzureServiceBus
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
         private readonly GarbageMan _garbageMan = new GarbageMan();
         private readonly IRetry _retry;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
 
         public AzureServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                          IBrokeredMessageFactory brokeredMessageFactory,
-                                          IGlobalHandlerThrottle globalHandlerThrottle,
-                                          ILogger logger,
-                                          IQueueManager queueManager,
-                                          Func<NamespaceManager> namespaceManager,
-                                          IRetry retry)
+                                        IBrokeredMessageFactory brokeredMessageFactory,
+                                        IGlobalHandlerThrottle globalHandlerThrottle,
+                                        ILogger logger,
+                                        IQueueManager queueManager,
+                                        Func<NamespaceManager> namespaceManager,
+                                        IRetry retry,
+                                        IDependencyResolver dependencyResolver,
+                                        ISqlFilterExpressionGenerator sqlFilterExpressionGenerator)
         {
             _queueManager = queueManager;
             _namespaceManager = namespaceManager;
             _retry = retry;
+            _dependencyResolver = dependencyResolver;
+            _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
             _brokeredMessageFactory = brokeredMessageFactory;
             _globalHandlerThrottle = globalHandlerThrottle;
             _concurrentHandlerLimit = concurrentHandlerLimit;
@@ -50,7 +62,7 @@ namespace Nimbus.Transports.AzureServiceBus
         public async Task TestConnection()
         {
             var version = await _namespaceManager().GetVersionInfoAsync();
-            _logger.Debug("Windows Service Bus transport is online with API version {ApiVersion}", version);
+            _logger.Debug("Azure Service Bus transport is online with API version {ApiVersion}", version);
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -68,10 +80,23 @@ namespace Nimbus.Transports.AzureServiceBus
             return _topicMessageSenders.GetOrAdd(topicPath, CreateTopicSender);
         }
 
-        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
+        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, Type handlerType)
         {
             var key = "{0}/{1}".FormatWith(topicPath, subscriptionName);
-            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName));
+            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, ConstructFilterExpression(handlerType)));
+        }
+
+        private string ConstructFilterExpression(Type handlerType)
+        {
+            var filterAttribute = handlerType.GetCustomAttributes<SubscriptionFilterAttribute>().FirstOrDefault();
+            if (filterAttribute == null) return "1=1";
+
+            using (var scope = _dependencyResolver.CreateChildScope())
+            {
+                var filter = (ISubscriptionFilter) scope.Resolve(filterAttribute.FilterType);
+                var filterExpression = _sqlFilterExpressionGenerator.GenerateFor(filter.FilterCondition);
+                return filterExpression;
+            }
         }
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
@@ -84,11 +109,11 @@ namespace Nimbus.Transports.AzureServiceBus
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
             var receiver = new AzureServiceBusQueueMessageReceiver(_brokeredMessageFactory,
-                                                                     _queueManager,
-                                                                     queuePath,
-                                                                     _concurrentHandlerLimit,
-                                                                     _globalHandlerThrottle,
-                                                                     _logger);
+                                                                   _queueManager,
+                                                                   queuePath,
+                                                                   _concurrentHandlerLimit,
+                                                                   _globalHandlerThrottle,
+                                                                   _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }
@@ -100,15 +125,16 @@ namespace Nimbus.Transports.AzureServiceBus
             return sender;
         }
 
-        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
+        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName, string filterExpression)
         {
             var receiver = new AzureServiceBusSubscriptionMessageReceiver(_queueManager,
-                                                                            topicPath,
-                                                                            subscriptionName,
-                                                                            _concurrentHandlerLimit,
-                                                                            _brokeredMessageFactory,
-                                                                            _globalHandlerThrottle,
-                                                                            _logger);
+                                                                          topicPath,
+                                                                          subscriptionName,
+                                                                          filterExpression,
+                                                                          _concurrentHandlerLimit,
+                                                                          _brokeredMessageFactory,
+                                                                          _globalHandlerThrottle,
+                                                                          _logger);
             _garbageMan.Add(receiver);
             return receiver;
         }

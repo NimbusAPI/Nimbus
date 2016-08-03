@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 
 namespace Nimbus.Infrastructure
@@ -11,7 +12,7 @@ namespace Nimbus.Infrastructure
         INimbusMessageReceiver GetQueueReceiver(string queuePath);
 
         INimbusMessageSender GetTopicSender(string topicPath);
-        INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName);
+        INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, Type handlerType);
 
         //FIXME add remaining transport-level functionality here and stop exposing it via the container
     }

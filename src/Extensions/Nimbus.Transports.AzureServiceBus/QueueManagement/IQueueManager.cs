@@ -9,7 +9,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         Task<MessageReceiver> CreateMessageReceiver(string queuePath);
 
         Task<TopicClient> CreateTopicSender(string topicPath);
-        Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName);
+        Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, string filterExpression);
 
         Task MarkQueueAsNonExistent(string queuePath);
         Task MarkTopicAsNonExistent(string topicPath);

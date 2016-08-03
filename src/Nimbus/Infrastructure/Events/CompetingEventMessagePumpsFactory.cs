@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Handlers;
 using Nimbus.Routing;
 
@@ -68,7 +69,7 @@ namespace Nimbus.Infrastructure.Events
 
                     _logger.Debug("Creating message pump for competing event subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
 
-                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName);
+                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName, handlerType);
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 

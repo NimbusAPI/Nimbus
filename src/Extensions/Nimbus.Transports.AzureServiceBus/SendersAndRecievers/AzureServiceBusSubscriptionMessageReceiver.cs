@@ -1,13 +1,16 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
+using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
-using Nimbus.Extensions;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
@@ -18,20 +21,23 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
+        private readonly string _filterExpression;
         private SubscriptionClient _subscriptionClient;
 
         public AzureServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
-                                                            string topicPath,
-                                                            string subscriptionName,
-                                                            ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                                            IBrokeredMessageFactory brokeredMessageFactory,
-                                                            IGlobalHandlerThrottle globalHandlerThrottle,
-                                                            ILogger logger)
+                                                          string topicPath,
+                                                          string subscriptionName,
+                                                          string filterExpression,
+                                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                                          IBrokeredMessageFactory brokeredMessageFactory,
+                                                          IGlobalHandlerThrottle globalHandlerThrottle,
+                                                          ILogger logger)
             : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
+            _filterExpression = filterExpression;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
         }
@@ -99,7 +105,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         {
             if (_subscriptionClient != null) return _subscriptionClient;
 
-            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
+            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName, _filterExpression);
             _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
             return _subscriptionClient;
         }

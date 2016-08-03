@@ -68,7 +68,7 @@ namespace Nimbus.Infrastructure.RequestResponse
 
                     _logger.Debug("Creating message pump for multicast request subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
 
-                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName);
+                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName, handlerType);
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
@@ -41,7 +42,7 @@ namespace Nimbus.Transports.InProcess
             return _container.ResolveWithOverrides<InProcessQueueReceiver>(queuePath, messageQueue);
         }
 
-        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
+        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, Type handlerType)
         {
             var subscription = new Subscription(topicPath, subscriptionName);
             return _container.ResolveWithOverrides<InProcessSubscriptionReceiver>(subscription);

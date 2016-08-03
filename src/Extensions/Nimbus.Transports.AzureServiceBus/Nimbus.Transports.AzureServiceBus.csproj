@@ -65,6 +65,8 @@
     <Compile Include="DelayedDelivery\DelayedDeliveryService.cs" />
     <Compile Include="Extensions\MessagingExceptionExtensions.cs" />
     <Compile Include="Extensions\MessagingFactoryExtensions.cs" />
+    <Compile Include="Filtering\ISqlFilterExpressionGenerator.cs" />
+    <Compile Include="Filtering\SqlFilterExpressionGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueManagement\AzureQueueManager.cs" />
     <Compile Include="QueueManagement\ConcurrentSet.cs" />
