@@ -105,6 +105,7 @@
     <Compile Include="Tests\AuditingInterceptorTests\Handlers\SomeRequestHandler.cs" />
     <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeCommand.cs" />
     <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeCommandSentViaDelay.cs" />
+    <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeEventSentViaDelay.cs" />
     <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeEvent.cs" />
     <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeMulticastRequest.cs" />
     <Compile Include="Tests\AuditingInterceptorTests\MessageTypes\SomeMulticastResponse.cs" />

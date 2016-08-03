@@ -84,6 +84,11 @@ namespace Nimbus
             return Task.Run(() => _eventSender.Publish(busEvent)).ConfigureAwaitFalse();
         }
 
+        public Task PublishAt<TBusEvent>(TBusEvent busEvent, DateTimeOffset deliveryTime) where TBusEvent : IBusEvent
+        {
+            return Task.Run(() => _eventSender.PublishAt(busEvent, deliveryTime)).ConfigureAwaitFalse();
+        }
+
         public IDeadLetterOffice DeadLetterOffice { get; }
 
         public EventHandler<EventArgs> Starting;

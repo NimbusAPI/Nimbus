@@ -25,6 +25,8 @@ namespace Nimbus
 
         Task Publish<TBusEvent>(TBusEvent busEvent) where TBusEvent : IBusEvent;
 
+        Task PublishAt<TBusEvent>(TBusEvent busEvent, DateTimeOffset deliveryTime) where TBusEvent : IBusEvent;
+
         IDeadLetterOffice DeadLetterOffice { get; }
     }
 }
