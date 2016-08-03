@@ -47,6 +47,7 @@
     <Compile Include="DependencyResolution\IDependencyResolver.cs" />
     <Compile Include="Filtering\Conditions\AndCondition.cs" />
     <Compile Include="Filtering\Conditions\IFilterCondition.cs" />
+    <Compile Include="Filtering\Conditions\NotCondition.cs" />
     <Compile Include="Filtering\ISubscriptionFilter.cs" />
     <Compile Include="Filtering\Conditions\MatchCondition.cs" />
     <Compile Include="Filtering\Conditions\OrCondition.cs" />
