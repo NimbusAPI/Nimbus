@@ -70,7 +70,7 @@ namespace Nimbus.Filtering.Conditions
             }
         }
 
-        private bool TryConvert(object propertyValue, Type expectedType, out object actualValue)
+        private static bool TryConvert(object propertyValue, Type expectedType, out object actualValue)
         {
             try
             {
