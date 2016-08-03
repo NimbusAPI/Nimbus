@@ -8,6 +8,6 @@ namespace Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.EventHandlers
     {
         public static Guid MySpecialThingId = Guid.Parse("{9D57E250-05F8-4E42-9FFC-8874B60B605F}");
 
-        public IFilterCondition FilterCondition => new MatchCondition("ThingId", MySpecialThingId.ToString());
+        public IFilterCondition FilterCondition => new MatchCondition("ThingId", MySpecialThingId);
     }
 }
