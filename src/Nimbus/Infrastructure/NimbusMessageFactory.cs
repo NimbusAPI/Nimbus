@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.MessageContracts;
 using NullGuard;
 
 namespace Nimbus.Infrastructure
@@ -34,6 +38,11 @@ namespace Nimbus.Infrastructure
             nimbusMessage.CorrelationId = currentDispatchContext.CorrelationId;
             nimbusMessage.From = _replyQueueName;
             nimbusMessage.ExpiresAfter = expiresAfter;
+
+            payload?.GetType().GetProperties()
+                    .Where(p => p.HasAttribute<FilterProperty>())
+                    .Do(p => nimbusMessage.Properties[p.Name] = p.GetValue(payload))
+                    .Done();
 
             return Task.FromResult(nimbusMessage);
         }

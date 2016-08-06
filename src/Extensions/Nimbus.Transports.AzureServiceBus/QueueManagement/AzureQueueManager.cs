@@ -92,7 +92,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                             }).ConfigureAwaitFalse();
         }
 
-        public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName)
+        public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, string filterExpression)
         {
             return Task.Run(() =>
                             {
@@ -100,11 +100,22 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
                                 return _retry.Do(() =>
                                                  {
-                                                     var subscriptionClient = _messagingFactory()
-                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                                     var subscriptionClient = _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+
+                                                     try
+                                                     {
+                                                         subscriptionClient.RemoveRule("$Default");
+                                                     }
+                                                     catch (MessagingEntityNotFoundException) { }
+                                                     try
+                                                     {
+                                                         subscriptionClient.AddRule("$Default", new SqlFilter(filterExpression));
+                                                     }
+                                                     catch (MessagingEntityAlreadyExistsException) { }
+
                                                      return subscriptionClient;
                                                  },
-                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName);
+                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " + filterExpression);
                             }).ConfigureAwaitFalse();
         }
 
@@ -216,13 +227,13 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 if (_knownTopics.Value.Contains(topicPath)) return;
 
                 var topicDescription = new TopicDescription(topicPath)
-                                       {
-                                           DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                           EnableBatchedOperations = true,
-                                           RequiresDuplicateDetection = false,
-                                           SupportOrdering = false,
-                                           AutoDeleteOnIdle = _autoDeleteOnIdle
-                                       };
+                {
+                    DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                    EnableBatchedOperations = true,
+                    RequiresDuplicateDetection = false,
+                    SupportOrdering = false,
+                    AutoDeleteOnIdle = _autoDeleteOnIdle
+                };
 
                 _retry.Do(() =>
                           {
@@ -264,14 +275,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 _retry.Do(() =>
                           {
                               var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                                            {
-                                                                MaxDeliveryCount = _maxDeliveryAttempts,
-                                                                DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                                                EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
-                                                                EnableBatchedOperations = true,
-                                                                RequiresSession = false,
-                                                                AutoDeleteOnIdle = _autoDeleteOnIdle
-                                                            };
+                              {
+                                  MaxDeliveryCount = _maxDeliveryAttempts,
+                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                  EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
+                                  EnableBatchedOperations = true,
+                                  RequiresSession = false,
+                                  AutoDeleteOnIdle = _autoDeleteOnIdle
+                              };
 
                               try
                               {
@@ -306,16 +317,16 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 _retry.Do(() =>
                           {
                               var queueDescription = new QueueDescription(queuePath)
-                                                     {
-                                                         MaxDeliveryCount = _maxDeliveryAttempts,
-                                                         DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                                         EnableDeadLetteringOnMessageExpiration = true,
-                                                         EnableBatchedOperations = true,
-                                                         RequiresDuplicateDetection = false,
-                                                         RequiresSession = false,
-                                                         SupportOrdering = false,
-                                                         AutoDeleteOnIdle = _autoDeleteOnIdle
-                                                     };
+                              {
+                                  MaxDeliveryCount = _maxDeliveryAttempts,
+                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                  EnableDeadLetteringOnMessageExpiration = true,
+                                  EnableBatchedOperations = true,
+                                  RequiresDuplicateDetection = false,
+                                  RequiresSession = false,
+                                  SupportOrdering = false,
+                                  AutoDeleteOnIdle = _autoDeleteOnIdle
+                              };
 
                               // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
                               // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and

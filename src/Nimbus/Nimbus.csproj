@@ -80,6 +80,9 @@
     <Compile Include="DevelopmentStubs\StubNamespaceCleanser.cs" />
     <Compile Include="Extensions\ConcurrentBagExtensions.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
+    <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Infrastructure\Filtering\FilterConditionProvider.cs" />
+    <Compile Include="Infrastructure\Filtering\IFilterConditionProvider.cs" />
     <Compile Include="Infrastructure\INimbusTransport.cs" />
     <Compile Include="Infrastructure\Logging\MessageLoggingExtensions.cs" />
     <Compile Include="Infrastructure\MessageSendersAndReceivers\GlobalHandlerThrottle.cs" />
@@ -147,6 +150,7 @@
     <Compile Include="Infrastructure\RequestResponse\MulticastRequestMessageDispatcher.cs" />
     <Compile Include="Infrastructure\Routing\SingleQueueAndTopicPerMessageTypeRouter.cs" />
     <Compile Include="Bus.cs" />
+    <Compile Include="Infrastructure\Filtering\SubscriptionFilterEvaluator.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptor.cs" />
     <Compile Include="Interceptors\Inbound\IInboundInterceptorFactory.cs" />
     <Compile Include="Interceptors\Inbound\InboundInterceptor.cs" />

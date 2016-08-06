@@ -4,6 +4,7 @@ using System.Linq;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.Filtering;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Events
@@ -19,9 +20,11 @@ namespace Nimbus.Infrastructure.Events
         private readonly PoorMansIoC _container;
         private readonly INimbusTransport _transport;
         private readonly IRouter _router;
+        private readonly IFilterConditionProvider _filterConditionProvider;
 
         internal MulticastEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
+                                                   IFilterConditionProvider filterConditionProvider,
                                                    IHandlerMapper handlerMapper,
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
@@ -39,11 +42,12 @@ namespace Nimbus.Infrastructure.Events
             _router = router;
             _typeProvider = typeProvider;
             _container = container;
+            _filterConditionProvider = filterConditionProvider;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof (IHandleMulticastEvent<>);
+            var openGenericHandlerType = typeof(IHandleMulticastEvent<>);
             var handlerTypes = _typeProvider.MulticastEventHandlerTypes.ToArray();
 
             // Events are routed to Topics and we'll create a subscription per instance of the logical endpoint to enable multicast behaviour
@@ -68,10 +72,15 @@ namespace Nimbus.Infrastructure.Events
                 {
                     var messageType = binding.MessageTypes.Single();
                     var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, _instanceName, handlerType);
+                    var filterCondition = _filterConditionProvider.GetFilterConditionFor(handlerType);
 
-                    _logger.Debug("Creating message pump for multicast event subscription '{0}/{1}' handling {2}", binding.TopicPath, subscriptionName, messageType);
+                    _logger.Debug("Creating message pump for multicast event subscription '{0}/{1}' handling {2} with filter {3}",
+                                  binding.TopicPath,
+                                  subscriptionName,
+                                  messageType,
+                                  filterCondition);
 
-                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName);
+                    var messageReceiver = _transport.GetTopicReceiver(binding.TopicPath, subscriptionName, filterCondition);
                     var handlerMap = new Dictionary<Type, Type[]> {{messageType, new[] {handlerType}}};
                     var messageDispatcher = _messageDispatcherFactory.Create(openGenericHandlerType, handlerMap);
 

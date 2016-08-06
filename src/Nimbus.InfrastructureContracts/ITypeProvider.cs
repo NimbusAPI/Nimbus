@@ -20,6 +20,7 @@ namespace Nimbus
         IEnumerable<Type> MulticastRequestTypes { get; }
         IEnumerable<Type> MulticastResponseTypes { get; }
 
+        IEnumerable<Type> FilterTypes { get; }
         IEnumerable<Type> InterceptorTypes { get; }
     }
 }

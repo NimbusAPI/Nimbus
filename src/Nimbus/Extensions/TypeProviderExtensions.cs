@@ -8,7 +8,11 @@ namespace Nimbus.Extensions
     {
         public static Type[] AllResolvableTypes(this ITypeProvider typeProvider)
         {
-            return typeProvider.AllHandlerTypes().Union(typeProvider.InterceptorTypes).ToArray();
+            return Enumerable.Empty<Type>()
+                .Union(typeProvider.AllHandlerTypes())
+                .Union(typeProvider.FilterTypes)
+                .Union(typeProvider.InterceptorTypes)
+                .ToArray();
         }
 
         public static Type[] AllHandlerTypes(this ITypeProvider typeProvider)

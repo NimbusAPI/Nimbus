@@ -5,6 +5,7 @@ using System.Reflection;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
+using Nimbus.Filtering;
 using Nimbus.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -31,6 +32,7 @@ namespace Nimbus.Infrastructure
         private readonly ThreadSafeLazy<Type[]> _multicastRequestTypes;
         private readonly ThreadSafeLazy<Type[]> _multicastResponseTypes;
         private readonly ThreadSafeLazy<Type[]> _interceptorTypes;
+        private readonly ThreadSafeLazy<Type[]> _filterTypes;
 
         private IEnumerable<Type> AllInstantiableTypesInScannedAssemblies => _allInstantiableTypesInScannedAssemblies.Value;
 
@@ -53,6 +55,7 @@ namespace Nimbus.Infrastructure
             _multicastRequestHandlerTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastRequestHandlerTypes);
             _multicastRequestTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastRequestTypes);
             _multicastResponseTypes = new ThreadSafeLazy<Type[]>(ScanForMulticastResponseTypes);
+            _filterTypes = new ThreadSafeLazy<Type[]>(ScanForFilterTypes);
             _interceptorTypes = new ThreadSafeLazy<Type[]>(ScanForInterceptorTypes);
         }
 
@@ -67,6 +70,7 @@ namespace Nimbus.Infrastructure
         public IEnumerable<Type> MulticastRequestHandlerTypes => _multicastRequestHandlerTypes.Value;
         public IEnumerable<Type> MulticastRequestTypes => _multicastRequestTypes.Value;
         public IEnumerable<Type> MulticastResponseTypes => _multicastResponseTypes.Value;
+        public IEnumerable<Type> FilterTypes => _filterTypes.Value;
         public IEnumerable<Type> InterceptorTypes => _interceptorTypes.Value;
 
         protected virtual Type[] ScanAssembliesForKnownTypes()
@@ -177,6 +181,15 @@ namespace Nimbus.Infrastructure
         {
             var types = AllInstantiableTypesInScannedAssemblies
                 .Where(t => typeof (IBusMulticastResponse).IsAssignableFrom(t))
+                .ToArray();
+
+            return types;
+        }
+
+        private Type[] ScanForFilterTypes()
+        {
+            var types = AllInstantiableTypesInScannedAssemblies
+                .Where(t => typeof(ISubscriptionFilter).IsAssignableFrom(t))
                 .ToArray();
 
             return types;

@@ -5,6 +5,7 @@ using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
@@ -68,7 +69,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             return _topicMessageSenders.GetOrAdd(topicPath, CreateTopicSender);
         }
 
-        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName)
+        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
             var key = "{0}/{1}".FormatWith(topicPath, subscriptionName);
             return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName));
