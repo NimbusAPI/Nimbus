@@ -1,6 +1,6 @@
 ﻿using Nimbus.Filtering;
 
-namespace Nimbus.Infrastructure.SubscriptionFiltering
+namespace Nimbus.Infrastructure.Filtering
 {
     internal static class SubscriptionFilterEvaluator
     {

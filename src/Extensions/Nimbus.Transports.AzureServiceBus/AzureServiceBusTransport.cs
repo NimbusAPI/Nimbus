@@ -10,6 +10,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Filtering;
 using Nimbus.Filtering.Attributes;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
@@ -80,10 +81,11 @@ namespace Nimbus.Transports.AzureServiceBus
             return _topicMessageSenders.GetOrAdd(topicPath, CreateTopicSender);
         }
 
-        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, Type handlerType)
+        public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
             var key = "{0}/{1}".FormatWith(topicPath, subscriptionName);
-            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, ConstructFilterExpression(handlerType)));
+            var filterSql = _sqlFilterExpressionGenerator.GenerateFor(filter);
+            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, filterSql));
         }
 
         private string ConstructFilterExpression(Type handlerType)

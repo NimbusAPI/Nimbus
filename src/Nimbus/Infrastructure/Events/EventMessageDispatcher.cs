@@ -8,7 +8,7 @@ using Nimbus.Exceptions;
 using Nimbus.Extensions;
 using Nimbus.Filtering;
 using Nimbus.Filtering.Attributes;
-using Nimbus.Infrastructure.SubscriptionFiltering;
+using Nimbus.Infrastructure.Filtering;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 
