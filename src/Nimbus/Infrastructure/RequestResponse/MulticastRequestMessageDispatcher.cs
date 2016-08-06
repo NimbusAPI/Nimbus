@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
+using Nimbus.Infrastructure.Filtering;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Interceptors.Inbound;
@@ -24,6 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly INimbusTransport _transport;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly IPropertyInjector _propertyInjector;
+        private readonly IFilterConditionProvider _filterConditionProvider;
 
         public MulticastRequestMessageDispatcher(INimbusMessageFactory nimbusMessageFactory,
                                                  IDependencyResolver dependencyResolver,
@@ -32,7 +34,8 @@ namespace Nimbus.Infrastructure.RequestResponse
                                                  INimbusTransport transport,
                                                  IOutboundInterceptorFactory outboundInterceptorFactory,
                                                  IReadOnlyDictionary<Type, Type[]> handlerMap,
-                                                 IPropertyInjector propertyInjector)
+                                                 IPropertyInjector propertyInjector,
+                                                 IFilterConditionProvider filterConditionProvider)
         {
             _nimbusMessageFactory = nimbusMessageFactory;
             _dependencyResolver = dependencyResolver;
@@ -41,6 +44,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _transport = transport;
             _handlerMap = handlerMap;
             _propertyInjector = propertyInjector;
+            _filterConditionProvider = filterConditionProvider;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
 
@@ -60,6 +64,13 @@ namespace Nimbus.Infrastructure.RequestResponse
             where TBusRequest : IBusMulticastRequest<TBusRequest, TBusResponse>
             where TBusResponse : IBusMulticastResponse
         {
+            var subscriptionFilter = _filterConditionProvider.GetFilterConditionFor(handlerType);
+            if (!nimbusMessage.MatchesFilter(subscriptionFilter))
+            {
+                _logger.Debug("Message {MessageId} does not match the subscription filter for {HandlerType}. Dropping it immediately.", nimbusMessage.MessageId, handlerType);
+                return;
+            }
+
             var replyQueueName = nimbusMessage.From;
             var replyQueueClient = _transport.GetQueueSender(replyQueueName);
 
@@ -113,10 +124,10 @@ namespace Nimbus.Infrastructure.RequestResponse
                         }
 
                         _logger.Debug("Sent successful response message {0} to {1} [MessageId:{2}, CorrelationId:{3}]",
-                                     nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
-                                     replyQueueName,
-                                     nimbusMessage.MessageId,
-                                     nimbusMessage.CorrelationId);
+                                      nimbusMessage.SafelyGetBodyTypeNameOrDefault(),
+                                      replyQueueName,
+                                      nimbusMessage.MessageId,
+                                      nimbusMessage.CorrelationId);
                     }
                     else
                     {
@@ -176,9 +187,9 @@ namespace Nimbus.Infrastructure.RequestResponse
                                  nimbusMessage.CorrelationId);
                     await replyQueueClient.Send(failedResponseMessage);
                     _logger.Debug("Sent failed response message to {0} [MessageId:{1}, CorrelationId:{2}]",
-                                 replyQueueName,
-                                 nimbusMessage.MessageId,
-                                 nimbusMessage.CorrelationId);
+                                  replyQueueName,
+                                  nimbusMessage.MessageId,
+                                  nimbusMessage.CorrelationId);
                 }
             }
         }
@@ -188,14 +199,14 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             var closedGenericHandlerType =
                 request.GetType()
-                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof (IBusMulticastRequest<,>)))
+                       .GetInterfaces().Where(t => t.IsClosedTypeOf(typeof(IBusMulticastRequest<,>)))
                        .Single();
 
             var genericArguments = closedGenericHandlerType.GetGenericArguments();
             var requestType = genericArguments[0];
             var responseType = genericArguments[1];
 
-            var openGenericMethod = typeof (MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
+            var openGenericMethod = typeof(MulticastRequestMessageDispatcher).GetMethod("Dispatch", BindingFlags.NonPublic | BindingFlags.Instance);
             var closedGenericMethod = openGenericMethod.MakeGenericMethod(requestType, responseType);
             return closedGenericMethod;
         }

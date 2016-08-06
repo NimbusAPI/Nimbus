@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
-using Nimbus.Filtering;
-using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure.Filtering;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
@@ -19,16 +16,19 @@ namespace Nimbus.Infrastructure.Events
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly IInboundInterceptorFactory _inboundInterceptorFactory;
+        private readonly IFilterConditionProvider _filterConditionProvider;
         private readonly ILogger _logger;
 
         protected EventMessageDispatcher(IDependencyResolver dependencyResolver,
                                          IReadOnlyDictionary<Type, Type[]> handlerMap,
                                          IInboundInterceptorFactory inboundInterceptorFactory,
+                                         IFilterConditionProvider filterConditionProvider,
                                          ILogger logger)
         {
             _dependencyResolver = dependencyResolver;
             _handlerMap = handlerMap;
             _inboundInterceptorFactory = inboundInterceptorFactory;
+            _filterConditionProvider = filterConditionProvider;
             _logger = logger;
         }
 
@@ -50,20 +50,17 @@ namespace Nimbus.Infrastructure.Events
 
         private async Task Dispatch<TBusEvent>(TBusEvent busEvent, NimbusMessage nimbusMessage, Type handlerType) where TBusEvent : IBusEvent
         {
+            var subscriptionFilter = _filterConditionProvider.GetFilterConditionFor(handlerType);
+            if (!nimbusMessage.MatchesFilter(subscriptionFilter))
+            {
+                _logger.Debug("Message {MessageId} does not match the subscription filter for {HandlerType}. Dropping it immediately.", nimbusMessage.MessageId, handlerType);
+                return;
+            }
+
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = CreateHandlerFromScope(scope, busEvent, handlerType, nimbusMessage);
 
-                var subscriptionFilterAttribute = handlerType.GetCustomAttribute(typeof(SubscriptionFilterAttribute)) as SubscriptionFilterAttribute;
-                if (subscriptionFilterAttribute != null)
-                {
-                    var subscriptionFilter = (ISubscriptionFilter)scope.Resolve(subscriptionFilterAttribute.FilterType);
-                    if (!nimbusMessage.MatchesFilter(subscriptionFilter))
-                    {
-                        _logger.Debug("Message {MessageId} does not match the subscription filter for {HandlerType}. Dropping it immediately.", nimbusMessage.MessageId, handlerType);
-                        return;
-                    }
-                }
                 var interceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busEvent, nimbusMessage);
 
                 Exception exception;

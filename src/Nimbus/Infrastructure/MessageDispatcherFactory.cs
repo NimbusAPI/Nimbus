@@ -5,6 +5,7 @@ using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
+using Nimbus.Infrastructure.Filtering;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Interceptors.Inbound;
@@ -21,8 +22,10 @@ namespace Nimbus.Infrastructure
         private readonly ILogger _logger;
         private readonly INimbusTransport _transport;
         private readonly IPropertyInjector _propertyInjector;
+        private readonly IFilterConditionProvider _filterConditonProvider;
 
         public MessageDispatcherFactory(IDependencyResolver dependencyResolver,
+                                        IFilterConditionProvider filterConditonProvider,
                                         IInboundInterceptorFactory inboundInterceptorFactory,
                                         ILogger logger,
                                         INimbusMessageFactory nimbusMessageFactory,
@@ -37,6 +40,7 @@ namespace Nimbus.Infrastructure
             _transport = transport;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _propertyInjector = propertyInjector;
+            _filterConditonProvider = filterConditonProvider;
         }
 
         public IMessageDispatcher Create(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
@@ -46,7 +50,7 @@ namespace Nimbus.Infrastructure
 
         private IMessageDispatcher BuildDispatcher(Type openGenericHandlerType, IReadOnlyDictionary<Type, Type[]> handlerMap)
         {
-            if (openGenericHandlerType == typeof (IHandleCommand<>))
+            if (openGenericHandlerType == typeof(IHandleCommand<>))
             {
                 return new CommandMessageDispatcher(_dependencyResolver,
                                                     _inboundInterceptorFactory,
@@ -55,25 +59,27 @@ namespace Nimbus.Infrastructure
                                                     _propertyInjector);
             }
 
-            if (openGenericHandlerType == typeof (IHandleCompetingEvent<>))
+            if (openGenericHandlerType == typeof(IHandleCompetingEvent<>))
             {
                 return new CompetingEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
                                                            _propertyInjector,
-                                                           _logger);
+                                                           _logger,
+                                                           _filterConditonProvider);
             }
 
-            if (openGenericHandlerType == typeof (IHandleMulticastEvent<>))
+            if (openGenericHandlerType == typeof(IHandleMulticastEvent<>))
             {
                 return new MulticastEventMessageDispatcher(_dependencyResolver,
                                                            _inboundInterceptorFactory,
                                                            handlerMap,
                                                            _propertyInjector,
-                                                           _logger);
+                                                           _logger,
+                                                           _filterConditonProvider);
             }
 
-            if (openGenericHandlerType == typeof (IHandleRequest<,>))
+            if (openGenericHandlerType == typeof(IHandleRequest<,>))
             {
                 return new RequestMessageDispatcher(_nimbusMessageFactory,
                                                     _dependencyResolver,
@@ -85,7 +91,7 @@ namespace Nimbus.Infrastructure
                                                     _propertyInjector);
             }
 
-            if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
+            if (openGenericHandlerType == typeof(IHandleMulticastRequest<,>))
             {
                 return new MulticastRequestMessageDispatcher(_nimbusMessageFactory,
                                                              _dependencyResolver,
@@ -94,7 +100,8 @@ namespace Nimbus.Infrastructure
                                                              _transport,
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
-                                                             _propertyInjector);
+                                                             _propertyInjector,
+                                                             _filterConditonProvider);
             }
 
             throw new NotSupportedException("There is no dispatcher for the handler type {0}.".FormatWith(openGenericHandlerType.FullName));
