@@ -97,7 +97,7 @@ namespace Nimbus.Configuration.PoorMansIocContainer
             var registration = RegistrationForImplementedType(type);
             if (registration == null)
             {
-                throw new DependencyResolutionException("No registration for type")
+                throw new DependencyResolutionException($"No registration for type {type.FullName}")
                     .WithData("RequestedType", type.FullName);
             }
 
