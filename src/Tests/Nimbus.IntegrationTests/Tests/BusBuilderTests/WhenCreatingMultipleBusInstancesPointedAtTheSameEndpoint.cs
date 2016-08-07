@@ -18,7 +18,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
     [Timeout(TimeoutSeconds*1000)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
-        protected const int TimeoutSeconds = 120;
+        protected const int TimeoutSeconds = 60;
 
         private Bus[] _buses;
         private readonly ILogger _logger = TestHarnessLoggerFactory.Create();

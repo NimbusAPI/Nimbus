@@ -1,4 +1,5 @@
-﻿using Nimbus.Configuration.Debug.Settings;
+﻿using System.Threading.Tasks;
+using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
@@ -39,11 +40,22 @@ namespace Nimbus.Configuration
             var bus = container.ResolveWithOverrides<Bus>(messagePumpsManager);
             container.Resolve<PropertyInjector>().Bus = bus;
 
-            bus.Starting += (sender, args) => CleanNamespace(container, logger);
-            bus.Disposing += delegate
+            bus.Starting += (s, e) =>
+                            {
+                                Task.Run(async () =>
+                                               {
+                                                   await container.Resolve<INimbusTransport>().TestConnection();
+                                                   await CleanNamespace(container, logger);
+                                               }).Wait();
+                            };
+
+            bus.Disposing += (s, e) =>
                              {
-                                 CleanNamespace(container, logger);
-                                 container.Dispose();
+                                 Task.Run(async () =>
+                                                {
+                                                    await CleanNamespace(container, logger);
+                                                    container.Dispose();
+                                                }).Wait();
                              };
 
             logger.Info("Bus built. Job done!");
@@ -51,16 +63,14 @@ namespace Nimbus.Configuration
             return bus;
         }
 
-        private static void CleanNamespace(PoorMansIoC container, ILogger logger)
+        private static async Task CleanNamespace(PoorMansIoC container, ILogger logger)
         {
-            container.Resolve<INimbusTransport>().TestConnection().Wait();
-
             var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
             if (!removeAllExistingElements) return;
 
             logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
             var cleanser = container.Resolve<INamespaceCleanser>();
-            cleanser.RemoveAllExistingNamespaceElements().Wait();
+            await cleanser.RemoveAllExistingNamespaceElements();
         }
     }
 }

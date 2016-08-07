@@ -73,6 +73,7 @@
     <Compile Include="AssemblyScanningTests\WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
     <Compile Include="AssemblyScanningTests\WhenAMessageTypeNameIsDuplicated.cs" />
     <Compile Include="AssemblyScanningTests\WhenAUnserializableAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BarEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BazEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\FooEvent.cs" />

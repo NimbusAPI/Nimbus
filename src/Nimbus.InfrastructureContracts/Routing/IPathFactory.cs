@@ -9,5 +9,6 @@ namespace Nimbus.Routing
         string TopicPathFor(Type type);
         string SubscriptionNameFor(string applicationName, Type handlerType);
         string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType);
+        string DeadLetterOfficePath();
     }
 }

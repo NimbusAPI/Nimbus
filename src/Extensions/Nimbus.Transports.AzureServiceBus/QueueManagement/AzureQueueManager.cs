@@ -18,8 +18,6 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 {
     internal class AzureQueueManager : IQueueManager
     {
-        public const string DeadLetterQueuePath = "deadletteroffice";
-
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
@@ -31,12 +29,12 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownQueues;
+        private readonly IPathFactory _pathFactory;
+        private readonly IRetry _retry;
         private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
-        private readonly IRetry _retry;
-        private readonly IPathFactory _pathFactory;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
@@ -148,12 +146,12 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         public Task<MessageSender> CreateDeadQueueMessageSender()
         {
-            return CreateMessageSender(DeadLetterQueuePath);
+            return CreateMessageSender(_pathFactory.DeadLetterOfficePath());
         }
 
         public Task<MessageReceiver> CreateDeadQueueMessageReceiver()
         {
-            return CreateMessageReceiver(DeadLetterQueuePath);
+            return CreateMessageReceiver(_pathFactory.DeadLetterOfficePath());
         }
 
         private ConcurrentSet<string> FetchExistingTopics()

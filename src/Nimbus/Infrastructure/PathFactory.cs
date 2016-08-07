@@ -14,6 +14,7 @@ namespace Nimbus.Infrastructure
         private const string _queuePrefix = "q";
         private const string _topicPrefix = "t";
         private const string _instanceInputQueuePrefix = "inputqueue";
+        private const string _deadLetterOfficePath = "deadletteroffice";
 
         // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
         private const string _queueCharacterWhitelist = "abcdefghijklmnopqrstuvwxyz1234567890.-";
@@ -67,6 +68,14 @@ namespace Nimbus.Infrastructure
             var sanitizedName = Sanitize(unsanitizedName);
             var name = Shorten(sanitizedName, MaxNameLength);
             return name;
+        }
+
+        public string DeadLetterOfficePath()
+        {
+            var unsanitizedPath = $"{_globalPrefix}{_deadLetterOfficePath}";
+            var sanitizedPath = Sanitize(unsanitizedPath);
+            var path = Shorten(sanitizedPath, MaxPathLength);
+            return path;
         }
 
         private static string StripGenericQualification(Type type)

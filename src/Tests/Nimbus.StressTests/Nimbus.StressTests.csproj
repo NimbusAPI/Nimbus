@@ -73,7 +73,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartupPerformanceTests\WhenCreatingABigBus.cs" />
-    <Compile Include="TestConfiguration.cs" />
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingACommand.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingACommandHandler.cs" />

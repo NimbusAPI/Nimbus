@@ -120,6 +120,21 @@ namespace Nimbus.UnitTests.InfrastructureTests
         }
 
         [Test]
+        public void WhenCreatingADeadLetterQueueForATypeWithAVeryLongName_WeShouldHaveAPathOfTheCorrectMaximumLength()
+        {
+            var prefix = new string('x', 250);
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = prefix});
+
+            var path = pathFactory.DeadLetterOfficePath();
+
+            path.Length.ShouldBe(PathFactory.MaxPathLength);
+
+            var expectedFullPath = $"{prefix}.deadletteroffice";
+            var expectedShortenedPath = PathFactory.Shorten(expectedFullPath, PathFactory.MaxPathLength);
+            path.ShouldBe(expectedShortenedPath);
+        }
+
+        [Test]
         public void WhenCreatingASubscriptionForATypeWeHaveAMaximumLengthOf50()
         {
             var pathFactory = new PathFactory(new GlobalPrefixSetting());
