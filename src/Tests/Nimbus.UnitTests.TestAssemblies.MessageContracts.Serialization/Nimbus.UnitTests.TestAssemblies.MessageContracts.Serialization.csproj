@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="UnserializableCommandWhoseAssemblyShouldNotBeIncluded.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WhenTheTestHarnessRuns.cs" />

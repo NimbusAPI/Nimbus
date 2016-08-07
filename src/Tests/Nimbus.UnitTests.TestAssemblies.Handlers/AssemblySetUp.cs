@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
 
-[assembly: Category("IntegrationTest")]
+[assembly: Category("UnitTest")]
 [assembly: Parallelizable(ParallelScope.Fixtures)]
-[assembly: LevelOfParallelism(32)]

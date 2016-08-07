@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="CommandWhoseAssemblyShouldNotBeIncluded.cs" />
     <Compile Include="DuplicateMessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

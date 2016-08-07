@@ -122,6 +122,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="Configuration\AzureBlobStorageContainerSharedAccessSignature.cs" />
     <Compile Include="Configuration\AzureBlobStorageContainerUri.cs" />
     <Compile Include="Configuration\RedisConnectionString.cs" />
