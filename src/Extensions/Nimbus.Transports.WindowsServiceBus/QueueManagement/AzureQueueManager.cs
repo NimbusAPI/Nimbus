@@ -20,11 +20,12 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
     {
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
-        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
-        private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly DefaultTimeoutSetting _defaultTimeout;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
+        private readonly GlobalPrefixSetting _globalPrefix;
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
 
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
@@ -42,6 +43,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  DefaultTimeoutSetting defaultTimeout,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+                                 GlobalPrefixSetting globalPrefix,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
                                  IPathFactory pathFactory,
                                  IRetry retry,
@@ -57,6 +59,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _globalPrefix = globalPrefix;
             _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
             _pathFactory = pathFactory;
 
@@ -162,7 +165,10 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                 if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
                 var topics = topicsAsync.Result;
-                var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path));
+                var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path)
+                                                                 .Where(p => p.StartsWith(_globalPrefix.Value))
+                                                                 .OrderBy(p => p)
+                                                                 .ToArray());
 
                 return topicPaths;
             },
@@ -216,6 +222,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 
                 var queues = queuesAsync.Result;
                 var queuePaths = queues.Select(q => q.Path)
+                                       .Where(p => p.StartsWith(_globalPrefix.Value))
                                        .OrderBy(p => p)
                                        .ToArray();
                 return new ConcurrentSet<string>(queuePaths);
