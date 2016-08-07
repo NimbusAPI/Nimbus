@@ -186,6 +186,7 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\SerializerConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\TransportConfigurationSources.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />
+    <Compile Include="WhenTheTestHarnessRuns.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">

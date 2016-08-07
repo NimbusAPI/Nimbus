@@ -243,10 +243,6 @@
       <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
       <Name>Nimbus.InfrastructureContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Nimbus.IntegrationTests.InfrastructureContracts\Nimbus.IntegrationTests.InfrastructureContracts.csproj">
-      <Project>{661699AC-929D-4F77-96A5-DE73F5B8E214}</Project>
-      <Name>Nimbus.IntegrationTests.InfrastructureContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>
