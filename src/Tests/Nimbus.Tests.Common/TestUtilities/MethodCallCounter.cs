@@ -11,15 +11,38 @@ using Serilog;
 
 namespace Nimbus.Tests.Common.TestUtilities
 {
-    public static class MethodCallCounter
+    public class MethodCallCounter
     {
-        private static readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
-        private static bool _stopped;
-        private static int _callCount;
+        private static readonly Dictionary<Guid, MethodCallCounter> _instances = new Dictionary<Guid, MethodCallCounter>();
 
-        public static void RecordCall<T>(Expression<Action<T>> expr)
+        private readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
+        private bool _stopped;
+        private int _callCount;
+
+        private MethodCallCounter()
         {
-            if (_stopped) throw new InvalidOperationException("{0} was not expecting any more calls!".FormatWith((typeof (MethodCallCounter).Name)));
+        }
+
+        public static MethodCallCounter CreateInstance(Guid instanceId)
+        {
+            var instance = new MethodCallCounter();
+            _instances.Add(instanceId, instance);
+            return instance;
+        }
+
+        public static MethodCallCounter ForInstance(Guid instanceId)
+        {
+            return _instances[instanceId];
+        }
+
+        public static void DestroyInstance(Guid instanceId)
+        {
+            _instances.Remove(instanceId);
+        }
+
+        public void RecordCall<T>(Expression<Action<T>> expr)
+        {
+            if (_stopped) throw new InvalidOperationException("{0} was not expecting any more calls!".FormatWith((typeof(MethodCallCounter).Name)));
 
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
@@ -29,14 +52,14 @@ namespace Nimbus.Tests.Common.TestUtilities
             foreach (var argExpr in methodCallExpression.Arguments)
             {
                 var messageExpression = argExpr;
-                var objectMember = Expression.Convert(messageExpression, typeof (object));
+                var objectMember = Expression.Convert(messageExpression, typeof(object));
                 var getterLambda = Expression.Lambda<Func<object>>(objectMember);
                 var getter = getterLambda.Compile();
                 var arg = getter();
                 args.Add(arg);
             }
 
-            var key = GetMethodKey(typeof (T), method);
+            var key = GetMethodKey(typeof(T), method);
             var methodCallBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             methodCallBag.Add(args.ToArray());
 
@@ -44,7 +67,7 @@ namespace Nimbus.Tests.Common.TestUtilities
             Log.Information("Observed call {CallCount} to {HandlerMethod}", callCount, key);
         }
 
-        public static IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls
+        public IEnumerable<KeyValuePair<string, object[]>> AllReceivedCalls
         {
             get
             {
@@ -61,7 +84,7 @@ namespace Nimbus.Tests.Common.TestUtilities
             }
         }
 
-        public static IEnumerable<object[]> AllReceivedCallArgs
+        public IEnumerable<object[]> AllReceivedCallArgs
         {
             get
             {
@@ -75,7 +98,7 @@ namespace Nimbus.Tests.Common.TestUtilities
             }
         }
 
-        public static IEnumerable<object> AllReceivedMessages
+        public IEnumerable<object> AllReceivedMessages
         {
             get
             {
@@ -89,33 +112,33 @@ namespace Nimbus.Tests.Common.TestUtilities
             }
         }
 
-        public static IEnumerable<object[]> ReceivedCallsWithAnyArg<T>(Expression<Action<T>> expr)
+        public IEnumerable<object[]> ReceivedCallsWithAnyArg<T>(Expression<Action<T>> expr)
         {
             var methodCallExpression = (MethodCallExpression) expr.Body;
             var method = methodCallExpression.Method;
-            var key = GetMethodKey(typeof (T), method);
+            var key = GetMethodKey(typeof(T), method);
             var messageBag = _allReceivedCalls.GetOrAdd(key, k => new ConcurrentBag<object[]>());
             return messageBag;
         }
 
-        public static int TotalReceivedCalls
+        public int TotalReceivedCalls
         {
             get { return AllReceivedCalls.Count(); }
         }
 
-        public static void Clear()
+        public void Clear()
         {
             _callCount = 0;
             _allReceivedCalls.Clear();
             _stopped = false;
         }
 
-        public static void Stop()
+        public void Stop()
         {
             _stopped = true;
         }
 
-        private static string GetMethodKey(Type type, MethodInfo method)
+        private string GetMethodKey(Type type, MethodInfo method)
         {
             var parameters = method
                 .GetParameters()
@@ -128,7 +151,7 @@ namespace Nimbus.Tests.Common.TestUtilities
             return key;
         }
 
-        public static void Dump()
+        public void Dump()
         {
             var allReceivedCalls = _allReceivedCalls
                 .ToDictionary();

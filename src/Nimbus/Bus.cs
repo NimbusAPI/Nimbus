@@ -44,9 +44,13 @@ namespace Nimbus
             _messagePumpsManager = messagePumpsManager;
             DeadLetterOffice = deadLetterOffice;
 
+            InstanceId = Guid.NewGuid();
+
             Started += async delegate { await _heartbeat.Start(); };
             Stopping += async delegate { await _heartbeat.Stop(); };
         }
+
+        public Guid InstanceId { get; }
 
         public Task Send<TBusCommand>(TBusCommand busCommand) where TBusCommand : IBusCommand
         {

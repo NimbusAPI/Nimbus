@@ -10,12 +10,11 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.Serialization;
-using Nimbus.Tests.Common;
+using Nimbus.PropertyInjection;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.UnitTests.DispatcherTests.Handlers;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
-using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
@@ -28,11 +27,16 @@ namespace Nimbus.UnitTests.DispatcherTests
 
         private readonly Guid _id1 = new Guid();
         private readonly Guid _id2 = new Guid();
+        private Guid BusId { get; set; }
+        private MethodCallCounter MethodCallCounter { get; set; }
 
         private const int _expectedCallCount = 2;
 
         protected override async Task<CommandMessageDispatcher> Given()
         {
+            BusId = Guid.NewGuid();
+            MethodCallCounter = MethodCallCounter.CreateInstance(BusId);
+
             var clock = new SystemClock();
             var logger = new ConsoleLogger();
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
@@ -40,8 +44,9 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"});
+            var propertyInjector = new StubPropertyInjector(BusId);
 
-            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof (IHandleCommand<>));
+            var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof(IHandleCommand<>));
 
             _nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                              replyQueueNameSetting,
@@ -52,7 +57,7 @@ namespace Nimbus.UnitTests.DispatcherTests
                                                 new NullInboundInterceptorFactory(),
                                                 new NullLogger(),
                                                 handlerMap,
-                                                Substitute.For<IPropertyInjector>());
+                                                propertyInjector);
         }
 
         protected override async Task When()
@@ -100,6 +105,28 @@ namespace Nimbus.UnitTests.DispatcherTests
         {
             var calls = MethodCallCounter.ReceivedCallsWithAnyArg<BrokerTestCommandHandler>(h => h.Dispose());
             calls.Count().ShouldBe(_expectedCallCount);
+        }
+
+        public override void TearDown()
+        {
+            MethodCallCounter.DestroyInstance(BusId);
+            base.TearDown();
+        }
+
+        private class StubPropertyInjector : IPropertyInjector
+        {
+            private readonly Guid _busId;
+
+            public StubPropertyInjector(Guid busId)
+            {
+                _busId = busId;
+            }
+
+            public void Inject(object handlerOrInterceptor, NimbusMessage nimbusMessage)
+            {
+                var requiresBusId = handlerOrInterceptor as IRequireBusId;
+                if (requiresBusId != null) requiresBusId.BusId = _busId;
+            }
         }
     }
 }

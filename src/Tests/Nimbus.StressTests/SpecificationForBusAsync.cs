@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 
 namespace Nimbus.StressTests
@@ -26,7 +25,6 @@ namespace Nimbus.StressTests
         {
             Task.Run(async () =>
                            {
-                               MethodCallCounter.Clear();
                                Subject = await Given();
 
                                _sw = Stopwatch.StartNew();

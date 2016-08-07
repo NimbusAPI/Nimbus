@@ -86,7 +86,7 @@
     <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingBHappenedEvent.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingBHappenedEventHandler.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\MessageContracts\CommandThatWillBlockTheThread.cs" />
-    <Compile Include="SpecificationForAsync.cs" />
+    <Compile Include="SpecificationForBusAsync.cs" />
     <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
     <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool.cs" />
     <Compile Include="ThroughputTests\EventHandlers\StressTestMessageHandler.cs" />

@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestUtilities;
@@ -20,18 +19,18 @@ namespace Nimbus.IntegrationTests
         protected readonly TimeSpan Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
         protected ScenarioInstance<BusBuilderConfiguration> Instance { get; private set; }
+        protected MethodCallCounter MethodCallCounter { get; private set; }
         protected Bus Bus { get; private set; }
 
         private bool _thenWasInvoked;
 
         protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            MethodCallCounter.Clear();
-
             Instance = scenario.CreateInstance();
             Reconfigure();
 
             Bus = Instance.Configuration.Build();
+            MethodCallCounter = MethodCallCounter.CreateInstance(Bus.InstanceId);
             await Bus.Start();
         }
 
@@ -67,8 +66,14 @@ namespace Nimbus.IntegrationTests
             var bus = Bus;
             Bus = null;
 
-            bus?.Stop().Wait();
-            bus?.Dispose();
+            if (bus != null)
+            {
+                var instanceId = bus.InstanceId;
+                bus.Stop().Wait();
+                bus.Dispose();
+
+                MethodCallCounter.DestroyInstance(instanceId);
+            }
 
             Instance?.Dispose();
             Instance = null;

@@ -68,6 +68,7 @@
     <Compile Include="ILogger.cs" />
     <Compile Include="ILargeMessageBodyStore.cs" />
     <Compile Include="NimbusMessage.cs" />
+    <Compile Include="PropertyInjection\IRequireBusId.cs" />
     <Compile Include="PropertyInjection\IRequireMessageProperties.cs" />
     <Compile Include="PropertyInjection\IRequireNimbusMessage.cs" />
     <Compile Include="PropertyInjection\IRequireBus.cs" />

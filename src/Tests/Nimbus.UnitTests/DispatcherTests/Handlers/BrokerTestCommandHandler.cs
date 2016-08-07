@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
+using Nimbus.PropertyInjection;
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.TestUtilities;
 using Nimbus.UnitTests.DispatcherTests.MessageContracts;
@@ -9,16 +10,18 @@ using Nimbus.UnitTests.DispatcherTests.MessageContracts;
 
 namespace Nimbus.UnitTests.DispatcherTests.Handlers
 {
-    public class BrokerTestCommandHandler : IHandleCommand<FooCommand>, IDisposable
+    public class BrokerTestCommandHandler : IHandleCommand<FooCommand>, IRequireBusId, IDisposable
     {
         public async Task Handle(FooCommand busCommand)
         {
-            MethodCallCounter.RecordCall<BrokerTestCommandHandler>(h => h.Handle(busCommand));
+            MethodCallCounter.ForInstance(BusId).RecordCall<BrokerTestCommandHandler>(h => h.Handle(busCommand));
         }
 
         public void Dispose()
         {
-            MethodCallCounter.RecordCall<BrokerTestCommandHandler>(h => h.Dispose());
+            MethodCallCounter.ForInstance(BusId).RecordCall<BrokerTestCommandHandler>(h => h.Dispose());
         }
+
+        public Guid BusId { get; set; }
     }
 }

@@ -1,23 +1,28 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.Tests.Common;
+using Nimbus.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
 
 #pragma warning disable 4014
 
 namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers
 {
-    public class SomeCompetingEventHandler : IHandleCompetingEvent<SomeEventWeOnlyHandleViaCompetition>, IHandleCompetingEvent<SomeEventWeHandleViaMulticastAndCompetition>
+    public class SomeCompetingEventHandler : IHandleCompetingEvent<SomeEventWeOnlyHandleViaCompetition>,
+                                             IHandleCompetingEvent<SomeEventWeHandleViaMulticastAndCompetition>,
+                                             IRequireBusId
     {
         public async Task Handle(SomeEventWeOnlyHandleViaCompetition busEvent)
         {
-            MethodCallCounter.RecordCall<SomeCompetingEventHandler>(h => h.Handle(busEvent));
+            MethodCallCounter.ForInstance(BusId).RecordCall<SomeCompetingEventHandler>(h => h.Handle(busEvent));
         }
 
         public async Task Handle(SomeEventWeHandleViaMulticastAndCompetition busEvent)
         {
-            MethodCallCounter.RecordCall<SomeCompetingEventHandler>(h => h.Handle(busEvent));
+            MethodCallCounter.ForInstance(BusId).RecordCall<SomeCompetingEventHandler>(h => h.Handle(busEvent));
         }
+
+        public Guid BusId { get; set; }
     }
 }
