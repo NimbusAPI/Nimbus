@@ -26,12 +26,26 @@ namespace Nimbus.Transports.InProcess.DelayedDelivery
                                var delay = deliveryTime.Subtract(_clock.UtcNow);
                                if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                                await Task.Delay(delay);
+
+                               var messageQueuePath = DeriveMessageQueuePath(message);
+
                                AsyncBlockingCollection<NimbusMessage> queue;
-                               if (!_messageStore.TryGetExistingMessageQueue(message.DeliverTo, out queue)) return;
+                               if (!_messageStore.TryGetExistingMessageQueue(messageQueuePath, out queue)) return;
                                await queue.Add(message);
                            }).ConfigureAwaitFalse();
 
             return Task.Delay(0);
+        }
+
+        private static string DeriveMessageQueuePath(NimbusMessage message)
+        {
+            object subscriptionName;
+            if (message.Properties.TryGetValue(MessagePropertyKeys.RedeliveryToSubscriptionName, out subscriptionName))
+            {
+                return InProcessTransport.FullyQualifiedSubscriptionPath(message.DeliverTo, (string) subscriptionName);
+            }
+
+            return message.DeliverTo;
         }
     }
 }
