@@ -28,7 +28,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
             transport.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
-            var pathFactory = new PathFactory();
+            var pathFactory = PathFactory.CreateWithNoPrefix();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"},

@@ -30,7 +30,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"},
-                new PathFactory());
+                PathFactory.CreateWithNoPrefix());
             TypeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);

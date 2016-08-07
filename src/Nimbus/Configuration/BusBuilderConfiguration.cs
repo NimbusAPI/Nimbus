@@ -38,7 +38,7 @@ namespace Nimbus.Configuration
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
         internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
-        internal IPathFactory PathFactory { get; set; } = new PathFactory();
+        internal IPathFactory PathFactory { get; set; } = Infrastructure.PathFactory.CreateWithNoPrefix();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }

@@ -84,6 +84,8 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="DateTimeOffsetTests\WhenAddingValuesToADateTime.cs" />
+    <Compile Include="InfrastructureTests\MessageContracts\SimpleCommand.cs" />
+    <Compile Include="InfrastructureTests\MessageContracts\SimpleEvent.cs" />
     <Compile Include="NimbusMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
     <Compile Include="NimbusMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />

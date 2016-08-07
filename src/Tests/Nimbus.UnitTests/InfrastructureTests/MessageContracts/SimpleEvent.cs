@@ -2,7 +2,7 @@
 
 namespace Nimbus.UnitTests.InfrastructureTests.MessageContracts
 {
-    public class MyEventWithALongName : IBusEvent
+    public class SimpleEvent : IBusEvent
     {
     }
 }

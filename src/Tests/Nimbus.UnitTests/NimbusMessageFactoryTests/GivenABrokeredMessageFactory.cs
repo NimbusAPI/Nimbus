@@ -19,7 +19,7 @@ namespace Nimbus.UnitTests.NimbusMessageFactoryTests
 
             ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"},
                                                               new InstanceNameSetting {Value = "TestInstance"},
-                                                              new PathFactory());
+                                                              PathFactory.CreateWithNoPrefix());
 
             return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                             ReplyQueueNameSetting,
