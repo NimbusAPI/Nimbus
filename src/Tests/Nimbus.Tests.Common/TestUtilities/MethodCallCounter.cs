@@ -13,9 +13,9 @@ namespace Nimbus.Tests.Common.TestUtilities
 {
     public class MethodCallCounter
     {
-        private static readonly Dictionary<Guid, MethodCallCounter> _instances = new Dictionary<Guid, MethodCallCounter>();
-
+        private static readonly ThreadSafeDictionary<Guid, MethodCallCounter> _instances = new ThreadSafeDictionary<Guid, MethodCallCounter>();
         private readonly ThreadSafeDictionary<string, ConcurrentBag<object[]>> _allReceivedCalls = new ThreadSafeDictionary<string, ConcurrentBag<object[]>>();
+
         private bool _stopped;
         private int _callCount;
 
@@ -26,7 +26,7 @@ namespace Nimbus.Tests.Common.TestUtilities
         public static MethodCallCounter CreateInstance(Guid instanceId)
         {
             var instance = new MethodCallCounter();
-            _instances.Add(instanceId, instance);
+            _instances.TryAdd(instanceId, instance);
             return instance;
         }
 
@@ -37,7 +37,8 @@ namespace Nimbus.Tests.Common.TestUtilities
 
         public static void DestroyInstance(Guid instanceId)
         {
-            _instances.Remove(instanceId);
+            MethodCallCounter dummy;
+            _instances.TryRemove(instanceId, out dummy);
         }
 
         public void RecordCall<T>(Expression<Action<T>> expr)
