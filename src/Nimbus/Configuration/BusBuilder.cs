@@ -39,23 +39,28 @@ namespace Nimbus.Configuration
             var bus = container.ResolveWithOverrides<Bus>(messagePumpsManager);
             container.Resolve<PropertyInjector>().Bus = bus;
 
-            bus.Starting += delegate
-                            {
-                                container.Resolve<INimbusTransport>().TestConnection().Wait();
-
-                                var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
-                                if (removeAllExistingElements)
-                                {
-                                    logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
-                                    var cleanser = container.Resolve<INamespaceCleanser>();
-                                    cleanser.RemoveAllExistingNamespaceElements().Wait();
-                                }
-                            };
-            bus.Disposing += delegate { container.Dispose(); };
+            bus.Starting += (sender, args) => CleanNamespace(container, logger);
+            bus.Disposing += delegate
+                             {
+                                 CleanNamespace(container, logger);
+                                 container.Dispose();
+                             };
 
             logger.Info("Bus built. Job done!");
 
             return bus;
+        }
+
+        private static void CleanNamespace(PoorMansIoC container, ILogger logger)
+        {
+            container.Resolve<INimbusTransport>().TestConnection().Wait();
+
+            var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
+            if (!removeAllExistingElements) return;
+
+            logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
+            var cleanser = container.Resolve<INamespaceCleanser>();
+            cleanser.RemoveAllExistingNamespaceElements().Wait();
         }
     }
 }

@@ -10,13 +10,15 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
     public class NamespaceCleanser : INamespaceCleanser
     {
         private readonly ConnectionStringSetting _connectionString;
+        private readonly GlobalPrefixSetting _globalPrefix;
         private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<NamespaceManager> _namespaceManager;
 
-        public NamespaceCleanser(ConnectionStringSetting connectionString, ILogger logger)
+        public NamespaceCleanser(ConnectionStringSetting connectionString, GlobalPrefixSetting globalPrefix, ILogger logger)
         {
             _connectionString = connectionString;
+            _globalPrefix = globalPrefix;
             _logger = logger;
 
             _namespaceManager = new ThreadSafeLazy<NamespaceManager>(() => NamespaceManager.CreateFromConnectionString(_connectionString));
@@ -27,23 +29,14 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         /// </summary>
         public async Task RemoveAllExistingNamespaceElements()
         {
-
             var queueDeletionTasks = _namespaceManager.Value.GetQueues()
                                                       .Select(q => q.Path)
-                                                      .Select(queuePath => Task.Run(async delegate
-                                                                                          {
-                                                                                              _logger.Debug("Deleting queue {0}", queuePath);
-                                                                                              await _namespaceManager.Value.DeleteQueueAsync(queuePath);
-                                                                                          }))
+                                                      .Select(DeleteQueue)
                                                       .ToArray();
 
             var topicDeletionTasks = _namespaceManager.Value.GetTopics()
                                                       .Select(t => t.Path)
-                                                      .Select(topicPath => Task.Run(async delegate
-                                                                                          {
-                                                                                              _logger.Debug("Deleting topic {0}", topicPath);
-                                                                                              await _namespaceManager.Value.DeleteTopicAsync(topicPath);
-                                                                                          }))
+                                                      .Select(DeleteTopic)
                                                       .ToArray();
 
             var allDeletionTasks = new Task[0]
@@ -52,6 +45,22 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
                 .ToArray();
 
             await Task.WhenAll(allDeletionTasks);
+        }
+
+        private async Task DeleteTopic(string topicPath)
+        {
+            if (!topicPath.StartsWith(_globalPrefix.Value)) return;
+
+            _logger.Debug("Deleting topic {0}", topicPath);
+            await _namespaceManager.Value.DeleteTopicAsync(topicPath);
+        }
+
+        private async Task DeleteQueue(string queuePath)
+        {
+            if (!queuePath.StartsWith(_globalPrefix.Value)) return;
+
+            _logger.Debug("Deleting queue {0}", queuePath);
+            await _namespaceManager.Value.DeleteQueueAsync(queuePath);
         }
     }
 }

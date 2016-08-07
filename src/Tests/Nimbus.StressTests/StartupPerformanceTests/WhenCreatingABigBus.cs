@@ -24,11 +24,15 @@ namespace Nimbus.StressTests.StartupPerformanceTests
     public class WhenCreatingABigBus
     {
         private NamespaceCleanser _namespaceCleanser;
+        private GlobalPrefixSetting _globalPrefix;
 
         [SetUp]
         public void SetUp()
         {
-            _namespaceCleanser = new NamespaceCleanser(new ConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureServiceBusConnectionString>()}, new NullLogger());
+            _globalPrefix = new GlobalPrefixSetting {Value = Guid.NewGuid().ToString()};
+            _namespaceCleanser = new NamespaceCleanser(new ConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureServiceBusConnectionString>()},
+                                                       _globalPrefix,
+                                                       new NullLogger());
             _namespaceCleanser.RemoveAllExistingNamespaceElements().Wait();
         }
 
@@ -127,8 +131,8 @@ namespace Nimbus.StressTests.StartupPerformanceTests
             var busCommandTypeBuilder = moduleBuilder.DefineType(commandTypeName,
                                                                  TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                  TypeAttributes.BeforeFieldInit,
-                                                                 typeof (Object));
-            busCommandTypeBuilder.AddInterfaceImplementation(typeof (IBusCommand));
+                                                                 typeof(Object));
+            busCommandTypeBuilder.AddInterfaceImplementation(typeof(IBusCommand));
             var busCommandType = busCommandTypeBuilder.CreateType();
             return busCommandType;
         }
@@ -139,13 +143,13 @@ namespace Nimbus.StressTests.StartupPerformanceTests
             var busCommandHandlerTypeBuilder = moduleBuilder.DefineType(commandHandlerTypeName,
                                                                         TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                         TypeAttributes.BeforeFieldInit,
-                                                                        typeof (Object));
-            var genericHandlerType = typeof (IHandleCommand<>).MakeGenericType(busCommandType);
+                                                                        typeof(Object));
+            var genericHandlerType = typeof(IHandleCommand<>).MakeGenericType(busCommandType);
             busCommandHandlerTypeBuilder.AddInterfaceImplementation(genericHandlerType);
 
-            var methodBuilder = busCommandHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof (Task), new[] {busCommandType});
+            var methodBuilder = busCommandHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof(Task), new[] {busCommandType});
             var il = methodBuilder.GetILGenerator();
-            il.ThrowException(typeof (NotImplementedException));
+            il.ThrowException(typeof(NotImplementedException));
 
             var handleMethod = genericHandlerType.GetMethod("Handle");
 
@@ -160,8 +164,8 @@ namespace Nimbus.StressTests.StartupPerformanceTests
             var busEventTypeBuilder = moduleBuilder.DefineType(eventTypeName,
                                                                TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                TypeAttributes.BeforeFieldInit,
-                                                               typeof (Object));
-            busEventTypeBuilder.AddInterfaceImplementation(typeof (IBusEvent));
+                                                               typeof(Object));
+            busEventTypeBuilder.AddInterfaceImplementation(typeof(IBusEvent));
             var busEventType = busEventTypeBuilder.CreateType();
             return busEventType;
         }
@@ -172,13 +176,13 @@ namespace Nimbus.StressTests.StartupPerformanceTests
             var busMulticastEventHandlerTypeBuilder = moduleBuilder.DefineType(multicastEventHandlerTypeName,
                                                                                TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                                TypeAttributes.BeforeFieldInit,
-                                                                               typeof (Object));
-            var genericHandlerType = typeof (IHandleMulticastEvent<>).MakeGenericType(busEventType);
+                                                                               typeof(Object));
+            var genericHandlerType = typeof(IHandleMulticastEvent<>).MakeGenericType(busEventType);
             busMulticastEventHandlerTypeBuilder.AddInterfaceImplementation(genericHandlerType);
 
-            var methodBuilder = busMulticastEventHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof (Task), new[] {busEventType});
+            var methodBuilder = busMulticastEventHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof(Task), new[] {busEventType});
             var il = methodBuilder.GetILGenerator();
-            il.ThrowException(typeof (NotImplementedException));
+            il.ThrowException(typeof(NotImplementedException));
 
             var handleMethod = genericHandlerType.GetMethod("Handle");
 
@@ -193,13 +197,13 @@ namespace Nimbus.StressTests.StartupPerformanceTests
             var busCompetingEventHandlerTypeBuilder = moduleBuilder.DefineType(competingEventHandlerTypeName,
                                                                                TypeAttributes.Public | TypeAttributes.AutoClass | TypeAttributes.AnsiClass |
                                                                                TypeAttributes.BeforeFieldInit,
-                                                                               typeof (Object));
-            var genericHandlerType = typeof (IHandleCompetingEvent<>).MakeGenericType(busEventType);
+                                                                               typeof(Object));
+            var genericHandlerType = typeof(IHandleCompetingEvent<>).MakeGenericType(busEventType);
             busCompetingEventHandlerTypeBuilder.AddInterfaceImplementation(genericHandlerType);
 
-            var methodBuilder = busCompetingEventHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof (Task), new[] {busEventType});
+            var methodBuilder = busCompetingEventHandlerTypeBuilder.DefineMethod("Handle", MethodAttributes.Public | MethodAttributes.Virtual, typeof(Task), new[] {busEventType});
             var il = methodBuilder.GetILGenerator();
-            il.ThrowException(typeof (NotImplementedException));
+            il.ThrowException(typeof(NotImplementedException));
 
             var handleMethod = genericHandlerType.GetMethod("Handle");
 
