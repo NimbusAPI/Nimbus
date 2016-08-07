@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.Filtering.Conditions;
 
 namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
 {
@@ -9,7 +10,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         Task<MessageReceiver> CreateMessageReceiver(string queuePath);
 
         Task<TopicClient> CreateTopicSender(string topicPath);
-        Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName);
+        Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition);
 
         Task MarkQueueAsNonExistent(string queuePath);
         Task MarkTopicAsNonExistent(string topicPath);
