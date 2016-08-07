@@ -75,6 +75,7 @@
     <Compile Include="PropertyInjection\IRequireDateTime.cs" />
     <Compile Include="PropertyInjection\IRequireDispatchContext.cs" />
     <Compile Include="PropertyInjection\IRequireLargeMessageBodyStore.cs" />
+    <Compile Include="Routing\IPathFactory.cs" />
     <Compile Include="Routing\IRouter.cs" />
     <Compile Include="ITypeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

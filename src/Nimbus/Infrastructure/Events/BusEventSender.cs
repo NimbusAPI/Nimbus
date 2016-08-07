@@ -19,6 +19,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
+        private readonly IPathFactory _pathFactory;
 
         public BusEventSender(IDependencyResolver dependencyResolver,
                               IKnownMessageTypeVerifier knownMessageTypeVerifier,
@@ -26,10 +27,12 @@ namespace Nimbus.Infrastructure.Events
                               INimbusMessageFactory nimbusMessageFactory,
                               INimbusTransport transport,
                               IOutboundInterceptorFactory outboundInterceptorFactory,
+                              IPathFactory pathFactory,
                               IRouter router)
         {
             _transport = transport;
             _router = router;
+            _pathFactory = pathFactory;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _nimbusMessageFactory = nimbusMessageFactory;
@@ -43,7 +46,7 @@ namespace Nimbus.Infrastructure.Events
 
             _knownMessageTypeVerifier.AssertValidMessageType(eventType);
 
-            var topicPath = _router.Route(eventType, QueueOrTopic.Topic);
+            var topicPath = _router.Route(eventType, QueueOrTopic.Topic, _pathFactory);
             var brokeredMessage = await _nimbusMessageFactory.Create(topicPath, busEvent);
 
             var sw = Stopwatch.StartNew();

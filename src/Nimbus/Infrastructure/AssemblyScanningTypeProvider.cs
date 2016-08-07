@@ -227,8 +227,9 @@ namespace Nimbus.Infrastructure
 
         private IEnumerable<string> CheckForDuplicateQueueNames()
         {
+            var pathFactory = new PathFactory();
             var duplicateQueues = this.AllMessageContractTypes()
-                                      .Select(t => new Tuple<string, Type>(PathFactory.QueuePathFor(t), t))
+                                      .Select(t => new Tuple<string, Type>(pathFactory.QueuePathFor(t), t))
                                       .GroupBy(tuple => tuple.Item1)
                                       .Where(tuple => tuple.Count() > 1)
                                       .ToArray();

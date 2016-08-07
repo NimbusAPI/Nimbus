@@ -20,6 +20,7 @@ namespace Nimbus.Infrastructure.Commands
         private readonly IRouter _router;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
+        private readonly IPathFactory _pathFactory;
 
         public BusCommandSender(IDependencyResolver dependencyResolver,
                                 IKnownMessageTypeVerifier knownMessageTypeVerifier,
@@ -27,6 +28,7 @@ namespace Nimbus.Infrastructure.Commands
                                 INimbusMessageFactory nimbusMessageFactory,
                                 INimbusTransport transport,
                                 IOutboundInterceptorFactory outboundInterceptorFactory,
+                                IPathFactory pathFactory,
                                 IRouter router)
         {
             _nimbusMessageFactory = nimbusMessageFactory;
@@ -34,6 +36,7 @@ namespace Nimbus.Infrastructure.Commands
             _logger = logger;
             _transport = transport;
             _router = router;
+            _pathFactory = pathFactory;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
         }
@@ -43,7 +46,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
             var message = await _nimbusMessageFactory.Create(destinationPath, busCommand);
 
             await Deliver(busCommand, commandType, message);
@@ -54,7 +57,7 @@ namespace Nimbus.Infrastructure.Commands
             var commandType = busCommand.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(commandType);
 
-            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue);
+            var destinationPath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
             var message = (await _nimbusMessageFactory.Create(destinationPath, busCommand)).WithScheduledEnqueueTime(whenToSend);
 
             await Deliver(busCommand, commandType, message);
@@ -62,7 +65,7 @@ namespace Nimbus.Infrastructure.Commands
 
         private async Task Deliver<TBusCommand>(TBusCommand busCommand, Type commandType, NimbusMessage nimbusMessage) where TBusCommand : IBusCommand
         {
-            var queuePath = _router.Route(commandType, QueueOrTopic.Queue);
+            var queuePath = _router.Route(commandType, QueueOrTopic.Queue, _pathFactory);
             nimbusMessage.DestinedForQueue(queuePath);
 
             var sw = Stopwatch.StartNew();

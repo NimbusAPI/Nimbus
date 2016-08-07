@@ -28,9 +28,11 @@ namespace Nimbus.UnitTests.BatchSendingTests
             transport.GetQueueSender(Arg.Any<string>()).Returns(ci => _nimbusMessageSender);
 
             var clock = new SystemClock();
+            var pathFactory = new PathFactory();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
-                new InstanceNameSetting {Value = "TestInstance"});
+                new InstanceNameSetting {Value = "TestInstance"},
+                pathFactory);
             var nimbusMessageFactory = new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                                                 replyQueueNameSetting,
                                                                 clock,
@@ -47,7 +49,7 @@ namespace Nimbus.UnitTests.BatchSendingTests
                                                         nimbusMessageFactory,
                                                         transport,
                                                         outboundInterceptorFactory,
-                                                        router);
+                                                        pathFactory, router);
             return Task.FromResult(busCommandSender);
         }
 

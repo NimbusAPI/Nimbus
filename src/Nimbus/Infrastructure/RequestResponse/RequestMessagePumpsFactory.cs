@@ -16,11 +16,13 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
         private readonly PoorMansIoC _container;
+        private readonly IPathFactory _pathFactory;
 
         public RequestMessagePumpsFactory(IHandlerMapper handlerMapper,
                                           ILogger logger,
                                           IMessageDispatcherFactory messageDispatcherFactory,
                                           INimbusTransport transport,
+                                          IPathFactory pathFactory,
                                           IRouter router,
                                           ITypeProvider typeProvider,
                                           PoorMansIoC container)
@@ -30,19 +32,20 @@ namespace Nimbus.Infrastructure.RequestResponse
             _handlerMapper = handlerMapper;
             _typeProvider = typeProvider;
             _container = container;
+            _pathFactory = pathFactory;
             _transport = transport;
             _router = router;
         }
 
         public IEnumerable<IMessagePump> CreateAll()
         {
-            var openGenericHandlerType = typeof (IHandleRequest<,>);
+            var openGenericHandlerType = typeof(IHandleRequest<,>);
             var handlerTypes = _typeProvider.RequestHandlerTypes.ToArray();
 
             // Create a single connection to each request queue determined by routing
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue)})
+                .Select(m => new {MessageType = m, QueuePath = _router.Route(m, QueueOrTopic.Queue, _pathFactory)})
                 .GroupBy(b => b.QueuePath)
                 .Select(g => new {QueuePath = g.Key, HandlerTypes = g.SelectMany(x => _handlerMapper.GetHandlerTypesFor(openGenericHandlerType, x.MessageType))});
 

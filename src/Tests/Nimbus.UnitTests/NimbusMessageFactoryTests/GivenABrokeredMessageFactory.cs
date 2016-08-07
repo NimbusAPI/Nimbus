@@ -17,7 +17,9 @@ namespace Nimbus.UnitTests.NimbusMessageFactoryTests
             _clock = Substitute.For<IClock>();
             _serializer = Substitute.For<ISerializer>();
 
-            ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"}, new InstanceNameSetting {Value = "TestInstance"});
+            ReplyQueueNameSetting = new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "TestApplication"},
+                                                              new InstanceNameSetting {Value = "TestInstance"},
+                                                              new PathFactory());
 
             return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
                                             ReplyQueueNameSetting,

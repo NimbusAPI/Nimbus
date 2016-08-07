@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
@@ -26,6 +25,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
+        private readonly IPathFactory _pathFactory;
 
         internal BusRequestSender(DefaultTimeoutSetting responseTimeout,
                                   IClock clock,
@@ -35,6 +35,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                   INimbusMessageFactory nimbusMessageFactory,
                                   INimbusTransport transport,
                                   IOutboundInterceptorFactory outboundInterceptorFactory,
+                                  IPathFactory pathFactory,
                                   IRouter router,
                                   RequestResponseCorrelator requestResponseCorrelator)
         {
@@ -42,6 +43,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _router = router;
             _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
+            _pathFactory = pathFactory;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _dependencyResolver = dependencyResolver;
             _logger = logger;
@@ -64,7 +66,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = busRequest.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
-            var queuePath = _router.Route(requestType, QueueOrTopic.Queue);
+            var queuePath = _router.Route(requestType, QueueOrTopic.Queue, _pathFactory);
 
             var nimbusMessage = (await _nimbusMessageFactory.Create(queuePath, busRequest))
                 .WithRequestTimeout(timeout)
@@ -113,7 +115,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                     await interceptor.OnRequestSendingError(busRequest, nimbusMessage, exception);
                 }
                 _logger.LogDispatchError("sending", queuePath, sw.Elapsed, exception);
-                    //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
+                //FIXME "sending" here is a bit misleading. The message could have been sent and the response not received.
 
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return default(TResponse);

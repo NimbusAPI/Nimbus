@@ -29,7 +29,8 @@ namespace Nimbus.UnitTests.DispatcherTests
             var clock = Substitute.For<IClock>();
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
-                new InstanceNameSetting {Value = "TestInstance"});
+                new InstanceNameSetting {Value = "TestInstance"},
+                new PathFactory());
             TypeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(TypeProvider);
             HandlerMapper = new HandlerMapper(TypeProvider);

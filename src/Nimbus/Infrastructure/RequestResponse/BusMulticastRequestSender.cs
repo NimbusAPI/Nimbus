@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
@@ -25,6 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IKnownMessageTypeVerifier _knownMessageTypeVerifier;
         private readonly IDependencyResolver _dependencyResolver;
         private readonly IOutboundInterceptorFactory _outboundInterceptorFactory;
+        private readonly IPathFactory _pathFactory;
 
         public BusMulticastRequestSender(IClock clock,
                                          IDependencyResolver dependencyResolver,
@@ -33,6 +33,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                                          INimbusMessageFactory nimbusMessageFactory,
                                          INimbusTransport transport,
                                          IOutboundInterceptorFactory outboundInterceptorFactory,
+                                         IPathFactory pathFactory,
                                          IRouter router,
                                          RequestResponseCorrelator requestResponseCorrelator)
         {
@@ -40,6 +41,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _router = router;
             _nimbusMessageFactory = nimbusMessageFactory;
             _requestResponseCorrelator = requestResponseCorrelator;
+            _pathFactory = pathFactory;
             _dependencyResolver = dependencyResolver;
             _outboundInterceptorFactory = outboundInterceptorFactory;
             _clock = clock;
@@ -54,7 +56,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             var requestType = busRequest.GetType();
             _knownMessageTypeVerifier.AssertValidMessageType(requestType);
 
-            var topicPath = _router.Route(requestType, QueueOrTopic.Topic);
+            var topicPath = _router.Route(requestType, QueueOrTopic.Topic, _pathFactory);
 
             var nimbusMessage = (await _nimbusMessageFactory.Create(topicPath, busRequest))
                 .WithRequestTimeout(timeout)

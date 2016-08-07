@@ -38,6 +38,7 @@ namespace Nimbus.Configuration
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
         internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
+        internal IPathFactory PathFactory { get; set; } = new PathFactory();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
@@ -79,6 +80,7 @@ namespace Nimbus.Configuration
             container.Register(Compressor, typeof(ICompressor));
             container.Register(Router, typeof(IRouter));
             container.Register(DeliveryRetryStrategy, typeof(IDeliveryRetryStrategy));
+            container.Register(PathFactory, typeof(IPathFactory));
 
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);

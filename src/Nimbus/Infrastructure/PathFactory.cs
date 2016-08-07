@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure
 {
-    public static class PathFactory
+    public class PathFactory : IPathFactory
     {
         private const string _queuePrefix = "q";
         private const string _topicPrefix = "t";
@@ -13,42 +14,42 @@ namespace Nimbus.Infrastructure
         // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
         private const string _queueCharacterWhitelist = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 
-        public static string InputQueuePathFor(string applicationName, string instanceName)
+        public string InputQueuePathFor(string applicationName, string instanceName)
         {
             return Sanitize(string.Format("{0}.{1}.{2}", _instanceInputQueuePrefix, applicationName, instanceName));
         }
 
-        public static string QueuePathFor(Type type)
+        public string QueuePathFor(Type type)
         {
             return Sanitize(_queuePrefix + "." + StripGenericQualification(type));
         }
 
-        public static string TopicPathFor(Type type)
+        public string TopicPathFor(Type type)
         {
             return Sanitize(_topicPrefix + "." + StripGenericQualification(type));
         }
 
-        public static string SubscriptionNameFor(string applicationName)
+        public string SubscriptionNameFor(string applicationName)
         {
             return Shorten(Sanitize(applicationName), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName)
+        public string SubscriptionNameFor(string applicationName, string instanceName)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName})), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, Type handlerType)
+        public string SubscriptionNameFor(string applicationName, Type handlerType)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, handlerType.Name})), 50);
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
+        public string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
         {
             return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name})), 50);
         }
 
-        private static string StripGenericQualification(Type type)
+        private string StripGenericQualification(Type type)
         {
             if (! type.IsGenericType) return type.FullName;
 
@@ -57,13 +58,13 @@ namespace Nimbus.Infrastructure
             return type.Namespace + "." + type.Name + "-" + string.Join("-", genericArgs);
         }
 
-        private static string Sanitize(string path)
+        private string Sanitize(string path)
         {
             path = string.Join("", path.ToLower().ToCharArray().Select(SanitiseCharacter));
             return path;
         }
 
-        private static string Shorten(string path, int maxlength)
+        private string Shorten(string path, int maxlength)
         {
             if (path.Length <= maxlength)
                 return path;
@@ -74,7 +75,7 @@ namespace Nimbus.Infrastructure
             return shortPath;
         }
 
-        private static char SanitiseCharacter(char currentChar)
+        private char SanitiseCharacter(char currentChar)
         {
             var whiteList = _queueCharacterWhitelist.ToCharArray();
 
@@ -84,7 +85,7 @@ namespace Nimbus.Infrastructure
             return currentChar;
         }
 
-        private static string CalculateAdler32Hash(string inputString)
+        private string CalculateAdler32Hash(string inputString)
         {
             const uint BASE = 65521;
             var buffer = Encoding.UTF8.GetBytes(inputString);

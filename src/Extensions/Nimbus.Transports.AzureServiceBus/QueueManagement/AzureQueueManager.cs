@@ -10,6 +10,7 @@ using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Routing;
 using Nimbus.Transports.AzureServiceBus.Extensions;
 using Nimbus.Transports.AzureServiceBus.Filtering;
 
@@ -35,17 +36,19 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
         private readonly IRetry _retry;
+        private readonly IPathFactory _pathFactory;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
-                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
-                                 IRetry retry,
-                                 ITypeProvider typeProvider,
-                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  DefaultTimeoutSetting defaultTimeout,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
-                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator)
+                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                                 IPathFactory pathFactory,
+                                 IRetry retry,
+                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
+                                 ITypeProvider typeProvider)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -57,6 +60,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
             _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
             _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
+            _pathFactory = pathFactory;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingSubscriptions);
@@ -369,7 +373,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         private bool WeHaveAHandler(string topicPath)
         {
-            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
+            var paths = _typeProvider.AllTypesHandledViaTopics().Select(_pathFactory.TopicPathFor);
             return paths.Contains(topicPath);
         }
 

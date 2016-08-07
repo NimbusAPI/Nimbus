@@ -5,7 +5,6 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.MessageContracts;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Stubs;
 using NSubstitute;
 using NUnit.Framework;
@@ -30,9 +29,9 @@ namespace Nimbus.UnitTests.CompressionTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                              new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}),
-                                              Substitute.For<IClock>(),
-                                              new DispatchContextManager());
+                                            new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}, new PathFactory()),
+                                            Substitute.For<IClock>(),
+                                            new DispatchContextManager());
         }
 
         protected override async Task When()

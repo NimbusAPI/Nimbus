@@ -8,7 +8,6 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Serializers.Json;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -25,7 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
 
         [Test]
-        [TestCaseSource(typeof (AllTransportConfigurations))]
+        [TestCaseSource(typeof(AllTransportConfigurations))]
         public async Task NoneOfThemShouldGoBang(string testName, IConfigurationScenario<TransportConfiguration> scenario)
         {
             await ClearMeABus(scenario);

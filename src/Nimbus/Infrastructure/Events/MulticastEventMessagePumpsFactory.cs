@@ -21,6 +21,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly INimbusTransport _transport;
         private readonly IRouter _router;
         private readonly IFilterConditionProvider _filterConditionProvider;
+        private readonly IPathFactory _pathFactory;
 
         internal MulticastEventMessagePumpsFactory(ApplicationNameSetting applicationName,
                                                    InstanceNameSetting instanceName,
@@ -29,6 +30,7 @@ namespace Nimbus.Infrastructure.Events
                                                    ILogger logger,
                                                    IMessageDispatcherFactory messageDispatcherFactory,
                                                    INimbusTransport transport,
+                                                   IPathFactory pathFactory,
                                                    IRouter router,
                                                    ITypeProvider typeProvider,
                                                    PoorMansIoC container)
@@ -42,6 +44,7 @@ namespace Nimbus.Infrastructure.Events
             _router = router;
             _typeProvider = typeProvider;
             _container = container;
+            _pathFactory = pathFactory;
             _filterConditionProvider = filterConditionProvider;
         }
 
@@ -53,7 +56,7 @@ namespace Nimbus.Infrastructure.Events
             // Events are routed to Topics and we'll create a subscription per instance of the logical endpoint to enable multicast behaviour
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic)})
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic, _pathFactory)})
                 .GroupBy(b => b.TopicPath)
                 .Select(g => new
                              {
@@ -71,7 +74,7 @@ namespace Nimbus.Infrastructure.Events
                 foreach (var handlerType in binding.HandlerTypes)
                 {
                     var messageType = binding.MessageTypes.Single();
-                    var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, _instanceName, handlerType);
+                    var subscriptionName = _pathFactory.SubscriptionNameFor(_applicationName, _instanceName, handlerType);
                     var filterCondition = _filterConditionProvider.GetFilterConditionFor(handlerType);
 
                     _logger.Debug("Creating message pump for multicast event subscription '{0}/{1}' handling {2} with filter {3}",
