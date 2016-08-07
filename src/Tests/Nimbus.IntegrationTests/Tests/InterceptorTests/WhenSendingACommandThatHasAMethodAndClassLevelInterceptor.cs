@@ -20,6 +20,7 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
     [TestFixture]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<Bus>
     {
+        private readonly string _globalPrefix = Guid.NewGuid().ToString();
         private MethodCallCounter MethodCallCounter { get; set; }
         private const int _expectedTotalCallCount = 11; // 5 interceptors * 2 + 1 handler
 
@@ -30,8 +31,9 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
             var logger = TestHarnessLoggerFactory.Create();
 
             var bus = new BusBuilder().Configure()
-                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
+                                      .WithGlobalPrefix(_globalPrefix)
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))

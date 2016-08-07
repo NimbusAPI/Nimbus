@@ -22,6 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 
         private Bus[] _buses;
         private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
+        private readonly string _globalPrefix = Guid.NewGuid().ToString();
 
         [Test]
         [TestCaseSource(typeof(AllTransportConfigurations))]
@@ -51,12 +52,13 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 var transportConfiguration = instance.Configuration;
 
                 var busBuilder = new BusBuilder().Configure()
+                                                 .WithNames("MyTestSuite", Environment.MachineName)
+                                                 .WithGlobalPrefix(_globalPrefix)
                                                  .WithTransport(transportConfiguration)
                                                  .WithRouter(new DestinationPerMessageTypeRouter())
                                                  .WithSerializer(new JsonSerializer())
                                                  .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                                                  .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                 .WithNames("MyTestSuite", Environment.MachineName)
                                                  .WithTypesFrom(typeProvider)
                                                  .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                                  .WithHeartbeatInterval(TimeSpan.MaxValue)
@@ -84,12 +86,13 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 var transportConfiguration = instance.Configuration;
 
                 var configuration = new BusBuilder().Configure()
+                                                    .WithNames("MyTestSuite", Environment.MachineName)
+                                                    .WithGlobalPrefix(_globalPrefix)
                                                     .WithTransport(transportConfiguration)
                                                     .WithRouter(new DestinationPerMessageTypeRouter())
                                                     .WithSerializer(new JsonSerializer())
                                                     .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                                                     .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                    .WithNames("MyTestSuite", Environment.MachineName)
                                                     .WithTypesFrom(typeProvider)
                                                     .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                     .WithHeartbeatInterval(TimeSpan.MaxValue)
