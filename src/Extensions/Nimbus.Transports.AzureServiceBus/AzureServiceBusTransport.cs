@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
@@ -8,8 +6,6 @@ using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Filtering;
-using Nimbus.Filtering.Attributes;
 using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -84,21 +80,7 @@ namespace Nimbus.Transports.AzureServiceBus
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
             var key = "{0}/{1}".FormatWith(topicPath, subscriptionName);
-            var filterSql = _sqlFilterExpressionGenerator.GenerateFor(filter);
-            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, filterSql));
-        }
-
-        private string ConstructFilterExpression(Type handlerType)
-        {
-            var filterAttribute = handlerType.GetCustomAttributes<SubscriptionFilterAttribute>().FirstOrDefault();
-            if (filterAttribute == null) return "1=1";
-
-            using (var scope = _dependencyResolver.CreateChildScope())
-            {
-                var filter = (ISubscriptionFilter) scope.Resolve(filterAttribute.FilterType);
-                var filterExpression = _sqlFilterExpressionGenerator.GenerateFor(filter.FilterCondition);
-                return filterExpression;
-            }
+            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, filter));
         }
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
@@ -127,12 +109,12 @@ namespace Nimbus.Transports.AzureServiceBus
             return sender;
         }
 
-        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName, string filterExpression)
+        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
         {
             var receiver = new AzureServiceBusSubscriptionMessageReceiver(_queueManager,
                                                                           topicPath,
                                                                           subscriptionName,
-                                                                          filterExpression,
+                                                                          filterCondition,
                                                                           _concurrentHandlerLimit,
                                                                           _brokeredMessageFactory,
                                                                           _globalHandlerThrottle,

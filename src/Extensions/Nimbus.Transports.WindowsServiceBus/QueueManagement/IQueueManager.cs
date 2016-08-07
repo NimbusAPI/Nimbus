@@ -18,7 +18,7 @@ namespace Nimbus.Transports.WindowsServiceBus.QueueManagement
         Task<MessageSender> CreateDeadQueueMessageSender();
         Task<MessageReceiver> CreateDeadQueueMessageReceiver();
 
-        Task<bool> ExistingTopic(string topicPath);
-        Task<bool> ExistingQueue(string queuePath);
+        Task<bool> TopicExists(string topicPath);
+        Task<bool> QueueExists(string queuePath);
     }
 }

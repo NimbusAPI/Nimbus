@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.IntegrationTests.Tests.PoisonMessageTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
@@ -54,9 +55,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Then]
-        public async Task ThePayloadOfTheMessageShouldBeTheOriginalCommandThatWentBang()
+        public async Task ThePayloadOfTheMessageShouldBeTheOriginalEventThatWentBang()
         {
-            ((GoBangEvent)_deadLetterMessages.Single().Payload).SomeContent.ShouldBe(_someContent);
+            ((GoBangEvent) _deadLetterMessages.Single().Payload).SomeContent.ShouldBe(_someContent);
         }
 
         [Then]
@@ -64,6 +65,13 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         {
             var nimbusMessage = _deadLetterMessages.Single();
             nimbusMessage.DeliveryAttempts.Count().ShouldBe(_maxDeliveryAttempts);
+        }
+
+        [Then]
+        public async Task TheNonExplodingEventHandlerShouldHaveSeenTheMessageOnce()
+        {
+            var nonExplodingCalls = MethodCallCounter.ReceivedCallsWithAnyArg<DoesNotGoBangCompetingEventHandler>(h => h.Handle(_goBangEvent)).ToArray();
+            nonExplodingCalls.Length.ShouldBe(1);
         }
     }
 }

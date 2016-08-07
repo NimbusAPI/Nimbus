@@ -76,6 +76,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                     if (brokeredMessage == null) return null;
 
                     var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
+                    nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
 
                     return nimbusMessage;
                 }

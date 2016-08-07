@@ -19,7 +19,7 @@ namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
 
         public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
-            if (await _queueManager.ExistingQueue(message.DeliverTo))
+            if (await _queueManager.QueueExists(message.DeliverTo))
             {
                 message.DeliverAfter = deliveryTime;
                 var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
@@ -28,7 +28,7 @@ namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
                 return;
             }
 
-            if (await _queueManager.ExistingTopic(message.DeliverTo))
+            if (await _queueManager.TopicExists(message.DeliverTo))
             {
                 message.DeliverAfter = deliveryTime;
                 var topicSender = await _queueManager.CreateTopicSender(message.DeliverTo);
@@ -36,6 +36,8 @@ namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
                 await topicSender.SendAsync(brokeredMessage2);
                 return;
             }
+
+            throw new NotSupportedException("Message redelivery was requested but neither a queue path nor a topic path could be found.");
         }
     }
 }

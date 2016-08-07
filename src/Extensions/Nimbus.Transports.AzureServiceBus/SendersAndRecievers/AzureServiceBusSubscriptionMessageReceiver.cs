@@ -7,9 +7,11 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Filtering.Attributes;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
+using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
@@ -21,13 +23,13 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
-        private readonly string _filterExpression;
+        private readonly IFilterCondition _filterCondition;
         private SubscriptionClient _subscriptionClient;
 
         public AzureServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
                                                           string topicPath,
                                                           string subscriptionName,
-                                                          string filterExpression,
+                                                          IFilterCondition filterCondition,
                                                           ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                                           IBrokeredMessageFactory brokeredMessageFactory,
                                                           IGlobalHandlerThrottle globalHandlerThrottle,
@@ -37,7 +39,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
-            _filterExpression = filterExpression;
+            _filterCondition = filterCondition;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
         }
@@ -82,6 +84,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                     if (brokeredMessage == null) return null;
 
                     var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
+                    nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
 
                     return nimbusMessage;
                 }
@@ -105,7 +108,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         {
             if (_subscriptionClient != null) return _subscriptionClient;
 
-            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName, _filterExpression);
+            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName, _filterCondition);
             _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
             return _subscriptionClient;
         }
