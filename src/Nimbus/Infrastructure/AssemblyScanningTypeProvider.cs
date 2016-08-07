@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Filtering;
 using Nimbus.Handlers;
@@ -227,7 +228,7 @@ namespace Nimbus.Infrastructure
 
         private IEnumerable<string> CheckForDuplicateQueueNames()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var duplicateQueues = this.AllMessageContractTypes()
                                       .Select(t => new Tuple<string, Type>(pathFactory.QueuePathFor(t), t))
                                       .GroupBy(tuple => tuple.Item1)

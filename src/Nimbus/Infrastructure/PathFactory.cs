@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Nimbus.Configuration.Settings;
 using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure
 {
-    public class PathFactory : IPathFactory
+    internal class PathFactory : IPathFactory
     {
         internal const int MaxPathLength = 260;
         internal const int MaxNameLength = 50;
@@ -19,19 +20,11 @@ namespace Nimbus.Infrastructure
 
         private readonly string _globalPrefix;
 
-        private PathFactory(string globalPrefix)
+        public PathFactory(GlobalPrefixSetting globalPrefix)
         {
-            _globalPrefix = globalPrefix;
-        }
-
-        public static PathFactory CreateWithNoPrefix()
-        {
-            return new PathFactory(string.Empty);
-        }
-
-        public static PathFactory CreateWithPrefix(string globalPrefix)
-        {
-            return new PathFactory($"{globalPrefix}.");
+            _globalPrefix = (globalPrefix.Value == string.Empty)
+                ? string.Empty
+                : $"{globalPrefix.Value}.";
         }
 
         public string InputQueuePathFor(string applicationName, string instanceName)

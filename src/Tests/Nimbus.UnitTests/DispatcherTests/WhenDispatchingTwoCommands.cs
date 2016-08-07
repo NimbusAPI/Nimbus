@@ -44,7 +44,7 @@ namespace Nimbus.UnitTests.DispatcherTests
             var replyQueueNameSetting = new ReplyQueueNameSetting(
                 new ApplicationNameSetting {Value = "TestApplication"},
                 new InstanceNameSetting {Value = "TestInstance"},
-                PathFactory.CreateWithNoPrefix());
+                new PathFactory(new GlobalPrefixSetting()));
             var propertyInjector = new StubPropertyInjector(BusId);
 
             var handlerMap = new HandlerMapper(typeProvider).GetFullHandlerMap(typeof(IHandleCommand<>));

@@ -29,7 +29,7 @@ namespace Nimbus.UnitTests.CompressionTests
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);
             return new NimbusMessageFactory(new DefaultMessageTimeToLiveSetting(),
-                                            new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}, PathFactory.CreateWithNoPrefix()),
+                                            new ReplyQueueNameSetting(new ApplicationNameSetting {Value = "App"}, new InstanceNameSetting {Value = "Instance"}, new PathFactory(new GlobalPrefixSetting())),
                                             Substitute.For<IClock>(),
                                             new DispatchContextManager());
         }

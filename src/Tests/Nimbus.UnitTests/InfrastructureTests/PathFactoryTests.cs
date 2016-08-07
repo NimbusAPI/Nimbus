@@ -1,4 +1,5 @@
-﻿using Nimbus.Infrastructure;
+﻿using Nimbus.Configuration.Settings;
+using Nimbus.Infrastructure;
 using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
@@ -11,7 +12,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForANestedType_WeShouldStripOutPlusSigns()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
             path.ShouldNotContain("+");
         }
@@ -19,7 +20,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueue_WeShouldConvertToLowerCase()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.TopicPathFor(typeof(MyEscapingTestMessages.EscapingTestMessage));
             var expectedName = "t." + typeof(MyEscapingTestMessages.EscapingTestMessage).FullName.Replace("+", ".").ToLower();
             path.ShouldBe(expectedName);
@@ -28,7 +29,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldStripOutBackticks()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.QueuePathFor(typeof(MyCommand<string>));
             path.ShouldNotContain("`");
         }
@@ -36,7 +37,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueueForAGenericType_WeShouldShortenTheGenericTypeArgumentName()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.QueuePathFor(typeof(MyCommand<string>));
             path.ShouldBe("q.nimbus.unittests.infrastructuretests.messagecontracts.mycommand.1-string");
         }
@@ -44,7 +45,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingASubscriptionForATypeASpaceShouldBeConvertedToTheSanitizeCharacter()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var subscriptionName = pathFactory.SubscriptionNameFor("My App", "App server", typeof(MyEventWithALongName));
             subscriptionName.ShouldBe("my.app.app.server.myeventwithalongname");
         }
@@ -52,7 +53,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAQueuePathWithAGlobalPrefix_ThePathShouldStartWithThePrefix()
         {
-            var pathFactory = PathFactory.CreateWithPrefix("testprefix");
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var path = pathFactory.QueuePathFor(typeof(SimpleCommand));
             path.ShouldBe("testprefix.q.nimbus.unittests.infrastructuretests.messagecontracts.simplecommand");
         }
@@ -60,7 +61,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingATopicPathWithAGlobalPrefix_ThePathShouldStartWithThePrefix()
         {
-            var pathFactory = PathFactory.CreateWithPrefix("testprefix");
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var path = pathFactory.TopicPathFor(typeof(SimpleEvent));
             path.ShouldBe("testprefix.t.nimbus.unittests.infrastructuretests.messagecontracts.simpleevent");
         }
@@ -68,7 +69,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingAnInputQueuePathWithAGlobalPrefix_ThePathShouldStartWithThePrefix()
         {
-            var pathFactory = PathFactory.CreateWithPrefix("testprefix");
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var path = pathFactory.InputQueuePathFor("My Application", "My Instance");
             path.ShouldBe("testprefix.inputqueue.my.application.my.instance");
         }
@@ -76,7 +77,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingANameForACompetingSubscriptionWithAGlobalPrefix_ThePathShouldNotStartWithThePrefix()
         {
-            var pathFactory = PathFactory.CreateWithPrefix("testprefix");
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var subscriptionName = pathFactory.SubscriptionNameFor("My Application", typeof(SimpleEvent));
             subscriptionName.ShouldBe("my.application.simpleevent");
         }
@@ -84,7 +85,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingANameForAMulticastSubscriptionWithAGlobalPrefix_ThePathShouldNotStartWithThePrefix()
         {
-            var pathFactory = PathFactory.CreateWithPrefix("testprefix");
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var subscriptionName = pathFactory.SubscriptionNameFor("My Application", "My Instance", typeof(SimpleEvent));
             subscriptionName.ShouldBe("my.application.my.instance.simpleevent");
         }
@@ -93,7 +94,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         public void WhenCreatingAQueueForATypeWithAVeryLongName_WeShouldHaveAPathOfTheCorrectMaximumLength()
         {
             var prefix = new string('x', 230);
-            var pathFactory = PathFactory.CreateWithPrefix(prefix);
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = prefix});
             var path = pathFactory.QueuePathFor(typeof(SimpleCommand));
 
             path.Length.ShouldBe(PathFactory.MaxPathLength);
@@ -107,7 +108,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         public void WhenCreatingATopicForATypeWithAVeryLongName_WeShouldHaveAPathOfTheCorrectMaximumLength()
         {
             var prefix = new string('x', 230);
-            var pathFactory = PathFactory.CreateWithPrefix(prefix);
+            var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = prefix});
 
             var path = pathFactory.TopicPathFor(typeof(SimpleEvent));
 
@@ -121,7 +122,7 @@ namespace Nimbus.UnitTests.InfrastructureTests
         [Test]
         public void WhenCreatingASubscriptionForATypeWeHaveAMaximumLengthOf50()
         {
-            var pathFactory = PathFactory.CreateWithNoPrefix();
+            var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.SubscriptionNameFor("MyLongApplicationName", "Appserver", typeof(MyEventWithALongName));
             path.Length.ShouldBe(50);
         }

@@ -38,10 +38,10 @@ namespace Nimbus.Configuration
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
         internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
-        internal IPathFactory PathFactory { get; set; } = Infrastructure.PathFactory.CreateWithNoPrefix();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
+        internal GlobalPrefixSetting GlobalPrefix { get; set; } = new GlobalPrefixSetting();
         internal DefaultTimeoutSetting DefaultTimeout { get; set; } = new DefaultTimeoutSetting();
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; } = new MaxDeliveryAttemptSetting();
         internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; } = new DefaultMessageTimeToLiveSetting();
@@ -80,8 +80,8 @@ namespace Nimbus.Configuration
             container.Register(Compressor, typeof(ICompressor));
             container.Register(Router, typeof(IRouter));
             container.Register(DeliveryRetryStrategy, typeof(IDeliveryRetryStrategy));
-            container.Register(PathFactory, typeof(IPathFactory));
 
+            container.RegisterType<PathFactory>(ComponentLifetime.SingleInstance, typeof(IPathFactory));
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
             container.RegisterType<CommandMessagePumpsFactory>(ComponentLifetime.SingleInstance);
