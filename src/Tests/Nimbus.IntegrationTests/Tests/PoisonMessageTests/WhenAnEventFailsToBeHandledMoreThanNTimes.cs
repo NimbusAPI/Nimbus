@@ -33,8 +33,10 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _someContent = Guid.NewGuid().ToString();
             _goBangEvent = new GoBangEvent(_someContent);
 
+            var expectedMessageCount = (_maxDeliveryAttempts * 1) + (1 * 1);    // one set of _maxDeliveryAttempts because of failure and one set of one because of success
+
             await Bus.Publish(_goBangEvent);
-            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= _maxDeliveryAttempts);
+            await Timeout.WaitUntil(() => MethodCallCounter.AllReceivedCalls.Count() >= expectedMessageCount);
 
             _deadLetterMessages = await Bus.DeadLetterOffice.PopAll(1, TimeSpan.FromSeconds(TimeoutSeconds));
         }
