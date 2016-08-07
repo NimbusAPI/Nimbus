@@ -10,7 +10,7 @@ namespace Nimbus.Tests.Common.Stubs
         {
             var testProperties = TestContext.CurrentContext?.Test.Properties;
             if (testProperties == null) return;
-            if (!testProperties.Contains("TestId")) return;
+            if (!testProperties.ContainsKey("TestId")) return;
 
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("TestId", new ScalarValue(testProperties["TestId"])));
         }

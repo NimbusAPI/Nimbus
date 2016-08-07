@@ -2,6 +2,7 @@ using System;
 using System.Runtime.ExceptionServices;
 using Nimbus.Tests.Common.Stubs;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using Serilog;
 using Serilog.Events;
 
@@ -40,14 +41,14 @@ namespace Nimbus.Tests.Common.Extensions
 
         public static void LogTestStart()
         {
-            TestContext.CurrentContext.Test.Properties["TestId"] = Guid.NewGuid();
+            TestContext.CurrentContext.Test.Properties.Set("TestId", Guid.NewGuid());
             Log.Information("Test {TestName} starting", TestContext.CurrentContext.Test.FullName);
         }
 
         public static void LogTestResult()
         {
             var testContext = TestContext.CurrentContext;
-            var testStatus = testContext.Result.Status;
+            var testStatus = testContext.Result.Outcome.Status;
             LogEventLevel level;
             switch (testStatus)
             {
