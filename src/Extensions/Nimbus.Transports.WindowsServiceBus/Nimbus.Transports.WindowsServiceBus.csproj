@@ -63,6 +63,15 @@
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
       <Link>Properties\NullGuard.cs</Link>
     </Compile>
+    <Compile Include="Extensions\SubscriptionClientFilteringExtensions.cs" />
+    <Compile Include="Filtering\AndConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\ConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\IsNullConditionGenerator.cs" />
+    <Compile Include="Filtering\ISqlFilterExpressionGenerator.cs" />
+    <Compile Include="Filtering\MatchConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\NotConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\OrConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\SqlFilterExpressionGenerator.cs" />
     <Compile Include="QueueManagement\AzureQueueManager.cs" />
     <Compile Include="BrokeredMessages\BrokeredMessageFactory.cs" />
     <Compile Include="BrokeredMessages\IBrokeredMessageFactory.cs" />

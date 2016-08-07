@@ -65,8 +65,10 @@
     <Compile Include="DelayedDelivery\DelayedDeliveryService.cs" />
     <Compile Include="Extensions\MessagingExceptionExtensions.cs" />
     <Compile Include="Extensions\MessagingFactoryExtensions.cs" />
+    <Compile Include="Extensions\SubscriptionClientFilteringExtensions.cs" />
     <Compile Include="Filtering\AndConditionSqlGenerator.cs" />
     <Compile Include="Filtering\ConditionSqlGenerator.cs" />
+    <Compile Include="Filtering\IsNullConditionGenerator.cs" />
     <Compile Include="Filtering\ISqlFilterExpressionGenerator.cs" />
     <Compile Include="Filtering\MatchConditionSqlGenerator.cs" />
     <Compile Include="Filtering\NotConditionSqlGenerator.cs" />

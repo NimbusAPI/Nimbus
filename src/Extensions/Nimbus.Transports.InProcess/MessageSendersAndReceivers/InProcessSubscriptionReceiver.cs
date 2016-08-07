@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
@@ -32,6 +33,13 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             topic.Subscribe(_subscription.SubscriptionName);
 
             return base.WarmUp();
+        }
+
+        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
+        {
+            var message = await base.Fetch(cancellationToken);
+            message.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscription.SubscriptionName;
+            return message;
         }
     }
 }

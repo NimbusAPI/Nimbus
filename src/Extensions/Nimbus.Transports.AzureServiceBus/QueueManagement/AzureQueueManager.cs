@@ -6,9 +6,12 @@ using Microsoft.ServiceBus.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Transports.AzureServiceBus.Extensions;
+using Nimbus.Transports.AzureServiceBus.Filtering;
 
 namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 {
@@ -27,6 +30,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownQueues;
+        private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
@@ -40,7 +44,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
                                  DefaultTimeoutSetting defaultTimeout,
-                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration)
+                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -51,6 +56,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingSubscriptions);
@@ -92,30 +98,26 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                             }).ConfigureAwaitFalse();
         }
 
-        public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, string filterExpression)
+        public Task<SubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
         {
             return Task.Run(() =>
                             {
                                 EnsureSubscriptionExists(topicPath, subscriptionName);
 
+                                var myOwnSubscriptionFilterCondition = new OrCondition(new MatchCondition(MessagePropertyKeys.RedeliveryToSubscriptionName, subscriptionName),
+                                                                                       new IsNullCondition(MessagePropertyKeys.RedeliveryToSubscriptionName));
+                                var combinedCondition = new AndCondition(filterCondition, myOwnSubscriptionFilterCondition);
+                                var filterSql = _sqlFilterExpressionGenerator.GenerateFor(combinedCondition);
+
                                 return _retry.Do(() =>
                                                  {
-                                                     var subscriptionClient = _messagingFactory().CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
-
-                                                     try
-                                                     {
-                                                         subscriptionClient.RemoveRule("$Default");
-                                                     }
-                                                     catch (MessagingEntityNotFoundException) { }
-                                                     try
-                                                     {
-                                                         subscriptionClient.AddRule("$Default", new SqlFilter(filterExpression));
-                                                     }
-                                                     catch (MessagingEntityAlreadyExistsException) { }
-
+                                                     var subscriptionClient = _messagingFactory()
+                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                                     subscriptionClient.ReplaceFilter("$Default", filterSql);
                                                      return subscriptionClient;
                                                  },
-                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " + filterExpression);
+                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
+                                                 filterCondition);
                             }).ConfigureAwaitFalse();
         }
 
@@ -219,6 +221,16 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                              "Fetching existing queues");
         }
 
+        public Task<bool> QueueExists(string queuePath)
+        {
+            return Task.Run(() => _knownQueues.Value.Contains(queuePath)).ConfigureAwaitFalse();
+        }
+
+        public Task<bool> TopicExists(string topicPath)
+        {
+            return Task.Run(() => _knownTopics.Value.Contains(topicPath)).ConfigureAwaitFalse();
+        }
+
         private void EnsureTopicExists(string topicPath)
         {
             if (_knownTopics.Value.Contains(topicPath)) return;
@@ -227,13 +239,13 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 if (_knownTopics.Value.Contains(topicPath)) return;
 
                 var topicDescription = new TopicDescription(topicPath)
-                {
-                    DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                    EnableBatchedOperations = true,
-                    RequiresDuplicateDetection = false,
-                    SupportOrdering = false,
-                    AutoDeleteOnIdle = _autoDeleteOnIdle
-                };
+                                       {
+                                           DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                           EnableBatchedOperations = true,
+                                           RequiresDuplicateDetection = false,
+                                           SupportOrdering = false,
+                                           AutoDeleteOnIdle = _autoDeleteOnIdle
+                                       };
 
                 _retry.Do(() =>
                           {
@@ -275,14 +287,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 _retry.Do(() =>
                           {
                               var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                              {
-                                  MaxDeliveryCount = _maxDeliveryAttempts,
-                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                  EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
-                                  EnableBatchedOperations = true,
-                                  RequiresSession = false,
-                                  AutoDeleteOnIdle = _autoDeleteOnIdle
-                              };
+                                                            {
+                                                                MaxDeliveryCount = _maxDeliveryAttempts,
+                                                                DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                                                EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
+                                                                EnableBatchedOperations = true,
+                                                                RequiresSession = false,
+                                                                AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                            };
 
                               try
                               {
@@ -317,16 +329,16 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                 _retry.Do(() =>
                           {
                               var queueDescription = new QueueDescription(queuePath)
-                              {
-                                  MaxDeliveryCount = _maxDeliveryAttempts,
-                                  DefaultMessageTimeToLive = _defaultMessageTimeToLive,
-                                  EnableDeadLetteringOnMessageExpiration = true,
-                                  EnableBatchedOperations = true,
-                                  RequiresDuplicateDetection = false,
-                                  RequiresSession = false,
-                                  SupportOrdering = false,
-                                  AutoDeleteOnIdle = _autoDeleteOnIdle
-                              };
+                                                     {
+                                                         MaxDeliveryCount = _maxDeliveryAttempts,
+                                                         DefaultMessageTimeToLive = _defaultMessageTimeToLive,
+                                                         EnableDeadLetteringOnMessageExpiration = true,
+                                                         EnableBatchedOperations = true,
+                                                         RequiresDuplicateDetection = false,
+                                                         RequiresSession = false,
+                                                         SupportOrdering = false,
+                                                         AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                     };
 
                               // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
                               // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and

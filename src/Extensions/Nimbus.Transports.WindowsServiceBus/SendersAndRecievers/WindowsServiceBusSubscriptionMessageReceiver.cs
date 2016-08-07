@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
@@ -18,11 +19,13 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
+        private readonly IFilterCondition _filterCondition;
         private SubscriptionClient _subscriptionClient;
 
         public WindowsServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
                                                             string topicPath,
                                                             string subscriptionName,
+                                                            IFilterCondition filterCondition,
                                                             ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                                             IBrokeredMessageFactory brokeredMessageFactory,
                                                             IGlobalHandlerThrottle globalHandlerThrottle,
@@ -32,6 +35,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             _queueManager = queueManager;
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
+            _filterCondition = filterCondition;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
         }
@@ -76,6 +80,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
                     if (brokeredMessage == null) return null;
 
                     var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
+                    nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
 
                     return nimbusMessage;
                 }
@@ -99,7 +104,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
         {
             if (_subscriptionClient != null) return _subscriptionClient;
 
-            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName);
+            _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName, _filterCondition);
             _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
             return _subscriptionClient;
         }

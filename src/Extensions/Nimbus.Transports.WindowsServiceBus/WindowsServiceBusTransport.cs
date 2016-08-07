@@ -72,7 +72,7 @@ namespace Nimbus.Transports.WindowsServiceBus
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
             var key = "{0}/{1}".FormatWith(topicPath, subscriptionName);
-            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName));
+            return _topicMessageReceivers.GetOrAdd(key, k => CreateTopicReceiver(topicPath, subscriptionName, filter));
         }
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
@@ -101,11 +101,12 @@ namespace Nimbus.Transports.WindowsServiceBus
             return sender;
         }
 
-        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName)
+        private INimbusMessageReceiver CreateTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
         {
             var receiver = new WindowsServiceBusSubscriptionMessageReceiver(_queueManager,
                                                                             topicPath,
                                                                             subscriptionName,
+                                                                            filterCondition,
                                                                             _concurrentHandlerLimit,
                                                                             _brokeredMessageFactory,
                                                                             _globalHandlerThrottle,

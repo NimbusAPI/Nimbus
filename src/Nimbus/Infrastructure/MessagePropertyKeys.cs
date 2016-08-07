@@ -21,5 +21,7 @@ namespace Nimbus.Infrastructure
         public const string SentToQueue = "SentToQueue";
         public const string SentToTopic = "SentToTopic";
         //public const string PrecedingMessageId = "PrecedingMessageId";
+
+        public const string RedeliveryToSubscriptionName = "RedeliveryToSubscriptionName";
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using Nimbus.Filtering.Conditions;
 
-namespace Nimbus.Transports.AzureServiceBus.Filtering
+namespace Nimbus.Transports.WindowsServiceBus.Filtering
 {
     internal static class ConditionSqlGenerator
     {

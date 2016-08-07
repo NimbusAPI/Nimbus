@@ -19,10 +19,25 @@ namespace Nimbus.Transports.WindowsServiceBus.DelayedDelivery
 
         public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
-            message.DeliverAfter = deliveryTime;
-            var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
-            var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
-            await messageSender.SendAsync(brokeredMessage);
+            if (await _queueManager.QueueExists(message.DeliverTo))
+            {
+                message.DeliverAfter = deliveryTime;
+                var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
+                var brokeredMessage = await _brokeredMessageFactory.BuildBrokeredMessage(message);
+                await messageSender.SendAsync(brokeredMessage);
+                return;
+            }
+
+            if (await _queueManager.TopicExists(message.DeliverTo))
+            {
+                message.DeliverAfter = deliveryTime;
+                var topicSender = await _queueManager.CreateTopicSender(message.DeliverTo);
+                var brokeredMessage2 = await _brokeredMessageFactory.BuildBrokeredMessage(message);
+                await topicSender.SendAsync(brokeredMessage2);
+                return;
+            }
+
+            throw new NotSupportedException("Message redelivery was requested but neither a queue path nor a topic path could be found.");
         }
     }
 }
