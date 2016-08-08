@@ -12,6 +12,7 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         private readonly ConcurrentBag<IComponentRegistration> _registrations = new ConcurrentBag<IComponentRegistration>();
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
+        private bool _isDisposed = false;
 
         public PoorMansIoC()
         {
@@ -20,12 +21,16 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         public void Register<T>(T instance, params Type[] implementedTypes)
         {
+            AssertIsNotDisposed();
+
             var advertisedTypes = implementedTypes.None() ? new[] {instance.GetType()} : implementedTypes;
             RegisterInstance(instance, advertisedTypes);
         }
 
         public void Register<T>(Func<PoorMansIoC, T> factory, ComponentLifetime componentLifetime, params Type[] implementedTypes)
         {
+            AssertIsNotDisposed();
+
             foreach (var t in implementedTypes)
             {
                 if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Factory return type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
@@ -36,6 +41,8 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         public void RegisterType<T>(ComponentLifetime lifetime, params Type[] implementedTypes)
         {
+            AssertIsNotDisposed();
+
             foreach (var t in implementedTypes)
             {
                 if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Concrete type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
@@ -46,6 +53,8 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         public void RegisterType(Type concreteType, ComponentLifetime lifetime, params Type[] implementedTypes)
         {
+            AssertIsNotDisposed();
+
             if (concreteType.IsInterface) throw new ArgumentException("An interface was supplied where there should have been a concrete type");
             if (implementedTypes.Any(it => !it.IsAssignableFrom(concreteType)))
                 throw new ArgumentException("One or more of the implemented types is not actually implemented by this concrete type.");
@@ -78,11 +87,15 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         public T Resolve<T>()
         {
+            AssertIsNotDisposed();
+
             return (T) Resolve(typeof (T));
         }
 
         public T ResolveWithOverrides<T>(params object[] overrides)
         {
+            AssertIsNotDisposed();
+
             return (T) Resolve(typeof (T), overrides);
         }
 
@@ -168,6 +181,12 @@ namespace Nimbus.Configuration.PoorMansIocContainer
                 .FirstOrDefault();
         }
 
+        private void AssertIsNotDisposed()
+        {
+            if (_isDisposed) throw new ObjectDisposedException(nameof(PoorMansIoC));
+        }
+
+
         public void Dispose()
         {
             Dispose(true);
@@ -177,6 +196,7 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+            _isDisposed = true;
 
             _garbageMan.Dispose();
 
