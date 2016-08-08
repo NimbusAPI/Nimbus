@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
@@ -44,8 +45,16 @@ namespace Nimbus.Configuration
                             {
                                 Task.Run(async () =>
                                                {
-                                                   await container.Resolve<INimbusTransport>().TestConnection();
-                                                   await CleanNamespace(container, logger);
+                                                   try
+                                                   {
+                                                       await container.Resolve<INimbusTransport>().TestConnection();
+                                                       await CleanNamespace(container, logger);
+                                                   }
+                                                   catch (Exception ex)
+                                                   {
+                                                       logger.Error(ex, "Failed to establish connection to underlying transport: {Message}", ex.Message);
+                                                       throw;
+                                                   }
                                                }).Wait();
                             };
 
