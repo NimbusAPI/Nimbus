@@ -16,6 +16,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]
+    [Parallelizable(ParallelScope.None)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
         protected const int TimeoutSeconds = 60;

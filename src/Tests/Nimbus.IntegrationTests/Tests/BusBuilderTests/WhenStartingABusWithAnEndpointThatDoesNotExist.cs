@@ -10,6 +10,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.None)]
     public class WhenStartingABusWithAnEndpointThatDoesNotExist
     {
         protected const int TimeoutSeconds = 10;
