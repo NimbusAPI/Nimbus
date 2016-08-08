@@ -2,21 +2,23 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
+using Nimbus.Routing;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.DeadLetterOffice
 {
     internal class RedisDeadLetterOffice : IDeadLetterOffice
     {
-        private const string _deadLetterOfficeRedisKey = "deadletteroffice";
+        private readonly string _deadLetterOfficeRedisKey;
 
         private readonly Func<IDatabase> _databaseFunc;
         private readonly ISerializer _serializer;
 
-        public RedisDeadLetterOffice(Func<IDatabase> databaseFunc, ISerializer serializer)
+        public RedisDeadLetterOffice(Func<IDatabase> databaseFunc, IPathFactory pathFactory, ISerializer serializer)
         {
             _databaseFunc = databaseFunc;
             _serializer = serializer;
+            _deadLetterOfficeRedisKey = pathFactory.DeadLetterOfficePath();
         }
 
         public Task<NimbusMessage> Peek()
@@ -29,7 +31,7 @@ namespace Nimbus.Transports.Redis.DeadLetterOffice
                                 var redisValue = redisValues.FirstOrDefault();
                                 if (!redisValue.HasValue) return null;
 
-                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof(NimbusMessage));
                                 return message;
                             }).ConfigureAwaitFalse();
         }
@@ -42,7 +44,7 @@ namespace Nimbus.Transports.Redis.DeadLetterOffice
                                 var redisValue = database.ListLeftPop(_deadLetterOfficeRedisKey);
                                 if (!redisValue.HasValue) return null;
 
-                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof (NimbusMessage));
+                                var message = (NimbusMessage) _serializer.Deserialize(redisValue.ToString(), typeof(NimbusMessage));
                                 return message;
                             }).ConfigureAwaitFalse();
         }
