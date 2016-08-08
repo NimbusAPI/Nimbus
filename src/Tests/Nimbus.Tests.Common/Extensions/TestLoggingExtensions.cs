@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.ExceptionServices;
 using Nimbus.Tests.Common.Stubs;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
@@ -13,7 +12,6 @@ namespace Nimbus.Tests.Common.Extensions
         static TestLoggingExtensions()
         {
             TestHarnessLoggerFactory.Create(Guid.Empty, string.Empty);
-            AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
 
@@ -26,19 +24,6 @@ namespace Nimbus.Tests.Common.Extensions
             if (exception.Source == typeof(TestLoggingExtensions).Assembly.GetName().Name) return;
 
             Log.Warning(exception, "An unhandled exception was thrown by {ExceptionSource}", exception.Source);
-        }
-
-        private static void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
-        {
-            var exception = e.Exception;
-            if (exception == null) return;
-
-            if (exception is OperationCanceledException) return;
-            if (exception.Source == "nunit.framework") return; // sigh.
-            if (exception.Source == "System.Xml") return; // sigh.
-            if (exception.Source == typeof(TestLoggingExtensions).Assembly.GetName().Name) return;
-
-            Log.Warning(exception, "A first-chance exception was thrown by {ExceptionSource}", exception.Source);
         }
 
         public static void LogTestStart()
