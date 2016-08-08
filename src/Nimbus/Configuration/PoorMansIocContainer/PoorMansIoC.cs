@@ -12,7 +12,7 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         private readonly ConcurrentBag<IComponentRegistration> _registrations = new ConcurrentBag<IComponentRegistration>();
 
         private readonly GarbageMan _garbageMan = new GarbageMan();
-        private bool _isDisposed = false;
+        private bool _isDisposed;
 
         public PoorMansIoC()
         {
@@ -33,7 +33,7 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
             foreach (var t in implementedTypes)
             {
-                if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Factory return type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
+                if (!t.IsAssignableFrom(typeof(T))) throw new ArgumentException("Factory return type {0} is not assignable to {1}".FormatWith(typeof(T).FullName, t.FullName));
             }
 
             RegisterFactoryDelegate(factory, componentLifetime, implementedTypes);
@@ -45,10 +45,10 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
             foreach (var t in implementedTypes)
             {
-                if (!t.IsAssignableFrom(typeof (T))) throw new ArgumentException("Concrete type {0} is not assignable to {1}".FormatWith(typeof (T).FullName, t.FullName));
+                if (!t.IsAssignableFrom(typeof(T))) throw new ArgumentException("Concrete type {0} is not assignable to {1}".FormatWith(typeof(T).FullName, t.FullName));
             }
 
-            RegisterType(typeof (T), lifetime, implementedTypes);
+            RegisterType(typeof(T), lifetime, implementedTypes);
         }
 
         public void RegisterType(Type concreteType, ComponentLifetime lifetime, params Type[] implementedTypes)
@@ -68,11 +68,11 @@ namespace Nimbus.Configuration.PoorMansIocContainer
 
         private void RegisterFactoryDelegate<T>(Func<PoorMansIoC, T> factory, ComponentLifetime componentLifetime, Type[] implementedTypes)
         {
-            var providedTypes = implementedTypes.None() ? new[] {typeof (T)} : implementedTypes;
+            var providedTypes = implementedTypes.None() ? new[] {typeof(T)} : implementedTypes;
 
             foreach (var type in providedTypes)
             {
-                _registrations.Add(new FactoryRegistration(c => factory(c), typeof (T), componentLifetime, type));
+                _registrations.Add(new FactoryRegistration(c => factory(c), typeof(T), componentLifetime, type));
             }
         }
 
@@ -89,14 +89,14 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         {
             AssertIsNotDisposed();
 
-            return (T) Resolve(typeof (T));
+            return (T) Resolve(typeof(T));
         }
 
         public T ResolveWithOverrides<T>(params object[] overrides)
         {
             AssertIsNotDisposed();
 
-            return (T) Resolve(typeof (T), overrides);
+            return (T) Resolve(typeof(T), overrides);
         }
 
         private object Resolve(Type type, params object[] overrides)
@@ -185,7 +185,6 @@ namespace Nimbus.Configuration.PoorMansIocContainer
         {
             if (_isDisposed) throw new ObjectDisposedException(nameof(PoorMansIoC));
         }
-
 
         public void Dispose()
         {
