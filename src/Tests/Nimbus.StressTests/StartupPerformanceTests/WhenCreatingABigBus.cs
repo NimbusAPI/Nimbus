@@ -50,7 +50,7 @@ namespace Nimbus.StressTests.StartupPerformanceTests
 
             var assemblyBuilder = EmitMessageContractsAndHandlersAssembly(numMessageTypes);
 
-            var logger = TestHarnessLoggerFactory.Create();
+            var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
             var typeProvider = new AssemblyScanningTypeProvider(assemblyBuilder);
 
             var firstBus = new BusBuilder().Configure()

@@ -7,7 +7,6 @@ using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
@@ -56,7 +55,7 @@ namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
         }
 
         [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
+        [TestCaseSource(typeof(AllBusConfigurations<WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);

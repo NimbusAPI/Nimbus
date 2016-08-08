@@ -22,7 +22,7 @@ namespace Nimbus.IntegrationTests.Tests.LargeMessageTests
 
         protected override async Task<AzureBlobStorageLargeMessageBodyStore> Given()
         {
-            var logger = TestHarnessLoggerFactory.Create();
+            var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
             return new AzureBlobStorageLargeMessageBodyStore(
                 new AzureStorageAccountConnectionStringSetting {Value = DefaultSettingsReader.Get<AzureBlobStorageConnectionString>()},
                 new AutoCreateBlobStorageContainerNameSetting(),

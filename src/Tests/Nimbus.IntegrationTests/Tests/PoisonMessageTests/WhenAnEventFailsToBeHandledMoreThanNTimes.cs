@@ -41,7 +41,6 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
             _deadLetterMessages = await Bus.DeadLetterOffice.PopAll(1, TimeSpan.FromSeconds(TimeoutSeconds));
         }
 
-        [Explicit("The NUnit runner appears to have problems with this test. Disabling whilst debugging.")]
         [Test]
         [TestCaseSource(typeof(AllBusConfigurations<WhenAnEventFailsToBeHandledMoreThanNTimes>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)

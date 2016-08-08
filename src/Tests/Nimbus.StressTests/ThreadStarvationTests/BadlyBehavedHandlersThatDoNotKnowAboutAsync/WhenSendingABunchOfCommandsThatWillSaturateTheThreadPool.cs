@@ -25,7 +25,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.BadlyBehavedHandlersThatDoNot
 
         protected override async Task<Bus> Given()
         {
-            _logger = TestHarnessLoggerFactory.Create();
+            _logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
 
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
 

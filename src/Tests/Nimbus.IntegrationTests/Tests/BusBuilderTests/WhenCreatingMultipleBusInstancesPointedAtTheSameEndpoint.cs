@@ -21,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         protected const int TimeoutSeconds = 60;
 
         private Bus[] _buses;
-        private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
+        private readonly ILogger _logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), typeof(WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint).FullName);
         private readonly string _globalPrefix = Guid.NewGuid().ToString();
 
         [Test]

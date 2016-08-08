@@ -19,7 +19,7 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
         public async Task ItShouldGoBangQuickly()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
-            var logger = TestHarnessLoggerFactory.Create();
+            var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
 
             using (
                 var bus = new BusBuilder().Configure()

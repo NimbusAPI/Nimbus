@@ -133,8 +133,6 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\AzureServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\InProcessScenariosFilter.cs" />
     <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
-    <Compile Include="Stubs\TestIdEnricher.cs" />
-    <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\CompressorScenariosSource.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\DeflateCompressorScenario.cs" />
