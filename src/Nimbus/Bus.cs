@@ -25,6 +25,7 @@ namespace Nimbus
 
         private readonly object _mutex = new object();
         private bool _isRunning;
+        private bool _isDisposed = false;
 
         internal Bus(ILogger logger,
                      ICommandSender commandSender,
@@ -173,7 +174,9 @@ namespace Nimbus
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
+            if (_isDisposed) return;
 
+            _isDisposed = true;
             var handler = Disposing;
             handler?.Invoke(this, EventArgs.Empty);
         }
