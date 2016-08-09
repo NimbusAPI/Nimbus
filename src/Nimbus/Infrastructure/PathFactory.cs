@@ -1,56 +1,86 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Nimbus.Configuration.Settings;
+using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure
 {
-    public static class PathFactory
+    internal class PathFactory : IPathFactory
     {
+        internal const int MaxPathLength = 260;
+        internal const int MaxNameLength = 50;
+
         private const string _queuePrefix = "q";
         private const string _topicPrefix = "t";
         private const string _instanceInputQueuePrefix = "inputqueue";
+        private const string _deadLetterOfficePath = "deadletteroffice";
 
         // Entity segments can contain only letters, numbers, periods (.), hyphens (-), and underscores.
         private const string _queueCharacterWhitelist = "abcdefghijklmnopqrstuvwxyz1234567890.-";
 
-        public static string InputQueuePathFor(string applicationName, string instanceName)
+        private readonly string _globalPrefix;
+
+        public PathFactory(GlobalPrefixSetting globalPrefix)
         {
-            return Sanitize(string.Format("{0}.{1}.{2}", _instanceInputQueuePrefix, applicationName, instanceName));
+            _globalPrefix = (globalPrefix.Value == string.Empty)
+                ? string.Empty
+                : $"{globalPrefix.Value}.";
         }
 
-        public static string QueuePathFor(Type type)
+        public string InputQueuePathFor(string applicationName, string instanceName)
         {
-            return Sanitize(_queuePrefix + "." + StripGenericQualification(type));
+            var unsanitizedPath = $"{_globalPrefix}{_instanceInputQueuePrefix}.{applicationName}.{instanceName}";
+            var sanitizedPath = Sanitize(unsanitizedPath);
+            var path = Shorten(sanitizedPath, MaxPathLength);
+            return path;
         }
 
-        public static string TopicPathFor(Type type)
+        public string QueuePathFor(Type type)
         {
-            return Sanitize(_topicPrefix + "." + StripGenericQualification(type));
+            var typeName = StripGenericQualification(type);
+            var unsanitizedPath = $"{_globalPrefix}{_queuePrefix}.{typeName}";
+            var sanitizedPath = Sanitize(unsanitizedPath);
+            var path = Shorten(sanitizedPath, MaxPathLength);
+            return path;
         }
 
-        public static string SubscriptionNameFor(string applicationName)
+        public string TopicPathFor(Type type)
         {
-            return Shorten(Sanitize(applicationName), 50);
+            var typeName = StripGenericQualification(type);
+            var unsanitizedPath = $"{_globalPrefix}{_topicPrefix}.{typeName}";
+            var sanitizedPath = Sanitize(unsanitizedPath);
+            var path = Shorten(sanitizedPath, MaxPathLength);
+            return path;
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName)
+        public string SubscriptionNameFor(string applicationName, Type handlerType)
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName})), 50);
+            var unsanitizedName = $"{applicationName}.{handlerType.Name}";
+            var sanitizedName = Sanitize(unsanitizedName);
+            var name = Shorten(sanitizedName, MaxNameLength);
+            return name;
         }
 
-        public static string SubscriptionNameFor(string applicationName, Type handlerType)
+        public string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, handlerType.Name})), 50);
+            var unsanitizedName = $"{applicationName}.{instanceName}.{handlerType.Name}";
+            var sanitizedName = Sanitize(unsanitizedName);
+            var name = Shorten(sanitizedName, MaxNameLength);
+            return name;
         }
 
-        public static string SubscriptionNameFor(string applicationName, string instanceName, Type handlerType)
+        public string DeadLetterOfficePath()
         {
-            return Shorten(Sanitize(string.Join(".", new[] {applicationName, instanceName, handlerType.Name})), 50);
+            var unsanitizedPath = $"{_globalPrefix}{_deadLetterOfficePath}";
+            var sanitizedPath = Sanitize(unsanitizedPath);
+            var path = Shorten(sanitizedPath, MaxPathLength);
+            return path;
         }
 
         private static string StripGenericQualification(Type type)
         {
-            if (! type.IsGenericType) return type.FullName;
+            if (!type.IsGenericType) return type.FullName;
 
             var genericArgs = type.GetGenericArguments().Select(arg => arg.Name);
 
@@ -63,14 +93,14 @@ namespace Nimbus.Infrastructure
             return path;
         }
 
-        private static string Shorten(string path, int maxlength)
+        internal static string Shorten(string path, int maxLength)
         {
-            if (path.Length <= maxlength)
+            if (path.Length <= maxLength)
                 return path;
 
             var hash = CalculateAdler32Hash(path);
 
-            var shortPath = path.Substring(0, maxlength - hash.Length) + hash;
+            var shortPath = path.Substring(0, maxLength - hash.Length) + hash;
             return shortPath;
         }
 

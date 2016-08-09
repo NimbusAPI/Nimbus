@@ -25,6 +25,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
         private const int _expectedMessageCount = NumberOfDoThingACommands*ThingAHappenedEventHandler.NumberOfDoThingBCommands*ThingBHappenedEventHandler.NumberOfDoThingCCommands;
 
+        private MethodCallCounter MethodCallCounter { get; set; }
+
         protected override async Task<Bus> Given()
         {
             //var logger = TestHarnessLoggerFactory.Create();
@@ -36,8 +38,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
                                       .WithNames("MyTestSuite", Environment.MachineName)
                                       .WithTransport(new InProcessTransportConfiguration())
                                       .WithTypesFrom(typeProvider)
-                                      .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IInboundInterceptor).IsAssignableFrom(t)).ToArray())
-                                      .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof (IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                      .WithGlobalInboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IInboundInterceptor).IsAssignableFrom(t)).ToArray())
+                                      .WithGlobalOutboundInterceptorTypes(typeProvider.InterceptorTypes.Where(t => typeof(IOutboundInterceptor).IsAssignableFrom(t)).ToArray())
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                       .WithLogger(logger)
@@ -46,6 +48,8 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
                                               dc.RemoveAllExistingNamespaceElementsOnStartup(
                                                   "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
+            MethodCallCounter = MethodCallCounter.CreateInstance(bus.InstanceId);
+
             await bus.Start(MessagePumpTypes.All);
 
             return bus;
@@ -53,7 +57,7 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
 
         protected override async Task When()
         {
-            Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof (DoThingCCommand).Name);
+            Console.WriteLine("Expecting {0} {1}s", _expectedMessageCount, typeof(DoThingCCommand).Name);
 
             var commands = Enumerable.Range(0, NumberOfDoThingACommands)
                                      .Select(i => new DoThingACommand())
@@ -68,6 +72,14 @@ namespace Nimbus.StressTests.ThreadStarvationTests.Cascades
         public async Task TheCorrectNumberOfMessagesShouldHaveBeenObserved()
         {
             MethodCallCounter.AllReceivedMessages.OfType<DoThingCCommand>().Count().ShouldBe(_expectedMessageCount);
+        }
+
+        public override void TestFixtureTearDown()
+        {
+            var bus = Subject;
+            if (bus != null) MethodCallCounter.DestroyInstance(bus.InstanceId);
+
+            base.TestFixtureTearDown();
         }
     }
 }

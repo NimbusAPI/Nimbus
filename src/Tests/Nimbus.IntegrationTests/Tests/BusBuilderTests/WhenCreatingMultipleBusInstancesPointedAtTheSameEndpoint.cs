@@ -8,7 +8,6 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Serializers.Json;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
@@ -17,15 +16,17 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]
+    [Parallelizable(ParallelScope.None)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {
-        protected const int TimeoutSeconds = 120;
+        protected const int TimeoutSeconds = 60;
 
         private Bus[] _buses;
-        private readonly ILogger _logger = TestHarnessLoggerFactory.Create();
+        private readonly ILogger _logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), typeof(WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint).FullName);
+        private readonly string _globalPrefix = Guid.NewGuid().ToString();
 
         [Test]
-        [TestCaseSource(typeof (AllTransportConfigurations))]
+        [TestCaseSource(typeof(AllTransportConfigurations))]
         public async Task NoneOfThemShouldGoBang(string testName, IConfigurationScenario<TransportConfiguration> scenario)
         {
             await ClearMeABus(scenario);
@@ -52,12 +53,13 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 var transportConfiguration = instance.Configuration;
 
                 var busBuilder = new BusBuilder().Configure()
+                                                 .WithNames("MyTestSuite", Environment.MachineName)
+                                                 .WithGlobalPrefix(_globalPrefix)
                                                  .WithTransport(transportConfiguration)
                                                  .WithRouter(new DestinationPerMessageTypeRouter())
                                                  .WithSerializer(new JsonSerializer())
                                                  .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                                                  .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                 .WithNames("MyTestSuite", Environment.MachineName)
                                                  .WithTypesFrom(typeProvider)
                                                  .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
                                                  .WithHeartbeatInterval(TimeSpan.MaxValue)
@@ -85,12 +87,13 @@ namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
                 var transportConfiguration = instance.Configuration;
 
                 var configuration = new BusBuilder().Configure()
+                                                    .WithNames("MyTestSuite", Environment.MachineName)
+                                                    .WithGlobalPrefix(_globalPrefix)
                                                     .WithTransport(transportConfiguration)
                                                     .WithRouter(new DestinationPerMessageTypeRouter())
                                                     .WithSerializer(new JsonSerializer())
                                                     .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
                                                     .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                                    .WithNames("MyTestSuite", Environment.MachineName)
                                                     .WithTypesFrom(typeProvider)
                                                     .WithDefaultTimeout(TimeSpan.FromSeconds(10))
                                                     .WithHeartbeatInterval(TimeSpan.MaxValue)

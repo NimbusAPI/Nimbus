@@ -68,6 +68,7 @@
     <Compile Include="Configuration\PoorMansIocContainer\FactoryRegistration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\IComponentRegistration.cs" />
     <Compile Include="Configuration\Settings\GlobalConcurrentHandlerLimitSetting.cs" />
+    <Compile Include="Configuration\Settings\GlobalPrefixSetting.cs" />
     <Compile Include="Configuration\Settings\ISetting.cs" />
     <Compile Include="Configuration\Transport\NotSupportedTransportConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\ComponentLifetime.cs" />

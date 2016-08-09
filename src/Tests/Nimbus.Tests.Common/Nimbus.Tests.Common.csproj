@@ -70,8 +70,8 @@
       <HintPath>..\..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
@@ -122,6 +122,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="Configuration\AzureBlobStorageContainerSharedAccessSignature.cs" />
     <Compile Include="Configuration\AzureBlobStorageContainerUri.cs" />
     <Compile Include="Configuration\RedisConnectionString.cs" />
@@ -132,8 +133,6 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\AzureServiceBus.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\InProcessScenariosFilter.cs" />
     <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
-    <Compile Include="Stubs\TestIdEnricher.cs" />
-    <Compile Include="Stubs\TestNameEnricher.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\CompressorScenariosSource.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Compressors\DeflateCompressorScenario.cs" />
@@ -186,6 +185,7 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Serializers\SerializerConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\TransportConfigurationSources.cs" />
     <Compile Include="Extensions\ThreadExtensions.cs" />
+    <Compile Include="WhenTheTestHarnessRuns.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj">

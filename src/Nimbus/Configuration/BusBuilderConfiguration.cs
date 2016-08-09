@@ -41,6 +41,7 @@ namespace Nimbus.Configuration
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
+        internal GlobalPrefixSetting GlobalPrefix { get; set; } = new GlobalPrefixSetting();
         internal DefaultTimeoutSetting DefaultTimeout { get; set; } = new DefaultTimeoutSetting();
         internal MaxDeliveryAttemptSetting MaxDeliveryAttempts { get; set; } = new MaxDeliveryAttemptSetting();
         internal DefaultMessageTimeToLiveSetting DefaultMessageTimeToLive { get; set; } = new DefaultMessageTimeToLiveSetting();
@@ -80,6 +81,7 @@ namespace Nimbus.Configuration
             container.Register(Router, typeof(IRouter));
             container.Register(DeliveryRetryStrategy, typeof(IDeliveryRetryStrategy));
 
+            container.RegisterType<PathFactory>(ComponentLifetime.SingleInstance, typeof(IPathFactory));
             container.RegisterType<ReplyQueueNameSetting>(ComponentLifetime.SingleInstance);
             container.RegisterType<RequestResponseCorrelator>(ComponentLifetime.SingleInstance);
             container.RegisterType<CommandMessagePumpsFactory>(ComponentLifetime.SingleInstance);

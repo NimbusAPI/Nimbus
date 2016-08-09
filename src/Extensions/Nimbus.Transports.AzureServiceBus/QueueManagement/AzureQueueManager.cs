@@ -10,6 +10,7 @@ using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.MessageContracts.Exceptions;
+using Nimbus.Routing;
 using Nimbus.Transports.AzureServiceBus.Extensions;
 using Nimbus.Transports.AzureServiceBus.Filtering;
 
@@ -17,35 +18,37 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 {
     internal class AzureQueueManager : IQueueManager
     {
-        public const string DeadLetterQueuePath = "deadletteroffice";
-
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly Func<MessagingFactory> _messagingFactory;
-        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
-        private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
+        private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly DefaultTimeoutSetting _defaultTimeout;
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
+        private readonly GlobalPrefixSetting _globalPrefix;
+        private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
 
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownQueues;
+        private readonly IPathFactory _pathFactory;
+        private readonly IRetry _retry;
         private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
         private readonly ITypeProvider _typeProvider;
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
-        private readonly IRetry _retry;
 
         public AzureQueueManager(Func<NamespaceManager> namespaceManager,
                                  Func<MessagingFactory> messagingFactory,
-                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
-                                 IRetry retry,
-                                 ITypeProvider typeProvider,
-                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
+                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  DefaultTimeoutSetting defaultTimeout,
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
-                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator)
+                                 GlobalPrefixSetting globalPrefix,
+                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                                 IPathFactory pathFactory,
+                                 IRetry retry,
+                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
+                                 ITypeProvider typeProvider)
         {
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
@@ -56,7 +59,9 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
             _autoDeleteOnIdle = autoDeleteOnIdle;
             _defaultTimeout = defaultTimeout;
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
+            _globalPrefix = globalPrefix;
             _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
+            _pathFactory = pathFactory;
 
             _knownTopics = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingTopics);
             _knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(FetchExistingSubscriptions);
@@ -144,12 +149,12 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         public Task<MessageSender> CreateDeadQueueMessageSender()
         {
-            return CreateMessageSender(DeadLetterQueuePath);
+            return CreateMessageSender(_pathFactory.DeadLetterOfficePath());
         }
 
         public Task<MessageReceiver> CreateDeadQueueMessageReceiver()
         {
-            return CreateMessageReceiver(DeadLetterQueuePath);
+            return CreateMessageReceiver(_pathFactory.DeadLetterOfficePath());
         }
 
         private ConcurrentSet<string> FetchExistingTopics()
@@ -160,7 +165,10 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                  if (!topicsAsync.Wait(_defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
 
                                  var topics = topicsAsync.Result;
-                                 var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path));
+                                 var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path)
+                                                                                  .Where(p => p.StartsWith(_globalPrefix.Value))
+                                                                                  .OrderBy(p => p)
+                                                                                  .ToArray());
 
                                  return topicPaths;
                              },
@@ -214,6 +222,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
                                  var queues = queuesAsync.Result;
                                  var queuePaths = queues.Select(q => q.Path)
+                                                        .Where(p => p.StartsWith(_globalPrefix.Value))
                                                         .OrderBy(p => p)
                                                         .ToArray();
                                  return new ConcurrentSet<string>(queuePaths);
@@ -369,7 +378,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         private bool WeHaveAHandler(string topicPath)
         {
-            var paths = _typeProvider.AllTypesHandledViaTopics().Select(PathFactory.TopicPathFor);
+            var paths = _typeProvider.AllTypesHandledViaTopics().Select(_pathFactory.TopicPathFor);
             return paths.Contains(topicPath);
         }
 

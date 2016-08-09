@@ -6,14 +6,14 @@ namespace Nimbus.Infrastructure.Routing
 {
     public class DestinationPerMessageTypeRouter : IRouter
     {
-        public string Route(Type messageType, QueueOrTopic queueOrTopic)
+        public string Route(Type messageType, QueueOrTopic queueOrTopic, IPathFactory pathFactory)
         {
             switch (queueOrTopic)
             {
                 case QueueOrTopic.Queue:
-                    return PathFactory.QueuePathFor(messageType);
+                    return pathFactory.QueuePathFor(messageType);
                 case QueueOrTopic.Topic:
-                    return PathFactory.TopicPathFor(messageType);
+                    return pathFactory.TopicPathFor(messageType);
                 default:
                     throw new Exception("Cannot build a route for the message type '{0}'.".FormatWith(messageType.FullName));
             }

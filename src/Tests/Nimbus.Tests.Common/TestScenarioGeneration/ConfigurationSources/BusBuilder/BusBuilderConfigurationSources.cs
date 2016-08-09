@@ -28,7 +28,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
         public IEnumerator<IConfigurationScenario<BusBuilderConfiguration>> GetEnumerator()
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
-            var logger = TestHarnessLoggerFactory.Create();
+            var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
 
             foreach (var syncContext in new SynchronizationContextConfigurationSources())
             {

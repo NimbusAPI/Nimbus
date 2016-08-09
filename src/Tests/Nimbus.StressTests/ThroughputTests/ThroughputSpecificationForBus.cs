@@ -9,7 +9,6 @@ using Nimbus.Infrastructure.Logging;
 using Nimbus.StressTests.ThroughputTests.EventHandlers;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Serilog;
@@ -36,11 +35,6 @@ namespace Nimbus.StressTests.ThroughputTests
 
         protected Bus Bus { get; private set; }
 
-        static ThroughputSpecificationForBus()
-        {
-            TestHarnessLoggerFactory.Create();
-        }
-
         protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             _instance = scenario.CreateInstance();
@@ -48,10 +42,10 @@ namespace Nimbus.StressTests.ThroughputTests
 
             var busBuilderConfiguration = _instance.Configuration;
 
-            if (!Debugger.IsAttached)
-            {
-                busBuilderConfiguration.WithLogger(new NullLogger());
-            }
+            var logger = Debugger.IsAttached
+                ? TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName)
+                : new NullLogger();
+            busBuilderConfiguration.WithLogger(logger);
 
             Bus = busBuilderConfiguration.Build();
             Log.Debug("Starting bus...");
@@ -94,7 +88,7 @@ namespace Nimbus.StressTests.ThroughputTests
         }
 
         [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<ThroughputSpecificationForBus>))]
+        [TestCaseSource(typeof(AllBusConfigurations<ThroughputSpecificationForBus>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);

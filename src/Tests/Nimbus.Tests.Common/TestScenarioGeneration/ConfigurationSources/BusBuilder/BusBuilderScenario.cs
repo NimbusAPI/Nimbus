@@ -42,6 +42,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
 
         public ScenarioInstance<BusBuilderConfiguration> CreateInstance()
         {
+            var globalPrefix = Guid.NewGuid().ToString();
+
             var transport = _transport.CreateInstance();
             var router = _router.CreateInstance();
             var serializer = _serializer.CreateInstance();
@@ -51,12 +53,13 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
 
             var configuration = new Nimbus.Configuration.BusBuilder()
                 .Configure()
+                .WithNames("MyTestSuite", Environment.MachineName)
+                .WithGlobalPrefix(globalPrefix)
                 .WithTransport(transport.Configuration)
                 .WithRouter(router.Configuration)
                 .WithSerializer(serializer.Configuration)
                 .WithCompressor(compressor.Configuration)
                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
-                .WithNames("MyTestSuite", Environment.MachineName)
                 .WithTypesFrom(_typeProvider)
                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                 .WithLogger(_logger)

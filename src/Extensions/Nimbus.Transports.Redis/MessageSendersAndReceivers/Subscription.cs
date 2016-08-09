@@ -2,6 +2,8 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 {
     internal class Subscription
     {
+        internal const string SubscriptionsPrefix = "subscriptions";
+
         public string TopicPath { get; }
         public string SubscriptionName { get; }
         public string TopicSubscribersRedisKey { get; }
@@ -17,7 +19,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
         public static string TopicSubscribersRedisKeyFor(string topicPath)
         {
-            return $"subscriptions.{topicPath}";
+            return $"{SubscriptionsPrefix}.{topicPath}";
         }
     }
 }

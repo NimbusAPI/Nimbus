@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,15 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="CommandWhoseAssemblyShouldNotBeIncluded.cs" />
     <Compile Include="DuplicateMessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WhenTheTestHarnessRuns.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
       <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
       <Name>Nimbus.MessageContracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

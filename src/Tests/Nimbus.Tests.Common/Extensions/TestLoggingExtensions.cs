@@ -1,7 +1,7 @@
 using System;
-using System.Runtime.ExceptionServices;
 using Nimbus.Tests.Common.Stubs;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using Serilog;
 using Serilog.Events;
 
@@ -11,8 +11,7 @@ namespace Nimbus.Tests.Common.Extensions
     {
         static TestLoggingExtensions()
         {
-            TestHarnessLoggerFactory.Create();
-            AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
+            TestHarnessLoggerFactory.Create(Guid.Empty, string.Empty);
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
 
@@ -22,32 +21,21 @@ namespace Nimbus.Tests.Common.Extensions
             if (exception == null) return;
 
             if (exception.Source == "nunit.framework") return; // sigh.
+            if (exception.Source == typeof(TestLoggingExtensions).Assembly.GetName().Name) return;
 
             Log.Warning(exception, "An unhandled exception was thrown by {ExceptionSource}", exception.Source);
         }
 
-        private static void OnFirstChanceException(object sender, FirstChanceExceptionEventArgs e)
-        {
-            var exception = e.Exception;
-            if (exception == null) return;
-
-            if (exception is OperationCanceledException) return;
-            if (exception.Source == "nunit.framework") return; // sigh.
-            if (exception.Source == "System.Xml") return; // sigh.
-
-            Log.Warning(exception, "A first-chance exception was thrown by {ExceptionSource}", exception.Source);
-        }
-
         public static void LogTestStart()
         {
-            TestContext.CurrentContext.Test.Properties["TestId"] = Guid.NewGuid();
+            TestContext.CurrentContext.Test.Properties.Set("TestId", Guid.NewGuid());
             Log.Information("Test {TestName} starting", TestContext.CurrentContext.Test.FullName);
         }
 
         public static void LogTestResult()
         {
             var testContext = TestContext.CurrentContext;
-            var testStatus = testContext.Result.Status;
+            var testStatus = testContext.Result.Outcome.Status;
             LogEventLevel level;
             switch (testStatus)
             {

@@ -15,6 +15,7 @@ namespace Nimbus.Infrastructure.Events
         private readonly ILogger _logger;
         private readonly IMessageDispatcherFactory _messageDispatcherFactory;
         private readonly INimbusTransport _transport;
+        private readonly IPathFactory _pathFactory;
         private readonly IRouter _router;
         private readonly IHandlerMapper _handlerMapper;
         private readonly ITypeProvider _typeProvider;
@@ -27,6 +28,7 @@ namespace Nimbus.Infrastructure.Events
                                                  ILogger logger,
                                                  IMessageDispatcherFactory messageDispatcherFactory,
                                                  INimbusTransport transport,
+                                                 IPathFactory pathFactory,
                                                  IRouter router,
                                                  ITypeProvider typeProvider,
                                                  PoorMansIoC container)
@@ -36,6 +38,7 @@ namespace Nimbus.Infrastructure.Events
             _logger = logger;
             _messageDispatcherFactory = messageDispatcherFactory;
             _transport = transport;
+            _pathFactory = pathFactory;
             _router = router;
             _typeProvider = typeProvider;
             _container = container;
@@ -50,7 +53,7 @@ namespace Nimbus.Infrastructure.Events
             // Events are routed to Topics and we'll create a competing subscription for the logical endpoint
             var allMessageTypesHandledByThisEndpoint = _handlerMapper.GetMessageTypesHandledBy(openGenericHandlerType, handlerTypes);
             var bindings = allMessageTypesHandledByThisEndpoint
-                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic)})
+                .Select(m => new {MessageType = m, TopicPath = _router.Route(m, QueueOrTopic.Topic, _pathFactory) })
                 .GroupBy(b => b.TopicPath)
                 .Select(g => new
                              {
@@ -68,7 +71,7 @@ namespace Nimbus.Infrastructure.Events
                 foreach (var handlerType in binding.HandlerTypes)
                 {
                     var messageType = binding.MessageTypes.Single();
-                    var subscriptionName = PathFactory.SubscriptionNameFor(_applicationName, handlerType);
+                    var subscriptionName = _pathFactory.SubscriptionNameFor(_applicationName, handlerType);
                     var filterCondition = _filterConditionProvider.GetFilterConditionFor(handlerType);
 
                     _logger.Debug("Creating message pump for competing event subscription '{0}/{1}' handling {2} with filter {3}",

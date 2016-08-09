@@ -10,7 +10,7 @@ namespace Nimbus.Infrastructure.PropertyInjection
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILargeMessageBodyStore _largeMessageBodyStore;
 
-        public IBus Bus { get; set; }
+        public Bus Bus { get; set; }
 
         public PropertyInjector(IClock clock, IDispatchContextManager dispatchContextManager, ILargeMessageBodyStore largeMessageBodyStore)
         {
@@ -25,6 +25,12 @@ namespace Nimbus.Infrastructure.PropertyInjection
             if (requireBus != null)
             {
                 requireBus.Bus = Bus;
+            }
+
+            var requiresBusId = handlerOrInterceptor as IRequireBusId;
+            if (requiresBusId != null)
+            {
+                requiresBusId.BusId = Bus.InstanceId;
             }
 
             var requireDispatchContext = handlerOrInterceptor as IRequireDispatchContext;

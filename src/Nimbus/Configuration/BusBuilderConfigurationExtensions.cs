@@ -50,6 +50,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithGlobalPrefix(this BusBuilderConfiguration configuration, string globalPrefix)
+        {
+            configuration.GlobalPrefix = new GlobalPrefixSetting { Value = globalPrefix };
+            return configuration;
+        }
+
         public static BusBuilderConfiguration WithTypesFrom(this BusBuilderConfiguration configuration, ITypeProvider typeProvider)
         {
             configuration.TypeProvider = typeProvider;

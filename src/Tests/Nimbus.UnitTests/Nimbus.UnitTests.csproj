@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1998</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1998</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -51,8 +53,8 @@
     <Reference Include="NSubstitute">
       <HintPath>..\..\packages\NSubstitute.1.7.1.0\lib\NET40\NSubstitute.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly, Version=1.1.1.1, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
@@ -73,6 +75,7 @@
     <Compile Include="AssemblyScanningTests\WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
     <Compile Include="AssemblyScanningTests\WhenAMessageTypeNameIsDuplicated.cs" />
     <Compile Include="AssemblyScanningTests\WhenAUnserializableAMessageThatIsInAnAssemblyThatIsNotIncluded.cs" />
+    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BarEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BazEvent.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\FooEvent.cs" />
@@ -84,6 +87,8 @@
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
     <Compile Include="BatchSendingTests\WhenSendingACollectionOfCommandsViaTheCommandSender.cs" />
     <Compile Include="DateTimeOffsetTests\WhenAddingValuesToADateTime.cs" />
+    <Compile Include="InfrastructureTests\MessageContracts\SimpleCommand.cs" />
+    <Compile Include="InfrastructureTests\MessageContracts\SimpleEvent.cs" />
     <Compile Include="NimbusMessageFactoryTests\GivenABrokeredMessageFactory.cs" />
     <Compile Include="NimbusMessageFactoryTests\WhenCreatingANewMessageWithContent.cs" />
     <Compile Include="CompressionTests\WhenBuildingBrokeredMessagesUsingCompression.cs" />

@@ -21,19 +21,19 @@ namespace Nimbus.Infrastructure.Routing
             _singleRequestQueuePath = singleRequestQueuePath;
         }
 
-        public string Route(Type messageType, QueueOrTopic queueOrTopic)
+        public string Route(Type messageType, QueueOrTopic queueOrTopic, IPathFactory pathFactory)
         {
             switch (queueOrTopic)
             {
                 case QueueOrTopic.Queue:
-                    if (typeof (IBusCommand).IsAssignableFrom(messageType))
+                    if (typeof(IBusCommand).IsAssignableFrom(messageType))
                     {
-                        return _singleCommandQueuePath ?? _fallbackRouter.Route(messageType, queueOrTopic);
+                        return _singleCommandQueuePath ?? _fallbackRouter.Route(messageType, queueOrTopic, pathFactory);
                     }
 
-                    if (messageType.IsClosedTypeOf(typeof (IBusRequest<,>)))
+                    if (messageType.IsClosedTypeOf(typeof(IBusRequest<,>)))
                     {
-                        return _singleRequestQueuePath ?? _fallbackRouter.Route(messageType, queueOrTopic);
+                        return _singleRequestQueuePath ?? _fallbackRouter.Route(messageType, queueOrTopic, pathFactory);
                     }
 
                     break;
@@ -41,7 +41,7 @@ namespace Nimbus.Infrastructure.Routing
                     break;
             }
 
-            return _fallbackRouter.Route(messageType, queueOrTopic);
+            return _fallbackRouter.Route(messageType, queueOrTopic, pathFactory);
         }
     }
 }

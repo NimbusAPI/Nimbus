@@ -18,21 +18,22 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 {
     [TestFixture]
-    public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<IBus>
+    public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<Bus>
     {
+        private readonly string _globalPrefix = Guid.NewGuid().ToString();
+        private MethodCallCounter MethodCallCounter { get; set; }
         private const int _expectedTotalCallCount = 11; // 5 interceptors * 2 + 1 handler
 
-        protected override async Task<IBus> Given()
+        protected override async Task<Bus> Given()
         {
-            MethodCallCounter.Clear();
-
             var testFixtureType = GetType();
             var typeProvider = new TestHarnessTypeProvider(new[] {testFixtureType.Assembly}, new[] {testFixtureType.Namespace});
-            var logger = TestHarnessLoggerFactory.Create();
+            var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
 
             var bus = new BusBuilder().Configure()
-                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithNames("MyTestSuite", Environment.MachineName)
+                                      .WithGlobalPrefix(_globalPrefix)
+                                      .WithTransport(new InProcessTransportConfiguration())
                                       .WithTypesFrom(typeProvider)
                                       .WithDependencyResolver(new DependencyResolver(typeProvider))
                                       .WithDefaultTimeout(TimeSpan.FromSeconds(TimeoutSeconds))
@@ -44,6 +45,10 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
                                           dc.RemoveAllExistingNamespaceElementsOnStartup(
                                               "I understand this will delete EVERYTHING in my namespace. I promise to only use this for test suites."))
                                       .Build();
+
+            MethodCallCounter = MethodCallCounter.CreateInstance(bus.InstanceId);
+            MethodCallCounter.Clear();
+
             await bus.Start();
 
             return bus;
@@ -56,6 +61,13 @@ namespace Nimbus.IntegrationTests.Tests.InterceptorTests
 
             MethodCallCounter.Stop();
             MethodCallCounter.Dump();
+        }
+
+        public override void TearDown()
+        {
+            var bus = Subject;
+            if (bus != null) MethodCallCounter.DestroyInstance(bus.InstanceId);
+            base.TearDown();
         }
 
         [Test]

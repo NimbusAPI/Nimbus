@@ -1,12 +1,14 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Handlers;
 using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
+using Nimbus.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
 
 namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers
 {
-    public class SlowBlackBallRequestHandler : IHandleMulticastRequest<BlackBallRequest, BlackBallResponse>
+    public class SlowBlackBallRequestHandler : IHandleMulticastRequest<BlackBallRequest, BlackBallResponse>, IRequireBusId
     {
         public static SemaphoreSlim HandlerThrottle { get; private set; }
 
@@ -22,7 +24,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
 
         public async Task<BlackBallResponse> Handle(BlackBallRequest request)
         {
-            MethodCallCounter.RecordCall<SlowBlackBallRequestHandler>(handler => handler.Handle(request));
+            MethodCallCounter.ForInstance(BusId).RecordCall<SlowBlackBallRequestHandler>(handler => handler.Handle(request));
 
             await HandlerThrottle.WaitAsync();
 
@@ -31,5 +33,7 @@ namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHan
                        IsBlackBalled = false
                    };
         }
+
+        public Guid BusId { get; set; }
     }
 }

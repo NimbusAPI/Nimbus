@@ -8,7 +8,6 @@ using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
@@ -22,7 +21,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         protected override void Reconfigure()
         {
             Instance.Configuration
-                    .WithGlobalOutboundInterceptorTypes(typeof (OutboundAuditingInterceptor))
+                    .WithGlobalOutboundInterceptorTypes(typeof(OutboundAuditingInterceptor))
                     .WithMaxDeliveryAttempts(1)
                     .WithHeartbeatInterval(TimeSpan.MaxValue)
                 ;
@@ -45,7 +44,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         }
 
         [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenSendingOneOfEachKindOfMessage>))]
+        [TestCaseSource(typeof(AllBusConfigurations<WhenSendingOneOfEachKindOfMessage>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
@@ -128,7 +127,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
             MethodCallCounter.AllReceivedCalls.Count().ShouldBe(7);
         }
 
-        private static object[] AllAuditedMessages()
+        private object[] AllAuditedMessages()
         {
             return MethodCallCounter.AllReceivedMessages
                                     .OfType<AuditEvent>()

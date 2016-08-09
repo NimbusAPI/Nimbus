@@ -1,4 +1,6 @@
-﻿using Nimbus.Configuration.Debug.Settings;
+﻿using System;
+using System.Threading.Tasks;
+using Nimbus.Configuration.Debug.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
@@ -39,23 +41,45 @@ namespace Nimbus.Configuration
             var bus = container.ResolveWithOverrides<Bus>(messagePumpsManager);
             container.Resolve<PropertyInjector>().Bus = bus;
 
-            bus.Starting += delegate
+            bus.Starting += (s, e) =>
                             {
-                                container.Resolve<INimbusTransport>().TestConnection().Wait();
-
-                                var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
-                                if (removeAllExistingElements)
-                                {
-                                    logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
-                                    var cleanser = container.Resolve<INamespaceCleanser>();
-                                    cleanser.RemoveAllExistingNamespaceElements().Wait();
-                                }
+                                Task.Run(async () =>
+                                               {
+                                                   try
+                                                   {
+                                                       await container.Resolve<INimbusTransport>().TestConnection();
+                                                       await CleanNamespace(container, logger);
+                                                   }
+                                                   catch (Exception ex)
+                                                   {
+                                                       logger.Error(ex, "Failed to establish connection to underlying transport: {Message}", ex.Message);
+                                                       throw;
+                                                   }
+                                               }).Wait();
                             };
-            bus.Disposing += delegate { container.Dispose(); };
+
+            bus.Disposing += (s, e) =>
+                             {
+                                 Task.Run(async () =>
+                                                {
+                                                    await CleanNamespace(container, logger);
+                                                    container.Dispose();
+                                                }).Wait();
+                             };
 
             logger.Info("Bus built. Job done!");
 
             return bus;
+        }
+
+        private static async Task CleanNamespace(PoorMansIoC container, ILogger logger)
+        {
+            var removeAllExistingElements = container.Resolve<RemoveAllExistingNamespaceElementsSetting>();
+            if (!removeAllExistingElements) return;
+
+            logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
+            var cleanser = container.Resolve<INamespaceCleanser>();
+            await cleanser.RemoveAllExistingNamespaceElements();
         }
     }
 }
