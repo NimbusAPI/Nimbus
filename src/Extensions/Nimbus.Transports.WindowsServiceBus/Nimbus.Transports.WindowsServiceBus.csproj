@@ -63,6 +63,7 @@
     <Compile Include="..\..\Nimbus\Properties\NullGuard.cs">
       <Link>Properties\NullGuard.cs</Link>
     </Compile>
+    <Compile Include="Configuration\ConnectionStringSetting.cs" />
     <Compile Include="Extensions\SubscriptionClientFilteringExtensions.cs" />
     <Compile Include="Filtering\AndConditionSqlGenerator.cs" />
     <Compile Include="Filtering\ConditionSqlGenerator.cs" />

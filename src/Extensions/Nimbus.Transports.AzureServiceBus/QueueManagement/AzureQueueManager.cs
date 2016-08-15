@@ -26,6 +26,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly GlobalPrefixSetting _globalPrefix;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
+        private readonly RequireRetriesToBeHandledBy _requireRetriesToBeHandledBy;
 
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
@@ -45,6 +46,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
                                  GlobalPrefixSetting globalPrefix,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                                 RequireRetriesToBeHandledBy requireRetriesToBeHandledBy,
                                  IPathFactory pathFactory,
                                  IRetry retry,
                                  ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
@@ -53,6 +55,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
             _namespaceManager = namespaceManager;
             _messagingFactory = messagingFactory;
             _maxDeliveryAttempts = maxDeliveryAttempts;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
             _retry = retry;
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
@@ -82,8 +85,9 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         {
             return Task.Run(async () =>
                                   {
+                                      var receiveMode = _requireRetriesToBeHandledBy == RetriesHandledBy.Transport ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete;
                                       EnsureQueueExists(queuePath);
-                                      var receiverAsync = await _messagingFactory().CreateMessageReceiverAsync(queuePath, ReceiveMode.ReceiveAndDelete);
+                                      var receiverAsync = await _messagingFactory().CreateMessageReceiverAsync(queuePath, receiveMode);
                                       return receiverAsync;
                                   }).ConfigureAwaitFalse();
         }
@@ -113,11 +117,12 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                                                        new IsNullCondition(MessagePropertyKeys.RedeliveryToSubscriptionName));
                                 var combinedCondition = new AndCondition(filterCondition, myOwnSubscriptionFilterCondition);
                                 var filterSql = _sqlFilterExpressionGenerator.GenerateFor(combinedCondition);
+                                var receiveMode = _requireRetriesToBeHandledBy == RetriesHandledBy.Transport ? ReceiveMode.PeekLock : ReceiveMode.ReceiveAndDelete;
 
                                 return _retry.Do(() =>
                                                  {
                                                      var subscriptionClient = _messagingFactory()
-                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                                         .CreateSubscriptionClient(topicPath, subscriptionName, receiveMode);
                                                      subscriptionClient.ReplaceFilter("$Default", filterSql);
                                                      return subscriptionClient;
                                                  },
@@ -302,7 +307,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                                 EnableDeadLetteringOnMessageExpiration = _enableDeadLetteringOnMessageExpiration,
                                                                 EnableBatchedOperations = true,
                                                                 RequiresSession = false,
-                                                                AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                                AutoDeleteOnIdle = _autoDeleteOnIdle,
+                                                                LockDuration = TimeSpan.FromMinutes(5)
                                                             };
 
                               try
@@ -346,7 +352,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                          RequiresDuplicateDetection = false,
                                                          RequiresSession = false,
                                                          SupportOrdering = false,
-                                                         AutoDeleteOnIdle = _autoDeleteOnIdle
+                                                         AutoDeleteOnIdle = _autoDeleteOnIdle,
+                                                         LockDuration = TimeSpan.FromMinutes(5)
                                                      };
 
                               // We don't check for queue existence here because that introduces a race condition with any other bus participant that's

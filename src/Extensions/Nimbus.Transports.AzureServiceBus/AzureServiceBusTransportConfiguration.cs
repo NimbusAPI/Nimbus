@@ -13,6 +13,7 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
+using Nimbus.Transports.AzureServiceBus.Configuration;
 using Nimbus.Transports.AzureServiceBus.DeadLetterOffice;
 using Nimbus.Transports.AzureServiceBus.DelayedDelivery;
 using Nimbus.Transports.AzureServiceBus.Extensions;
@@ -27,6 +28,7 @@ namespace Nimbus.Transports.AzureServiceBus
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; } = new ServerConnectionCountSetting();
         internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
         internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
+        internal RequireRetriesToBeHandledBy RequireRetriesToBeHandledBy { get; set; } = new RequireRetriesToBeHandledBy();
 
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; } = new UnsupportedLargeMessageBodyStorageConfiguration();
 
@@ -54,16 +56,22 @@ namespace Nimbus.Transports.AzureServiceBus
             return this;
         }
 
+        public AzureServiceBusTransportConfiguration WithRetriesHandledBy(RetriesHandledBy retriesHandledBy)
+        {
+            RequireRetriesToBeHandledBy = new RequireRetriesToBeHandledBy {Value = retriesHandledBy};
+            return this;
+        }
+
         protected override void RegisterComponents(PoorMansIoC container)
         {
-            container.RegisterType<AzureServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
+            container.RegisterType<AzureServiceBusTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));
 
-            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
+            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof(IBrokeredMessageFactory));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
-            container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
-            container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
-            container.RegisterType<AzureServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
+            container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof(IQueueManager));
+            container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
+            container.RegisterType<AzureServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
+            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             container.RegisterType<SqlFilterExpressionGenerator>(ComponentLifetime.SingleInstance, typeof(ISqlFilterExpressionGenerator));
 
             container.Register(c =>

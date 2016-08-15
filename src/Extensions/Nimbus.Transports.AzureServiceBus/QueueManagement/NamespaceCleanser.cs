@@ -4,6 +4,7 @@ using Microsoft.ServiceBus;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
+using Nimbus.Transports.AzureServiceBus.Configuration;
 
 namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 {

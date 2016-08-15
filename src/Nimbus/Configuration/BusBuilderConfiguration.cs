@@ -52,6 +52,7 @@ namespace Nimbus.Configuration
         internal GlobalOutboundInterceptorTypesSetting GlobalOutboundInterceptorTypes { get; set; } = new GlobalOutboundInterceptorTypesSetting();
         internal ConcurrentHandlerLimitSetting ConcurrentHandlerLimit { get; set; } = new ConcurrentHandlerLimitSetting();
         internal GlobalConcurrentHandlerLimitSetting GlobalConcurrentHandlerLimit { get; set; } = new GlobalConcurrentHandlerLimitSetting();
+        internal RequireRetriesToBeHandledBy RequireRetriesToBeHandledBy { get; set; } = new RequireRetriesToBeHandledBy();
 
         public Bus Build()
         {

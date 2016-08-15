@@ -13,6 +13,7 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.Transports.WindowsServiceBus.BrokeredMessages;
+using Nimbus.Transports.WindowsServiceBus.Configuration;
 using Nimbus.Transports.WindowsServiceBus.DeadLetterOffice;
 using Nimbus.Transports.WindowsServiceBus.DelayedDelivery;
 using Nimbus.Transports.WindowsServiceBus.Extensions;

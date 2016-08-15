@@ -39,6 +39,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             return _queuePath;
         }
 
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+        }
+
         protected override async Task WarmUp()
         {
             await GetMessageReceiver();

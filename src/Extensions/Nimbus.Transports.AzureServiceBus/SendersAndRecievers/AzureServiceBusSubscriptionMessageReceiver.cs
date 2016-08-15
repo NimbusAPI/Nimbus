@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Filtering.Attributes;
@@ -24,13 +25,17 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         private readonly string _topicPath;
         private readonly string _subscriptionName;
         private readonly IFilterCondition _filterCondition;
+        private readonly RequireRetriesToBeHandledBy _requireRetriesToBeHandledBy;
         private SubscriptionClient _subscriptionClient;
+
+        private readonly ThreadSafeDictionary<Guid, BrokeredMessage> _trackedMessages = new ThreadSafeDictionary<Guid, BrokeredMessage>();
 
         public AzureServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
                                                           string topicPath,
                                                           string subscriptionName,
                                                           IFilterCondition filterCondition,
                                                           ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                                          RequireRetriesToBeHandledBy requireRetriesToBeHandledBy,
                                                           IBrokeredMessageFactory brokeredMessageFactory,
                                                           IGlobalHandlerThrottle globalHandlerThrottle,
                                                           ILogger logger)
@@ -40,6 +45,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
             _filterCondition = filterCondition;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
             _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
         }
@@ -47,6 +53,38 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         public override string ToString()
         {
             return "{0}/{1}".FormatWith(_topicPath, _subscriptionName);
+        }
+
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+            if (_requireRetriesToBeHandledBy == RetriesHandledBy.Bus) return;
+
+            try
+            {
+                BrokeredMessage brokeredMessage;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                await brokeredMessage.CompleteAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Failed to complete {MessageId}", message.MessageId);
+            }
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+            if (_requireRetriesToBeHandledBy == RetriesHandledBy.Bus) return;
+
+            try
+            {
+                BrokeredMessage brokeredMessage;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                await brokeredMessage.AbandonAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Failed to abandon {MessageId}", message.MessageId);
+            }
         }
 
         protected override async Task WarmUp()
@@ -85,6 +123,8 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
                     var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
                     nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
+
+                    _trackedMessages.TryAdd(nimbusMessage.MessageId, brokeredMessage);
 
                     return nimbusMessage;
                 }

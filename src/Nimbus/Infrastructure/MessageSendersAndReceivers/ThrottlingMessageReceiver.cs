@@ -75,8 +75,10 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             }
         }
 
-        protected abstract Task WarmUp();
+        public abstract Task RecordSuccess(NimbusMessage message);
+        public abstract Task RecordFailure(NimbusMessage message);
 
+        protected abstract Task WarmUp();
         protected abstract Task<NimbusMessage> Fetch(CancellationToken cancellationToken);
 
         private async Task Worker(Func<NimbusMessage, Task> callback)

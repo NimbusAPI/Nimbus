@@ -7,5 +7,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
     {
         Task Start(Func<NimbusMessage, Task> callback);
         Task Stop();
+
+        Task RecordSuccess(NimbusMessage message);
+        Task RecordFailure(NimbusMessage message);
     }
 }

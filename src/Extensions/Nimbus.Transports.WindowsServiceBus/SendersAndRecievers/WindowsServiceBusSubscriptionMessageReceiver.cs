@@ -45,6 +45,14 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
             return "{0}/{1}".FormatWith(_topicPath, _subscriptionName);
         }
 
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+        }
+
         protected override async Task WarmUp()
         {
             await GetSubscriptionClient();

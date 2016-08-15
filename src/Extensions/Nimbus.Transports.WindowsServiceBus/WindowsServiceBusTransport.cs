@@ -48,6 +48,8 @@ namespace Nimbus.Transports.WindowsServiceBus
             _logger = logger;
         }
 
+        public RetriesHandledBy RetriesHandledBy { get; } = RetriesHandledBy.Bus;
+
         public async Task TestConnection()
         {
             var version = await _namespaceManager().GetVersionInfoAsync();

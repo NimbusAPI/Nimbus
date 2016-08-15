@@ -22,6 +22,7 @@ namespace Nimbus.Transports.AzureServiceBus
         private readonly IQueueManager _queueManager;
         private readonly Func<NamespaceManager> _namespaceManager;
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
+        private readonly RequireRetriesToBeHandledBy _requireRetriesToBeHandledBy;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IGlobalHandlerThrottle _globalHandlerThrottle;
         private readonly ILogger _logger;
@@ -36,6 +37,7 @@ namespace Nimbus.Transports.AzureServiceBus
         private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
 
         public AzureServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                        RequireRetriesToBeHandledBy requireRetriesToBeHandledBy,
                                         IBrokeredMessageFactory brokeredMessageFactory,
                                         IGlobalHandlerThrottle globalHandlerThrottle,
                                         ILogger logger,
@@ -52,9 +54,12 @@ namespace Nimbus.Transports.AzureServiceBus
             _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
             _brokeredMessageFactory = brokeredMessageFactory;
             _globalHandlerThrottle = globalHandlerThrottle;
-            _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
+            _concurrentHandlerLimit = concurrentHandlerLimit;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
         }
+
+        public RetriesHandledBy RetriesHandledBy => _requireRetriesToBeHandledBy;
 
         public async Task TestConnection()
         {
@@ -96,6 +101,7 @@ namespace Nimbus.Transports.AzureServiceBus
                                                                    _queueManager,
                                                                    queuePath,
                                                                    _concurrentHandlerLimit,
+                                                                   _requireRetriesToBeHandledBy,
                                                                    _globalHandlerThrottle,
                                                                    _logger);
             _garbageMan.Add(receiver);
@@ -116,6 +122,7 @@ namespace Nimbus.Transports.AzureServiceBus
                                                                           subscriptionName,
                                                                           filterCondition,
                                                                           _concurrentHandlerLimit,
+                                                                          _requireRetriesToBeHandledBy,
                                                                           _brokeredMessageFactory,
                                                                           _globalHandlerThrottle,
                                                                           _logger);

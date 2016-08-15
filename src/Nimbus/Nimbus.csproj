@@ -67,6 +67,7 @@
     <Compile Include="Configuration\LargeMessages\LargeMessageStorageConfiguration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\FactoryRegistration.cs" />
     <Compile Include="Configuration\PoorMansIocContainer\IComponentRegistration.cs" />
+    <Compile Include="Configuration\Settings\RequireRetriesToBeHandledBy.cs" />
     <Compile Include="Configuration\Settings\GlobalConcurrentHandlerLimitSetting.cs" />
     <Compile Include="Configuration\Settings\GlobalPrefixSetting.cs" />
     <Compile Include="Configuration\Settings\ISetting.cs" />
@@ -179,7 +180,6 @@
     <Compile Include="Infrastructure\Commands\CommandMessagePumpsFactory.cs" />
     <Compile Include="Infrastructure\RequestResponse\RequestMessagePumpsFactory.cs" />
     <Compile Include="Configuration\Settings\ApplicationNameSetting.cs" />
-    <Compile Include="Configuration\Settings\ConnectionStringSetting.cs" />
     <Compile Include="Configuration\Settings\DefaultTimeoutSetting.cs" />
     <Compile Include="Configuration\Settings\InstanceNameSetting.cs" />
     <Compile Include="Configuration\Settings\MaxDeliveryAttemptSetting.cs" />

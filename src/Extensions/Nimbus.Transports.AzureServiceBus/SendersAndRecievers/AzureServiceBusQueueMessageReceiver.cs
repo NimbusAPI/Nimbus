@@ -2,12 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
-using Nimbus.Extensions;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
@@ -16,20 +17,24 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
+        private readonly RequireRetriesToBeHandledBy _requireRetriesToBeHandledBy;
         private readonly ILogger _logger;
 
         private volatile MessageReceiver _messageReceiver;
+        private readonly ThreadSafeDictionary<Guid, BrokeredMessage> _trackedMessages = new ThreadSafeDictionary<Guid, BrokeredMessage>();
 
         public AzureServiceBusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
-                                                     IQueueManager queueManager,
-                                                     string queuePath,
-                                                     ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                                     IGlobalHandlerThrottle globalHandlerThrottle,
-                                                     ILogger logger)
+                                                   IQueueManager queueManager,
+                                                   string queuePath,
+                                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                                   RequireRetriesToBeHandledBy requireRetriesToBeHandledBy,
+                                                   IGlobalHandlerThrottle globalHandlerThrottle,
+                                                   ILogger logger)
             : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
             _logger = logger;
             _brokeredMessageFactory = brokeredMessageFactory;
         }
@@ -37,6 +42,38 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         public override string ToString()
         {
             return _queuePath;
+        }
+
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+            if (_requireRetriesToBeHandledBy == RetriesHandledBy.Bus) return;
+
+            try
+            {
+                BrokeredMessage brokeredMessage;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                await brokeredMessage.CompleteAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Failed to complete {MessageId}", message.MessageId);
+            }
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+            if (_requireRetriesToBeHandledBy == RetriesHandledBy.Bus) return;
+
+            try
+            {
+                BrokeredMessage brokeredMessage;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                await brokeredMessage.AbandonAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Failed to abandon {MessageId}", message.MessageId);
+            }
         }
 
         protected override async Task WarmUp()

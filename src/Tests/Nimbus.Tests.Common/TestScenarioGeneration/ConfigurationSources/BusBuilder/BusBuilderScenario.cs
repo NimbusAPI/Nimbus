@@ -28,7 +28,8 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                                   IConfigurationScenario<ISerializer> serializer,
                                   IConfigurationScenario<ICompressor> compressor,
                                   IConfigurationScenario<ContainerConfiguration> iocContainer,
-                                  IConfigurationScenario<SyncContextConfiguration> syncContext) : base(transport, router, serializer, compressor, iocContainer, syncContext)
+                                  IConfigurationScenario<SyncContextConfiguration> syncContext)
+            : base(transport, router, serializer, compressor, iocContainer, syncContext)
         {
             _typeProvider = typeProvider;
             _logger = logger;

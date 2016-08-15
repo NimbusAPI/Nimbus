@@ -14,6 +14,7 @@ using Nimbus.MessageContracts;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Transports.WindowsServiceBus;
+using Nimbus.Transports.WindowsServiceBus.Configuration;
 using Nimbus.Transports.WindowsServiceBus.QueueManagement;
 using NUnit.Framework;
 

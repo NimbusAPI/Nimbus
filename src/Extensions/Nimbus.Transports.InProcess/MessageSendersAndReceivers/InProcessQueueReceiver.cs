@@ -32,6 +32,14 @@ namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers
             return _queuePath;
         }
 
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+        }
+
         protected override Task WarmUp()
         {
             return Task.Run(() => _messageQueue.EnsureValueCreated());

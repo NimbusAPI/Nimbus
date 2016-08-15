@@ -19,6 +19,8 @@ namespace Nimbus.Transports.InProcess
             _container = container;
         }
 
+        public RetriesHandledBy RetriesHandledBy { get; } = RetriesHandledBy.Bus;
+
         public Task TestConnection()
         {
             return Task.Delay(0);

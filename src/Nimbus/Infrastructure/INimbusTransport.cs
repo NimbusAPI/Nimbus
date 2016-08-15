@@ -8,6 +8,8 @@ namespace Nimbus.Infrastructure
 {
     internal interface INimbusTransport
     {
+        RetriesHandledBy RetriesHandledBy { get; }
+
         Task TestConnection();
 
         INimbusMessageSender GetQueueSender(string queuePath);

@@ -16,6 +16,7 @@ namespace Nimbus.Infrastructure
     {
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
+        private readonly RequireRetriesToBeHandledBy _requireRetriesToBeHandledBy;
         private readonly IClock _clock;
         private readonly IDispatchContextManager _dispatchContextManager;
         private readonly ILogger _logger;
@@ -30,6 +31,7 @@ namespace Nimbus.Infrastructure
 
         public MessagePump(EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
                            MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                           RequireRetriesToBeHandledBy requireRetriesToBeHandledBy,
                            IClock clock,
                            IDeadLetterOffice deadLetterOffice,
                            IDelayedDeliveryService delayedDeliveryService,
@@ -41,6 +43,7 @@ namespace Nimbus.Infrastructure
         {
             _enableDeadLetteringOnMessageExpiration = enableDeadLetteringOnMessageExpiration;
             _maxDeliveryAttempts = maxDeliveryAttempts;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
             _clock = clock;
             _dispatchContextManager = dispatchContextManager;
             _logger = logger;
@@ -106,7 +109,7 @@ namespace Nimbus.Infrastructure
                     message.ExpiresAfter,
                     now);
 
-                await PostToDeadLetterOffice(message);
+                if (_requireRetriesToBeHandledBy == RetriesHandledBy.Bus) await PostToDeadLetterOffice(message);
 
                 return;
             }
@@ -122,11 +125,19 @@ namespace Nimbus.Infrastructure
                         await _messageDispatcher.Dispatch(message);
                     }
                     _logger.Debug("Dispatched message {MessageId}", message.MessageId);
+                    await _receiver.RecordSuccess(message);
                     return;
                 }
                 catch (Exception exc)
                 {
+                    await _receiver.RecordFailure(message);
                     _logger.Warn(exc, "Dispatch failed for message {MessageId}", message.MessageId);
+                }
+
+                if (_requireRetriesToBeHandledBy == RetriesHandledBy.Transport)
+                {
+                    _logger.Debug("The bus is configured to require the transport layer to handle retries. No further action will be taken for this message.");
+                    return;
                 }
 
                 var numDeliveryAttempts = message.DeliveryAttempts.Count();

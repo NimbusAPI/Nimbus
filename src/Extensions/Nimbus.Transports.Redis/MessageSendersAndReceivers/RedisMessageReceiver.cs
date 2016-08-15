@@ -37,6 +37,14 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _logger = logger;
         }
 
+        public override async Task RecordSuccess(NimbusMessage message)
+        {
+        }
+
+        public override async Task RecordFailure(NimbusMessage message)
+        {
+        }
+
         protected override Task WarmUp()
         {
             return Task.Run(() =>
@@ -72,7 +80,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                           return null;
                                       }
 
-                                      var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof (NimbusMessage));
+                                      var message = (NimbusMessage) _serializer.Deserialize(redisValue, typeof(NimbusMessage));
                                       return message;
                                   },
                             cancellationToken).ConfigureAwaitFalse();

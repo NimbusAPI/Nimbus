@@ -19,6 +19,8 @@ namespace Nimbus.Transports.Redis
             _connectionMultiplexerFactory = connectionMultiplexerFactory;
         }
 
+        public RetriesHandledBy RetriesHandledBy { get; } = RetriesHandledBy.Bus;
+
         public Task TestConnection()
         {
             return _connectionMultiplexerFactory.TestConnection();
