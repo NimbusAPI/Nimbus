@@ -1,4 +1,4 @@
-** This is the v2 maintenance fork of Nimbus**
+**This is the v2 maintenance fork of Nimbus**
 
 You probably want the [Nimbus](https://github.com/NimbusAPI/Nimbus) repository.
 
