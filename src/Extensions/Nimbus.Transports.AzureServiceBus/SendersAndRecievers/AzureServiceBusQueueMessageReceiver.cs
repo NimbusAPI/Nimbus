@@ -51,7 +51,11 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             try
             {
                 BrokeredMessage brokeredMessage;
-                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage))
+                {
+                    _logger.Warn("Failed to locate {MessageId} for completion", message.MessageId);
+                    return;
+                }
                 await brokeredMessage.CompleteAsync();
             }
             catch (Exception e)
@@ -67,7 +71,11 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             try
             {
                 BrokeredMessage brokeredMessage;
-                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage)) return;
+                if (!_trackedMessages.TryRemove(message.MessageId, out brokeredMessage))
+                {
+                    _logger.Warn("Failed to locate {MessageId} for abandonment", message.MessageId);
+                    return;
+                }
                 await brokeredMessage.AbandonAsync();
             }
             catch (Exception e)
@@ -111,6 +119,12 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                     if (brokeredMessage == null) return null;
 
                     var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(brokeredMessage);
+
+                    if (_requireRetriesToBeHandledBy == RetriesHandledBy.Transport)
+                    {
+                        _trackedMessages.TryAdd(nimbusMessage.MessageId, brokeredMessage);
+                    }
+
                     return nimbusMessage;
                 }
             }

@@ -6,7 +6,6 @@ using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 
@@ -39,7 +38,7 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         }
 
         [Test]
-        [TestCaseSource(typeof (AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
+        [TestCaseSource(typeof(AllBusConfigurations<WhenACommandFailsToBeHandledMoreThanNTimes>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
             await Given(scenario);
@@ -62,6 +61,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         [Then]
         public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts()
         {
+            // if the transport layer is handling retry attempts then we don't get to record delivery attempts
+            if (Instance.Configuration.RequireRetriesToBeHandledBy == RetriesHandledBy.Transport) return;
+
             var nimbusMessage = _deadLetterMessages.Single();
             nimbusMessage.DeliveryAttempts.Count().ShouldBe(_maxDeliveryAttempts);
         }

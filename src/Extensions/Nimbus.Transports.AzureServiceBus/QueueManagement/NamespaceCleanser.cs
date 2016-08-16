@@ -30,36 +30,51 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         /// </summary>
         public async Task RemoveAllExistingNamespaceElements()
         {
-            var queueDeletionTasks = _namespaceManager.Value.GetQueues()
-                                                      .Select(q => q.Path)
-                                                      .Select(DeleteQueue)
-                                                      .ToArray();
+            var namespaceManager = _namespaceManager.Value;
+            var queuesTask = namespaceManager.GetQueuesAsync();
+            var topicsTask = namespaceManager.GetTopicsAsync();
 
-            var topicDeletionTasks = _namespaceManager.Value.GetTopics()
-                                                      .Select(t => t.Path)
-                                                      .Select(DeleteTopic)
-                                                      .ToArray();
+            var queues = await queuesTask;
+            var queueDeletionTasks = queues
+                .Select(q => q.Path)
+                .Where(BelongsToMe)
+                .Select(DeleteQueue)
+                .ToArray();
+
+            var topics = await topicsTask;
+            var topicDeletionTasks = topics
+                .Select(t => t.Path)
+                .Where(BelongsToMe)
+                .Select(DeleteTopic)
+                .ToArray();
 
             var allDeletionTasks = new Task[0]
                 .Union(queueDeletionTasks)
                 .Union(topicDeletionTasks)
                 .ToArray();
 
+            _logger.Debug("Deleting {QueueCount} queues and {TopicCount} topics (total {TotalCount})",
+                          queueDeletionTasks.Length,
+                          topicDeletionTasks.Length,
+                          queueDeletionTasks.Length + topicDeletionTasks.Length);
+
             await Task.WhenAll(allDeletionTasks);
+        }
+
+        private bool BelongsToMe(string queueOrTopicPath)
+        {
+            var belongsToMe = queueOrTopicPath.StartsWith(_globalPrefix.Value);
+            return belongsToMe;
         }
 
         private async Task DeleteTopic(string topicPath)
         {
-            if (!topicPath.StartsWith(_globalPrefix.Value)) return;
-
             _logger.Debug("Deleting topic {0}", topicPath);
             await _namespaceManager.Value.DeleteTopicAsync(topicPath);
         }
 
         private async Task DeleteQueue(string queuePath)
         {
-            if (!queuePath.StartsWith(_globalPrefix.Value)) return;
-
             _logger.Debug("Deleting queue {0}", queuePath);
             await _namespaceManager.Value.DeleteQueueAsync(queuePath);
         }

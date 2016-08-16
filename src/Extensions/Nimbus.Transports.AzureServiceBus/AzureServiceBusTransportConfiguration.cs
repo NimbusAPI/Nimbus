@@ -28,8 +28,6 @@ namespace Nimbus.Transports.AzureServiceBus
         internal ServerConnectionCountSetting ServerConnectionCount { get; set; } = new ServerConnectionCountSetting();
         internal MaxSmallMessageSizeSetting MaxSmallMessageSize { get; set; } = new MaxSmallMessageSizeSetting();
         internal MaxLargeMessageSizeSetting MaxLargeMessageSize { get; set; } = new MaxLargeMessageSizeSetting();
-        internal RequireRetriesToBeHandledBy RequireRetriesToBeHandledBy { get; set; } = new RequireRetriesToBeHandledBy();
-
         internal LargeMessageStorageConfiguration LargeMessageStorageConfiguration { get; set; } = new UnsupportedLargeMessageBodyStorageConfiguration();
 
         public AzureServiceBusTransportConfiguration WithConnectionString(string connectionString)
@@ -53,12 +51,6 @@ namespace Nimbus.Transports.AzureServiceBus
         public AzureServiceBusTransportConfiguration WithServerConnectionCount(int serverConnectionCount)
         {
             ServerConnectionCount = new ServerConnectionCountSetting {Value = serverConnectionCount};
-            return this;
-        }
-
-        public AzureServiceBusTransportConfiguration WithRetriesHandledBy(RetriesHandledBy retriesHandledBy)
-        {
-            RequireRetriesToBeHandledBy = new RequireRetriesToBeHandledBy {Value = retriesHandledBy};
             return this;
         }
 

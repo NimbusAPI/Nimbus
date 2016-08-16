@@ -31,6 +31,12 @@ namespace Nimbus.Configuration
             return configuration;
         }
 
+        public static BusBuilderConfiguration WithRetriesHandledBy(this BusBuilderConfiguration configuration, RetriesHandledBy retriesHandledBy)
+        {
+            configuration.RequireRetriesToBeHandledBy = new RequireRetriesToBeHandledBy {Value = retriesHandledBy};
+            return configuration;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="configuration"></param>
@@ -52,7 +58,7 @@ namespace Nimbus.Configuration
 
         public static BusBuilderConfiguration WithGlobalPrefix(this BusBuilderConfiguration configuration, string globalPrefix)
         {
-            configuration.GlobalPrefix = new GlobalPrefixSetting { Value = globalPrefix };
+            configuration.GlobalPrefix = new GlobalPrefixSetting {Value = globalPrefix};
             return configuration;
         }
 

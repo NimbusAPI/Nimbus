@@ -247,6 +247,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         private void EnsureTopicExists(string topicPath)
         {
+            EnsureQueueExists(_pathFactory.DeadLetterOfficePath());
+
             if (_knownTopics.Value.Contains(topicPath)) return;
             lock (LockFor(topicPath))
             {
@@ -308,7 +310,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                                 EnableBatchedOperations = true,
                                                                 RequiresSession = false,
                                                                 AutoDeleteOnIdle = _autoDeleteOnIdle,
-                                                                LockDuration = TimeSpan.FromMinutes(5)
+                                                                LockDuration = TimeSpan.FromMinutes(5),
+                                                                ForwardDeadLetteredMessagesTo = _pathFactory.DeadLetterOfficePath()
                                                             };
 
                               try
@@ -335,8 +338,18 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         internal void EnsureQueueExists(string queuePath)
         {
-            if (_knownQueues.Value.Contains(queuePath)) return;
+            var deadLetterOfficePath = _pathFactory.DeadLetterOfficePath();
 
+            var weAreCreatingTheDeadLetterOffice = queuePath == deadLetterOfficePath;
+
+            // if we're creating the dead letter office path, don't infinitely call ourselves
+            if (!weAreCreatingTheDeadLetterOffice) EnsureQueueExists(deadLetterOfficePath);
+
+            var forwardDeadLetteredMessagesTo = weAreCreatingTheDeadLetterOffice
+                ? null
+                : deadLetterOfficePath;
+
+            if (_knownQueues.Value.Contains(queuePath)) return;
             lock (LockFor(queuePath))
             {
                 if (_knownQueues.Value.Contains(queuePath)) return;
@@ -353,7 +366,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                          RequiresSession = false,
                                                          SupportOrdering = false,
                                                          AutoDeleteOnIdle = _autoDeleteOnIdle,
-                                                         LockDuration = TimeSpan.FromMinutes(5)
+                                                         LockDuration = TimeSpan.FromMinutes(5),
+                                                         ForwardDeadLetteredMessagesTo = forwardDeadLetteredMessagesTo
                                                      };
 
                               // We don't check for queue existence here because that introduces a race condition with any other bus participant that's

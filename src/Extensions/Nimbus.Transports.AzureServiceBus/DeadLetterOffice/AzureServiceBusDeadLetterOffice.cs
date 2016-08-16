@@ -8,7 +8,7 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
 {
     internal class AzureServiceBusDeadLetterOffice : IDeadLetterOffice
     {
-        readonly IQueueManager _queueManager;
+        private readonly IQueueManager _queueManager;
         private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
         public AzureServiceBusDeadLetterOffice(IQueueManager queueManager, IBrokeredMessageFactory brokeredMessageFactory)

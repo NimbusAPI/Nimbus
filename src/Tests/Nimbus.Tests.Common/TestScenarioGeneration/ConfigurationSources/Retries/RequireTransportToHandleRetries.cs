@@ -1,13 +1,13 @@
 using Nimbus.Configuration.Settings;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports.Retries
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Retries
 {
-    public class RequireBusToHandleRetries : ConfigurationScenario<RequireRetriesToBeHandledBy>
+    public class RequireTransportToHandleRetries : ConfigurationScenario<RequireRetriesToBeHandledBy>
     {
         public override ScenarioInstance<RequireRetriesToBeHandledBy> CreateInstance()
         {
-            var instance = new RequireRetriesToBeHandledBy { Value = RetriesHandledBy.Bus };
+            var instance = new RequireRetriesToBeHandledBy { Value = RetriesHandledBy.Transport };
             return new ScenarioInstance<RequireRetriesToBeHandledBy>(instance);
         }
     }

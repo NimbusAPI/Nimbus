@@ -48,11 +48,20 @@ namespace Nimbus.Configuration
                                                    try
                                                    {
                                                        await container.Resolve<INimbusTransport>().TestConnection();
-                                                       await CleanNamespace(container, logger);
                                                    }
                                                    catch (Exception ex)
                                                    {
                                                        logger.Error(ex, "Failed to establish connection to underlying transport: {Message}", ex.Message);
+                                                       throw;
+                                                   }
+
+                                                   try
+                                                   {
+                                                       await CleanNamespace(container, logger);
+                                                   }
+                                                   catch (Exception ex)
+                                                   {
+                                                       logger.Error(ex, "Failed cleanse namespace on bus start");
                                                        throw;
                                                    }
                                                }).Wait();
@@ -62,7 +71,14 @@ namespace Nimbus.Configuration
                              {
                                  Task.Run(async () =>
                                                 {
-                                                    await CleanNamespace(container, logger);
+                                                    try
+                                                    {
+                                                        await CleanNamespace(container, logger);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        logger.Error(ex, "Failed to cleanse namespace on bus teardown");
+                                                    }
                                                     container.Dispose();
                                                 }).Wait();
                              };

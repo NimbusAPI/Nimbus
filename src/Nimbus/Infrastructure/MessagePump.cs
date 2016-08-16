@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
@@ -125,13 +124,30 @@ namespace Nimbus.Infrastructure
                         await _messageDispatcher.Dispatch(message);
                     }
                     _logger.Debug("Dispatched message {MessageId}", message.MessageId);
-                    await _receiver.RecordSuccess(message);
+
+                    try
+                    {
+                        await _receiver.RecordSuccess(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Warn(ex, "Failed to complete message {MessageId}.", message.MessageId);
+                    }
+
                     return;
                 }
                 catch (Exception exc)
                 {
-                    await _receiver.RecordFailure(message);
                     _logger.Warn(exc, "Dispatch failed for message {MessageId}", message.MessageId);
+
+                    try
+                    {
+                        await _receiver.RecordFailure(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Warn(ex, "Failed to abandon for message {MessageId}.", message.MessageId);
+                    }
                 }
 
                 if (_requireRetriesToBeHandledBy == RetriesHandledBy.Transport)
@@ -152,9 +168,9 @@ namespace Nimbus.Infrastructure
                     {
                         var nextDeliveryTime = _deliveryRetryStrategy.CalculateNextRetryTime(message);
                         _logger.Debug("Re-enqueuing message {MessageId} for attempt {DeliveryAttempts} at delivery at {DeliveryTime}",
-                                     message.MessageId,
-                                     numDeliveryAttempts + 1,
-                                     nextDeliveryTime);
+                                      message.MessageId,
+                                      numDeliveryAttempts + 1,
+                                      nextDeliveryTime);
                         await _delayedDeliveryService.DeliverAfter(message, nextDeliveryTime);
                     }
                     catch (Exception exc)

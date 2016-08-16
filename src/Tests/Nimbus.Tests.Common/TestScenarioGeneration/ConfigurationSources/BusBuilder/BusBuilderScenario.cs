@@ -1,5 +1,6 @@
 using System;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
 using Nimbus.Routing;
@@ -15,6 +16,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
         private readonly TestHarnessTypeProvider _typeProvider;
         private readonly ILogger _logger;
         private readonly IConfigurationScenario<TransportConfiguration> _transport;
+        private readonly IConfigurationScenario<RequireRetriesToBeHandledBy> _requireRetriesToBeHandledBy;
         private readonly IConfigurationScenario<IRouter> _router;
         private readonly IConfigurationScenario<ISerializer> _serializer;
         private readonly IConfigurationScenario<ICompressor> _compressor;
@@ -24,16 +26,18 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
         public BusBuilderScenario(TestHarnessTypeProvider typeProvider,
                                   ILogger logger,
                                   IConfigurationScenario<TransportConfiguration> transport,
+                                  IConfigurationScenario<RequireRetriesToBeHandledBy> requireRetriesToBeHandledBy,
                                   IConfigurationScenario<IRouter> router,
                                   IConfigurationScenario<ISerializer> serializer,
                                   IConfigurationScenario<ICompressor> compressor,
                                   IConfigurationScenario<ContainerConfiguration> iocContainer,
                                   IConfigurationScenario<SyncContextConfiguration> syncContext)
-            : base(transport, router, serializer, compressor, iocContainer, syncContext)
+            : base(transport, requireRetriesToBeHandledBy, router, serializer, compressor, iocContainer, syncContext)
         {
             _typeProvider = typeProvider;
             _logger = logger;
             _transport = transport;
+            _requireRetriesToBeHandledBy = requireRetriesToBeHandledBy;
             _router = router;
             _serializer = serializer;
             _compressor = compressor;
@@ -46,6 +50,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
             var globalPrefix = Guid.NewGuid().ToString();
 
             var transport = _transport.CreateInstance();
+            var retriesToBeHandledBy = _requireRetriesToBeHandledBy.CreateInstance();
             var router = _router.CreateInstance();
             var serializer = _serializer.CreateInstance();
             var compressor = _compressor.CreateInstance();
@@ -61,6 +66,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                 .WithSerializer(serializer.Configuration)
                 .WithCompressor(compressor.Configuration)
                 .WithDeliveryRetryStrategy(new ImmediateRetryDeliveryStrategy())
+                .WithRetriesHandledBy(retriesToBeHandledBy.Configuration.Value)
                 .WithTypesFrom(_typeProvider)
                 .WithHeartbeatInterval(TimeSpan.MaxValue)
                 .WithLogger(_logger)

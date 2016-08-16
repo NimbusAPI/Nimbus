@@ -7,6 +7,7 @@ using Nimbus.Configuration;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressors;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
+using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Retries;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
@@ -43,7 +44,16 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                             {
                                 foreach (var compressor in new CompressorScenariosSource())
                                 {
-                                    yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer, syncContext);
+                                    yield return
+                                        new BusBuilderScenario(typeProvider,
+                                                               logger,
+                                                               transport,
+                                                               new RequireBusToHandleRetries(),
+                                                               router,
+                                                               serializer,
+                                                               compressor,
+                                                               iocContainer,
+                                                               syncContext);
                                 }
                             }
                         }
@@ -55,13 +65,19 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBui
                 {
                     foreach (var router in new RouterConfigurationSources().Take(1))
                     {
-                        foreach (var serializer in new SerializerConfigurationSources(typeProvider).Take(1))
+                        foreach (var retryConfiguration in new RetryConfigurationSources())
                         {
-                            foreach (var iocContainer in new IoCContainerConfigurationSources().Take(1))
+                            if ((!(transport is AzureServiceBus)) && retryConfiguration is RequireTransportToHandleRetries) continue;
+
+                            foreach (var serializer in new SerializerConfigurationSources(typeProvider).Take(1))
                             {
-                                foreach (var compressor in new CompressorScenariosSource().Take(1))
+                                foreach (var iocContainer in new IoCContainerConfigurationSources().Take(1))
                                 {
-                                    yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer, syncContext);
+                                    foreach (var compressor in new CompressorScenariosSource().Take(1))
+                                    {
+                                        yield return
+                                            new BusBuilderScenario(typeProvider, logger, transport, retryConfiguration, router, serializer, compressor, iocContainer, syncContext);
+                                    }
                                 }
                             }
                         }

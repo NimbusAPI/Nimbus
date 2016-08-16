@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Nimbus.Configuration.Settings;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports.Retries
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Retries
 {
     public class RetryConfigurationSources: IEnumerable<IConfigurationScenario<RequireRetriesToBeHandledBy>>
     {

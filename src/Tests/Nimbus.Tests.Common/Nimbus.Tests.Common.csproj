@@ -131,9 +131,9 @@
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SyncContextConfiguration.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\SynchronizationContexts\SynchronizationContextConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\AzureServiceBus.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Retries\RequireBusToHandleRetries.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Retries\RequireTransportToHandleRetries.cs" />
-    <Compile Include="TestScenarioGeneration\ConfigurationSources\Transports\Retries\RetryConfigurationSources.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Retries\RequireBusToHandleRetries.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Retries\RequireTransportToHandleRetries.cs" />
+    <Compile Include="TestScenarioGeneration\ConfigurationSources\Retries\RetryConfigurationSources.cs" />
     <Compile Include="TestScenarioGeneration\ScenarioComposition\Filters\InProcessScenariosFilter.cs" />
     <Compile Include="TestUtilities\SingleThreadedSynchronizationContext.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
