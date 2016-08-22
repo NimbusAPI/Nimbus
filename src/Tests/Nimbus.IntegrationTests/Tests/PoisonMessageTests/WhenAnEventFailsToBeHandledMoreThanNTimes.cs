@@ -65,6 +65,9 @@ namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
         [Then]
         public async Task TheMessageShouldHaveTheCorrectNumberOfDeliveryAttempts()
         {
+            // if the transport layer is handling retry attempts then we don't get to record delivery attempts
+            if (Instance.Configuration.RequireRetriesToBeHandledBy == RetriesHandledBy.Transport) return;
+
             var nimbusMessage = _deadLetterMessages.Single();
             nimbusMessage.DeliveryAttempts.Count().ShouldBe(_maxDeliveryAttempts);
         }
