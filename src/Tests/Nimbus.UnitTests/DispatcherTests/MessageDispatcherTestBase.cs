@@ -78,7 +78,8 @@ namespace Nimbus.UnitTests.DispatcherTests
                 messagingFactory,
                 HandlerMapper.GetFullHandlerMap(typeof (IHandleRequest<,>)),
                 new DefaultMessageLockDurationSetting(),
-                _taskFactory);
+                _taskFactory,
+                Substitute.For<IPropertyInjector>());
         }
 
         internal CommandMessageDispatcher GetCommandMessageDispatcher<TCommand, TCommandHandler>(IInboundInterceptor interceptor)

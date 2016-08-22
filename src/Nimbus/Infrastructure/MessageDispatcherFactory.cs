@@ -107,7 +107,8 @@ namespace Nimbus.Infrastructure
                                                     _messagingFactory,
                                                     handlerMap,
                                                     _defaultMessageLockDuration,
-                                                    _taskFactory);
+                                                    _taskFactory,
+                                                    _propertyInjector);
             }
 
             if (openGenericHandlerType == typeof (IHandleMulticastRequest<,>))
@@ -121,7 +122,8 @@ namespace Nimbus.Infrastructure
                                                              _outboundInterceptorFactory,
                                                              handlerMap,
                                                              _defaultMessageLockDuration,
-                                                             _taskFactory);
+                                                             _taskFactory,
+                                                             _propertyInjector);
             }
 
             throw new NotSupportedException("There is no dispatcher for the handler type {0}.".FormatWith(openGenericHandlerType.FullName));

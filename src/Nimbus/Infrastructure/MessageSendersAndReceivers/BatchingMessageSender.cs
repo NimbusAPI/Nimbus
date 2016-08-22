@@ -19,7 +19,7 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
         private readonly object _mutex = new object();
         private readonly SemaphoreSlim _sendingSemaphore = new SemaphoreSlim(_maxConcurrentFlushTasks, _maxConcurrentFlushTasks);
 
-        private Task _lazyFlushTask;
+        private Func<Task> _lazyFlushTask;
 
         protected abstract Task SendBatch(BrokeredMessage[] messages);
 
@@ -36,9 +36,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
                 if (_lazyFlushTask == null)
                 {
-                    _lazyFlushTask = FlushMessagesLazily();
+                    _lazyFlushTask = FlushMessagesLazily;
                 }
-                return _lazyFlushTask;
+                return _lazyFlushTask.Invoke();
             }
         }
 
