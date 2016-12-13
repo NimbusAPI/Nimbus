@@ -95,11 +95,6 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
                     if (message == null)
                     {
-                        if (!cancellationTokenSource.IsCancellationRequested)
-                        {
-                            // if we're shutting down, we're fine if we received a null message - we asked to quit, after all...
-                            _logger.Debug($"Call to {nameof(Fetch)} returned null on {{QueueOrTopic}}. Retrying...", ToString());
-                        }
                         continue;
                     }
 
