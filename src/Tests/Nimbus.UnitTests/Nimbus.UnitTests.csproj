@@ -83,6 +83,7 @@
     <Compile Include="BatchSendingTests\MessageContracts\BarCommand.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\BazCommand.cs" />
     <Compile Include="BatchSendingTests\MessageContracts\FooCommand.cs" />
+    <Compile Include="BatchSendingTests\WhenAnExceptionOccursWhilePublishingAMessage.cs" />
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfCommands.cs" />
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEvents.cs" />
     <Compile Include="BatchSendingTests\WhenPublishingACollectionOfEventsViaTheBusEventSender.cs" />
