@@ -83,6 +83,9 @@ namespace Nimbus.Infrastructure.Events
                     await interceptor.OnEventPublishingError(busEvent, brokeredMessage, exception);
                 }
                 _logger.LogDispatchError("publishing", topicPath, sw.Elapsed, exception);
+
+                if (exception != null)
+                    throw exception;
             }
         }
     }
