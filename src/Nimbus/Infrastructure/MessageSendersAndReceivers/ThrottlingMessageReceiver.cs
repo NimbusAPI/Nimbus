@@ -83,6 +83,9 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
         private async Task Worker(Func<BrokeredMessage, Task> callback, Task cancellationTask)
         {
+            var cancellationTokenSource = _cancellationTokenSource;
+            var consecutiveExceptionCount = 0;
+
             while (_running)
             {
                 try
@@ -95,21 +98,23 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                     if (!_running) return;
                     if (messages.None()) continue;
 
+                    consecutiveExceptionCount = 0;
+
                     GlobalMessageCounters.IncrementReceivedMessageCount(messages.Length);
 
                     var tasks = messages
                         .Select(m => Task.Run(async () =>
-                                                    {
-                                                        await _throttle.WaitAsync(_cancellationTokenSource.Token);
-                                                        try
-                                                        {
-                                                            await callback(m);
-                                                        }
-                                                        finally
-                                                        {
-                                                            _throttle.Release();
-                                                        }
-                                                    }))
+                        {
+                            await _throttle.WaitAsync(_cancellationTokenSource.Token);
+                            try
+                            {
+                                await callback(m);
+                            }
+                            finally
+                            {
+                                _throttle.Release();
+                            }
+                        }))
                         .ToArray();
 
                     if (_throttle.CurrentCount == 0) await Task.WhenAny(tasks);
@@ -120,9 +125,31 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 }
                 catch (Exception exc)
                 {
-                    _logger.Error(exc, "Worker exception in {0} for {1}", GetType().Name, this);
+                    consecutiveExceptionCount++;
+                    var delay = CalculateDelayFor(consecutiveExceptionCount);
+
+                    _logger.Error(exc,
+                                  "Worker exception ({ConsecutiveExceptionCount} consecutive) in {Type} for {QueueOrSubscriptionPath}. Delaying for {Duration}.",
+                                  consecutiveExceptionCount,
+                                  GetType().Name,
+                                  this,
+                                  delay);
+
+                    try
+                    {
+                        await Task.Delay(delay, cancellationTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
                 }
             }
+        }
+
+        private static TimeSpan CalculateDelayFor(int consecutiveExceptionCount)
+        {
+            var delayFor = TimeSpan.FromMilliseconds(Math.Max(consecutiveExceptionCount * 100, 1000));
+            return delayFor;
         }
 
         public void Dispose()

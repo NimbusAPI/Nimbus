@@ -37,6 +37,7 @@ namespace Nimbus.Infrastructure.Heartbeat
         private Timer _heartbeatTimer;
         private Timer _collectTimer;
         private bool _isRunning;
+        private int _heartbeatExecuting;
 
         public Heartbeat(HeartbeatIntervalSetting heartbeatInterval, IClock clock, IEventSender eventSender, ILogger logger)
         {
@@ -64,9 +65,27 @@ namespace Nimbus.Infrastructure.Heartbeat
             }
         }
 
-        private void OnHeartbeatTimerElapsed(object sender, ElapsedEventArgs e)
+        private async void OnHeartbeatTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            Task.Run(() => Beat());
+            // Prevent overlapping execution of heartbeats
+            if (System.Threading.Interlocked.CompareExchange(ref _heartbeatExecuting, 1, 0) == 0)
+            {
+                try
+                {
+                    // The timer elapsed handler is already executing on the threadpool, so
+                    // there is no reason to use Task.Run() to invoke the Beat method. Await the
+                    // beat so the heartbeatExecuting flag can be set to zero (reset) when complete.
+                    await Beat();
+                }
+                catch (Exception exc)
+                {
+                    _logger.Warn("Error publishing heartbeat: {Message}.", exc.ToString());
+                }
+                finally
+                {
+                    _heartbeatExecuting = 0; // indicates completion
+                }
+            }
         }
 
         private async Task Beat()
