@@ -9,6 +9,7 @@ using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Handlers;
 using Nimbus.Infrastructure.LongRunningTasks;
+using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.TaskScheduling;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
@@ -28,6 +29,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         private readonly IReadOnlyDictionary<Type, Type[]> _handlerMap;
         private readonly DefaultMessageLockDurationSetting _defaultMessageLockDuration;
         private readonly INimbusTaskFactory _taskFactory;
+        private readonly IPropertyInjector _propertyInjector;
 
         public RequestMessageDispatcher(
             IBrokeredMessageFactory brokeredMessageFactory,
@@ -39,7 +41,8 @@ namespace Nimbus.Infrastructure.RequestResponse
             INimbusMessagingFactory messagingFactory,
             IReadOnlyDictionary<Type, Type[]> handlerMap,
             DefaultMessageLockDurationSetting defaultMessageLockDuration,
-            INimbusTaskFactory taskFactory)
+            INimbusTaskFactory taskFactory,
+            IPropertyInjector propertyInjector)
         {
             _brokeredMessageFactory = brokeredMessageFactory;
             _clock = clock;
@@ -51,6 +54,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             _handlerMap = handlerMap;
             _defaultMessageLockDuration = defaultMessageLockDuration;
             _taskFactory = taskFactory;
+            _propertyInjector = propertyInjector;
         }
 
         public async Task Dispatch(BrokeredMessage message)
@@ -76,6 +80,7 @@ namespace Nimbus.Infrastructure.RequestResponse
             using (var scope = _dependencyResolver.CreateChildScope())
             {
                 var handler = (IHandleRequest<TBusRequest, TBusResponse>)scope.Resolve(handlerType);
+                _propertyInjector.Inject(handler, brokeredMessage);
                 var inboundInterceptors = _inboundInterceptorFactory.CreateInterceptors(scope, handler, busRequest, brokeredMessage);
 
                 try
