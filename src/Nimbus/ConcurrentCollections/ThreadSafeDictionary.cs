@@ -52,7 +52,7 @@ namespace Nimbus.ConcurrentCollections
             {
                 lock (_dictionary)
                 {
-                    if (_dictionary.ContainsKey(key)) return false;
+                    if (!_dictionary.ContainsKey(key)) return false;
 
                     value = _dictionary[key];
                     _dictionary.Remove(key);
