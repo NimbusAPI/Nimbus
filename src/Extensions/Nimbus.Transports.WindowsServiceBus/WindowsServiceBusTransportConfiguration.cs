@@ -17,6 +17,7 @@ using Nimbus.Transports.WindowsServiceBus.DeadLetterOffice;
 using Nimbus.Transports.WindowsServiceBus.DelayedDelivery;
 using Nimbus.Transports.WindowsServiceBus.Extensions;
 using Nimbus.Transports.WindowsServiceBus.QueueManagement;
+using Nimbus.Transports.WindowsServiceBus.Filtering;
 
 namespace Nimbus.Transports.WindowsServiceBus
 {
@@ -63,6 +64,7 @@ namespace Nimbus.Transports.WindowsServiceBus
             container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<WindowsServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
+            container.RegisterType<SqlFilterExpressionGenerator>(ComponentLifetime.SingleInstance, typeof(ISqlFilterExpressionGenerator));
 
             container.Register(c =>
                                {
