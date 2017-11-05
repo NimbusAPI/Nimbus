@@ -11,6 +11,9 @@
     <releaseNotes>Init.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>.NET service bus messaging Redis</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <projectUrl>http://nimbusapi.com/</projectUrl>
+    <dependencies>
+      <dependency id="StackExchange.Redis" version="1.0.488" />
+    </dependencies>
   </metadata>
 </package>

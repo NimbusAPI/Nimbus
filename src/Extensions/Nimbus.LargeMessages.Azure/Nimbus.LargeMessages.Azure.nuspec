@@ -11,6 +11,6 @@
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>azure servicebus large messages</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <projectUrl>http://nimbusapi.com/</projectUrl>
   </metadata>
 </package>

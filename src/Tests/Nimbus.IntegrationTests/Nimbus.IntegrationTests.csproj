@@ -57,8 +57,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.2.0.0\lib\net45\Serilog.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\packages\Serilog.2.5.0\lib\net45\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly, Version=1.1.1.1, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -224,10 +223,6 @@
     <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj">
       <Project>{109fb118-fa9a-4eb2-88af-f66c973ce50f}</Project>
       <Name>Nimbus.Serializers.Json</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Serializers.ProtoBuf\Nimbus.Serializers.ProtoBuf.csproj">
-      <Project>{b4162aa1-5f41-4ffd-90fb-4d7093955f6d}</Project>
-      <Name>Nimbus.Serializers.ProtoBuf</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extensions\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj">
       <Project>{78C6284D-129E-4283-889E-B94679C36A4F}</Project>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.Trace</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.TraceLoggerConfigurationExtensions">
+            <summary>
+            Adds the WriteTo.Trace() extension method to <see cref="T:Serilog.LoggerConfiguration"/>.
+            </summary>
+        </member>
+        <member name="M:Serilog.TraceLoggerConfigurationExtensions.Trace(Serilog.Configuration.LoggerSinkConfiguration,Serilog.Events.LogEventLevel,System.String,System.IFormatProvider,Serilog.Core.LoggingLevelSwitch)">
+            <summary>
+            Write log events to the <see cref="T:System.Diagnostics.Trace"/>.
+            </summary>
+            <param name="sinkConfiguration">Logger sink configuration.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.
+            the default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+        </member>
+        <member name="M:Serilog.TraceLoggerConfigurationExtensions.Trace(Serilog.Configuration.LoggerSinkConfiguration,Serilog.Formatting.ITextFormatter,Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)">
+            <summary>
+            Write log events to the <see cref="T:System.Diagnostics.Trace"/>.
+            </summary>
+            <param name="sinkConfiguration">Logger sink configuration.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <param name="formatter">A custom formatter to apply to the output events. This can be used with
+            e.g. <see cref="T:Serilog.Formatting.Json.JsonFormatter"/> to produce JSON output. To customize the text layout only, use the
+            overload that accepts an output template instead.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+        </member>
+    </members>
+</doc>

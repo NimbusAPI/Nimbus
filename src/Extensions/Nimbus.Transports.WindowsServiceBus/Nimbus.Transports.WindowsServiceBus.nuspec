@@ -11,7 +11,7 @@
     <releaseNotes>Init.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>.NET service bus messaging Windows Service Bus Azure Service Bus WSB ASB</tags>
-    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+    <projectUrl>http://nimbusapi.com/</projectUrl>
     <dependencies>
       <dependency id="WindowsAzure.ServiceBus" version="[2.1.4.0]" />
       <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.3]" />

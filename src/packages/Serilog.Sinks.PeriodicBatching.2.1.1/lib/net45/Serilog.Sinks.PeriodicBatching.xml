@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.PeriodicBatching</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.Sinks.PeriodicBatching.BatchedConnectionStatus">
+            <summary>
+            Manages reconnection period and transient fault response for <see cref="T:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink"/>.
+            During normal operation an object of this type will simply echo the configured batch transmission
+            period. When availabilty fluctuates, the class tracks the number of failed attempts, each time
+            increasing the interval before reconnection is attempted (up to a set maximum) and at predefined
+            points indicating that either the current batch, or entire waiting queue, should be dropped. This
+            Serves two purposes - first, a loaded receiver may need a temporary reduction in traffic while coming
+            back online. Second, the sender needs to account for both bad batches (the first fault response) and
+            also overproduction (the second, queue-dropping response). In combination these should provide a
+            reasonable delivery effort but ultimately protect the sender from memory exhaustion.
+            </summary>
+            <remarks>
+            Currently used only by <see cref="T:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink"/>, but may
+            provide the basis for a "smart" exponential backoff timer. There are other factors to consider
+            including the desire to send batches "when full" rather than continuing to buffer, and so-on.
+            </remarks>
+        </member>
+        <member name="T:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink">
+            <summary>
+            Base class for sinks that log events in batches. Batching is
+            triggered asynchronously on a timer.
+            </summary>
+            <remarks>
+            To avoid unbounded memory growth, events are discarded after attempting
+            to send a batch, regardless of whether the batch succeeded or not. Implementers
+            that want to change this behavior need to either implement from scratch, or
+            embed retry logic in the batch emitting functions.
+            </remarks>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.#ctor(System.Int32,System.TimeSpan)">
+            <summary>
+            Construct a sink posting to the specified database.
+            </summary>
+            <param name="batchSizeLimit">The maximum number of events to include in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.#ctor(System.Int32,System.TimeSpan,System.Int32)">
+            <summary>
+            Construct a sink posting to the specified database.
+            </summary>
+            <param name="batchSizeLimit">The maximum number of events to include in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="queueLimit">Maximum number of events in the queue.</param>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.Dispose(System.Boolean)">
+            <summary>
+            Free resources held by the sink.
+            </summary>
+            <param name="disposing">If true, called because the object is being disposed; if false,
+            the object is being disposed from the finalizer.</param>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})">
+            <summary>
+            Emit a batch of log events, running to completion synchronously.
+            </summary>
+            <param name="events">The events to emit.</param>
+            <remarks>Override either <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/> or <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/>,
+            not both.</remarks>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})">
+            <summary>
+            Emit a batch of log events, running asynchronously.
+            </summary>
+            <param name="events">The events to emit.</param>
+            <remarks>Override either <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/> or <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/>,
+            not both. </remarks>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.Emit(Serilog.Events.LogEvent)">
+            <summary>
+            Emit the provided log event to the sink. If the sink is being disposed or
+            the app domain unloaded, then the event is ignored.
+            </summary>
+            <param name="logEvent">Log event to emit.</param>
+            <exception cref="T:System.ArgumentNullException">The event is null.</exception>
+            <remarks>
+            The sink implements the contract that any events whose Emit() method has
+            completed at the time of sink disposal will be flushed (or attempted to,
+            depending on app domain state).
+            </remarks>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.CanInclude(Serilog.Events.LogEvent)">
+            <summary>
+            Determine whether a queued log event should be included in the batch. If
+            an override returns false, the event will be dropped.
+            </summary>
+            <param name="evt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatch">
+            <summary>
+            Allows derived sinks to perform periodic work without requiring additional threads
+            or timers (thus avoiding additional flush/shut-down complexity).
+            </summary>
+            <remarks>Override either <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatch"/> or <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatchAsync"/>,
+            not both. </remarks>
+        </member>
+        <member name="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatchAsync">
+            <summary>
+            Allows derived sinks to perform periodic work without requiring additional threads
+            or timers (thus avoiding additional flush/shut-down complexity).
+            </summary>
+            <remarks>Override either <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatchAsync"/> or <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.OnEmptyBatch"/>,
+            not both. </remarks>
+        </member>
+    </members>
+</doc>
