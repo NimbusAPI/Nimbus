@@ -13,7 +13,7 @@
     <tags>azure servicebus log4net</tags>
     <projectUrl>http://nimbusapi.com/</projectUrl>
     <dependencies>
-      <dependency id="Log4net" />
+      <dependency id="Log4net" version="2.0.3"/>
     </dependencies>
   </metadata>
 </package>
