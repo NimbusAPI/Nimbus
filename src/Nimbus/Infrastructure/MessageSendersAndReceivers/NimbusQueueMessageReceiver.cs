@@ -8,17 +8,22 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
     internal class NimbusQueueMessageReceiver : ThrottlingMessageReceiver
     {
+        public const int TransientRetryLimit = 20;
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
+        private readonly ILogger _logger;
 
         private volatile MessageReceiver _messageReceiver;
         private readonly object _mutex = new object();
+        private int _transientErrorCount;
 
         public NimbusQueueMessageReceiver(IQueueManager queueManager, string queuePath, ConcurrentHandlerLimitSetting concurrentHandlerLimit, ILogger logger)
             : base(concurrentHandlerLimit, logger)
         {
             _queueManager = queueManager;
             _queuePath = queuePath;
+            _logger = logger;
+            _transientErrorCount = 0;
         }
 
         public override string ToString()
@@ -40,19 +45,32 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
                 var messageReceiver = await GetMessageReceiver();
 
                 var receiveTask = messageReceiver.ReceiveBatchAsync(batchSize, TimeSpan.FromSeconds(300));
-                await Task.WhenAny(receiveTask, cancellationTask);
-
+                await Task.WhenAny(receiveTask, cancellationTask);                
                 if (cancellationTask.IsCompleted) return new BrokeredMessage[0];
                 
                 var messages = await receiveTask;
+                _transientErrorCount = 0;
                 return messages.ToArray();
             }
             catch (Exception exc)
             {
-                if (exc.IsTransientFault()) throw;
+                if (IsTransientFault(exc))
+                {
+                    _transientErrorCount++;
+                    throw;
+                }
+                _transientErrorCount = 0;
+                _logger.Warn("Discarding subscription client");
                 DiscardMessageReceiver();
                 throw;
             }
+        }
+
+        private bool IsTransientFault(Exception exc)
+        {
+            //See related issue https://github.com/NimbusAPI/Nimbus/issues/218 
+            //If we permanently get the same transient exception, we should treat it as non transient and renew the client in an attempt to resolve the issue    
+            return _transientErrorCount <= TransientRetryLimit && exc.IsTransientFault();
         }
 
         private async Task<MessageReceiver> GetMessageReceiver()
@@ -70,9 +88,16 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
             _messageReceiver = null;
 
             if (messageReceiver == null) return;
-            if (messageReceiver.IsClosed) return;
+            try
+            {
+                if (messageReceiver.IsClosed) return;
 
-            messageReceiver.Close();
+                messageReceiver.Close();
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn($"Renewing subscription client. Got error {ex.GetType().FullName} {ex.Message}");
+            }
         }
 
         protected override void Dispose(bool disposing)
