@@ -1,6 +1,4 @@
-﻿using System.Runtime.Remoting.Messaging;
-
-namespace Nimbus.Infrastructure.Logging
+﻿namespace Nimbus.Infrastructure.Logging
 {
     internal static class DispatchLoggingContext
     {

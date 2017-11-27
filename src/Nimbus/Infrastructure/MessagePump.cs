@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
@@ -12,7 +11,7 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 namespace Nimbus.Infrastructure
 {
     [DebuggerDisplay("{_receiver}")]
-    internal class MessagePump : IMessagePump
+    public class MessagePump : IMessagePump
     {
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
@@ -51,7 +50,7 @@ namespace Nimbus.Infrastructure
             _deliveryRetryStrategy = deliveryRetryStrategy;
         }
 
-        public async Task Start()
+        public virtual async Task Start()
         {
             await _startStopSemaphore.WaitAsync();
 
@@ -71,7 +70,7 @@ namespace Nimbus.Infrastructure
             }
         }
 
-        public async Task Stop()
+        public virtual async Task Stop()
         {
             await _startStopSemaphore.WaitAsync();
 

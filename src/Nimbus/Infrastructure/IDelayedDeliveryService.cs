@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Nimbus.Infrastructure
 {
-    internal interface IDelayedDeliveryService
+    public interface IDelayedDeliveryService
     {
         Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime);
     }

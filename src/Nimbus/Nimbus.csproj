@@ -13,9 +13,10 @@
     <VersionSuffix>issue-275.1</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.2.1" />
-    <PackageReference Include="NullGuard.Fody" Version="1.6.3" />
-    <PackageReference Include="Virtuosity.Fody" Version="1.20.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="2.0.0" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0-preview1-25914-04" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />

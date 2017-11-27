@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 
@@ -19,15 +19,15 @@ namespace Nimbus.Infrastructure.Dispatching
 
             SubsequentDispatchContext dispatchContext;
             return (_store.TryGetValue(currentDispatchContextId.Value, out dispatchContext))
-                ? (IDispatchContext) dispatchContext
+                ? (IDispatchContext)dispatchContext
                 : new InitialDispatchContext();
         }
 
         public IDisposable StartNewDispatchContext(IDispatchContext dispatchContext)
         {
             AssertCanStartDispatch(dispatchContext);
-            
-            if (!_store.TryAdd(dispatchContext.DispatchId, (SubsequentDispatchContext) dispatchContext))
+
+            if (!_store.TryAdd(dispatchContext.DispatchId, (SubsequentDispatchContext)dispatchContext))
                 throw new InvalidOperationException("Cannot add duplicate {0} {1} to the {0} store."
                                                         .FormatWith(typeof(SubsequentDispatchContext).Name, dispatchContext.DispatchId));
 
@@ -49,14 +49,14 @@ namespace Nimbus.Infrastructure.Dispatching
             _store.TryRemove(dispatchContextId, out removed);
         }
 
-// ReSharper disable once UnusedParameter.Local
+        // ReSharper disable once UnusedParameter.Local
         private static void AssertCanStartDispatch(IDispatchContext dispatchContext)
         {
             var currentDispatchId = GetCurrentDispatchContextId();
             if (currentDispatchId != null)
                 throw new InvalidOperationException("Dispatch {0} is already in progress in this Logical CallContext. Did you forget to Dispose it?"
                                                         .FormatWith(currentDispatchId));
-            
+
             if (dispatchContext is InitialDispatchContext)
                 throw new InvalidOperationException("Don't start a Dispatch with a {0}, use a new {1} instead."
                                                         .FormatWith(typeof(InitialDispatchContext).Name, typeof(SubsequentDispatchContext).Name));
