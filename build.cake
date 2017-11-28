@@ -17,7 +17,8 @@ var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
 
 // Git Version \\(^_^)//
 var gitVersionInfo = GitVersion(new GitVersionSettings {
-    OutputType = GitVersionOutput.Json
+    OutputType = GitVersionOutput.Json,
+    UpdateAssemblyInfo = false
 });
 
 // What branch are we on for conditional Tasks?
@@ -60,10 +61,6 @@ Task("Build")
 Task("SetVersion")
     .Does(() =>
     {
-        GitVersion(new GitVersionSettings {
-            UpdateAssemblyInfo = true
-        });
-
         var projects = GetFiles("./src/**/*.csproj");
 
         foreach(var project in projects)
