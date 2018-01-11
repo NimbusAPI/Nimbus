@@ -70,6 +70,8 @@ namespace Nimbus.Infrastructure.LongRunningTasks
         private async Task WatchHandlerTask(ILongRunningTask longRunningHandler, BrokeredMessage message)
         {
             _logger.Debug("Started long-running task wrapper for message {MessageId}", message.MessageId);
+            //Start with the default message lock duration for our calculations of the remaining time
+            var messageLockDuration = _messageLockDuration;
 
             while (true)
             {
@@ -87,7 +89,7 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                     return;
                 }
 
-                var acceptableRemainingLockDuration = TimeSpan.FromMilliseconds(_messageLockDuration.TotalMilliseconds*_acceptableRemainingLockProportion);
+                var acceptableRemainingLockDuration = TimeSpan.FromMilliseconds(messageLockDuration.TotalMilliseconds*_acceptableRemainingLockProportion);
                 var remainingTimeBeforeRenewalRequired = remainingLockTime - acceptableRemainingLockDuration;
                 var timeToDelay = remainingTimeBeforeRenewalRequired <= TimeSpan.Zero
                                       ? TimeSpan.Zero
@@ -122,6 +124,8 @@ namespace Nimbus.Infrastructure.LongRunningTasks
                 try
                 {
                     await RenewLockStrategy(message);
+                    //The server has just renewed the lock, the duration of the next lock will give us the server value of the lock duration, and we can use this for our next lock renewal calculation
+                    messageLockDuration = LockedUntilUtcStrategy(message).Subtract(now);
 
                     _logger.Debug("Long-running handler {HandlerType} for message {MessageId} renewed its lock (now has {LockTimeRemaining} seconds remaining).",
                                   longRunningHandler.GetType().FullName,
