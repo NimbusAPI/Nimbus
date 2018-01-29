@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Azure blob storage extensions for large message support in Nimbus.</Description>
+    <AssemblyTitle>Nimbus.LargeMessages.Azure</AssemblyTitle>
+    <AssemblyName>Nimbus.LargeMessages.Azure</AssemblyName>
+    <PackageId>Nimbus.LargeMessages.Azure</PackageId>
+    <Authors>Damian Maclennan, Andrew Harcourt</Authors>
+    <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
+    <PackageTags>azure,servicebus,autofac</PackageTags>
+    <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
+    <VersionPrefix>3.0.1</VersionPrefix>
+    <VersionSuffix>issue-275.1</VersionSuffix>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
+    <ProjectReference Include="../../Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="../../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
+  </ItemGroup>
+</Project>
