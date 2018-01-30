@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Nimbus log that writes to Log4net.</Description>
+    <AssemblyTitle>Nimbus.Logger.Log4Net</AssemblyTitle>
+    <AssemblyName>Nimbus.Logger.Log4Net</AssemblyName>
+    <PackageId>Nimbus.Logger.Log4Net</PackageId>
+    <Authors>Mustafa Arif</Authors>
+    <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
+    <PackageTags>azure,servicebus,autofac</PackageTags>
+    <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
+    <VersionPrefix>3.0.1</VersionPrefix>
+    <VersionSuffix>issue-275.1</VersionSuffix>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Log4Net" Version="2.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
+    <ProjectReference Include="../../Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="../../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
+  </ItemGroup>
+</Project>
