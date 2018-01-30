@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Ninject extensions for Nimbus.</Description>
+    <AssemblyTitle>Nimbus.Ninject</AssemblyTitle>
+    <AssemblyName>Nimbus.Ninject</AssemblyName>
+    <PackageId>Nimbus.Ninject</PackageId>
+    <Authors>Adrian Edwards</Authors>
+    <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
+    <PackageTags>azure,servicebus,ninject</PackageTags>
+    <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
+    <VersionPrefix>3.0.1</VersionPrefix>
+    <VersionSuffix>issue-275.1</VersionSuffix>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Ninject" Version="3.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
+    <ProjectReference Include="../../Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="../../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
+  </ItemGroup>
+</Project>
