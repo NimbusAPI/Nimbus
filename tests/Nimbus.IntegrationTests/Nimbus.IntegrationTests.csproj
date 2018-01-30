@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.9.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
+    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
+    <PackageReference Include="ConfigInjector" Version="2.2.1175" />
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
+    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />
+    <ProjectReference Include="../../src/Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="../../src/Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="../Nimbus.Tests.Common/Nimbus.Tests.Common.csproj" />
+  </ItemGroup>
+</Project>
