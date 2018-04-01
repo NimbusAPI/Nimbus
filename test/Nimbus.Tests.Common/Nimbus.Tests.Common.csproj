@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="nunit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.2" />
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
@@ -28,10 +28,15 @@
     <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.8" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Ninject/Nimbus.Ninject.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Unity/Nimbus.Unity.csproj" />
     <ProjectReference Include="../../src/Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
     <ProjectReference Include="../../src/Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
-
-    <ProjectReference Include="../../src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />
   </ItemGroup>
+  <!-- Mono Reference Assemblies for non Windows Build Environments -->
+  <PropertyGroup Condition="'$(MonoReferenceAssemblies)' != ''">
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net462'">$(MonoReferenceAssemblies)/4.6.2-api</FrameworkPathOverride>
+  </PropertyGroup>
 </Project>

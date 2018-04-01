@@ -15,4 +15,8 @@
   <ItemGroup>
     <ProjectReference Include="../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
   </ItemGroup>
+  <!-- Mono Reference Assemblies for non Windows Build Environments -->
+  <PropertyGroup Condition="'$(MonoReferenceAssemblies)' != ''">
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net462'">$(MonoReferenceAssemblies)/4.6.2-api</FrameworkPathOverride>
+  </PropertyGroup>
 </Project>

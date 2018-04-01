@@ -12,4 +12,8 @@
     <VersionPrefix>3.0.1</VersionPrefix>
     <VersionSuffix>issue-275.1</VersionSuffix>
   </PropertyGroup>
+  <!-- Mono Reference Assemblies for non Windows Build Environments -->
+  <PropertyGroup Condition="'$(MonoReferenceAssemblies)' != ''">
+    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net462'">$(MonoReferenceAssemblies)/4.6.2-api</FrameworkPathOverride>
+  </PropertyGroup>
 </Project>

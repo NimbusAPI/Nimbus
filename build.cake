@@ -52,9 +52,30 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
     {
-        DotNetCoreBuild("./", new DotNetCoreBuildSettings {
+        var buildSettings = new DotNetCoreBuildSettings {
             Configuration = configuration
-        });
+        };
+
+        switch((int)Environment.OSVersion.Platform) {
+            // Unix
+            case 4: 
+            {
+                Information("Building on {0}", Environment.OSVersion.Platform);
+                
+                // Set Mono Reference Libraries. 
+                buildSettings.ArgumentCustomization = args => args.Append("/p:MonoReferenceAssemblies=/usr/lib/mono");
+                break;
+            }
+            
+            // Assumed Windows.. 
+            default: 
+            {
+                Information("Building on {0}", Environment.OSVersion.Platform);
+                break;
+            }
+        }
+
+        DotNetCoreBuild("./", buildSettings);
     }
 );
 

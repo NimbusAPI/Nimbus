@@ -1,6 +1,6 @@
-using Microsoft.Practices.Unity;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Unity.Configuration;
+using Unity;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {

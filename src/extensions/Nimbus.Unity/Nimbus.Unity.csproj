@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Autofac extensions for Nimbus.</Description>
-    <AssemblyTitle>Nimbus.Autofac</AssemblyTitle>
-    <AssemblyName>Nimbus.Autofac</AssemblyName>
-    <PackageId>Nimbus.Autofac</PackageId>
-    <Authors>Damian Maclennan, Andrew Harcourt</Authors>
+    <Description>Unity extensions for Nimbus.</Description>
+    <AssemblyTitle>Nimbus.Unity</AssemblyTitle>
+    <AssemblyName>Nimbus.Unity</AssemblyName>
+    <PackageId>Nimbus.Unity</PackageId>
+    <Authors>Stuart Blackler</Authors>
     <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
-    <PackageTags>azure,servicebus,autofac</PackageTags>
+    <PackageTags>azure servicebus unity nimbus</PackageTags>
     <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
     <VersionPrefix>3.0.1</VersionPrefix>
     <VersionSuffix>issue-275.1</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="Unity" Version="5.8.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
