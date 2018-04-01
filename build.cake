@@ -109,11 +109,11 @@ Task("Restore")
 Task("Test")
     .Does(() =>
     {
-        var testProjects = GetFiles("./src/Test/**/*.csproj");
+        var testProjects = GetFiles("./test/**/*.csproj");
 
         foreach(var testProject in testProjects)
         {
-            DotNetCoreTool(testProject.FullPath, "xunit", "-xml TestResult.xml");
+            DotNetCoreTest(testProject.FullPath);
         }
     });
 

@@ -25,11 +25,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Serilog", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Ninject", "src\extensions\Nimbus.Ninject\Nimbus.Ninject.csproj", "{CDA7320E-DFF5-43EA-9E77-00081B2C6873}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D132EB55-819D-45C6-9C00-A24A512A7564}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D132EB55-819D-45C6-9C00-A24A512A7564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.IntegrationTests", "tests\Nimbus.IntegrationTests\Nimbus.IntegrationTests.csproj", "{A5582AA3-50AD-481B-BE18-C71CCB0B4CDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.IntegrationTests", "test\Nimbus.IntegrationTests\Nimbus.IntegrationTests.csproj", "{A5582AA3-50AD-481B-BE18-C71CCB0B4CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Tests.Common", "tests\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj", "{7D399192-A277-4134-BA10-9C66A191D903}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Tests.Common", "test\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj", "{7D399192-A277-4134-BA10-9C66A191D903}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
