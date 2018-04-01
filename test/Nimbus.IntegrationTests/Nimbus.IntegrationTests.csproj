@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <IsPackable>false</IsPackable>
-  </PropertyGroup>
+  </PropertyGroup> 
   <ItemGroup>
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
@@ -10,12 +10,12 @@
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Castle.Windsor" Version="4.1.0" />
-    <PackageReference Include="ConfigInjector" Version="2.2.1175" />
+    <PackageReference Include="ConfigInjector" Version="2.3.19" />
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="Serilog" Version="2.6.0" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
-    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.6" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />

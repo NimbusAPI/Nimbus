@@ -14,7 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.6.0" />
-    <PackageReference Include="Serilog.Exceptions" Version="3.0.0" />
+    <PackageReference Include="Serilog.Exceptions" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
