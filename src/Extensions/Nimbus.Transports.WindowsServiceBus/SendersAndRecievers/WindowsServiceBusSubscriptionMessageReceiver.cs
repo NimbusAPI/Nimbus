@@ -54,7 +54,7 @@ namespace Nimbus.Transports.WindowsServiceBus.SendersAndRecievers
         {
             try
             {
-                if (!cancellationSemaphore.IsDisposed())
+                if (!cancellationSemaphore.IsDisposedOrNull())
                 {
                     await cancellationSemaphore.WaitAsync(cancellationToken);
                 }

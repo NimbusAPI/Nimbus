@@ -1,17 +1,13 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Filtering.Attributes;
 using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
-using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
@@ -58,7 +54,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         {
             try
             {
-                if (!cancellationSemaphore.IsDisposed())
+                if (!cancellationSemaphore.IsDisposedOrNull())
                 {
                     await cancellationSemaphore.WaitAsync(cancellationToken);
                 }

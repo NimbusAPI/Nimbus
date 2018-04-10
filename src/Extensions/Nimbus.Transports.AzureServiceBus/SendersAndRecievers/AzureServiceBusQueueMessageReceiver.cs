@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
-using Nimbus.Extensions;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
@@ -48,7 +48,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         {
             try
             {
-                if (!cancellationSemaphore.IsDisposed())
+                if (!cancellationSemaphore.IsDisposedOrNull())
                 {
                     await cancellationSemaphore.WaitAsync(cancellationToken);
                 }

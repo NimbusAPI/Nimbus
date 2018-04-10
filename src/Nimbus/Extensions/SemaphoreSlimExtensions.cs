@@ -8,7 +8,7 @@ namespace Nimbus.Extensions
     {
         private static readonly FieldInfo _lockObjFieldInfo = typeof(SemaphoreSlim).GetField("m_lockObj", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        public static bool IsDisposed(this SemaphoreSlim semaphoreSlim)
+        internal static bool IsDisposed(this SemaphoreSlim semaphoreSlim)
         {
             if (semaphoreSlim == null)
             {
@@ -16,6 +16,11 @@ namespace Nimbus.Extensions
             }
 
             return _lockObjFieldInfo.GetValue(semaphoreSlim) == null;
+        }
+
+        internal static bool IsDisposedOrNull(this SemaphoreSlim semaphoreSlim)
+        {
+            return semaphoreSlim == null || semaphoreSlim.IsDisposed();
         }
     }
 }
