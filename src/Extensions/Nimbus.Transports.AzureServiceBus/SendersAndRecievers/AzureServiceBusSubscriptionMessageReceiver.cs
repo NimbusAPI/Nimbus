@@ -58,9 +58,15 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         {
             try
             {
-                await cancellationSemaphore.WaitAsync(cancellationToken);
+                if (!cancellationSemaphore.IsDisposed())
+                {
+                    await cancellationSemaphore.WaitAsync(cancellationToken);
+                }
             }
             catch (OperationCanceledException)
+            {
+            }
+            catch (ObjectDisposedException)
             {
             }
         }

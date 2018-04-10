@@ -82,6 +82,7 @@
     <Compile Include="Extensions\ConcurrentBagExtensions.cs" />
     <Compile Include="Extensions\FluentConfigurationExtensions.cs" />
     <Compile Include="Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Extensions\SemaphoreSlimExtensions.cs" />
     <Compile Include="Infrastructure\Filtering\FilterConditionProvider.cs" />
     <Compile Include="Infrastructure\Filtering\IFilterConditionProvider.cs" />
     <Compile Include="Infrastructure\INimbusTransport.cs" />
