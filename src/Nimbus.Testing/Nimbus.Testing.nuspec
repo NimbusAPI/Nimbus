@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nimbus.Testing</id>
+    <version>$version$</version>
+    <title>Nimbus.Testing</title>
+    <authors>Seda Yildiz and Ricky Attilia</authors>
+    <owners>Damian Maclennan</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Nimbus Testing for setting up a unit test on a message handler</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>azure servicebus testing</tags>
+    <projectUrl>http://nimbusapi.github.io/</projectUrl>
+  </metadata>
+</package>
