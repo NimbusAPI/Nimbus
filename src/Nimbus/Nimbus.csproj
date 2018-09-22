@@ -4,7 +4,11 @@
       <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
     </ItemGroup>
     <ItemGroup>
+      <PackageReference Include="fody" Version="3.2.4" />
+      <PackageReference Include="fodycecil" Version="3.0.2" />
       <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+      <PackageReference Include="nullguard.fody" Version="1.8.3" />
+      <PackageReference Include="virtuosity.fody" Version="1.21.1" />
     </ItemGroup>
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>

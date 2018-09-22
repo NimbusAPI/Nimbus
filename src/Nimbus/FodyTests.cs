@@ -1,4 +1,5 @@
-﻿namespace Nimbus
+﻿using Nimbus.Properties;
+namespace Nimbus
 {
     /// <summary>
     ///     We DELIBERATELY do not explicitly null-check any arguments in this codebase - it's too easy to forget. We
@@ -6,24 +7,23 @@
     ///     that allows our test suite to confirm that Fody is correctly injecting its NullGuard aspect.
     /// </summary>
 
-    //TODO - fix this
-    // internal class FodyTests
-    // {
-    //     // ReSharper disable once UnusedParameter.Local
-    //     public FodyTests(object o)
-    //     {
-    //     }
+    internal class FodyTests
+    {
+        // ReSharper disable once UnusedParameter.Local
+        public FodyTests(object o)
+        {
+        }
 
-    //     // ReSharper disable once UnusedParameter.Local
-    //     public void DoFoo(object o)
-    //     {
-    //     }
+        // ReSharper disable once UnusedParameter.Local
+        public void DoFoo(object o)
+        {
+        }
 
-    //     [UsedImplicitly]
-    //     // ReSharper disable once UnusedMember.Local
-    //     // ReSharper disable once UnusedParameter.Local
-    //     private void DoBar(object o)
-    //     {
-    //     }
-    // }
+        [UsedImplicitly]
+        // ReSharper disable once UnusedMember.Local
+        // ReSharper disable once UnusedParameter.Local
+        private void DoBar(object o)
+        {
+        }
+    }
 }
