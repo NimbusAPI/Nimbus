@@ -7,6 +7,7 @@ using Nimbus.Extensions;
 using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.MessageContracts;
+using NullGuard;
 
 namespace Nimbus.Infrastructure
 {
@@ -28,9 +29,7 @@ namespace Nimbus.Infrastructure
             _dispatchContextManager = dispatchContextManager;
         }
 
-        //TODO
-        //public Task<NimbusMessage> Create(string destinationPath, [AllowNull] object payload)
-        public Task<NimbusMessage> Create(string destinationPath,  object payload)
+        public Task<NimbusMessage> Create(string destinationPath,  [AllowNull] object payload)
         {
             var nimbusMessage = new NimbusMessage(destinationPath, payload);
             var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);
