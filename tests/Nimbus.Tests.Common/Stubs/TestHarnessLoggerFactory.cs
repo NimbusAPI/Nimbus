@@ -26,10 +26,10 @@ namespace Nimbus.Tests.Common.Stubs
                 .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()
                 .WriteTo.Seq("http://localhost:5341")
-                .Chain(l =>
-                       {
-                           if (Debugger.IsAttached) l.WriteTo.Trace();
-                       })
+                // .Chain(l =>
+                //        {
+                //            if (Debugger.IsAttached) l.WriteTo.Trace();
+                //        })
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 

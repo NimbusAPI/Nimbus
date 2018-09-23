@@ -1,9 +1,9 @@
 using System;
-using ConfigInjector;
+//using ConfigInjector;
 
 namespace Nimbus.Tests.Common.Configuration
 {
-    public class AzureBlobStorageContainerUri : ConfigurationSetting<Uri>
+    public class AzureBlobStorageContainerUri //: ConfigurationSetting<Uri>
     {
     }
 }

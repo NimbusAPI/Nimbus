@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores;
+// using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.LargeMessageStores;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
@@ -11,13 +11,13 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
         public IEnumerator<IConfigurationScenario<TransportConfiguration>> GetEnumerator()
         {
             yield return new InProcess();
-            yield return new Redis();
+            // yield return new Redis();
 
-            foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
-            {
-                //yield return new WindowsServiceBus(largeMessageStorage);  //FIXME reinstate when we have separate app domains
-                yield return new AzureServiceBus(largeMessageStorage);
-            }
+            // foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
+            // {
+            //     //yield return new WindowsServiceBus(largeMessageStorage);  //FIXME reinstate when we have separate app domains
+            //     yield return new AzureServiceBus(largeMessageStorage);
+            // }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
