@@ -16,6 +16,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nimbus\Nimbus.csproj" />
+    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj" />
+    <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.MessageContracts\Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.Handlers\Nimbus.UnitTests.TestAssemblies.Handlers.csproj" />
+    <ProjectReference Include="..\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization\Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

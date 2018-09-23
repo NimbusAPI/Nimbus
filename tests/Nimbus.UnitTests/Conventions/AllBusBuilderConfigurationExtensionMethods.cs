@@ -40,7 +40,6 @@ namespace Nimbus.UnitTests.Conventions
                                  {
                                      typeof (BusBuilderConfigurationExtensions).Assembly,
                                      typeof (AutofacBusBuilderConfigurationExtensions).Assembly,
-                                     typeof (WindsorBusBuilderConfigurationExtensions).Assembly
                                  };
 
                 var testCases = assemblies
