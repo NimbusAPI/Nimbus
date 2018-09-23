@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "Nimbus\Nimbus.csproj", "{150EDEEE-6188-41AA-8F8A-8ED931A38B37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus", "src\Nimbus\Nimbus.csproj", "{150EDEEE-6188-41AA-8F8A-8ED931A38B37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.InfrastructureContracts", "Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj", "{7CB15804-6150-4A8E-9CF8-C3C09480775F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.InfrastructureContracts", "src\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj", "{7CB15804-6150-4A8E-9CF8-C3C09480775F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.MessageContracts", "Nimbus.MessageContracts\Nimbus.MessageContracts.csproj", "{49BA9BB4-1661-46AE-B8C3-8DEE14282AF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.MessageContracts", "src\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj", "{49BA9BB4-1661-46AE-B8C3-8DEE14282AF8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DD9A756-E192-4969-8979-193114FD843B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "src\extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj", "{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,5 +64,21 @@ Global
 		{49BA9BB4-1661-46AE-B8C3-8DEE14282AF8}.Release|x64.Build.0 = Release|Any CPU
 		{49BA9BB4-1661-46AE-B8C3-8DEE14282AF8}.Release|x86.ActiveCfg = Release|Any CPU
 		{49BA9BB4-1661-46AE-B8C3-8DEE14282AF8}.Release|x86.Build.0 = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|x64.Build.0 = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Debug|x86.Build.0 = Debug|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|x64.ActiveCfg = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|x64.Build.0 = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|x86.ActiveCfg = Release|Any CPU
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC8BBBE6-238A-49FD-91C8-2331F89DAA7B} = {3DD9A756-E192-4969-8979-193114FD843B}
+		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010} = {BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}
 	EndGlobalSection
 EndGlobal
