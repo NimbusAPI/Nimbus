@@ -1,12 +1,12 @@
-using System.Collections.Concurrent;
 using System.Threading;
+using Nimbus.ConcurrentCollections;
 
 namespace Nimbus.Infrastructure
 {
     //http://www.cazzulino.com/callcontext-netstandard-netcore.html
     public static class CallContext
     {
-        static ConcurrentDictionary<string, AsyncLocal<object>> state = new ConcurrentDictionary<string, AsyncLocal<object>>();
+        static ThreadSafeDictionary<string, AsyncLocal<object>> state = new ThreadSafeDictionary<string, AsyncLocal<object>>();
 
         /// <summary>
         /// Stores a given object and associates it with the specified name.
