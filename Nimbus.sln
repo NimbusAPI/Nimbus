@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "src\extensions\Nimbus.Autofac\Nimbus.Autofac.csproj", "{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Serilog", "src\extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj", "{EC2BD69F-A9CA-456A-80EE-638FD78081DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,10 +92,23 @@ Global
 		{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}.Release|x64.Build.0 = Release|Any CPU
 		{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}.Release|x86.Build.0 = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|x64.Build.0 = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BC8BBBE6-238A-49FD-91C8-2331F89DAA7B} = {3DD9A756-E192-4969-8979-193114FD843B}
 		{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010} = {BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}
 		{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395} = {BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}
+		{EC2BD69F-A9CA-456A-80EE-638FD78081DA} = {BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}
 	EndGlobalSection
 EndGlobal
