@@ -9,8 +9,6 @@
     <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
     <PackageTags>azure,servicebus</PackageTags>
     <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
-    <VersionPrefix>3.0.1</VersionPrefix>
-    <VersionSuffix>issue-275.1</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />

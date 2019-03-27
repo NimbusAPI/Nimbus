@@ -1,25 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Nimbus log that writes to Log4net.</Description>
-    <AssemblyTitle>Nimbus.Logger.Log4Net</AssemblyTitle>
-    <AssemblyName>Nimbus.Logger.Log4Net</AssemblyName>
-    <PackageId>Nimbus.Logger.Log4Net</PackageId>
-    <Authors>Mustafa Arif</Authors>
+    <description>Nimbus serializer implemented with Newtonsoft.Json</description>
+    <AssemblyTitle>Nimbus.Serializers.Json</AssemblyTitle>
+    <AssemblyName>Nimbus.Serializers.Json</AssemblyName>
+    <PackageId>Nimbus.Serializers.Json</PackageId>
+    <Authors>Damian Maclennan, Andrew Harcourt</Authors>
     <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
     <PackageTags>azure,servicebus,autofac</PackageTags>
     <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Log4Net" Version="2.0.8" />
-    <PackageReference Include="Fody" Version="4.2.1" PrivateAssets="all" />
-    <PackageReference Include="NullGuard.Fody" Version="1.8.7" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Fody" Version="4.2.1" privateAssets="all" />
+    <PackageReference Include="NullGuard.Fody" Version="1.8.7" privateAssets="all" />
+    <PackageReference Include="Virtuosity.Fody" Version="2.0.0" privateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
     <ProjectReference Include="../../Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
     <ProjectReference Include="../../Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
   </ItemGroup>
+
   <!-- Mono Reference Assemblies for non Windows Build Environments -->
   <PropertyGroup Condition="'$(MonoReferenceAssemblies)' != ''">
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net462'">$(MonoReferenceAssemblies)/4.6.2-api</FrameworkPathOverride>

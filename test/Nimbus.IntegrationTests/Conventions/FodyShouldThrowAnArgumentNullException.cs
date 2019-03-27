@@ -10,7 +10,6 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds * 1000)]
     [Category("Convention")]
     public class FodyShouldThrowAnArgumentNullException
     {
@@ -33,7 +32,7 @@ namespace Nimbus.IntegrationTests.Conventions
                 ex = exc.InnerException;
             }
 
-            ex.ShouldBeTypeOf<ArgumentNullException>();
+            ex.ShouldBeOfType<ArgumentNullException>();
         }
 
         [Test]
@@ -56,7 +55,7 @@ namespace Nimbus.IntegrationTests.Conventions
                 ex = exc.InnerException;
             }
 
-            ex.ShouldBeTypeOf<ArgumentNullException>();
+            ex.ShouldBeOfType<ArgumentNullException>();
         }
 
         [Test]
@@ -79,7 +78,7 @@ namespace Nimbus.IntegrationTests.Conventions
                 ex = exc.InnerException;
             }
 
-            ex.ShouldBeTypeOf<ArgumentNullException>();
+            ex.ShouldBeOfType<ArgumentNullException>();
         }
 
         private static Type GetFodyTestsType(Assembly assembly)

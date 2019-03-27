@@ -4,37 +4,54 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.2" />
-    <PackageReference Include="Autofac" Version="4.6.2" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
-    <PackageReference Include="CommonServiceLocator" Version="2.0.3" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="Autofac" Version="4.9.2" />
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Castle.Windsor" Version="5.0.0" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
     <PackageReference Include="ConfigInjector" Version="2.3.19" />
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
     <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.0.0" />
-    <PackageReference Include="Serilog.Exceptions" Version="4.0.0" />
+    <PackageReference Include="Serilog.Exceptions" Version="5.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Unity" Version="5.8.4" />
-    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.8" />
+    <PackageReference Include="Unity" Version="5.10.2" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.1.0" />
   </ItemGroup>
+
+  <!-- Core Nimbus Packages -->
   <ItemGroup>
-    <ProjectReference Include="../../src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj" />
-    <ProjectReference Include="../../src/extensions/Nimbus.Ninject/Nimbus.Ninject.csproj" />
-    <ProjectReference Include="../../src/extensions/Nimbus.Unity/Nimbus.Unity.csproj" />
     <ProjectReference Include="../../src/Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj" />
     <ProjectReference Include="../../src/Nimbus.MessageContracts/Nimbus.MessageContracts.csproj" />
     <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />
   </ItemGroup>
+
+  <!-- Nimbus Extensions -->
+  <ItemGroup>
+    <ProjectReference Include="../../src/extensions/Nimbus.Autofac/Nimbus.Autofac.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.LargeMessages.Azure/Nimbus.LargeMessages.Azure.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.LargeMessages.FileSystem/Nimbus.LargeMessages.FileSystem.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Logger.Log4Net/Nimbus.Logger.Log4Net.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Ninject/Nimbus.Ninject.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Serializers.Json/Nimbus.Serializers.Json.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Transports.AzureServiceBus/Nimbus.Transports.AzureServiceBus.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Transports.InProcess/Nimbus.Transports.InProcess.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Transports.Redis/Nimbus.Transports.Redis.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Transports.WindowsServiceBus/Nimbus.Transports.WindowsServiceBus.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Unity/Nimbus.Unity.csproj" />
+    <ProjectReference Include="../../src/extensions/Nimbus.Windsor/Nimbus.Windsor.csproj" />
+  </ItemGroup>
+
   <!-- Mono Reference Assemblies for non Windows Build Environments -->
   <PropertyGroup Condition="'$(MonoReferenceAssemblies)' != ''">
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net462'">$(MonoReferenceAssemblies)/4.6.2-api</FrameworkPathOverride>

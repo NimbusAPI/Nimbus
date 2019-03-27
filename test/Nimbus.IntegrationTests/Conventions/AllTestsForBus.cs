@@ -6,14 +6,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
+using Ninject.Infrastructure.Language;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
     [Category("Convention")]
     public class AllTestsForBus
     {

@@ -13,7 +13,6 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
     [Category("Convention")]
     public class AllIntegrationTests
     {
@@ -31,18 +30,6 @@ namespace Nimbus.IntegrationTests.Conventions
         public async Task ShouldBeAsync(MethodInfo testMethod)
         {
             testMethod.HasAttribute<AsyncStateMachineAttribute>().ShouldBe(true);
-        }
-
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldHaveATimeout(MethodInfo testMethod)
-        {
-            if (testMethod.HasAttribute<TimeoutAttribute>()) return;
-
-            var fixtureTypeHeirarchy = new[] {testMethod.DeclaringType}.DepthFirst(t => t.BaseType != null ? new[] {t.BaseType} : new Type[0]);
-            if (fixtureTypeHeirarchy.Any(t => t.HasAttribute<TimeoutAttribute>())) return;
-
-            Assert.Fail();
         }
 
         private class TestCases : IEnumerable<TestCaseData>

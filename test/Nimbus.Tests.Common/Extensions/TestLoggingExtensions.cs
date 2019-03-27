@@ -28,7 +28,6 @@ namespace Nimbus.Tests.Common.Extensions
 
         public static void LogTestStart()
         {
-            TestContext.CurrentContext.Test.Properties.Set("TestId", Guid.NewGuid());
             Log.Information("Test {TestName} starting", TestContext.CurrentContext.Test.FullName);
         }
 

@@ -1,34 +1,87 @@
-// Tools
-#tool "nuget:?package=GitVersion.CommandLine"
-#tool "nuget:?package=OctopusTools"
+/**********************************************************************
+ * Tools
+ **********************************************************************/
+#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0"
 
-// Namespaces
-using System.Xml;
-using System.Xml.Linq;
-
+/**********************************************************************
+ * Arguments
+ **********************************************************************/
 // Build Configuration
 var configuration = Argument("configuration", "Release");
 
-// Build Target
+// Build Targets
 var target = Argument("target", "Default");
 
-// Local Variables..
+
+/**********************************************************************
+ * Global Variables
+ **********************************************************************/
+
+// Are we on a Build Server
 var isContinuousIntegrationBuild = !BuildSystem.IsLocalBuild;
 
-// Git Version \\(^_^)//
-var gitVersionInfo = GitVersion(new GitVersionSettings {
-    OutputType = GitVersionOutput.Json,
-    UpdateAssemblyInfo = false
-});
+// Nuget Server Settings
+var nugetKey = EnvironmentVariable("PROGET_KEY") ?? "NO BUENOS";
+var nugetServer = EnvironmentVariable("PROGET_SERVERURL") ?? "NO BUENOS";
 
-// What branch are we on for conditional Tasks?
-var isMasterBranch = gitVersionInfo.BranchName == "master" ? true : false;
+// Octopus API Key & Server Url
+var octopusDeployApiKey = EnvironmentVariable("OCTOPUS_API") ?? "NO BUENOS";
+var octopusDeployServer = EnvironmentVariable("OCTOPUS_SERVERURL") ?? "NO BUENOS";
 
-// Package Version
-var nugetVersion = gitVersionInfo.NuGetVersion;
+GitVersion gitVersionInfo;
+string nugetVersion = "1.0.0";
+string informationalVersion = "1.0.0";
+bool isMasterBranch = false;
+
+try {
+    // Git Version \\(^_^)//
+    gitVersionInfo = GitVersion(new GitVersionSettings {
+        OutputType = GitVersionOutput.Json
+    });
+
+    // Package Version
+    nugetVersion = gitVersionInfo.NuGetVersion;
+    informationalVersion = gitVersionInfo.InformationalVersion;
+    isMasterBranch = gitVersionInfo.BranchName == "master";
+}
+catch
+{
+    Error("Could not set GitVersionInfo");
+}
+
+/**********************************************************************
+ * Artifacts
+ **********************************************************************/
 
 // Artifacts Directory
 EnsureDirectoryExists("./artifacts");
+var artifactsDirectory = Directory("./artifacts");
+
+/**********************************************************************
+ * Setup Tasks
+ **********************************************************************/
+Setup(context => {
+    if (gitVersionInfo != null)
+    {
+        Information("Building Version {0} on {1}", nugetVersion, gitVersionInfo.BranchName);
+    }
+    else
+    {
+        Information("Building an unknown version");
+    }
+});
+
+Teardown(context => {
+    if (gitVersionInfo != null)
+    {
+        Information("Finished building Version {0} on {1}", nugetVersion, gitVersionInfo.BranchName);
+    }
+    else
+    {
+        Information("Finished building an unknown version");
+    }
+});
+
 
 /********************************************************************
  * Actual Build Steps
@@ -48,84 +101,15 @@ Task("Clean")
 );
 
 Task("Build")
-    .IsDependentOn("SetVersion")
-    .IsDependentOn("Restore")
     .Does(() =>
     {
-        var buildSettings = new DotNetCoreBuildSettings {
-            Configuration = configuration
-        };
-
-        switch((int)Environment.OSVersion.Platform) {
-            // Unix
-            case 4: 
-            {
-                Information("Building on {0}", Environment.OSVersion.Platform);
-                
-                // Set Mono Reference Libraries. 
-                buildSettings.ArgumentCustomization = args => args.Append("/p:MonoReferenceAssemblies=/usr/lib/mono");
-                break;
-            }
-            
-            // Assumed Windows.. 
-            default: 
-            {
-                Information("Building on {0}", Environment.OSVersion.Platform);
-                break;
-            }
-        }
-
-        DotNetCoreBuild("./", buildSettings);
-    }
-);
-
-Task("SetVersion")
-    .Does(() =>
-    {
-        var projects = GetFiles("./src/**/*.csproj");
-
-        foreach(var project in projects)
-        {
-            var document = XDocument.Load(project.FullPath);
-            var propertyGroup = document.Descendants("PropertyGroup")
-                .FirstOrDefault();
-            var versionPrefix = propertyGroup.Descendants("VersionPrefix")
-                .FirstOrDefault();
-            var versionSuffix = propertyGroup.Descendants("VersionSuffix")
-                .FirstOrDefault();
-
-            if (versionPrefix != null)
-            {
-                Information("Version Prefix is present, Setting {0}", gitVersionInfo.MajorMinorPatch);
-                versionPrefix.SetValue(gitVersionInfo.MajorMinorPatch);
-            } else
-            {
-                Information("Version Prefix is not present, Writing {0}", gitVersionInfo.MajorMinorPatch);
-                propertyGroup.SetElementValue("VersionPrefix", gitVersionInfo.MajorMinorPatch);
-            }
-
-            if (versionSuffix != null)
-            {
-                Information("Version Suffix is present, Setting {0}", gitVersionInfo.PreReleaseTag);
-                versionSuffix.SetValue(gitVersionInfo.PreReleaseTag);
-            }
-            else
-            {
-                Information("Version Suffix is not present, Writing {0}", gitVersionInfo.PreReleaseTag);
-                propertyGroup.SetElementValue("VersionSuffix", gitVersionInfo.PreReleaseTag);
-            }
-
-            document.Save(project.FullPath);
-        }
-    }
-);
-
-Task("Restore")
-    .Does(() =>
-    {
-        DotNetCoreRestore();
-    }
-);
+        DotNetCoreBuild("./", new DotNetCoreBuildSettings {
+            Configuration = configuration,
+            ArgumentCustomization = args =>
+                args.Append($"/p:Version={nugetVersion}")
+                    .Append($"/p:InformationalVersion={informationalVersion}")
+        });
+    });
 
 Task("Test")
     .Does(() =>
@@ -148,8 +132,13 @@ Task("Pack")
         {
             DotNetCorePack(project.FullPath, new DotNetCorePackSettings
             {
+                NoBuild = true,
                 Configuration = configuration,
-            });
+                OutputDirectory = artifactsDirectory,
+                ArgumentCustomization = args =>
+                    args.Append($"/p:Version={nugetVersion}")
+                        .Append($"/p:InformationalVersion={informationalVersion}")
+                    });
         }
     });
 

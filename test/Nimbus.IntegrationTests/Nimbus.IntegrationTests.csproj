@@ -4,18 +4,18 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.2" />
-    <PackageReference Include="Autofac" Version="4.6.2" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="Autofac" Version="4.9.2" />
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Castle.Windsor" Version="5.0.0" />
     <PackageReference Include="ConfigInjector" Version="2.3.19" />
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
-    <PackageReference Include="NUnit" Version="3.10.1" />
-    <PackageReference Include="Serilog" Version="2.6.0" />
-    <PackageReference Include="Shouldly" Version="3.0.0" />
-    <PackageReference Include="WindowsAzure.ServiceBus" Version="4.1.8" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Shouldly" Version="3.0.2" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Nimbus/Nimbus.csproj" />

@@ -8,6 +8,9 @@ _ReSharper.*
 .gitignore
 .vs
 
+# Fody Generated Noise
+FodyWeavers.xsd
+
 # Cake
 tools
 artifacts

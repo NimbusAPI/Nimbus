@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Nimbus log that writes to Log4net.</Description>
-    <AssemblyTitle>Nimbus.Logger.Log4Net</AssemblyTitle>
-    <AssemblyName>Nimbus.Logger.Log4Net</AssemblyName>
-    <PackageId>Nimbus.Logger.Log4Net</PackageId>
-    <Authors>Mustafa Arif</Authors>
+    <description>In-process transport layer for Nimbus.</description>
+    <AssemblyTitle>Nimbus.Transports.InProcess</AssemblyTitle>
+    <AssemblyName>Nimbus.Transports.InProcess</AssemblyName>
+    <PackageId>Nimbus.Transports.InProcess</PackageId>
+    <authors>Damian Maclennan and Andrew Harcourt</authors>
     <PackageProjectUrl>http://nimbusapi.com/</PackageProjectUrl>
-    <PackageTags>azure,servicebus,autofac</PackageTags>
+    <PackageTags>azure servicebus unity nimbus</PackageTags>
     <TargetFrameworks>netstandard2.0; net462</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Log4Net" Version="2.0.8" />
-    <PackageReference Include="Fody" Version="4.2.1" PrivateAssets="all" />
-    <PackageReference Include="NullGuard.Fody" Version="1.8.7" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="4.2.1" privateAssets="all" />
+    <PackageReference Include="NullGuard.Fody" Version="1.8.7" privateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../Nimbus/Nimbus.csproj" />
