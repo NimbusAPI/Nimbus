@@ -4,7 +4,7 @@
       <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="StackExchange.Redis" Version="2.0.505" />
+      <PackageReference Include="StackExchange.Redis" Version="2.0.571" />
     </ItemGroup>
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
