@@ -7,3 +7,6 @@ _ReSharper.*
 *.ncrunchproject
 .gitignore
 .vs
+
+# Cake Bits
+tools
