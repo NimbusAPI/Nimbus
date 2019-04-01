@@ -3,7 +3,7 @@
     <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="serilog" Version="2.7.1" />
+    <PackageReference Include="serilog" Version="2.8.0" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
