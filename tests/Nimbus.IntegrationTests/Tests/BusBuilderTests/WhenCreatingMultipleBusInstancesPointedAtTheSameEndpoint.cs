@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    //[Timeout(TimeoutSeconds*1000)]
     [Parallelizable(ParallelScope.None)]
     public class WhenCreatingMultipleBusInstancesPointedAtTheSameEndpoint
     {

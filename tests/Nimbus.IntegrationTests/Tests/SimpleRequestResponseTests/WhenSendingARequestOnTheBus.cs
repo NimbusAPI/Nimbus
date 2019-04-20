@@ -30,7 +30,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests
         [Then]
         public async Task WeShouldGetSomethingNiceBack()
         {
-            _response.ShouldBeTypeOf<SomeResponse>();
+            _response.ShouldBeOfType<SomeResponse>();
         }
     }
 }

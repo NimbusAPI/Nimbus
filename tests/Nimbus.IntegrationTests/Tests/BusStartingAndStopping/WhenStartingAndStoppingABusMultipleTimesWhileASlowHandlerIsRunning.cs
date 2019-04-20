@@ -13,7 +13,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    //[Timeout(TimeoutSeconds*1000)]
     [Parallelizable(ParallelScope.None)]
     public class WhenStartingAndStoppingABusMultipleTimesWhileASlowHandlerIsRunning : TestForBus
     {

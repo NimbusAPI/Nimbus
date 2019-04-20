@@ -6,7 +6,6 @@ var version = string.Format("1.0.0.{0}", buildNumber);
 
 var packageId = "";
 
-var distDirectory = "./dist";
 var packageDirectory = "./artifacts";
 
 Information($"Running target {target} in configuration {configuration}");
@@ -16,7 +15,7 @@ Information($"Running target {target} in configuration {configuration}");
 Task("Clean")  
     .Does(() =>
     {
-        CleanDirectory(distDirectory);
+        DotNetCoreClean("./");
         CleanDirectory(packageDirectory);
     });
 
@@ -38,7 +37,7 @@ Task("Restore")
             new DotNetCoreBuildSettings()
             {
                 Configuration = configuration,
-                ArgumentCustomization = args => args.Append("--no-restore"),
+                NoRestore = true
             });
     });
 
@@ -48,12 +47,38 @@ Task("Test")
     .Does(() =>
     {
         var projects = GetFiles("./tests/Nimbus.UnitTests/Nimbus.UnitTests.csproj");
+        var settings = new DotNetCoreTestSettings
+            {
+                NoBuild = true,
+                NoRestore = true,
+                Configuration = configuration,
+            };
         foreach(var project in projects)
         {
+            
             Information("Testing project " + project);
-            DotNetCoreTest(project.FullPath);
+            DotNetCoreTest(project.FullPath, settings);
         }
     });
+
+Task("IntegrationTest")  
+    .Does(() =>
+    {
+        var projects = GetFiles("./tests/Nimbus.IntegrationTests/Nimbus.IntegrationTests.csproj");
+        var settings = new DotNetCoreTestSettings
+            {
+                NoBuild = true,
+                NoRestore = true,
+                Configuration = configuration,
+            };
+        foreach(var project in projects)
+        {
+            
+            Information("Testing project " + project);
+            DotNetCoreTest(project.FullPath, settings);
+        }
+    });
+
 
 // Publish th
 
@@ -69,56 +94,6 @@ Task("BuildAndTest")
 // to run everything starting from Clean, all the way up to Publish.
 Task("Default")  
     .IsDependentOn("BuildAndTest");
-
-Task("Package")
-    .Does(() => 
-    {
-        
-
-        StartProcess("dotnet", new ProcessSettings {
-            Arguments = new ProcessArgumentBuilder()
-                .Append("octo")
-                .Append("pack")
-                .Append($"--id={packageId}")
-                .Append($"--version={version}")
-                .Append($"--basePath=\"{distDirectory}\"")
-                .Append($"--outFolder=\"{packageDirectory}\"")
-            }
-        );
-    });
-
-Task("PushPackages")
-	.IsDependentOn("Package")
-	.Does(() => {
-		if (HasEnvironmentVariable("octopusurl"))
-		{
-			var server = EnvironmentVariable("octopusurl");
-			var apikey = EnvironmentVariable("octopusapikey");
-            var package = $"{packageDirectory}/{packageId}.{version}.nupkg";
-			
-            Information($"The Octopus variable was present. {server}");
-
-            StartProcess("dotnet", new ProcessSettings {
-                        Arguments = new ProcessArgumentBuilder()
-                            .Append("octo")
-                            .Append("push")
-                            .Append($"--package={package}")
-                            .Append($"--server=\"{server}\"")
-                            .Append($"--apiKey=\"{apikey}\"")
-                        }
-                    );
-		}
-        else
-        {
-            Information("No Octopus variables present.");
-        }
-
-	});
-
-Task("CI")
-    .IsDependentOn("BuildAndTest")
-    .IsDependentOn("Package")
-    .IsDependentOn("PushPackages");
 
 // Executes the task specified in the target argument.
 RunTarget(target); 

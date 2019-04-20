@@ -55,7 +55,7 @@ namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
         [Then]
         public async Task TheRequestShouldHaveReceivedAResponse()
         {
-            _response.ShouldBeTypeOf<SomeResponse>();
+            _response.ShouldBeOfType<SomeResponse>();
         }
 
         [Then]

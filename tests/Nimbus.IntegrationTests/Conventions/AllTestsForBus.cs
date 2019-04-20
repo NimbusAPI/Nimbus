@@ -13,7 +13,7 @@ using Shouldly;
 namespace Nimbus.IntegrationTests.Conventions
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    //[Timeout(TimeoutSeconds*1000)]
     [Category("Convention")]
     public class AllTestsForBus
     {

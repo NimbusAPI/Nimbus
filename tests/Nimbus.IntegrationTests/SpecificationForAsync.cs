@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    //[Timeout(TimeoutSeconds*1000)]
     public abstract class SpecificationForAsync<T> where T : class
     {
         protected const int TimeoutSeconds = 30;
@@ -20,7 +20,7 @@ namespace Nimbus.IntegrationTests
 
         private Stopwatch _sw;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             Task.Run(async () =>
@@ -46,7 +46,7 @@ namespace Nimbus.IntegrationTests
             TestLoggingExtensions.LogTestResult();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
             var disposable = Subject as IDisposable;

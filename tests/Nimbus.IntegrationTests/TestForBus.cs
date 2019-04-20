@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Nimbus.IntegrationTests
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    //[Timeout(TimeoutSeconds*1000)]
     public abstract class TestForBus
     {
         protected const int TimeoutSeconds = 60;
