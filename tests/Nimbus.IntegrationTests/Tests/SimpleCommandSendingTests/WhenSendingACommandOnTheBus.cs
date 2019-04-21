@@ -25,7 +25,7 @@ namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
         [TestCaseSource(typeof (AllBusConfigurations<WhenSendingACommandOnTheBus>))]
         public async Task Run(string testName, IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
-            await Given(scenario);
+            await Given(scenario); 
             await When();
             await Then();
         }

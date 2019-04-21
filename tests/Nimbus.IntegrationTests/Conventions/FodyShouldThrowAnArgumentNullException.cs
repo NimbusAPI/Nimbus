@@ -21,7 +21,7 @@ namespace Nimbus.IntegrationTests.Conventions
         public async Task WhenPassingANullArgumentToAConstructor(Assembly assembly)
         {
             var fodyTestsType = GetFodyTestsType(assembly);
-            fodyTestsType.ShouldNotBe(null);
+            fodyTestsType.ShouldNotBeNull();
 
             Should.Throw<TargetInvocationException>(() => 
             {
@@ -35,27 +35,16 @@ namespace Nimbus.IntegrationTests.Conventions
         public async Task WhenPassingANullArgumentToAPublicMethod(Assembly assembly)
         {
             var fodyTestsType = GetFodyTestsType(assembly);
-            fodyTestsType.ShouldNotBe(null);
+            fodyTestsType.ShouldNotBeNull();
 
             var fodyTests = Activator.CreateInstance(fodyTestsType, "dummy");
             var method = fodyTestsType.GetMethod("DoFoo", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-            Should.Throw<ArgumentNullException>(() => 
+            Should.Throw<TargetInvocationException>(() => 
             {
                 method.Invoke(fodyTests, new object[] { null });
             });
 
-            // Exception ex = null;
-            // try
-            // {
-            //     method.Invoke(fodyTests, new object[] { null });
-            // }
-            // catch (TargetInvocationException exc)
-            // {
-            //     ex = exc.InnerException;
-            // }
-
-            // ex.ShouldBeTypeOf<ArgumentNullException>();
         }
 
         [Test]
@@ -73,17 +62,6 @@ namespace Nimbus.IntegrationTests.Conventions
                 method.Invoke(fodyTests, new object[] { null });
             });
 
-            // Exception ex = null;
-            // try
-            // {
-            //     method.Invoke(fodyTests, new object[] {null});
-            // }
-            // catch (TargetInvocationException exc)
-            // {
-            //     ex = exc.InnerException;
-            // }
-
-            // ex.ShouldBeTypeOf<ArgumentNullException>();
         }
 
         private static Type GetFodyTestsType(Assembly assembly)

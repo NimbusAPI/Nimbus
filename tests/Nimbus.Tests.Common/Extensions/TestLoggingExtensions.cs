@@ -12,7 +12,7 @@ namespace Nimbus.Tests.Common.Extensions
         static TestLoggingExtensions()
         {
             TestHarnessLoggerFactory.Create(Guid.Empty, string.Empty);
-            //AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
 
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)

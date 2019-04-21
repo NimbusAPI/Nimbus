@@ -1,5 +1,6 @@
 using System.Threading;
 using Nimbus.ConcurrentCollections;
+using NullGuard;
 
 namespace Nimbus.Infrastructure
 {
@@ -13,7 +14,7 @@ namespace Nimbus.Infrastructure
         /// </summary>
         /// <param name="name">The name with which to associate the new item in the call context.</param>
         /// <param name="data">The object to store in the call context.</param>
-        public static void LogicalSetData(string name, object data) =>
+        public static void LogicalSetData(string name, [AllowNull]object data) =>
             state.GetOrAdd(name, _ => new AsyncLocal<object>()).Value = data;
 
         /// <summary>
