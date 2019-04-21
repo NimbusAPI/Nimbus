@@ -29,7 +29,7 @@ namespace Nimbus.IntegrationTests.Conventions
             inProcess.ShouldNotBeEmpty();
             complete.ShouldNotBeEmpty();
 
-            inProcess.Length.ShouldBeLessThanOrEqualTo(complete.Length);
+            inProcess.Length.ShouldBeLessThan(complete.Length);
         }
     }
 }

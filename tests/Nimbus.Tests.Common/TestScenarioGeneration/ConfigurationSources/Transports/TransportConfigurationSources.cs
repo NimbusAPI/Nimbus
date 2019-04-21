@@ -11,13 +11,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
         public IEnumerator<IConfigurationScenario<TransportConfiguration>> GetEnumerator()
         {
             yield return new InProcess();
-            // yield return new Redis();
-
-            // foreach (var largeMessageStorage in new LargeMessageStorageConfigurationSources())
-            // {
-            //     //yield return new WindowsServiceBus(largeMessageStorage);  //FIXME reinstate when we have separate app domains
-            //     yield return new AzureServiceBus(largeMessageStorage);
-            // }
+            yield return new Redis();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
