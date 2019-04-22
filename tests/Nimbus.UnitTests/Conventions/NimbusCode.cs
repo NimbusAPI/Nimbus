@@ -15,18 +15,7 @@ namespace Nimbus.UnitTests.Conventions
     [Category("Convention")]
     public class NimbusCode
     {
-        /// <summary>
-        ///     ConcurrentDictionary doesn't prevent multiple creation of items for non-existing keys. Use ThreadSafeDictionary
-        ///     instead.
-        /// </summary>
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldNeverUseConcurrentDictionary(Type type)
-        {
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            fields.Where(f => f.FieldType.IsClosedTypeOf(typeof (ConcurrentDictionary<,>))).ShouldBeEmpty();
-        }
-
+        
         /// <summary>
         ///     Lazy doesn't prevent multiple creation of items when the Lazy object is uninitialized. Use ThreadSafeLazy instead.
         /// </summary>
