@@ -108,7 +108,7 @@ Task("BuildPackages")
 Task("PushPackages")
 	.Does(() => {
 
-        var package = $"./{packageDirectory}/nimbus.{version}.nupkg";
+        var package = $"./{packageDirectory}/Nimbus.{version}.nupkg";
         if (! System.IO.File.Exists(package))
         {
             Information($"File {package} doesn't exist");
@@ -137,7 +137,9 @@ Task("BuildAndTest")
     .IsDependentOn("Restore")
     .IsDependentOn("GenerateVersionFile")
     .IsDependentOn("Build")
-    .IsDependentOn("Test");
+    .IsDependentOn("Test")
+    .IsDependentOn("BuildPackages")
+    .IsDependentOn("IntegrationTest");
 
 // The default task to run if none is explicitly specified. In this case, we want
 // to run everything starting from Clean, all the way up to Publish.

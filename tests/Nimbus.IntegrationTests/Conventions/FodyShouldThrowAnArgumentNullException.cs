@@ -1,93 +1,93 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using Shouldly;
+﻿// using System;
+// using System.Collections;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Reflection;
+// using System.Threading.Tasks;
+// using NUnit.Framework;
+// using Shouldly;
 
-namespace Nimbus.IntegrationTests.Conventions
-{
-    [TestFixture]
-    //[Timeout(TimeoutSeconds * 1000)]
-    [Category("Convention")]
-    public class FodyShouldThrowAnArgumentNullException
-    {
-        protected const int TimeoutSeconds = 15;
+// namespace Nimbus.IntegrationTests.Conventions
+// {
+//     [TestFixture]
+//     //[Timeout(TimeoutSeconds * 1000)]
+//     [Category("Convention")]
+//     public class FodyShouldThrowAnArgumentNullException
+//     {
+//         protected const int TimeoutSeconds = 15;
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task WhenPassingANullArgumentToAConstructor(Assembly assembly)
-        {
-            var fodyTestsType = GetFodyTestsType(assembly);
-            fodyTestsType.ShouldNotBeNull();
+//         [Test]
+//         [TestCaseSource(typeof (TestCases))]
+//         public async Task WhenPassingANullArgumentToAConstructor(Assembly assembly)
+//         {
+//             var fodyTestsType = GetFodyTestsType(assembly);
+//             fodyTestsType.ShouldNotBeNull();
 
-            Should.Throw<TargetInvocationException>(() => 
-            {
-                Activator.CreateInstance(fodyTestsType, new object[] {null});
-            });
+//             Should.Throw<TargetInvocationException>(() => 
+//             {
+//                 Activator.CreateInstance(fodyTestsType, new object[] {null});
+//             });
 
-        }
+//         }
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task WhenPassingANullArgumentToAPublicMethod(Assembly assembly)
-        {
-            var fodyTestsType = GetFodyTestsType(assembly);
-            fodyTestsType.ShouldNotBeNull();
+//         [Test]
+//         [TestCaseSource(typeof (TestCases))]
+//         public async Task WhenPassingANullArgumentToAPublicMethod(Assembly assembly)
+//         {
+//             var fodyTestsType = GetFodyTestsType(assembly);
+//             fodyTestsType.ShouldNotBeNull();
 
-            var fodyTests = Activator.CreateInstance(fodyTestsType, "dummy");
-            var method = fodyTestsType.GetMethod("DoFoo", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+//             var fodyTests = Activator.CreateInstance(fodyTestsType, "dummy");
+//             var method = fodyTestsType.GetMethod("DoFoo", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-            Should.Throw<TargetInvocationException>(() => 
-            {
-                method.Invoke(fodyTests, new object[] { null });
-            });
+//             Should.Throw<TargetInvocationException>(() => 
+//             {
+//                 method.Invoke(fodyTests, new object[] { null });
+//             });
 
-        }
+//         }
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task WhenPassingANullArgumentToAPrivateMethod(Assembly assembly)
-        {
-            var fodyTestsType = GetFodyTestsType(assembly);
-            fodyTestsType.ShouldNotBe(null);
+//         [Test]
+//         [TestCaseSource(typeof (TestCases))]
+//         public async Task WhenPassingANullArgumentToAPrivateMethod(Assembly assembly)
+//         {
+//             var fodyTestsType = GetFodyTestsType(assembly);
+//             fodyTestsType.ShouldNotBe(null);
 
-            var fodyTests = Activator.CreateInstance(fodyTestsType, "dummy");
-            var method = fodyTestsType.GetMethod("DoBar", BindingFlags.Instance | BindingFlags.NonPublic);
+//             var fodyTests = Activator.CreateInstance(fodyTestsType, "dummy");
+//             var method = fodyTestsType.GetMethod("DoBar", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            Should.Throw<ArgumentNullException>(() => 
-            {
-                method.Invoke(fodyTests, new object[] { null });
-            });
+//             Should.Throw<ArgumentNullException>(() => 
+//             {
+//                 method.Invoke(fodyTests, new object[] { null });
+//             });
 
-        }
+//         }
 
-        private static Type GetFodyTestsType(Assembly assembly)
-        {
-            return assembly
-                .DefinedTypes
-                .Where(t => t.Name == "FodyTests")
-                .FirstOrDefault();
-        }
+//         private static Type GetFodyTestsType(Assembly assembly)
+//         {
+//             return assembly
+//                 .DefinedTypes
+//                 .Where(t => t.Name == "FodyTests")
+//                 .FirstOrDefault();
+//         }
 
-        private class TestCases : IEnumerable<TestCaseData>
-        {
-            public IEnumerator<TestCaseData> GetEnumerator()
-            {
-                return AppDomainScanner.MyAssemblies
-                                       .Where(a => !a.GetName().Name.Contains("Test"))
-                                       .Where(a => !a.GetName().Name.Contains("MessageContracts"))
-                                       .Where(a => !a.GetName().Name.Contains("InfrastructureContracts"))
-                                       .Select(a => new TestCaseData(a).SetName(a.GetName().Name))
-                                       .GetEnumerator();
-            }
+//         private class TestCases : IEnumerable<TestCaseData>
+//         {
+//             public IEnumerator<TestCaseData> GetEnumerator()
+//             {
+//                 return AppDomainScanner.MyAssemblies
+//                                        .Where(a => !a.GetName().Name.Contains("Test"))
+//                                        .Where(a => !a.GetName().Name.Contains("MessageContracts"))
+//                                        .Where(a => !a.GetName().Name.Contains("InfrastructureContracts"))
+//                                        .Select(a => new TestCaseData(a).SetName(a.GetName().Name))
+//                                        .GetEnumerator();
+//             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-        }
-    }
-}
+//             IEnumerator IEnumerable.GetEnumerator()
+//             {
+//                 return GetEnumerator();
+//             }
+//         }
+//     }
+// }
