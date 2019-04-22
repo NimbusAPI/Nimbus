@@ -10,3 +10,11 @@ _ReSharper.*
 
 # Cake Bits
 tools
+
+#Mac stuff
+.DS_Store
+
+
+# build stuff
+dist_package/
+**/*/AssemblyInfo.cs

@@ -1,4 +1,5 @@
 //using ConfigInjector.QuickAndDirty;
+using System;
 using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
@@ -10,8 +11,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
     {
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            //var connectionString = DefaultSettingsReader.Get<RedisConnectionString>();
-            var connectionString = "localhost";
+            var connectionString = Environment.GetEnvironmentVariable("REDIS_TEST_CONNECTION") ?? "localhost";
 
             var configuration = new RedisTransportConfiguration()
                 .WithConnectionString(connectionString);

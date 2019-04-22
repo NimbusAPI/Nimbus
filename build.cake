@@ -1,22 +1,19 @@
 var target = Argument("Target", "Default");  
 var configuration = Argument("Configuration", "Release");
+var version = EnvironmentVariable("BUILD_NUMBER") ?? Argument("buildVersion", "0.0.0");
+var nugetApiKey = EnvironmentVariable("NUGET_API_KEY") ?? "";
 
-var buildNumber = Argument("buildNumber", "0");
-var version = string.Format("1.0.0.{0}", buildNumber);
+Information($"Running target {target} in configuration {configuration} with version {version}");
 
-var packageId = "";
-
-var packageDirectory = "./artifacts";
-
-Information($"Running target {target} in configuration {configuration}");
+var packageDirectory = Directory("./dist_package");
 
 
 // Deletes the contents of the Artifacts folder if it contains anything from a previous build.
 Task("Clean")  
     .Does(() =>
     {
-        DotNetCoreClean("./");
         CleanDirectory(packageDirectory);
+        DotNetCoreClean("./");
     });
 
 // Run dotnet restore to restore all package references.
@@ -28,6 +25,18 @@ Task("Restore")
         DotNetCoreRestore("./", settings);
     });
 
+
+Task("GenerateVersionFile")
+    .Does(() =>
+    {
+        var file = "./src/Nimbus/AssemblyInfo.cs";
+        CreateAssemblyInfo(file, new AssemblyInfoSettings {
+            Product = "Nimbus",
+            Version = version,
+            FileVersion = version,
+            InformationalVersion = version,
+        });
+    });
 
 // Build using the build configuration specified as an argument.
  Task("Build")
@@ -41,8 +50,6 @@ Task("Restore")
             });
     });
 
-// Look under a 'Tests' folder and run dotnet test against all of those projects.
-// Then drop the XML test results file in the Artifacts folder at the root.
 Task("Test")  
     .Does(() =>
     {
@@ -80,13 +87,55 @@ Task("IntegrationTest")
     });
 
 
-// Publish th
+
+Task("BuildPackages")
+    .Does(()=>
+    {
+        var settings = new DotNetCorePackSettings
+        {
+            Configuration = configuration,
+            NoBuild = true,
+            OutputDirectory = packageDirectory,
+            ArgumentCustomization = args => args
+                        .Append($"/p:PackageVersion={version}")
+        
+        };
+       DotNetCorePack("./src/Nimbus/Nimbus.csproj", settings); 
+    });
+
+
+
+Task("PushPackages")
+	.Does(() => {
+
+        var package = $"./{packageDirectory}/nimbus.{version}.nupkg";
+        if (! System.IO.File.Exists(package))
+        {
+            Information($"File {package} doesn't exist");
+        }
+        if ( !String.IsNullOrEmpty(nugetApiKey))
+        {
+            var settings = new DotNetCoreNuGetPushSettings
+            {
+                ApiKey = nugetApiKey,
+                Source = "https://www.nuget.org/api/v2/package"
+            };
+            Information($"Pushing package {package}");
+            DotNetCoreNuGetPush($"{package}", settings);
+        }
+        else
+        {
+            Information($"No Nuget keys found. Skipping package {package}");
+        }
+	});
+
+
 
 // A meta-task that runs all the steps to Build and Test the app
 Task("BuildAndTest")  
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
-    //.IsDependentOn("GenerateVersionFile")
+    .IsDependentOn("GenerateVersionFile")
     .IsDependentOn("Build")
     .IsDependentOn("Test");
 
@@ -94,6 +143,16 @@ Task("BuildAndTest")
 // to run everything starting from Clean, all the way up to Publish.
 Task("Default")  
     .IsDependentOn("BuildAndTest");
+
+Task("CI")
+    .IsDependentOn("GenerateVersionFile")
+    .IsDependentOn("Build")
+    .IsDependentOn("Test")
+    .IsDependentOn("BuildPackages");
+
+Task("Init").Does(()=>{
+    //nothing
+});
 
 // Executes the task specified in the target argument.
 RunTarget(target); 
