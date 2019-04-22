@@ -8,7 +8,7 @@ namespace Nimbus.UnitTests.MulticastRequestResponseTests
     [TestFixture]
     internal class WhenTakingTwoResponses : GivenAWrapperWithTwoResponses
     {
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1.5);
 
         private string[] _result;
 
