@@ -11,19 +11,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.MessageContracts", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DD9A756-E192-4969-8979-193114FD843B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{BC8BBBE6-238A-49FD-91C8-2331F89DAA7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "src\extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj", "{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Serializers.Json", "src\Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj", "{5A8D2BF0-9094-4F7E-BABE-35DB7FD7A010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "src\extensions\Nimbus.Autofac\Nimbus.Autofac.csproj", "{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Autofac", "src\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj", "{9A5AE007-9A5D-4F7B-9956-EDFF90A5B395}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Serilog", "src\extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj", "{EC2BD69F-A9CA-456A-80EE-638FD78081DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Serilog", "src\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj", "{EC2BD69F-A9CA-456A-80EE-638FD78081DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Log4net", "src\extensions\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj", "{0CF98382-EA8F-4194-872F-8D9DEE3D4F62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Logger.Log4net", "src\Extensions\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj", "{0CF98382-EA8F-4194-872F-8D9DEE3D4F62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.InProcess", "src\extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj", "{804FE628-C030-47CF-AAEE-7EF64105BCF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.InProcess", "src\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj", "{804FE628-C030-47CF-AAEE-7EF64105BCF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.Redis", "src\extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj", "{3A21D9C3-96D5-47A7-97AD-16FCBADAABFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.Redis", "src\Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj", "{3A21D9C3-96D5-47A7-97AD-16FCBADAABFE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E09F4DD0-F505-4397-B428-E176ABAB19FB}"
 EndProject

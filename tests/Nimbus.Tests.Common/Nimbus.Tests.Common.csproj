@@ -21,11 +21,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nimbus\Nimbus.csproj" />
-    <ProjectReference Include="..\..\src\extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj" />
-    <ProjectReference Include="..\..\src\extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
-    <ProjectReference Include="..\..\src\extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
-    <ProjectReference Include="..\..\src\extensions\Nimbus.Autofac\Nimbus.Autofac.csproj" />
-    <ProjectReference Include="..\..\src\extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Nimbus.Autofac\Nimbus.Autofac.csproj" />
+    <ProjectReference Include="..\..\src\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
   </ItemGroup>
 
 </Project>

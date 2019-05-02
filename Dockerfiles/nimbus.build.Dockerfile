@@ -35,12 +35,12 @@ COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts/Nimbus.UnitTests.T
 COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj 
 
 # Extensions
-COPY ./src/extensions/Nimbus.Autofac/Nimbus.Autofac.csproj  ./src/extensions/Nimbus.Autofac/Nimbus.Autofac.csproj
-COPY ./src/extensions/Nimbus.Logger.Log4net/Nimbus.Logger.Log4net.csproj  ./src/extensions/Nimbus.Logger.Log4net/Nimbus.Logger.Log4net.csproj
-COPY ./src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj  ./src/extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj
-COPY ./src/extensions/Nimbus.Serializers.Json/Nimbus.Serializers.Json.csproj  ./src/extensions/Nimbus.Serializers.Json/Nimbus.Serializers.Json.csproj
-COPY ./src/extensions/Nimbus.Transports.InProcess/Nimbus.Transports.InProcess.csproj  ./src/extensions/Nimbus.Transports.InProcess/Nimbus.Transports.InProcess.csproj
-COPY ./src/extensions/Nimbus.Transports.Redis/Nimbus.Transports.Redis.csproj  ./src/extensions/Nimbus.Transports.Redis/Nimbus.Transports.Redis.csproj
+COPY ./src/Extensions/Nimbus.Autofac/Nimbus.Autofac.csproj  ./src/Extensions/Nimbus.Autofac/Nimbus.Autofac.csproj
+COPY ./src/Extensions/Nimbus.Logger.Log4net/Nimbus.Logger.Log4net.csproj  ./src/Extensions/Nimbus.Logger.Log4net/Nimbus.Logger.Log4net.csproj
+COPY ./src/Extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj  ./src/Extensions/Nimbus.Logger.Serilog/Nimbus.Logger.Serilog.csproj
+COPY ./src/Extensions/Nimbus.Serializers.Json/Nimbus.Serializers.Json.csproj  ./src/Extensions/Nimbus.Serializers.Json/Nimbus.Serializers.Json.csproj
+COPY ./src/Extensions/Nimbus.Transports.InProcess/Nimbus.Transports.InProcess.csproj  ./src/Extensions/Nimbus.Transports.InProcess/Nimbus.Transports.InProcess.csproj
+COPY ./src/Extensions/Nimbus.Transports.Redis/Nimbus.Transports.Redis.csproj  ./src/Extensions/Nimbus.Transports.Redis/Nimbus.Transports.Redis.csproj
 
 
 RUN ./build.sh --Target="Clean" --buildVersion="$BUILD_NUMBER"
