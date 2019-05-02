@@ -26,16 +26,34 @@ Task("Restore")
     });
 
 
+private IEnumerable<FilePath> GetShippableProjects()
+{
+    var files = GetFiles("**/*.csproj").Where(f => f.FullPath.Contains("src") && !f.FullPath.Contains("tests")).ToArray();
+    return files;
+}
+
+
+
+
 Task("GenerateVersionFile")
     .Does(() =>
     {
-        var file = "./src/Nimbus/AssemblyInfo.cs";
-        CreateAssemblyInfo(file, new AssemblyInfoSettings {
-            Product = "Nimbus",
-            Version = version,
-            FileVersion = version,
-            InformationalVersion = version,
-        });
+        foreach(var project in GetShippableProjects())
+        {
+            var directory = project.GetDirectory();
+            var projectName = project.GetFilenameWithoutExtension().ToString();
+
+            var file = $"{directory}/AssemblyInfo.cs";
+            Information($"Writing {file} for project {projectName}");
+            CreateAssemblyInfo(file, new AssemblyInfoSettings {
+                Product = projectName,
+                Version = version,
+                FileVersion = version,
+                InformationalVersion = version,
+            });
+
+        }
+        
     });
 
 // Build using the build configuration specified as an argument.
@@ -100,32 +118,43 @@ Task("BuildPackages")
                         .Append($"/p:PackageVersion={version}")
         
         };
-       DotNetCorePack("./src/Nimbus/Nimbus.csproj", settings); 
+        foreach(var project in GetShippableProjects())
+        {
+            DotNetCorePack(project.ToString(), settings); 
+        }
+        
     });
 
 
+Task("Foo")
+    .Does(()=>{
+        var packages = GetFiles($"{packageDirectory}/Nimbus.*.nupkg");
+        foreach(var file in packages)
+        {
+            Information(file);
+        }
+    });
 
 Task("PushPackages")
 	.Does(() => {
 
-        var package = $"./{packageDirectory}/Nimbus.{version}.nupkg";
-        if (! System.IO.File.Exists(package))
-        {
-            Information($"File {package} doesn't exist");
-        }
         if ( !String.IsNullOrEmpty(nugetApiKey))
         {
             var settings = new DotNetCoreNuGetPushSettings
             {
                 ApiKey = nugetApiKey,
-                Source = "https://www.nuget.org/api/v2/package"
+                Source = "https://www.myget.org/F/nimbusapi/api/v2/package"
             };
-            Information($"Pushing package {package}");
-            DotNetCoreNuGetPush($"{package}", settings);
+            var packages = GetFiles($"{packageDirectory}/Nimbus.*.nupkg");
+            foreach(var file in packages)
+            {
+                Information($"Pushing package {package}");
+                DotNetCoreNuGetPush($"{package}", settings);
+            }
         }
         else
         {
-            Information($"No Nuget keys found. Skipping package {package}");
+            Information($"No Nuget keys found. Skipping step");
         }
 	});
 
@@ -138,8 +167,8 @@ Task("BuildAndTest")
     .IsDependentOn("GenerateVersionFile")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("IntegrationTest");
+    .IsDependentOn("BuildPackages");
+    //.IsDependentOn("IntegrationTest");
 
 // The default task to run if none is explicitly specified. In this case, we want
 // to run everything starting from Clean, all the way up to Publish.
