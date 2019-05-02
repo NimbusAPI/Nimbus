@@ -1,7 +1,7 @@
 var target = Argument("Target", "Default");  
 var configuration = Argument("Configuration", "Release");
 var version = EnvironmentVariable("BUILD_NUMBER") ?? Argument("buildVersion", "0.0.0");
-var nugetApiKey = EnvironmentVariable("NUGET_API_KEY") ?? "";
+var nugetApiKey = EnvironmentVariable("NUGET_API_KEY") ?? Argument("nugetApiKey", "");
 
 Information($"Running target {target} in configuration {configuration} with version {version}");
 
@@ -148,8 +148,8 @@ Task("PushPackages")
             var packages = GetFiles($"{packageDirectory}/Nimbus.*.nupkg");
             foreach(var file in packages)
             {
-                Information($"Pushing package {package}");
-                DotNetCoreNuGetPush($"{package}", settings);
+                Information($"Pushing package {file}");
+                DotNetCoreNuGetPush($"{file}", settings);
             }
         }
         else
