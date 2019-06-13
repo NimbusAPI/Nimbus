@@ -1,5 +1,5 @@
 # Build image
-FROM microsoft/dotnet:2.1.301-sdk AS builder
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-0.0.0}
@@ -18,7 +18,7 @@ COPY ./build.sh ./build.cake   ./
 # Install Cake, and compile the Cake build script
 RUN ./build.sh --Target="Init" --buildVersion="$BUILD_NUMBER"
 
-COPY ./Nimbus.sln ./  
+COPY ./Nimbus.sln ./
 
 # Core
 COPY ./src/Nimbus/Nimbus.csproj  ./src/Nimbus/Nimbus.csproj
@@ -26,13 +26,13 @@ COPY ./src/Nimbus.InfrastructureContracts/Nimbus.InfrastructureContracts.csproj 
 COPY ./src/Nimbus.MessageContracts/Nimbus.MessageContracts.csproj  ./src/Nimbus.MessageContracts/Nimbus.MessageContracts.csproj
 
 # Tests
-COPY ./tests/Nimbus.Tests.Common/Nimbus.Tests.Common.csproj  ./tests/Nimbus.Tests.Common/Nimbus.Tests.Common.csproj 
-COPY ./tests/Nimbus.IntegrationTests/Nimbus.IntegrationTests.csproj  ./tests/Nimbus.IntegrationTests/Nimbus.IntegrationTests.csproj 
+COPY ./tests/Nimbus.Tests.Common/Nimbus.Tests.Common.csproj  ./tests/Nimbus.Tests.Common/Nimbus.Tests.Common.csproj
+COPY ./tests/Nimbus.IntegrationTests/Nimbus.IntegrationTests.csproj  ./tests/Nimbus.IntegrationTests/Nimbus.IntegrationTests.csproj
 
-COPY ./tests/Nimbus.UnitTests/Nimbus.UnitTests.csproj  ./tests/Nimbus.UnitTests/Nimbus.UnitTests.csproj 
-COPY ./tests/Nimbus.UnitTests.TestAssemblies.Handlers/Nimbus.UnitTests.TestAssemblies.Handlers.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.Handlers/Nimbus.UnitTests.TestAssemblies.Handlers.csproj 
-COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts/Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts/Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj 
-COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj 
+COPY ./tests/Nimbus.UnitTests/Nimbus.UnitTests.csproj  ./tests/Nimbus.UnitTests/Nimbus.UnitTests.csproj
+COPY ./tests/Nimbus.UnitTests.TestAssemblies.Handlers/Nimbus.UnitTests.TestAssemblies.Handlers.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.Handlers/Nimbus.UnitTests.TestAssemblies.Handlers.csproj
+COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts/Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts/Nimbus.UnitTests.TestAssemblies.MessageContracts.csproj
+COPY ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj  ./tests/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization/Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization.csproj
 
 # Extensions
 COPY ./src/Extensions/Nimbus.Autofac/Nimbus.Autofac.csproj  ./src/Extensions/Nimbus.Autofac/Nimbus.Autofac.csproj
