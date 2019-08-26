@@ -4,7 +4,7 @@
     <ProjectReference Include="..\..\src\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.10.1" />
+    <PackageReference Include="nunit" Version="3.12.0" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
