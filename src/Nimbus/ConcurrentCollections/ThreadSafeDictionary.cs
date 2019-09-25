@@ -7,8 +7,8 @@ namespace Nimbus.ConcurrentCollections
 {
     public class ThreadSafeDictionary<TKey, TValue>
     {
-        private readonly IDictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
-        private readonly IDictionary<TKey, object> _locks = new Dictionary<TKey, object>();
+        private readonly IDictionary<TKey, TValue> _dictionary = new ConcurrentDictionary<TKey, TValue>();
+        private readonly IDictionary<TKey, object> _locks = new ConcurrentDictionary<TKey, object>();
 
         public TValue this[TKey key]
         {
