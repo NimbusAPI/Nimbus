@@ -20,16 +20,14 @@ namespace Nimbus.Tests.Common.Stubs
 
         private static Serilog.ILogger CreateLogger()
         {
+            var seqServerUrl = AppSettingsLoader.Get<string>("logging.seq.url");
+
             var logger = new LoggerConfiguration()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()
-                .WriteTo.Seq("http://localhost:5341")
-                // .Chain(l =>
-                //        {
-                //            if (Debugger.IsAttached) l.WriteTo.Trace();
-                //        })
+                .WriteTo.Seq(seqServerUrl)
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 

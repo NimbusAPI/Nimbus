@@ -11,7 +11,7 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
     {
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            var connectionString = Environment.GetEnvironmentVariable("REDIS_TEST_CONNECTION") ?? "localhost";
+            var connectionString = AppSettingsLoader.Get<string>("transports.redis.connectionString");
 
             var configuration = new RedisTransportConfiguration()
                 .WithConnectionString(connectionString);
