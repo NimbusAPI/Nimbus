@@ -1,31 +1,11 @@
 version: "3"
 
 services:
-  nimbus-build:
+  nimbus:
     build:
       context: .
-      dockerfile: ./Dockerfiles/nimbus.build.Dockerfile
+      dockerfile: ./Dockerfile
       args:
         - BUILD_NUMBER
         - NUGET_API_KEY
-    image: nimbus-build:latest
-  nimbus-test:
-    build:
-      context: .
-      dockerfile: ./Dockerfiles/nimbus.test.Dockerfile
-    image: nimbus-test:latest
-    depends_on:
-      - nimbus-build
-      - redis-test
-  redis-test:
-    image: redis
-    expose:
-      - "6379"
-  nimbus-publish:
-    build:
-      context: .
-      dockerfile: ./Dockerfiles/nimbus.publish.Dockerfile
-      args:
-        - BUILD_NUMBER
-        - NUGET_API_KEY
-    image: nimbus-publish:latest
+    image: nimbus:${BUILD_NUMBER}

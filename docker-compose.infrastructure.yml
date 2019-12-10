@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  seq:
+    image: datalust/seq
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+    expose:
+      - 5341
+
+  redis:
+    image: redis
+    expose:
+      - 6379
