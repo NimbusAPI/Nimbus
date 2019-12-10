@@ -6,3 +6,4 @@
 artifacts
 dist
 tools
+**/appsettings.Development.json
