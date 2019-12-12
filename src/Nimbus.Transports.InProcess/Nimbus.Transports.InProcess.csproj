@@ -1,12 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-      <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
-      <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+      <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+      <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    </ItemGroup>
-     <PropertyGroup>
+    <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
         <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>

@@ -52,6 +52,7 @@ COPY ./src ./src
 
 RUN /bin/bash ./build.sh --Target="CI" --buildVersion="$BUILD_NUMBER"
 
+
 WORKDIR /sln
 
 

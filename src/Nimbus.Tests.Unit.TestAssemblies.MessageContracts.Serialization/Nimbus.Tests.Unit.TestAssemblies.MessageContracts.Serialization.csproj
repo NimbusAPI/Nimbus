@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
-    <ProjectReference Include="..\..\src\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="nunit" Version="3.12.0" />

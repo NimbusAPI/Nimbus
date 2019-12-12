@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
+    <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="serilog" Version="2.8.0" />
