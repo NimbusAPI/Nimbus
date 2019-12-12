@@ -18,6 +18,7 @@ using Nimbus.Tests.Unit.DispatcherTests.Handlers;
 using Nimbus.Tests.Unit.DispatcherTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
+#pragma warning disable 4014
 
 namespace Nimbus.Tests.Unit.DispatcherTests
 {
