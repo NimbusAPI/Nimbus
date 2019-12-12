@@ -7,6 +7,7 @@ using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Unit.DependencyResolverTests.TestInfrastructure;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes
 {
@@ -20,12 +21,11 @@ namespace Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes
             using (var scope = dependencyResolver.CreateChildScope())
             {
                 var handler = scope.Resolve(componentType);
-                //TODO: Fix
-                //handler.ShouldBeTypeOf(componentType);
+                handler.ShouldBeOfType(componentType);
             }
         }
 
-        public class TestCases : IEnumerable<TestCaseData>
+        private class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {
