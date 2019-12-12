@@ -1,4 +1,5 @@
 using System;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Dispatching
 {

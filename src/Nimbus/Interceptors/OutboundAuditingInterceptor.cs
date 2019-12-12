@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.ControlMessages;
-using Nimbus.PropertyInjection;
 
 namespace Nimbus.Interceptors
 {

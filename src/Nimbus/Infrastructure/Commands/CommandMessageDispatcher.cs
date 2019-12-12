@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.DependencyResolution;
 using Nimbus.Exceptions;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 

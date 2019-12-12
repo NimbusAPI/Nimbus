@@ -1,4 +1,6 @@
-﻿namespace Nimbus.Infrastructure.Logging
+﻿using Nimbus.InfrastructureContracts;
+
+namespace Nimbus.Infrastructure.Logging
 {
     internal static class DispatchLoggingContext
     {

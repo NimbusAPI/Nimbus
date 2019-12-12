@@ -1,5 +1,5 @@
 using System;
-using Nimbus.Filtering.Conditions;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
 namespace Nimbus.Infrastructure.Filtering
 {

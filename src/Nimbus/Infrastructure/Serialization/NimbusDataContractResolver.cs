@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using NullGuard;
 
 namespace Nimbus.Infrastructure.Serialization

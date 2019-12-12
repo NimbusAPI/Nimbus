@@ -7,6 +7,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {

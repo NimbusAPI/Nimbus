@@ -1,7 +1,7 @@
 using System;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts.Routing;
 using Nimbus.MessageContracts;
-using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.Routing
 {

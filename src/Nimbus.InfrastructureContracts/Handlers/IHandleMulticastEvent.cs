@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.Handlers
+namespace Nimbus.InfrastructureContracts.Handlers
 {
     public interface IHandleMulticastEvent<TBusEvent> where TBusEvent : IBusEvent
     {

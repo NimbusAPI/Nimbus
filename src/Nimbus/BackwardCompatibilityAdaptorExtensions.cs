@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
 namespace Nimbus

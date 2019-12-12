@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.DependencyResolution
+namespace Nimbus.InfrastructureContracts.DependencyResolution
 {
     public interface IDependencyResolver : ICreateChildScopes, IDisposable
     {

@@ -1,0 +1,21 @@
+using System.Collections;
+using System.Collections.Generic;
+using Nimbus.InfrastructureContracts.Routing;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Routers
+{
+    internal class RouterConfigurationSources : IEnumerable<IConfigurationScenario<IRouter>>
+    {
+        public IEnumerator<IConfigurationScenario<IRouter>> GetEnumerator()
+        {
+            yield return new DestinationPerMessageType();
+            yield return new SingleQueueAndTopicPerMessageType();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+}

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.PropertyInjection
+namespace Nimbus.InfrastructureContracts.PropertyInjection
 {
     /// <summary>
     /// Implement this interface to have the unique InstanceId of the current Bus instance injected into your handler.

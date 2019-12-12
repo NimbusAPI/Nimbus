@@ -4,12 +4,13 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Routing;
 using Nimbus.Interceptors.Outbound;
 using Nimbus.MessageContracts;
-using Nimbus.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {

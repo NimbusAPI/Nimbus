@@ -1,6 +1,7 @@
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Dispatching;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 
 namespace Nimbus.Infrastructure.PropertyInjection
 {
