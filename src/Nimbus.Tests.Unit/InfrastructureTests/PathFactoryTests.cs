@@ -39,7 +39,7 @@ namespace Nimbus.Tests.Unit.InfrastructureTests
         {
             var pathFactory = new PathFactory(new GlobalPrefixSetting());
             var path = pathFactory.QueuePathFor(typeof(MyCommand<string>));
-            path.ShouldBe("q.nimbus.unittests.infrastructuretests.messagecontracts.mycommand.1-string");
+            path.ShouldBe("q.nimbus.tests.unit.infrastructuretests.messagecontracts.mycommand.1-string");
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace Nimbus.Tests.Unit.InfrastructureTests
         {
             var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var path = pathFactory.QueuePathFor(typeof(SimpleCommand));
-            path.ShouldBe("testprefix.q.nimbus.unittests.infrastructuretests.messagecontracts.simplecommand");
+            path.ShouldBe("testprefix.q.nimbus.tests.unit.infrastructuretests.messagecontracts.simplecommand");
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace Nimbus.Tests.Unit.InfrastructureTests
         {
             var pathFactory = new PathFactory(new GlobalPrefixSetting {Value = "testprefix"});
             var path = pathFactory.TopicPathFor(typeof(SimpleEvent));
-            path.ShouldBe("testprefix.t.nimbus.unittests.infrastructuretests.messagecontracts.simpleevent");
+            path.ShouldBe("testprefix.t.nimbus.tests.unit.infrastructuretests.messagecontracts.simpleevent");
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace Nimbus.Tests.Unit.InfrastructureTests
 
             path.Length.ShouldBe(PathFactory.MaxPathLength);
 
-            var expectedFullPath = $"{prefix}.q.nimbus.unittests.infrastructuretests.messagecontracts.simplecommand";
+            var expectedFullPath = $"{prefix}.q.nimbus.tests.unit.infrastructuretests.messagecontracts.simplecommand";
             var expectedShortenedPath = PathFactory.Shorten(expectedFullPath, PathFactory.MaxPathLength);
             path.ShouldBe(expectedShortenedPath);
         }
@@ -114,7 +114,7 @@ namespace Nimbus.Tests.Unit.InfrastructureTests
 
             path.Length.ShouldBe(PathFactory.MaxPathLength);
 
-            var expectedFullPath = $"{prefix}.t.nimbus.unittests.infrastructuretests.messagecontracts.simpleevent";
+            var expectedFullPath = $"{prefix}.t.nimbus.tests.unit.infrastructuretests.messagecontracts.simpleevent";
             var expectedShortenedPath = PathFactory.Shorten(expectedFullPath, PathFactory.MaxPathLength);
             path.ShouldBe(expectedShortenedPath);
         }

@@ -16,7 +16,7 @@ namespace Nimbus.Tests.Unit.Conventions
         [TestCaseSource(typeof (TestCases))]
         public void MustBeInTheCoreNimbusNamespace(Type type)
         {
-            type.Namespace.ShouldBe("Nimbus");
+            type.Namespace.ShouldBe("Nimbus.InfrastructureContracts");
         }
 
         internal class TestCases : IEnumerable<TestCaseData>
