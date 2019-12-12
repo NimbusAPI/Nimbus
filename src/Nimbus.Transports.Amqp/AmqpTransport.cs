@@ -1,10 +1,10 @@
 ﻿using System;using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
-using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Serializers.Json;
 using Nimbus.Transports.Amqp.MessageSendersAndRecievers;
 
@@ -13,6 +13,10 @@ namespace Nimbus.Transports.Amqp
 {
     internal class AmqpTransport : INimbusTransport
     {
+        public AmqpTransport()
+        {
+        }
+
         public Task TestConnection()
         {
             return Task.CompletedTask;
@@ -20,7 +24,7 @@ namespace Nimbus.Transports.Amqp
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
-            return new AmqpMessageSender(queuePath);
+            return new AmqpMessageSender(queuePath, new JsonSerializer());
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)

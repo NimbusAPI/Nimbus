@@ -11,8 +11,8 @@
         <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
-        <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
         <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
     </ItemGroup>
     <ItemGroup>

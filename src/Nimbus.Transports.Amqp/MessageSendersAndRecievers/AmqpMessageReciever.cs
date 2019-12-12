@@ -5,6 +5,7 @@ using Amqp;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
 {
@@ -28,10 +29,10 @@ namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            var address = new Address("localhost:5672");
+            var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
             var connection = new Connection(address);
             var session = new Session(connection);
-            var receiver = new ReceiverLink(session, "receiver-drain", _queuePath);
+            var receiver = new ReceiverLink(session, "test", _queuePath);
 
             receiver.SetCredit(10);
 
@@ -45,9 +46,9 @@ namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
                     (NimbusMessage) _serializer.Deserialize(brokerMessage.Body.ToString(), typeof(NimbusMessage));
             }
 
-            receiver.Close();
-            session.Close();
-            connection.Close();
+            await receiver.CloseAsync();
+            await session.CloseAsync();
+            await connection.CloseAsync();
 
             return message;
         }
