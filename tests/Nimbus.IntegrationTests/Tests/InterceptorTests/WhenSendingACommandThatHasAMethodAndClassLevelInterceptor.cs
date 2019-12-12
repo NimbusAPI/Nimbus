@@ -6,6 +6,7 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
 using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;

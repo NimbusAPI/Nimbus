@@ -4,6 +4,7 @@ using Nimbus.Configuration;
 using Nimbus.Exceptions;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
 using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;

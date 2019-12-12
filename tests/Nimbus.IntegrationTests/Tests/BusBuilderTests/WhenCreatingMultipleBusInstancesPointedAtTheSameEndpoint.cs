@@ -6,6 +6,7 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Routing;
+using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Serializers.Json;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
+using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressors;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;

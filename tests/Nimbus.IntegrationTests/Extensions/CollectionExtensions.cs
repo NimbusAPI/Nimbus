@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nimbus.Extensions;
 
-namespace Nimbus.Tests.Common.Extensions
+namespace Nimbus.IntegrationTests.Extensions
 {
     internal static class CollectionExtensions
     {

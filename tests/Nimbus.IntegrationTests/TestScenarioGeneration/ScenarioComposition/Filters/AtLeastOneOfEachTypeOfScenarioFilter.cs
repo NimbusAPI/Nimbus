@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Tests.Common.Extensions;
+using Nimbus.IntegrationTests.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
 
