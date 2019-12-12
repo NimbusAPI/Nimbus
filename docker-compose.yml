@@ -1,11 +1,18 @@
 version: "3"
 
 services:
-  nimbus:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-      args:
-        - BUILD_NUMBER
-        - NUGET_API_KEY
-    image: nimbus:${BUILD_NUMBER}
+  seq:
+    image: datalust/seq
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+    expose:
+      - 5341
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379

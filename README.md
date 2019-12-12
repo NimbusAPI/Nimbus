@@ -10,7 +10,7 @@ For more information go to [The Nimbus website](http://nimbusapi.com/) or our [D
 
 ```bash
 git clone <this repository>
-docker-compose -f docker-compose.infrastructure.yml up -d
+docker-compose up -d
 dotnet test
 ```
 

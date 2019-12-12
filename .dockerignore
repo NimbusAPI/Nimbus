@@ -1,6 +1,6 @@
 .git
-.vs
-.vscode
+**/.vs
+**/.vscode
 **/bin/*
 **/obj/*
 artifacts

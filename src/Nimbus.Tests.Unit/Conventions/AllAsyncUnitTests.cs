@@ -16,19 +16,19 @@ namespace Nimbus.Tests.Unit.Conventions
     {
         [Test]
         [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldReturnTask(MethodInfo testMethod)
+        public void ShouldReturnTask(MethodInfo testMethod)
         {
             typeof (Task).IsAssignableFrom(testMethod.ReturnType).ShouldBe(true);
         }
 
         [Test]
         [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldBeAsync(MethodInfo testMethod)
+        public void ShouldBeAsync(MethodInfo testMethod)
         {
             testMethod.HasAttribute<AsyncStateMachineAttribute>().ShouldBe(true);
         }
 
-        internal class TestCases : IEnumerable<TestCaseData>
+        private class TestCases : IEnumerable<TestCaseData>
         {
             public IEnumerator<TestCaseData> GetEnumerator()
             {

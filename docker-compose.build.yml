@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  nimbus:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - BUILD_NUMBER
+        - NUGET_API_KEY
+    image: nimbus:${BUILD_NUMBER}
