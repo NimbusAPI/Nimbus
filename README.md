@@ -2,10 +2,23 @@
 
 Nimbus is a .NET client library to provide an easy abstraction over common messaging frameworks.
 
+## Developing using Nimbus
+
 For more information go to [The Nimbus website](http://nimbusapi.com/) or our [Documentation Wiki](https://github.com/NimbusAPI/Nimbus/wiki)
 
-## Developing Nimbus
+## Developing Nimbus itself
 
-1. git clone this repository
-2. `docker-compose -f docker-compose.infrastructure.yml up -d`
-3. Run the tests in your favourite IDE or command-line tool
+```bash
+git clone <this repository>
+docker-compose -f docker-compose.infrastructure.yml up -d
+dotnet test
+```
+
+### Development infrastructure
+
+There are two docker-compose files. The `docker-compose.infrastructure.yml` file will spin up:
+
+- a [Seq](https://datalust.co) server at <http://localhost:5341>
+- a [Redis](https://redis.io/) server at `localhost:6379`
+
+The integration tests are configured to run via the `appsettings.json` file within the build pipeline using standard Docker single-token service names. Locally, test configuration is overridden via the `appsettings.Development.json` file that points all of the services to the ports on localhost exposed by Docker.
