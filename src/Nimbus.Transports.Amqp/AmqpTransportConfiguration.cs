@@ -16,7 +16,7 @@ namespace Nimbus.Transports.Amqp
         protected override void RegisterComponents(PoorMansIoC container)
         {
             container.RegisterType<AmqpMessageSender>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<AmqpMessageReciever>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<AmqpMessageReceiver>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<AmqpTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
             container.RegisterType<AmqpDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<AmqpDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));

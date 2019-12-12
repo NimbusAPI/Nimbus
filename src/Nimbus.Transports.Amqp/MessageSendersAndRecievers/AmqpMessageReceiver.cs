@@ -9,12 +9,15 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
 {
-    internal class AmqpMessageReciever : ThrottlingMessageReceiver
+    internal class AmqpMessageReceiver : ThrottlingMessageReceiver
     {
         private readonly string _queuePath;
         private readonly ISerializer _serializer;
+        private ReceiverLink _receiver;
+        private Connection _connection;
+        private Session _session;
 
-        public AmqpMessageReciever(string queuePath, ISerializer serializer,
+        public AmqpMessageReceiver(string queuePath, ISerializer serializer,
             ConcurrentHandlerLimitSetting concurrentHandlerLimit, IGlobalHandlerThrottle globalHandlerThrottle,
             ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
@@ -24,18 +27,14 @@ namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
 
         protected override Task WarmUp()
         {
+            GetMessageReceiver();
             return Task.CompletedTask;
         }
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-            var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
-            var connection = new Connection(address);
-            var session = new Session(connection);
-            var receiver = new ReceiverLink(session, "test", _queuePath);
 
-            receiver.SetCredit(10);
-
+            var receiver = GetMessageReceiver();
             NimbusMessage message = null;
             var brokerMessage = await receiver.ReceiveAsync(TimeSpan.FromSeconds(300));
             if (brokerMessage != null)
@@ -46,11 +45,41 @@ namespace Nimbus.Transports.Amqp.MessageSendersAndRecievers
                     (NimbusMessage) _serializer.Deserialize(brokerMessage.Body.ToString(), typeof(NimbusMessage));
             }
 
-            await receiver.CloseAsync();
-            await session.CloseAsync();
-            await connection.CloseAsync();
-
             return message;
+        }
+        
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (!disposing) return;
+
+                DiscardMessageReceiver();
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
+        }
+        
+        private ReceiverLink GetMessageReceiver()
+        {
+            if (_receiver != null) return _receiver;
+            
+            var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
+            _connection = new Connection(address);
+            _session = new Session(_connection);
+            _receiver = new ReceiverLink(_session, "test", _queuePath);
+            _receiver.SetCredit(10);
+
+            return _receiver;
+        }
+
+        private async void DiscardMessageReceiver()
+        {
+            await _receiver.CloseAsync();
+            await _session.CloseAsync();
+            await _connection.CloseAsync();
         }
     }
 }
