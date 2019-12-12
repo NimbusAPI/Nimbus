@@ -1,5 +1,5 @@
 using System;
-using Nimbus.DependencyResolution;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
 namespace Nimbus.Tests.Common.Stubs
 {

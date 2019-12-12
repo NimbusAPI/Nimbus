@@ -2,13 +2,14 @@ using System;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Routing;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.BusBuilder
 {
     internal class BusBuilderScenario : CompositeScenario, IConfigurationScenario<BusBuilderConfiguration>
     {

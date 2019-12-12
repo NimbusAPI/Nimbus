@@ -1,9 +1,8 @@
 ﻿using Nimbus.Extensions;
-using Nimbus.Infrastructure.Logging;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.LoggingTests.TemplateNormalization
+namespace Nimbus.Tests.Unit.LoggingTests.TemplateNormalization
 {
     [TestFixture]
     public class WhenNormalizingStructuredLogTemplates

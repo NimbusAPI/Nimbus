@@ -1,7 +1,7 @@
 using System;
 using Nimbus.Configuration;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
     public class ContainerConfiguration
     {

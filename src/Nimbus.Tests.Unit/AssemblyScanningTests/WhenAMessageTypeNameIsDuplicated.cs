@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using Nimbus.Infrastructure;
-using Nimbus.UnitTests.TestAssemblies.MessageContracts;
+using Nimbus.Tests.Unit.TestAssemblies.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.AssemblyScanningTests
+namespace Nimbus.Tests.Unit.AssemblyScanningTests
 {
     [TestFixture]
     public class WhenAMessageTypeNameIsDuplicated

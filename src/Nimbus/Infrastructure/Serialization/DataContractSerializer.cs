@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Serialization
 {

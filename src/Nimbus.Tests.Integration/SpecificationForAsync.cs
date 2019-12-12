@@ -1,11 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Extensions;
-using Nimbus.Tests.Common.Extensions;
+using Nimbus.Tests.Integration.Extensions;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Integration
 {
     [TestFixture]
     //[Timeout(TimeoutSeconds*1000)]

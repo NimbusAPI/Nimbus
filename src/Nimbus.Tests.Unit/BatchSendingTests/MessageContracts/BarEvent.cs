@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.UnitTests.BatchSendingTests.MessageContracts
+namespace Nimbus.Tests.Unit.BatchSendingTests.MessageContracts
 {
     public class BarEvent : IBusEvent
     {

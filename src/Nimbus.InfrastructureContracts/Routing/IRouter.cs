@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Routing
+namespace Nimbus.InfrastructureContracts.Routing
 {
     public interface IRouter
     {

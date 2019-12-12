@@ -1,8 +1,8 @@
 ﻿using System;
-using Nimbus.Filtering;
-using Nimbus.Filtering.Conditions;
+using Nimbus.InfrastructureContracts.Filtering;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
-namespace Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.EventHandlers
+namespace Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.EventHandlers
 {
     public class MatchingSubscriptionFilter : ISubscriptionFilter
     {

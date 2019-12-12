@@ -1,10 +1,10 @@
 ﻿using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
-using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
+using Nimbus.Tests.Unit.InfrastructureTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.InfrastructureTests
+namespace Nimbus.Tests.Unit.InfrastructureTests
 {
     [TestFixture]
     public class PathFactoryTests

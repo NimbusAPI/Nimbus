@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.Extensions;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Integration
 {
     public static class AppDomainScanner
     {

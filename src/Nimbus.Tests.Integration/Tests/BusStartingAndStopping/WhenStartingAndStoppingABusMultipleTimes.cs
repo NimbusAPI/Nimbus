@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
+namespace Nimbus.Tests.Integration.Tests.BusStartingAndStopping
 {
     [TestFixture]
     public class WhenStartingAndStoppingABusMultipleTimes : TestForBus

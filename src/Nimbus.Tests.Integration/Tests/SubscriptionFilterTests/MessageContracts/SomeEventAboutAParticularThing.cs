@@ -1,7 +1,7 @@
 ﻿using System;
 using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.MessageContracts
 {
     public class SomeEventAboutAParticularThing: IBusEvent
     {

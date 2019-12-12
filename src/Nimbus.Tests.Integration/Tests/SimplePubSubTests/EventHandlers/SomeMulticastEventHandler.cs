@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimplePubSubTests.MessageContracts;
 
 #pragma warning disable 4014
 
-namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers
+namespace Nimbus.Tests.Integration.Tests.SimplePubSubTests.EventHandlers
 {
     public class SomeMulticastEventHandler : IHandleMulticastEvent<SomeEventWeOnlyHandleViaMulticast>, IHandleMulticastEvent<SomeEventWeHandleViaMulticastAndCompetition>, IRequireBusId
     {

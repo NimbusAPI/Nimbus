@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
-using Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes.MessageContracts;
+using Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes.MessageContracts;
 
 #pragma warning disable 4014
 
-namespace Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes.Handlers
+namespace Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes.Handlers
 {
     public class FooRequestHandler : IHandleRequest<FooRequest, FooResponse>, IRequireBusId
     {

@@ -5,6 +5,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.MessageSendersAndReceivers

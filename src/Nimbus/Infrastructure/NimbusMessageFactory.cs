@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using NullGuard;
 

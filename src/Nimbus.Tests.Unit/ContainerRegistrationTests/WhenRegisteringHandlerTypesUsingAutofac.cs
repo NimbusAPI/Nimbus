@@ -4,7 +4,7 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.ContainerRegistrationTests
+namespace Nimbus.Tests.Unit.ContainerRegistrationTests
 {
     [TestFixture]
     public class WhenRegisteringHandlerTypesUsingAutofac

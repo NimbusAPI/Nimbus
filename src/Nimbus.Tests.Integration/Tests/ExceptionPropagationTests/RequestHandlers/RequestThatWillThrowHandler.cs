@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Integration.Tests.ExceptionPropagationTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers
+namespace Nimbus.Tests.Integration.Tests.ExceptionPropagationTests.RequestHandlers
 {
     public class RequestThatWillThrowHandler : IHandleRequest<RequestThatWillThrow, RequestThatWillThrowResponse>
     {

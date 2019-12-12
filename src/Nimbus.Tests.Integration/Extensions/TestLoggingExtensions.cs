@@ -1,11 +1,11 @@
 using System;
-using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using Serilog;
 using Serilog.Events;
 
-namespace Nimbus.IntegrationTests.Extensions
+namespace Nimbus.Tests.Integration.Extensions
 {
     public static class TestLoggingExtensions
     {

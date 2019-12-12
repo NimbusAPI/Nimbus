@@ -1,5 +1,6 @@
-﻿using Nimbus.DependencyResolution;
-using Nimbus.Infrastructure;
+﻿using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
 namespace Nimbus.Interceptors.Outbound
 {

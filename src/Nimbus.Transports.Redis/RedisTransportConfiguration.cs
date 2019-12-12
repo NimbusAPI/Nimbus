@@ -8,6 +8,7 @@ using Nimbus.Configuration.Transport;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.Redis.Configuration;
 using Nimbus.Transports.Redis.ConnectionManagement;
 using Nimbus.Transports.Redis.DeadLetterOffice;

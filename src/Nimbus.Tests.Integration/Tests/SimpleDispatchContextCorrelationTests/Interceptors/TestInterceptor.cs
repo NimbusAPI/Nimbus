@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.PropertyInjection;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors
+namespace Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests.Interceptors
 {
     public class TestInterceptor : InboundInterceptor, IRequireDispatchContext, IRequireNimbusMessage
     {

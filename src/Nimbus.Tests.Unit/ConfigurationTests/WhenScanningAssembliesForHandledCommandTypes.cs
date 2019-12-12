@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.MessageContracts;
 using Shouldly;
 
-namespace Nimbus.UnitTests.ConfigurationTests
+namespace Nimbus.Tests.Unit.ConfigurationTests
 {
     public class WhenScanningAssembliesForHandledCommandTypes : SpecificationFor<AssemblyScanningTypeProvider>
     {

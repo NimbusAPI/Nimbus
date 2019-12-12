@@ -3,19 +3,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.Handlers;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.Interceptors;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Transports.InProcess;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.InterceptorTests
+namespace Nimbus.Tests.Integration.Tests.InterceptorTests
 {
     [TestFixture]
     public class WhenSendingACommandThatHasAMethodAndClassLevelInterceptor : SpecificationForAsync<Bus>

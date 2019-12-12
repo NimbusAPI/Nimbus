@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Nimbus.Filtering.Conditions
+namespace Nimbus.InfrastructureContracts.Filtering.Conditions
 {
     public class IsNullCondition : IFilterCondition
     {

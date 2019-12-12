@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.AbstractBaseTypeMessageTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.Handlers
+namespace Nimbus.Tests.Integration.Tests.AbstractBaseTypeMessageTests.Handlers
 {
     public class SomeConcreteRequestTypeMulticastHandler : IHandleMulticastRequest<SomeConcreteRequestType, SomeConcreteResponseType>, IRequireBusId
     {

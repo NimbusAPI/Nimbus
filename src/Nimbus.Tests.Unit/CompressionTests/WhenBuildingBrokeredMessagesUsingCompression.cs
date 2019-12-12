@@ -4,13 +4,14 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common.Stubs;
 using NSubstitute;
 using NUnit.Framework;
 using DataContractSerializer = Nimbus.Infrastructure.Serialization.DataContractSerializer;
 
-namespace Nimbus.UnitTests.CompressionTests
+namespace Nimbus.Tests.Unit.CompressionTests
 {
     internal class WhenBuildingNimbusMessagesUsingCompression : SpecificationForAsync<NimbusMessageFactory>
     {

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.InProcess;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports
 {
     internal class InProcess : ConfigurationScenario<TransportConfiguration>
     {

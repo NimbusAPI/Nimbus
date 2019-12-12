@@ -6,14 +6,15 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Routing;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
+using Nimbus.Tests.Unit.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.BatchSendingTests
+namespace Nimbus.Tests.Unit.BatchSendingTests
 {
     [TestFixture]
     internal class WhenPublishingACollectionOfEventsViaTheBusEventSender : SpecificationForAsync<BusEventSender>

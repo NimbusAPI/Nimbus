@@ -1,9 +1,9 @@
 ﻿using Nimbus.Infrastructure;
-using Nimbus.UnitTests.TestAssemblies.Handlers;
+using Nimbus.Tests.Unit.TestAssemblies.Handlers;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.AssemblyScanningTests
+namespace Nimbus.Tests.Unit.AssemblyScanningTests
 {
     [TestFixture]
     public class WhenAHandlerReferencesAMessageThatIsInAnAssemblyThatIsNotIncluded

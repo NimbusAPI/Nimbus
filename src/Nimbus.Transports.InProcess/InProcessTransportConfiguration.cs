@@ -4,6 +4,7 @@ using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.InProcess.DeadLetterOffice;
 using Nimbus.Transports.InProcess.DelayedDelivery;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;

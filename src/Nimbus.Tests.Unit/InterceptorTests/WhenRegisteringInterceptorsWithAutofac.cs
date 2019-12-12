@@ -2,16 +2,17 @@
 using Autofac;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.Interceptors.Outbound;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.InterceptorTests
+namespace Nimbus.Tests.Unit.InterceptorTests
 {
     [TestFixture]
     public class WhenRegisteringInterceptorsWithAutofac

@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.UnitTests.TestAssemblies.MessageContracts
+namespace Nimbus.Tests.Unit.TestAssemblies.MessageContracts
 {
     /// <summary>
     ///     We use this message type to test our AssemblyScanningTypeProvider by having a handler for this

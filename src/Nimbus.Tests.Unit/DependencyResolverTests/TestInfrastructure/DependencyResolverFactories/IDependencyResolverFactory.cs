@@ -1,6 +1,7 @@
-using Nimbus.DependencyResolution;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories
+namespace Nimbus.Tests.Unit.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories
 {
     public interface IDependencyResolverFactory
     {

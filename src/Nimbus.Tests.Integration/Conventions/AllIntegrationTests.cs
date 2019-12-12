@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Conventions
+namespace Nimbus.Tests.Integration.Conventions
 {
     [TestFixture]
     //[Timeout(TimeoutSeconds*1000)]

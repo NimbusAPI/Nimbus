@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.Redis.MessageSendersAndReceivers;
 using StackExchange.Redis;
 

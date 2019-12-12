@@ -1,7 +1,8 @@
 ﻿using System;
+using Nimbus.InfrastructureContracts;
 using ISerilogLogger = Serilog.ILogger;
 
-namespace Nimbus.Logger.Serilog
+namespace Nimbus.Logger.Serilog.Logger.Serilog
 {
     public class SerilogLogger : ILogger
     {

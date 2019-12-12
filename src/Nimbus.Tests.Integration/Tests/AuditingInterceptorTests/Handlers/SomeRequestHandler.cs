@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Integration.Tests.AuditingInterceptorTests.MessageTypes;
 
-namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.Handlers
+namespace Nimbus.Tests.Integration.Tests.AuditingInterceptorTests.Handlers
 {
     public class SomeRequestHandler : IHandleRequest<SomeRequest, SomeResponse>
     {

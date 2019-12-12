@@ -1,19 +1,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimplePubSubTests.EventHandlers;
+using Nimbus.Tests.Integration.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
 #pragma warning disable 4014
 
-namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
+namespace Nimbus.Tests.Integration.Tests.SimplePubSubTests
 {
     [TestFixture]
     public class WhenPublishingAnEventThatWeHandleViaCompetitionAndMulticast : TestForBus

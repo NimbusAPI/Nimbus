@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.SimplePubSubTests.MessageContracts
 {
     public class SomeEventWeOnlyHandleViaMulticast : IBusEvent
     {

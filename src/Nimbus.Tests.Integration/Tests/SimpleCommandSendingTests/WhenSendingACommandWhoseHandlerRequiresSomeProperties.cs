@@ -1,17 +1,15 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers;
-using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests.CommandHandlers;
+using Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests
+namespace Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests
 {
     [TestFixture]
     public class WhenSendingACommandWhoseHandlerRequiresSomeProperties : TestForBus

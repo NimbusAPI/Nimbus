@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.ConfigurationTests
+namespace Nimbus.Tests.Unit.ConfigurationTests
 {
     [TestFixture]
     public class WhenLookingForClosedTypesOfAnOpenGeneric

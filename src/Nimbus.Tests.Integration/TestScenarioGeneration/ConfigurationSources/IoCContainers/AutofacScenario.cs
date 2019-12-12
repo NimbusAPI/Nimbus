@@ -1,8 +1,8 @@
 using Autofac;
 using Nimbus.Configuration;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
     internal class AutofacScenario : ConfigurationScenario<ContainerConfiguration>
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using Nimbus.Infrastructure;
-using Nimbus.UnitTests.DelayedSendingTests.MessageContracts;
+using Nimbus.InfrastructureContracts;
+using Nimbus.Tests.Unit.DelayedSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.DelayedSendingTests
+namespace Nimbus.Tests.Unit.DelayedSendingTests
 {
     [TestFixture]
     public class WhenSendingACommandThatIsDelayedByAnHour : SpecificationFor<IBus>

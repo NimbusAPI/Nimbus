@@ -2,16 +2,15 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.PoisonMessageTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
+namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests
 {
     [TestFixture]
     public class WhenACommandFailsToBeHandledMoreThanNTimes : TestForBus

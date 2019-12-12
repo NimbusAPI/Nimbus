@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition.Filters
 {
     public class InProcessScenariosFilter : IScenarioFilter
     {

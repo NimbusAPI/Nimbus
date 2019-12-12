@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using Nimbus.Infrastructure;
-using Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization;
+using Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.AssemblyScanningTests
+namespace Nimbus.Tests.Unit.AssemblyScanningTests
 {
     [TestFixture]
     public class WhenAUnserializableAMessageThatIsInAnAssemblyThatIsNotIncluded

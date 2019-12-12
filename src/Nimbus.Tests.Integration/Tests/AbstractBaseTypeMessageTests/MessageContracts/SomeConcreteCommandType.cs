@@ -1,4 +1,4 @@
-﻿namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts
+﻿namespace Nimbus.Tests.Integration.Tests.AbstractBaseTypeMessageTests.MessageContracts
 {
     /// <summary>
     ///     We use this message type to confirm that our AssemblyScanningTypeProvider can handle message

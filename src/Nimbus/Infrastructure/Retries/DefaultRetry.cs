@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Retries
 {

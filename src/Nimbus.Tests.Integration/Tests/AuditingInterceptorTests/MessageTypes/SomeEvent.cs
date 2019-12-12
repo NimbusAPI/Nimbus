@@ -1,6 +1,6 @@
 using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes
+namespace Nimbus.Tests.Integration.Tests.AuditingInterceptorTests.MessageTypes
 {
     public class SomeEvent : IBusEvent
     {

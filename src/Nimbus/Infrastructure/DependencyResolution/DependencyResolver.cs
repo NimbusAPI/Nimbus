@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Nimbus.ConcurrentCollections;
-using Nimbus.DependencyResolution;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
 namespace Nimbus.Infrastructure.DependencyResolution
 {

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.Conventions
+namespace Nimbus.Tests.Unit.Conventions
 {
     [TestFixture]
     [Category("Convention")]

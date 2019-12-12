@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using JsonSerializer = Nimbus.Serializers.Json.JsonSerializer;
+using Nimbus.Configuration;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Serializers.Json.Configuration
 {
     /// <summary>
     ///     Extends <see cref="BusBuilderConfiguration" /> with support for the Json.Net serialization framework.

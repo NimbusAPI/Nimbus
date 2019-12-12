@@ -2,7 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Routing;
 using StackExchange.Redis;
 
 namespace Nimbus.Transports.Redis.DeadLetterOffice

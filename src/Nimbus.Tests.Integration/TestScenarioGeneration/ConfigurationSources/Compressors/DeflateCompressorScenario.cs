@@ -1,7 +1,8 @@
 ﻿using Nimbus.Infrastructure.Compression;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.InfrastructureContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressors
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Compressors
 {
     public class DeflateCompressorScenario : ConfigurationScenario<ICompressor>
     {

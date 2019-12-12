@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.MulticastRequestResponseTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.RequestHandlers
+namespace Nimbus.Tests.Integration.Tests.MulticastRequestResponseTests.RequestHandlers
 {
     public class SlowBlackBallRequestHandler : IHandleMulticastRequest<BlackBallRequest, BlackBallResponse>, IRequireBusId
     {

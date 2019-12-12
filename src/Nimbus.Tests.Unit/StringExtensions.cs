@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Unit
 {
     public static class StringExtensions
     {

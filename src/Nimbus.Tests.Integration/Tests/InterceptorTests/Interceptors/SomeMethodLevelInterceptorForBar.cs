@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.TestUtilities;
 
-namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors
+namespace Nimbus.Tests.Integration.Tests.InterceptorTests.Interceptors
 {
     public class SomeMethodLevelInterceptorForBar : InboundInterceptor, IRequireBusId
     {

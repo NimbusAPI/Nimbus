@@ -5,7 +5,7 @@ using Nimbus.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.DateTimeOffsetTests
+namespace Nimbus.Tests.Unit.DateTimeOffsetTests
 {
     public class WhenAddingValuesToADateTime
     {

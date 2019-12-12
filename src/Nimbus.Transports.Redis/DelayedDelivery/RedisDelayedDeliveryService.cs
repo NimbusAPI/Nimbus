@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.Redis.DelayedDelivery
 {

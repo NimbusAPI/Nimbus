@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.InfrastructureContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Serializers
 {
     public class SerializerConfigurationSources : IEnumerable<IConfigurationScenario<ISerializer>>
     {

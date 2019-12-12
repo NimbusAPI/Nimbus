@@ -1,4 +1,4 @@
-namespace Nimbus.Routing
+namespace Nimbus.InfrastructureContracts.Routing
 {
     public enum QueueOrTopic
     {

@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Integration.Tests.BusStartingAndStopping.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers
+namespace Nimbus.Tests.Integration.Tests.BusStartingAndStopping.Handlers
 {
     public class QuickCommandHandler : IHandleCommand<QuickCommand>
     {

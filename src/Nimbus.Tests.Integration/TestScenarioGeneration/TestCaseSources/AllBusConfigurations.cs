@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nimbus.IntegrationTests.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
+using Nimbus.Tests.Integration.Extensions;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.BusBuilder;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition.Filters;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources
 {
     public class AllBusConfigurations<TTestType> : IEnumerable<TestCaseData>
     {

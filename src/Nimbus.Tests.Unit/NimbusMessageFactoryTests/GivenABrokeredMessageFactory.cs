@@ -2,9 +2,10 @@
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.InfrastructureContracts;
 using NSubstitute;
 
-namespace Nimbus.UnitTests.NimbusMessageFactoryTests
+namespace Nimbus.Tests.Unit.NimbusMessageFactoryTests
 {
     internal abstract class GivenANimbusMessageFactory : SpecificationForAsync<NimbusMessageFactory>
     {

@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.InProcess.QueueManagement;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers

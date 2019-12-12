@@ -4,13 +4,12 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
-using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Extensions;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Integration
 {
     [TestFixture]
     [Timeout(TimeoutSeconds*1000)]

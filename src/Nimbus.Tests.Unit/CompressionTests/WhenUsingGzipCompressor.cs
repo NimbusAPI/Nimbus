@@ -3,7 +3,7 @@ using Nimbus.Infrastructure.Compression;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.CompressionTests
+namespace Nimbus.Tests.Unit.CompressionTests
 {
     internal class WhenUsingGzipCompressor : SpecificationFor<GzipCompressor>
     {

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Nimbus.UnitTests.TestAssemblies.MessageContracts
+namespace Nimbus.Tests.Unit.TestAssemblies.MessageContracts
 {
     public class WhenTheTestHarnessRuns
     {

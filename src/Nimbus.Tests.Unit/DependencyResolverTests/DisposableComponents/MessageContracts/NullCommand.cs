@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.DisposableComponents.MessageContracts
+namespace Nimbus.Tests.Unit.DependencyResolverTests.DisposableComponents.MessageContracts
 {
     public class NullCommand : IBusCommand
     {

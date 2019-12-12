@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes;
-using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories;
+using Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes;
+using Nimbus.Tests.Unit.DependencyResolverTests.TestInfrastructure.DependencyResolverFactories;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure
+namespace Nimbus.Tests.Unit.DependencyResolverTests.TestInfrastructure
 {
     internal static class TestHarnessDependencyResolversFactory
     {

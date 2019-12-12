@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
-using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.InProcess.MessageSendersAndReceivers;
 using Nimbus.Transports.InProcess.QueueManagement;
 

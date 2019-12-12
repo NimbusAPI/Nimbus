@@ -1,8 +1,8 @@
 ﻿using System;
 using Autofac;
-using Nimbus.DependencyResolution;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
-namespace Nimbus.Autofac.Infrastructure
+namespace Nimbus.Containers.Autofac.Infrastructure
 {
     public class AutofacDependencyResolverScope : IDependencyResolverScope
     {

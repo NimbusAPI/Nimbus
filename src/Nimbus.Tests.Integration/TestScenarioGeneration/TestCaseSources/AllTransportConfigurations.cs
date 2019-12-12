@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 using NUnit.Framework;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources
 {
     public class AllTransportConfigurations : IEnumerable<TestCaseData>
     {

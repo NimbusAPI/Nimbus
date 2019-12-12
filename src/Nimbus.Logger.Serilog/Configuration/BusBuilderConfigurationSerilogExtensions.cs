@@ -1,7 +1,9 @@
-﻿using Nimbus.Logger.Serilog;
+﻿using Nimbus.Configuration;
+using Nimbus.Logger.Serilog.Logger.Serilog;
+using Serilog;
 using ISerilogLogger = Serilog.ILogger;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Logger.Serilog.Configuration
 {
     /// <summary>
     ///     Extends <see cref="BusBuilderConfiguration" /> with support for the Serilog logging framework.
@@ -9,7 +11,7 @@ namespace Nimbus.Configuration
     public static class BusBuilderConfigurationSerilogExtensions
     {
         /// <summary>
-        ///     Log to the provided Serilog <see cref="Serilog.ILogger" />.
+        ///     Log to the provided Serilog <see cref="ILogger" />.
         /// </summary>
         /// <param name="configuration">The bus configuration to apply the logger to.</param>
         /// <param name="logger">The logger.</param>
@@ -21,7 +23,7 @@ namespace Nimbus.Configuration
         }
 
         /// <summary>
-        ///     Log to the Serilog <see cref="Serilog.Log" /> class.
+        ///     Log to the Serilog <see cref="Log" /> class.
         /// </summary>
         /// <param name="configuration">The bus configuration to apply the logger to.</param>
         /// <returns>Bus configuration.</returns>

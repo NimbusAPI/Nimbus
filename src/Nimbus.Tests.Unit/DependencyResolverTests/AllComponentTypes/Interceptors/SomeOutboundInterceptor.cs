@@ -1,6 +1,6 @@
 ﻿using Nimbus.Interceptors.Outbound;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes.Interceptors
+namespace Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes.Interceptors
 {
     internal class SomeOutboundInterceptor : OutboundInterceptor
     {

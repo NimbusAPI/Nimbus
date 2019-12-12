@@ -1,8 +1,9 @@
 ﻿using Nimbus.Infrastructure.Logging;
+using Nimbus.InfrastructureContracts;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Nimbus.Enrichers
+namespace Nimbus.Logger.Serilog.Enrichers
 {
     public class NimbusMessageEnricher : ILogEventEnricher
     {

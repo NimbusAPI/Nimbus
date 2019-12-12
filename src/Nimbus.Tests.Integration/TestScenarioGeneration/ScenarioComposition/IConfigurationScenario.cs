@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition
 {
     public interface IConfigurationScenario
     {

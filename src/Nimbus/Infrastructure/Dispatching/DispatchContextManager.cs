@@ -1,6 +1,7 @@
 using System;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Dispatching
 {

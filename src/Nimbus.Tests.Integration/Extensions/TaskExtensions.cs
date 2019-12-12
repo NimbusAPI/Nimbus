@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Nimbus.IntegrationTests.Extensions
+namespace Nimbus.Tests.Integration.Extensions
 {
     public static class TaskExtensions
     {

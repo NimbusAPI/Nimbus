@@ -1,8 +1,9 @@
 ﻿using System;
 using log4net;
 using Nimbus.Infrastructure.Logging;
+using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Logger.Log4net
+namespace Nimbus.Logger.Log4net.Logger.Log4Net
 {
     public class Log4NetLogger : ILogger
     {

@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests.MessageContracts
 {
     public class GoBangCommand : IBusCommand
     {

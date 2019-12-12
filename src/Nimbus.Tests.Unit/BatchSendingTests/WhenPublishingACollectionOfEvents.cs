@@ -5,13 +5,14 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
-using Nimbus.UnitTests.BatchSendingTests.MessageContracts;
+using Nimbus.Tests.Unit.BatchSendingTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.BatchSendingTests
+namespace Nimbus.Tests.Unit.BatchSendingTests
 {
     [TestFixture]
     public class WhenPublishingACollectionOfEvents : SpecificationForAsync<Bus>

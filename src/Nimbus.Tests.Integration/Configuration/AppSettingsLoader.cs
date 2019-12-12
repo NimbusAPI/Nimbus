@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 
-namespace Nimbus.IntegrationTests.Configuration
+namespace Nimbus.Tests.Integration.Configuration
 {
     public static class AppSettingsLoader {
         private static readonly Lazy<AppSettings> _configuration = new Lazy<AppSettings> (Build);

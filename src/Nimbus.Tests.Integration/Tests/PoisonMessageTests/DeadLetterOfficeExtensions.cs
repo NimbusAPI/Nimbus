@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests
+namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests
 {
     internal static class DeadLetterOfficeExtensions
     {

@@ -7,6 +7,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
 {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.Interceptors;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers
+namespace Nimbus.Tests.Integration.Tests.InterceptorTests.Handlers
 {
     [Interceptor(typeof (SomeClassLevelInterceptor))]
     public class MultipleCommandHandler : SomeBaseCommandHandler, IRequireBusId

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.Redis.Configuration;
 using StackExchange.Redis;
 

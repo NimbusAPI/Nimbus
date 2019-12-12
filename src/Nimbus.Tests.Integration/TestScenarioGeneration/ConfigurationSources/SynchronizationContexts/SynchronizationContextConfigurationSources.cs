@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts
 {
     public class SynchronizationContextConfigurationSources : IEnumerable<IConfigurationScenario<SyncContextConfiguration>>
     {

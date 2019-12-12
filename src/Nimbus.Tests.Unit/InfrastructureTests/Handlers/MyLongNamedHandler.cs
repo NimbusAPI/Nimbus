@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.UnitTests.InfrastructureTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Unit.InfrastructureTests.MessageContracts;
 
-namespace Nimbus.UnitTests.InfrastructureTests.Handlers
+namespace Nimbus.Tests.Unit.InfrastructureTests.Handlers
 {
     public class MyLongNamedHandler : IHandleMulticastEvent<MyEventWithALongName>
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.PoisonMessageTests.MessageContracts;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.PoisonMessageTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.PoisonMessageTests.EventHandlers
+namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests.EventHandlers
 {
     public class DoesNotGoBangCompetingEventHandler : IHandleCompetingEvent<GoBangEvent>, IRequireBusId
     {

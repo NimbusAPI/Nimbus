@@ -1,8 +1,5 @@
 using System;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
-using Nimbus.Filtering.Conditions;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Dispatching;
@@ -11,12 +8,16 @@ using Nimbus.Infrastructure.Filtering;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.Serialization;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.MessageContracts;
 using Nimbus.Tests.Common.Stubs;
 using NSubstitute;
 
-namespace Nimbus.UnitTests.DispatcherTests
+namespace Nimbus.Tests.Unit.DispatcherTests
 {
     public abstract class MessageDispatcherTestBase
     {

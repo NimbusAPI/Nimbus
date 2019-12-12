@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.MulticastRequestResponseTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.MulticastRequestResponseTests.MessageContracts
 {
     public class BlackBallResponse : IBusMulticastResponse
     {

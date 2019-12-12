@@ -1,7 +1,8 @@
-﻿using Nimbus.Logger.Log4net;
-using log4net;
+﻿using log4net;
+using Nimbus.Configuration;
+using Nimbus.Logger.Log4net.Logger.Log4Net;
 
-namespace Nimbus.Configuration
+namespace Nimbus.Logger.Log4net.Configuration
 {
     /// <summary>
     ///     Extends <see cref="BusBuilderConfiguration" /> with support for the Log4net logging framework.

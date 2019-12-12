@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Integration.Tests.SimpleRequestResponseTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleRequestResponseTests.RequestHandlers
+namespace Nimbus.Tests.Integration.Tests.SimpleRequestResponseTests.RequestHandlers
 {
     public class SomeRequestHandler : IHandleRequest<SomeRequest, SomeResponse>
     {

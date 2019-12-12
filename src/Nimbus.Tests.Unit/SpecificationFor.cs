@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Unit
 {
     [TestFixture]
     public abstract class SpecificationFor<T> where T : class

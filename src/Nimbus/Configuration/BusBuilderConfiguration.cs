@@ -3,7 +3,6 @@ using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
-using Nimbus.DependencyResolution;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
@@ -20,9 +19,11 @@ using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Infrastructure.Serialization;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Routing;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {

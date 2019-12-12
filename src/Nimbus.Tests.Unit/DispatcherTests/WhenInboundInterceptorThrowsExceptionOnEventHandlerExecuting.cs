@@ -1,11 +1,12 @@
 ﻿using System;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Interceptors.Inbound;
-using Nimbus.UnitTests.DispatcherTests.Handlers;
-using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using Nimbus.Tests.Unit.DispatcherTests.Handlers;
+using Nimbus.Tests.Unit.DispatcherTests.MessageContracts;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.DispatcherTests
+namespace Nimbus.Tests.Unit.DispatcherTests
 {
     public class WhenInboundInterceptorThrowsExceptionOnEventHandlerExecutin : MessageDispatcherTestBase
     {

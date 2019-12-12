@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers
+namespace Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests.CommandHandlers
 {
     public class SecondCommandHandler : IHandleCommand<SecondCommand>, IRequireBus, IRequireBusId
     {

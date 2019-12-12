@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.MulticastRequestResponseTests
+namespace Nimbus.Tests.Unit.MulticastRequestResponseTests
 {
     [TestFixture]
     internal class WhenTakingASingleResponse : GivenAWrapperWithTwoResponses

@@ -1,4 +1,4 @@
-namespace Nimbus.IntegrationTests.Configuration
+namespace Nimbus.Tests.Integration.Configuration
 {
     public class AppSettings
     {

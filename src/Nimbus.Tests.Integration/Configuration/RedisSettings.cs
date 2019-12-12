@@ -1,6 +1,4 @@
-using Nimbus.Transports.Redis.Configuration;
-
-namespace Nimbus.IntegrationTests.Configuration
+namespace Nimbus.Tests.Integration.Configuration
 {
     public class RedisSettings
     {

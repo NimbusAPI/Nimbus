@@ -1,17 +1,16 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
-using Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests.Interceptors;
+using Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleDispatchContextCorrelationTests
+namespace Nimbus.Tests.Integration.Tests.SimpleDispatchContextCorrelationTests
 {
     [TestFixture]
     public class WhenSendingACascadeOfCommands : TestForBus

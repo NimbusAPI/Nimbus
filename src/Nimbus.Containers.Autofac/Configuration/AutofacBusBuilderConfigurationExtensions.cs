@@ -1,5 +1,6 @@
 ﻿using Autofac;
-using Nimbus.DependencyResolution;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
 // ReSharper disable CheckNamespace
 

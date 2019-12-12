@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests.MessageContracts
 {
     public class SomeCommandThatHasNoHandler : IBusCommand
     {

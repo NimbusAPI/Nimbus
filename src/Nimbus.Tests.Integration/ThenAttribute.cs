@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Integration
 {
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class ThenAttribute : Attribute

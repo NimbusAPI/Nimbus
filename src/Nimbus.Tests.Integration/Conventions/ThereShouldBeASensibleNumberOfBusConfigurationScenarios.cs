@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition.Filters;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Conventions
+namespace Nimbus.Tests.Integration.Conventions
 {
     public class ConfigurationScenarioTests
     {

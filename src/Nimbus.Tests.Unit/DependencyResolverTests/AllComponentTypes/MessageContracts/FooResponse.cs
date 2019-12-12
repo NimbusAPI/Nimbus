@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.AllComponentTypes.MessageContracts
+namespace Nimbus.Tests.Unit.DependencyResolverTests.AllComponentTypes.MessageContracts
 {
     public class FooResponse : IBusResponse
     {

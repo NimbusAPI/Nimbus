@@ -1,4 +1,5 @@
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
 {

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.DependencyResolution;
@@ -10,15 +9,17 @@ using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.Serialization;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Common.TestUtilities;
-using Nimbus.UnitTests.DispatcherTests.Handlers;
-using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using Nimbus.Tests.Unit.DispatcherTests.Handlers;
+using Nimbus.Tests.Unit.DispatcherTests.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.DispatcherTests
+namespace Nimbus.Tests.Unit.DispatcherTests
 {
     [TestFixture]
     internal class WhenDispatchingTwoCommands : SpecificationForAsync<CommandMessageDispatcher>

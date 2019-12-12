@@ -2,15 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nimbus.DependencyResolution;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.UnitTests.DependencyResolverTests.DisposableComponents.Handlers;
-using Nimbus.UnitTests.DependencyResolverTests.TestInfrastructure;
+using Nimbus.Tests.Unit.DependencyResolverTests.DisposableComponents.Handlers;
+using Nimbus.Tests.Unit.DependencyResolverTests.TestInfrastructure;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.DisposableComponents
+namespace Nimbus.Tests.Unit.DependencyResolverTests.DisposableComponents
 {
     [TestFixture]
     public class WhenResolvingDisposableComponentsFromADependencyResolver

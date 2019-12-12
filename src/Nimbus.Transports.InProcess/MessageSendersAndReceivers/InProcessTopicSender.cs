@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.InProcess.QueueManagement;
 
 namespace Nimbus.Transports.InProcess.MessageSendersAndReceivers

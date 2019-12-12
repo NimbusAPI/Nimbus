@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.SimplePubSubTests
+namespace Nimbus.Tests.Integration.Tests.SimplePubSubTests
 {
     public class WhenPublishingAnEventThatIsNotHandled : TestForBus
     {

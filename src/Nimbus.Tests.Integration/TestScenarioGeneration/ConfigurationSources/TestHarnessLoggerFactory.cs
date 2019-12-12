@@ -1,12 +1,13 @@
 ﻿using System;
 using Nimbus.ConcurrentCollections;
-using Nimbus.Enrichers;
-using Nimbus.IntegrationTests.Configuration;
-using Nimbus.Logger.Serilog;
+using Nimbus.Logger.Serilog.Enrichers;
+using Nimbus.Logger.Serilog.Logger.Serilog;
+using Nimbus.Tests.Integration.Configuration;
 using Serilog;
 using Serilog.Exceptions;
+using ILogger = Nimbus.InfrastructureContracts.ILogger;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources
 {
     public class TestHarnessLoggerFactory
     {

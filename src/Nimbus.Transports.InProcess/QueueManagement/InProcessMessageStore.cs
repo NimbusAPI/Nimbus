@@ -1,4 +1,5 @@
 ﻿using Nimbus.ConcurrentCollections;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.InProcess.QueueManagement
 {

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Nimbus.UnitTests.TestAssemblies.Handlers
+namespace Nimbus.Tests.Unit.TestAssemblies.Handlers
 {
     public class WhenTheTestHarnessRuns
     {

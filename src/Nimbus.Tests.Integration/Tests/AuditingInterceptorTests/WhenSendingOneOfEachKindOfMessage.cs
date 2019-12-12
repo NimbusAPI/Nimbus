@@ -2,17 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.Tests.AuditingInterceptorTests.MessageTypes;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.AuditingInterceptorTests
+namespace Nimbus.Tests.Integration.Tests.AuditingInterceptorTests
 {
     public class WhenSendingOneOfEachKindOfMessage : TestForBus
     {

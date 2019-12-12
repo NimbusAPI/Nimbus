@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts
+namespace Nimbus.Tests.Integration.Tests.AbstractBaseTypeMessageTests.MessageContracts
 {
     public class SomeConcreteResponseType : IBusResponse, IBusMulticastResponse
     {

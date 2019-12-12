@@ -2,7 +2,7 @@
 using Nimbus.Infrastructure.RequestResponse;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests.MulticastRequestResponseTests
+namespace Nimbus.Tests.Unit.MulticastRequestResponseTests
 {
     [TestFixture]
     internal abstract class GivenAWrapperWithTwoResponses : SpecificationFor<MulticastRequestResponseCorrelationWrapper<string>>

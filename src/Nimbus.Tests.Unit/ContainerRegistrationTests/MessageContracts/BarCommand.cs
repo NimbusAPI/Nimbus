@@ -1,6 +1,6 @@
 ﻿using Nimbus.MessageContracts;
 
-namespace Nimbus.UnitTests.ContainerRegistrationTests.MessageContracts
+namespace Nimbus.Tests.Unit.ContainerRegistrationTests.MessageContracts
 {
     public class BarCommand : IBusCommand
     {

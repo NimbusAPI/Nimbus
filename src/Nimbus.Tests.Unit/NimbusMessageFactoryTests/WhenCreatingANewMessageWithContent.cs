@@ -2,11 +2,11 @@ using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
-using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.NimbusMessageFactoryTests
+namespace Nimbus.Tests.Unit.NimbusMessageFactoryTests
 {
     [TestFixture]
     internal class WhenCreatingANewMessageWithContent : GivenANimbusMessageFactory

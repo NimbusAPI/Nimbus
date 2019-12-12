@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Nimbus.Extensions;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition
 {
     [DebuggerDisplay("{Name}")]
     internal abstract class CompositeScenario : IConfigurationScenario

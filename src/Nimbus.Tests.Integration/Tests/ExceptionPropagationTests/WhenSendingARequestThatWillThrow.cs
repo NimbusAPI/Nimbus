@@ -2,15 +2,14 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Exceptions;
-using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.MessageContracts;
-using Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.Tests.ExceptionPropagationTests.MessageContracts;
+using Nimbus.Tests.Integration.Tests.ExceptionPropagationTests.RequestHandlers;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests
+namespace Nimbus.Tests.Integration.Tests.ExceptionPropagationTests
 {
     [TestFixture]
     public class WhenSendingARequestThatWillThrow : TestForBus

@@ -6,14 +6,15 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Serializers.Json;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests.Tests.BusBuilderTests
+namespace Nimbus.Tests.Integration.Tests.BusBuilderTests
 {
     [TestFixture]
     //[Timeout(TimeoutSeconds*1000)]

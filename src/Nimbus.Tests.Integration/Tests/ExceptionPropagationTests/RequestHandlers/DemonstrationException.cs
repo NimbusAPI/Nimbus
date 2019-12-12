@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Nimbus.IntegrationTests.Tests.ExceptionPropagationTests.RequestHandlers
+namespace Nimbus.Tests.Integration.Tests.ExceptionPropagationTests.RequestHandlers
 {
     [Serializable]
     public class DemonstrationException : Exception

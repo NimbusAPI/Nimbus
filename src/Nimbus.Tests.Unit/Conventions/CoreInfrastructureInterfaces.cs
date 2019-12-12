@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Nimbus.InfrastructureContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.Conventions
+namespace Nimbus.Tests.Unit.Conventions
 {
     [TestFixture]
     [Category("Convention")]

@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.BusStartingAndStopping.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers
+namespace Nimbus.Tests.Integration.Tests.BusStartingAndStopping.Handlers
 {
     public class SlowCommandHandler : IHandleCommand<SlowCommand>, IRequireBusId
     {

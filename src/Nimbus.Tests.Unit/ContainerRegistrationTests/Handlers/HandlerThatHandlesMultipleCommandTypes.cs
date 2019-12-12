@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.UnitTests.ContainerRegistrationTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Unit.ContainerRegistrationTests.MessageContracts;
 
-namespace Nimbus.UnitTests.ContainerRegistrationTests.Handlers
+namespace Nimbus.Tests.Unit.ContainerRegistrationTests.Handlers
 {
     public class HandlerThatHandlesMultipleCommandTypes : IHandleCommand<FooCommand>, IHandleCommand<BarCommand>
     {

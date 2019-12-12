@@ -4,12 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Nimbus.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.Conventions
+namespace Nimbus.Tests.Unit.Conventions
 {
     [TestFixture]
     [Category("Convention")]

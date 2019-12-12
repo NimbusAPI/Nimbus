@@ -1,5 +1,6 @@
 using System;
 using Nimbus.Infrastructure;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Tests.Common.Stubs
 {

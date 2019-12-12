@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.MessageContracts;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.SimpleCommandSendingTests.CommandHandlers
+namespace Nimbus.Tests.Integration.Tests.SimpleCommandSendingTests.CommandHandlers
 {
     public class SomeOtherCommandHandler : IHandleCommand<SomeOtherCommand>, IRequireDispatchContext, IRequireMessageProperties, IRequireBusId
     {

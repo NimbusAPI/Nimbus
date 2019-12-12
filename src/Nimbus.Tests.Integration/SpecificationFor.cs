@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Nimbus.IntegrationTests
+namespace Nimbus.Tests.Integration
 {
     [TestFixture]
     public abstract class SpecificationFor<T> where T : class

@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Unit.DispatcherTests.MessageContracts;
 
-namespace Nimbus.UnitTests.DispatcherTests.Handlers
+namespace Nimbus.Tests.Unit.DispatcherTests.Handlers
 {
     public class EmptyEventHandler : IHandleMulticastEvent<EmptyEvent>
     {

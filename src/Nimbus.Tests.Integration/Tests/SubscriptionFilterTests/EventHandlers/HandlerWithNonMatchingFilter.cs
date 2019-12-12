@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Filtering.Attributes;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.MessageContracts;
-using Nimbus.PropertyInjection;
+using Nimbus.InfrastructureContracts.Filtering.Attributes;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.MessageContracts;
 using NUnit.Framework;
 
 #pragma warning disable 4014
 
-namespace Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.EventHandlers
+namespace Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.EventHandlers
 {
     [SubscriptionFilter(typeof(NonMatchingSubscriptionFilter))]
     public class HandlerWithNonMatchingFilter : IHandleCompetingEvent<SomeEventAboutAParticularThing>, IRequireBusId

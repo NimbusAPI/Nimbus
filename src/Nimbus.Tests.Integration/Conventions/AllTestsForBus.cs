@@ -6,11 +6,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Extensions;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Conventions
+namespace Nimbus.Tests.Integration.Conventions
 {
     [TestFixture]
     //[Timeout(TimeoutSeconds*1000)]

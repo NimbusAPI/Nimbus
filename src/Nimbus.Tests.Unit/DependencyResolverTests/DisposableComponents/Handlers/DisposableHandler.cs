@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.UnitTests.DependencyResolverTests.DisposableComponents.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Unit.DependencyResolverTests.DisposableComponents.MessageContracts;
 
-namespace Nimbus.UnitTests.DependencyResolverTests.DisposableComponents.Handlers
+namespace Nimbus.Tests.Unit.DependencyResolverTests.DisposableComponents.Handlers
 {
     public class DisposableHandler : IHandleCommand<NullCommand>, IDisposable
     {

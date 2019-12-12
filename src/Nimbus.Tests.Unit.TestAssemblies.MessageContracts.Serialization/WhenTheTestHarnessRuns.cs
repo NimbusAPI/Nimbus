@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Nimbus.UnitTests.TestAssemblies.MessageContracts.Serialization
+namespace Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization
 {
     public class WhenTheTestHarnessRuns
     {

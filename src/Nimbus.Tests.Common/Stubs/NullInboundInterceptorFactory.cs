@@ -1,4 +1,5 @@
-﻿using Nimbus.DependencyResolution;
+﻿using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Tests.Common.Stubs

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.Interceptors;
-using Nimbus.IntegrationTests.Tests.InterceptorTests.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.Interceptors.Inbound;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.Interceptors;
+using Nimbus.Tests.Integration.Tests.InterceptorTests.MessageContracts;
 
-namespace Nimbus.IntegrationTests.Tests.InterceptorTests.Handlers
+namespace Nimbus.Tests.Integration.Tests.InterceptorTests.Handlers
 {
     [Interceptor(typeof (SomeBaseClassLevelInterceptor))]
     public abstract class SomeBaseCommandHandler : IHandleCommand<FooCommand>, IHandleCommand<BarCommand>

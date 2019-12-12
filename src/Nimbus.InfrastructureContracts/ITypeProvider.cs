@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Nimbus
+namespace Nimbus.InfrastructureContracts
 {
     public interface ITypeProvider
     {

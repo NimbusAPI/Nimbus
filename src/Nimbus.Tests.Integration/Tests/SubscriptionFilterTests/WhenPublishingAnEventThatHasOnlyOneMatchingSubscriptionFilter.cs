@@ -1,19 +1,17 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.EventHandlers;
-using Nimbus.IntegrationTests.Tests.SubscriptionFilterTests.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.EventHandlers;
+using Nimbus.Tests.Integration.Tests.SubscriptionFilterTests.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
 #pragma warning disable 4014
 
-namespace Nimbus.IntegrationTests.Tests.SubscriptionFilterTests
+namespace Nimbus.Tests.Integration.Tests.SubscriptionFilterTests
 {
     public class WhenPublishingAnEventThatHasOnlyOneMatchingSubscriptionFilter : TestForBus
     {

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Nimbus.UnitTests
+namespace Nimbus.Tests.Unit
 {
     public abstract class SpecificationForAsync<T> where T : class
     {

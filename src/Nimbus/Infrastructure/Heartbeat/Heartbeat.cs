@@ -10,6 +10,7 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.ControlMessages;
 using Timer = System.Timers.Timer;
 

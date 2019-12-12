@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Nimbus.PropertyInjection
+namespace Nimbus.InfrastructureContracts.PropertyInjection
 {
     public interface IRequireMessageProperties
     {

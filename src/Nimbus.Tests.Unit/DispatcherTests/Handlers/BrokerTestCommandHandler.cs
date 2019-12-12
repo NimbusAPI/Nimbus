@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.PropertyInjection;
-using Nimbus.Tests.Common;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.PropertyInjection;
 using Nimbus.Tests.Common.TestUtilities;
-using Nimbus.UnitTests.DispatcherTests.MessageContracts;
+using Nimbus.Tests.Unit.DispatcherTests.MessageContracts;
 
 #pragma warning disable 4014
 
-namespace Nimbus.UnitTests.DispatcherTests.Handlers
+namespace Nimbus.Tests.Unit.DispatcherTests.Handlers
 {
     public class BrokerTestCommandHandler : IHandleCommand<FooCommand>, IRequireBusId, IDisposable
     {

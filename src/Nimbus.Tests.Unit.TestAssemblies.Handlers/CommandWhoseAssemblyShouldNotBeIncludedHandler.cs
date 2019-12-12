@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Handlers;
-using Nimbus.UnitTests.TestAssemblies.MessageContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.Tests.Unit.TestAssemblies.MessageContracts;
 
-namespace Nimbus.UnitTests.TestAssemblies.Handlers
+namespace Nimbus.Tests.Unit.TestAssemblies.Handlers
 {
     public class CommandWhoseAssemblyShouldNotBeIncludedHandler : IHandleCommand<CommandWhoseAssemblyShouldNotBeIncluded>
     {

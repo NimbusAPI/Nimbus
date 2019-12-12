@@ -1,4 +1,5 @@
 using Nimbus.Infrastructure.Compression;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Configuration
 {

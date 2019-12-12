@@ -3,17 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.Handlers;
-using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
-using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
-using Nimbus.Tests.Common.TestUtilities;
+using Nimbus.Tests.Integration.Tests.BusStartingAndStopping.Handlers;
+using Nimbus.Tests.Integration.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.IntegrationTests.Tests.BusStartingAndStopping
+namespace Nimbus.Tests.Integration.Tests.BusStartingAndStopping
 {
     [TestFixture]
     public class WhenStoppingTheBusWhileThereAreManyCommandsInAQueue : TestForBus

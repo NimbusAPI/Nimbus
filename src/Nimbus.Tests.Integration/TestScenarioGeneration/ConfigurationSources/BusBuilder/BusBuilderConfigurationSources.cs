@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
-using Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources;
 using Nimbus.Tests.Common.Stubs;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Compressors;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Routers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Serializers;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
-using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Compressors;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Routers;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Serializers;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.SynchronizationContexts;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.BusBuilder
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.BusBuilder
 {
     public class BusBuilderConfigurationSources : IEnumerable<IConfigurationScenario<BusBuilderConfiguration>>
     {

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure.DependencyResolution;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.IoCContainers
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers
 {
     public class NoContainerScenario : ConfigurationScenario<ContainerConfiguration>
     {

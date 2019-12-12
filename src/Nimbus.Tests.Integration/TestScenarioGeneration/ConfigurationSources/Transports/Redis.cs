@@ -1,10 +1,9 @@
-using System;
-using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Tests.Integration.Configuration;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.Redis;
 
-namespace Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources.Transports
+namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports
 {
     internal class Redis : ConfigurationScenario<TransportConfiguration>
     {

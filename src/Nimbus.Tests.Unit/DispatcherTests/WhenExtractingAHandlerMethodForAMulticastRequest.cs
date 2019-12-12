@@ -3,7 +3,7 @@ using Nimbus.MessageContracts;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Nimbus.UnitTests.DispatcherTests
+namespace Nimbus.Tests.Unit.DispatcherTests
 {
     public class WhenExtractingAHandlerMethodForAMulticastRequest
     {

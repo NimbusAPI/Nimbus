@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 
 namespace Nimbus
