@@ -50,7 +50,7 @@ RUN ./build.sh --Target="Restore" --buildVersion="$BUILD_NUMBER"
 COPY ./tests ./tests
 COPY ./src ./src
 
-RUN /bin/bash ./build.sh --Target="Build" --buildVersion="$BUILD_NUMBER"
+RUN /bin/bash ./build.sh --Target="CI" --buildVersion="$BUILD_NUMBER"
 
 WORKDIR /sln
 

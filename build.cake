@@ -160,15 +160,6 @@ Task("PushPackages")
 
 
 
-// A meta-task that runs all the steps to Build and Test the app
-Task("BuildAndTest")  
-    .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
-    .IsDependentOn("GenerateVersionFile")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .IsDependentOn("BuildPackages");
-    //.IsDependentOn("IntegrationTest");
 
 // The default task to run if none is explicitly specified. In this case, we want
 // to run everything starting from Clean, all the way up to Publish.
@@ -178,7 +169,6 @@ Task("Default")
 Task("CI")
     .IsDependentOn("GenerateVersionFile")
     .IsDependentOn("Build")
-    .IsDependentOn("Test")
     .IsDependentOn("BuildPackages");
 
 Task("Init").Does(()=>{
