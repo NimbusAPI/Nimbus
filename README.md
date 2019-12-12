@@ -16,7 +16,7 @@ dotnet test
 
 ### Development infrastructure
 
-There are two docker-compose files. The `docker-compose.infrastructure.yml` file will spin up:
+There are two docker-compose files. The `docker-compose.yml` file will spin up:
 
 - a [Seq](https://datalust.co) server at <http://localhost:5341>
 - a [Redis](https://redis.io/) server at `localhost:6379`
