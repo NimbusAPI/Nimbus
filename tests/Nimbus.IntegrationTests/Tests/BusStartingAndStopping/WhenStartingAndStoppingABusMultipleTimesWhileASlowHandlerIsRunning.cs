@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
 using Nimbus.IntegrationTests.Tests.BusStartingAndStopping.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;

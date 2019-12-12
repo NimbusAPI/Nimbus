@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AbstractBaseTypeMessageTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition.Filters;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;

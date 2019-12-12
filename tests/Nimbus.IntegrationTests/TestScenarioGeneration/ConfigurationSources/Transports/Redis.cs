@@ -1,17 +1,16 @@
-//using ConfigInjector.QuickAndDirty;
 using System;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Common.Configuration;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Transports.Redis;
 
-namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
+namespace Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources.Transports
 {
     internal class Redis : ConfigurationScenario<TransportConfiguration>
     {
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            var connectionString = Environment.GetEnvironmentVariable("REDIS_TEST_CONNECTION") ?? "localhost";
+            var connectionString =  AppSettingsLoader.Settings.Transports.Redis.ConnectionString;
 
             var configuration = new RedisTransportConfiguration()
                 .WithConnectionString(connectionString);

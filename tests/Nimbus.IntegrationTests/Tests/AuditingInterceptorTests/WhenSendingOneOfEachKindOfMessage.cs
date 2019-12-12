@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.AuditingInterceptorTests.MessageTypes;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Interceptors;
 using Nimbus.MessageContracts.ControlMessages;
 using Nimbus.Tests.Common.Extensions;

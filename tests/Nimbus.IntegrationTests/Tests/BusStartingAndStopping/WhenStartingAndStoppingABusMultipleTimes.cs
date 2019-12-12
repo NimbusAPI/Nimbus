@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
 using NUnit.Framework;

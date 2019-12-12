@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nimbus.IntegrationTests.Extensions;
 using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 

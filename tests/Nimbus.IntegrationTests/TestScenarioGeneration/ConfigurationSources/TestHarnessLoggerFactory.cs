@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Enrichers;
-using Nimbus.Extensions;
+using Nimbus.IntegrationTests.Configuration;
 using Nimbus.Logger.Serilog;
 using Serilog;
 using Serilog.Exceptions;
 
-namespace Nimbus.Tests.Common.Stubs
+namespace Nimbus.IntegrationTests.TestScenarioGeneration.ConfigurationSources
 {
     public class TestHarnessLoggerFactory
     {
@@ -20,16 +19,14 @@ namespace Nimbus.Tests.Common.Stubs
 
         private static Serilog.ILogger CreateLogger()
         {
+            var seqServerUrl = AppSettingsLoader.Settings.Logging.Seq.Url.ToString();
+
             var logger = new LoggerConfiguration()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
                 .Enrich.With<NimbusMessageEnricher>()
                 .Enrich.WithExceptionDetails()
-                .WriteTo.Seq("http://localhost:5341")
-                // .Chain(l =>
-                //        {
-                //            if (Debugger.IsAttached) l.WriteTo.Trace();
-                //        })
+                .WriteTo.Seq(seqServerUrl)
                 .MinimumLevel.Verbose()
                 .CreateLogger();
 

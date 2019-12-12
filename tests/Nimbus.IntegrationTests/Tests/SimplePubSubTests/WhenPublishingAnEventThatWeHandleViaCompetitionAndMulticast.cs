@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.EventHandlers;
 using Nimbus.IntegrationTests.Tests.SimplePubSubTests.MessageContracts;
+using Nimbus.IntegrationTests.TestScenarioGeneration.TestCaseSources;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
 using Nimbus.Tests.Common.TestScenarioGeneration.TestCaseSources;
