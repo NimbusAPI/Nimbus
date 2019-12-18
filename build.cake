@@ -50,7 +50,7 @@ Task ("Build")
             });
     });
 
-Task ("Test")
+Task ("UnitTest")
     .Does (() => {
         var projects = GetFiles ("./src/Nimbus.Tests.Unit/Nimbus.Tests.Unit.csproj");
         var settings = new DotNetCoreTestSettings {
@@ -80,13 +80,18 @@ Task ("IntegrationTest")
         }
     });
 
+Task("Test")
+    .IsDependentOn("UnitTest")
+    .IsDependentOn("IntegrationTest")
+    ;
+
 Task ("PushPackages")
     .Does (() => {
 
-        // if (String.IsNullOrEmpty (nugetApiKey)) {
-        //     Information ($"No Nuget keys found. Skipping step");
-        //     return;
-        // }
+        if (String.IsNullOrEmpty (nugetApiKey)) {
+            Information ($"No Nuget keys found. Skipping step");
+            return;
+        }
 
         var settings = new DotNetCoreNuGetPushSettings {
             ApiKey = nugetApiKey,
@@ -95,7 +100,7 @@ Task ("PushPackages")
         var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
         foreach (var file in packages) {
             Information ($"Pushing package {file}");
-            // DotNetCoreNuGetPush ($"{file}", settings);
+            DotNetCoreNuGetPush ($"{file}", settings);
         }
     });
 
