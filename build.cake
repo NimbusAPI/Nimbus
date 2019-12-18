@@ -7,11 +7,25 @@ Information ($"Running target {target} in configuration {configuration} with ver
 
 var packageDirectory = Directory ("./dist_package");
 
+Task ("Init").Does (() => {
+    //nothing
+});
+
+private IEnumerable<FilePath> GetAllProjects () {
+    var files = GetFiles ("./src/**/*.csproj").ToArray ();
+    return files;
+}
+
 // Deletes the contents of the Artifacts folder if it contains anything from a previous build.
 Task ("Clean")
     .Does (() => {
         CleanDirectory (packageDirectory);
-        DotNetCoreClean ("./src");
+        DotNetCoreClean ("./src",
+            new DotNetCoreCleanSettings () {
+            Configuration = configuration,
+            ArgumentCustomization = builder => builder
+                .Append($"/p:Version={version}")
+            });
     });
 
 // Run dotnet restore to restore all package references.
@@ -21,37 +35,18 @@ Task ("Restore")
         DotNetCoreRestore ("./src", settings);
     });
 
-private IEnumerable<FilePath> GetShippableProjects () {
-    var files = GetFiles ("./src/**/*.csproj").Where (f => !f.FullPath.Contains (".Tests.")).ToArray ();
-    return files;
-}
-
-Task ("GenerateVersionFile")
-    .Does (() => {
-        foreach (var project in GetShippableProjects ()) {
-            var directory = project.GetDirectory ();
-            var projectName = project.GetFilenameWithoutExtension ().ToString ();
-
-            var file = $"{directory}/AssemblyInfo.cs";
-            Information ($"Writing {file} for project {projectName}");
-            CreateAssemblyInfo (file, new AssemblyInfoSettings {
-                Product = projectName,
-                    Version = version,
-                    FileVersion = version,
-                    InformationalVersion = version,
-            });
-
-        }
-
-    });
-
 // Build using the build configuration specified as an argument.
 Task ("Build")
+    .IsDependentOn ("Restore")
     .Does (() => {
         DotNetCoreBuild ("./src",
             new DotNetCoreBuildSettings () {
                 Configuration = configuration,
-                    NoRestore = true
+                ArgumentCustomization = builder => builder
+                    .Append($"/p:Version={version}"),
+                NoRestore = true,
+                MSBuildSettings = new DotNetCoreMSBuildSettings {
+                }
             });
     });
 
@@ -85,62 +80,41 @@ Task ("IntegrationTest")
         }
     });
 
-Task ("BuildPackages")
-    .Does (() => {
-        var settings = new DotNetCorePackSettings {
-        Configuration = configuration,
-        NoBuild = true,
-        OutputDirectory = packageDirectory,
-        ArgumentCustomization = args => args
-        .Append ($"/p:PackageVersion={version}")
-
-        };
-        foreach (var project in GetShippableProjects ()) {
-            DotNetCorePack (project.ToString (), settings);
-        }
-    });
-
 Task ("PushPackages")
     .Does (() => {
 
-        if (!String.IsNullOrEmpty (nugetApiKey)) {
+        // if (String.IsNullOrEmpty (nugetApiKey)) {
+        //     Information ($"No Nuget keys found. Skipping step");
+        //     return;
+        // }
+
         var settings = new DotNetCoreNuGetPushSettings {
-        ApiKey = nugetApiKey,
-        Source = "https://www.myget.org/F/nimbusapi/api/v2/package"
-            };
-            var packages = GetFiles ($"{packageDirectory}/Nimbus.*.nupkg");
-            foreach (var file in packages) {
-                Information ($"Pushing package {file}");
-                DotNetCoreNuGetPush ($"{file}", settings);
-            }
-        } else {
-            Information ($"No Nuget keys found. Skipping step");
+            ApiKey = nugetApiKey,
+            Source = "https://www.myget.org/F/nimbusapi/api/v2/package"
+        };
+        var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
+        foreach (var file in packages) {
+            Information ($"Pushing package {file}");
+            // DotNetCoreNuGetPush ($"{file}", settings);
         }
     });
 
 // A meta-task that runs all the steps to Build and Test the app
 Task ("BuildAndTest")
     .IsDependentOn ("Clean")
-    .IsDependentOn ("Restore")
-    .IsDependentOn ("GenerateVersionFile")
     .IsDependentOn ("Build")
     .IsDependentOn ("Test")
-    .IsDependentOn ("BuildPackages");
-//.IsDependentOn("IntegrationTest");
+    ;
+
+Task ("CI")
+    .IsDependentOn ("Build")
+    ;
 
 // The default task to run if none is explicitly specified. In this case, we want
 // to run everything starting from Clean, all the way up to Publish.
 Task ("Default")
-    .IsDependentOn ("BuildAndTest");
-
-Task ("CI")
-    .IsDependentOn ("GenerateVersionFile")
-    .IsDependentOn ("Build")
-    .IsDependentOn ("BuildPackages");
-
-Task ("Init").Does (() => {
-    //nothing
-});
+    .IsDependentOn ("BuildAndTest")
+    ;
 
 // Executes the task specified in the target argument.
 RunTarget (target);
