@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Nimbus.Tests.Integration
 {
     [TestFixture]
-    [Timeout(TimeoutSeconds*1000)]
+    [Timeout(TimeoutSeconds * 1000)]
     public abstract class TestForBus
     {
         protected const int TimeoutSeconds = 60;
@@ -21,8 +21,6 @@ namespace Nimbus.Tests.Integration
         protected ScenarioInstance<BusBuilderConfiguration> Instance { get; private set; }
         protected MethodCallCounter MethodCallCounter { get; private set; }
         protected Bus Bus { get; private set; }
-
-        private bool _thenWasInvoked;
 
         protected virtual async Task Given(IConfigurationScenario<BusBuilderConfiguration> scenario)
         {
@@ -42,21 +40,24 @@ namespace Nimbus.Tests.Integration
 
         protected async Task Then()
         {
-            _thenWasInvoked = true;
-
             var assertionMethods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
                                             .Where(m => m.HasAttribute<ThenAttribute>())
                                             .ToArray();
 
             await assertionMethods
-                .Select(m => (Task) m.Invoke(this, new object[0]))
-                .WhenAll();
+                  .Where(m => typeof(Task).IsAssignableFrom(m.ReturnType))
+                  .Select(m => (Task) m.Invoke(this, new object[0]))
+                  .WhenAll();
+
+            assertionMethods
+                .Where(m => m.ReturnType == typeof(void))
+                .Do(m => m.Invoke(this, new object[0]))
+                .Done();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _thenWasInvoked = false;
             TestLoggingExtensions.LogTestStart();
         }
 
@@ -79,8 +80,6 @@ namespace Nimbus.Tests.Integration
             Instance = null;
 
             TestLoggingExtensions.LogTestResult();
-
-            if (!_thenWasInvoked) Assert.Fail($"Test completed without calling {nameof(Then)} method.");
         }
     }
 }
