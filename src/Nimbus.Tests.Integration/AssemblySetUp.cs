@@ -2,4 +2,4 @@
 
 [assembly: Category("IntegrationTest")]
 [assembly: Parallelizable(ParallelScope.Fixtures)]
-[assembly: LevelOfParallelism(32)]
+[assembly: LevelOfParallelism(2)]
