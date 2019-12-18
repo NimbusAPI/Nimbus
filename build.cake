@@ -50,13 +50,30 @@ Task ("Build")
             });
     });
 
-Task ("UnitTest")
+Task ("ConventionTest")
     .Does (() => {
-        var projects = GetFiles ("./src/Nimbus.Tests.Unit/Nimbus.Tests.Unit.csproj");
+        var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
         var settings = new DotNetCoreTestSettings {
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
+            Filter = "Category=\"Convention\""
+        };
+        foreach (var project in projects) {
+
+            Information ("Testing project " + project);
+            DotNetCoreTest (project.FullPath, settings);
+        }
+    });
+
+Task ("UnitTest")
+    .Does (() => {
+        var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
+        var settings = new DotNetCoreTestSettings {
+            NoBuild = true,
+            NoRestore = true,
+            Configuration = configuration,
+            Filter = "Category=\"UnitTest\""
         };
         foreach (var project in projects) {
 
@@ -67,11 +84,12 @@ Task ("UnitTest")
 
 Task ("IntegrationTest")
     .Does (() => {
-        var projects = GetFiles ("./src/Nimbus.Tests.Integration/Nimbus.Tests.Integration.csproj");
+        var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
         var settings = new DotNetCoreTestSettings {
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
+            Filter = "Category!=\"Convention\" & Category!=\"UnitTest\""
         };
         foreach (var project in projects) {
 
@@ -81,6 +99,7 @@ Task ("IntegrationTest")
     });
 
 Task("Test")
+    .IsDependentOn("ConventionTest")
     .IsDependentOn("UnitTest")
     .IsDependentOn("IntegrationTest")
     ;
