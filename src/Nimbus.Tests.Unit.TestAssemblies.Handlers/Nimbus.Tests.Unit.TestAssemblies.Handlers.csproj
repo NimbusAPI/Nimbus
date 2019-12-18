@@ -11,4 +11,8 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;1998;4014</NoWarn>
+  </PropertyGroup>  
 </Project>
