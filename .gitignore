@@ -8,6 +8,7 @@ _ReSharper.*
 .gitignore
 .vs
 .idea
+*.stackdump
 
 # Cake Bits
 tools
