@@ -1,10 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Nimbus.Configuration;
-using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
@@ -16,45 +11,26 @@ namespace Nimbus.Tests.Unit.Conventions
     public class AllExtensionMethodsNotOnPublicInterfaces
     {
         [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBeInternal(MethodInfo method)
+        public void MustAdhereToConventions()
         {
-            method.IsAssembly.ShouldBe(true);
-        }
+            var assemblies = new[]
+                             {
+                                 typeof(Bus).Assembly
+                             };
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBeOnAClassThatIsMarkedAsInternal(MethodInfo method)
-        {
-            method.DeclaringType.IsPublic.ShouldBe(false);
-        }
+            var extensionMethods = assemblies
+                                   .SelectMany(a => a.DefinedTypes)
+                                   .SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
+                                   .Where(m => m.IsExtensionMethod());
 
-        private class TestCases : IEnumerable<TestCaseData>
-        {
-            public IEnumerator<TestCaseData> GetEnumerator()
+            foreach (var method in extensionMethods)
             {
-                var assemblies = new[]
-                                 {
-                                     typeof (Bus).Assembly
-                                 };
+                if (method.GetParameters().First().ParameterType.IsPublic) continue;
 
-                var testCases = assemblies
-                    .SelectMany(a => a.DefinedTypes)
-                    .SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
-                    .Where(m => m.IsExtensionMethod())
-                    .Where(m => !m.IsExtensionMethodFor<IBus>())
-                    .Where(m => !m.IsExtensionMethodFor<INimbusConfiguration>())
-                    .Where(m => !m.IsExtensionMethodFor<ITypeProvider>())
-                    .Select(m => new TestCaseData(m)
-                                .SetName("{0}.{1}".FormatWith(m.DeclaringType.FullName, m.Name))
-                    );
+                method.IsAssembly.ShouldBeTrue($"Method {method.DeclaringType}.{method.Name} must be internal");
 
-                return testCases.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
+                // ReSharper disable once PossibleNullReferenceException
+                method.DeclaringType.IsPublic.ShouldBeFalse($"Extension method class {method.DeclaringType} must be internal");
             }
         }
     }

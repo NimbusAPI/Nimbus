@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -11,58 +10,44 @@ using Shouldly;
 namespace Nimbus.Tests.Integration.Conventions
 {
     [TestFixture]
-    //[Timeout(TimeoutSeconds*1000)]
     [Category("Convention")]
     public class AllIntegrationTests
     {
-        protected const int TimeoutSeconds = 15;
-
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldReturnTask(MethodInfo testMethod)
+        public void MustAdhereToConventions()
         {
-            typeof (Task).IsAssignableFrom(testMethod.ReturnType).ShouldBe(true);
+            var methods = GetType().Assembly
+                                   .GetExportedTypes()
+                                   .Where(t => t.GetCustomAttributes<TestFixtureAttribute>().Any())
+                                   .SelectMany(t => t.GetMethods())
+                                   .Where(m => m.GetCustomAttributes<TestAttribute>().Any())
+                                   .ToArray();
+
+            foreach (var method in methods)
+            {
+                ShouldBeAsync(method);
+                ShouldReturnTask(method);
+                //ShouldHaveATimeout(method);
+            }
         }
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public async Task ShouldBeAsync(MethodInfo testMethod)
+        private static void ShouldReturnTask(MethodInfo testMethod)
+        {
+            typeof(Task).IsAssignableFrom(testMethod.ReturnType).ShouldBe(true);
+        }
+
+        private static void ShouldBeAsync(MethodInfo testMethod)
         {
             testMethod.HasAttribute<AsyncStateMachineAttribute>().ShouldBe(true);
         }
 
-        //TODO
-        // [Test]
-        // [TestCaseSource(typeof (TestCases))]
-        // public async Task ShouldHaveATimeout(MethodInfo testMethod)
-        // {
-        //     if (testMethod.HasAttribute<TimeoutAttribute>()) return;
-
-        //     var fixtureTypeHeirarchy = new[] {testMethod.DeclaringType}.DepthFirst(t => t.BaseType != null ? new[] {t.BaseType} : new Type[0]);
-        //     if (fixtureTypeHeirarchy.Any(t => t.HasAttribute<TimeoutAttribute>())) return;
-
-        //     Assert.Fail();
-        // }
-
-        private class TestCases : IEnumerable<TestCaseData>
+        private static void ShouldHaveATimeout(MethodInfo testMethod)
         {
-            public IEnumerator<TestCaseData> GetEnumerator()
-            {
-                return GetType().Assembly
-                                .GetExportedTypes()
-                                .Where(t => t.GetCustomAttributes<TestFixtureAttribute>().Any())
-                                .SelectMany(t => t.GetMethods())
-                                .Where(m => m.GetCustomAttributes<TestAttribute>().Any())
-                                .Select(m => new TestCaseData(m)
-                                            .SetName("{0}.{1}".FormatWith(m.DeclaringType.FullName, m.Name))
-                    )
-                                .GetEnumerator();
-            }
+            if (testMethod.HasAttribute<TimeoutAttribute>()) return;
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            var fixtureTypeHierarchy = new[] {testMethod.DeclaringType}.DepthFirst(t => t.BaseType != null ? new[] {t.BaseType} : new Type[0]);
+            if (fixtureTypeHierarchy.Any(t => t.HasAttribute<TimeoutAttribute>())) return;
+
+            Assert.Fail();
         }
     }
 }

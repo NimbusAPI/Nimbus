@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration;
-using Nimbus.Extensions;
 using Nimbus.Tests.Common.Extensions;
 using NUnit.Framework;
 using Shouldly;
@@ -14,46 +11,28 @@ namespace Nimbus.Tests.Unit.Conventions
     [Category("Convention")]
     public class AllBusBuilderConfigurationExtensionMethods
     {
-        private readonly string _configurationExtensionsNamespace = typeof (BusBuilderConfigurationExtensions).Namespace;
+        private readonly string _configurationExtensionsNamespace = typeof(BusBuilderConfigurationExtensions).Namespace;
 
         [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBeInTheSameNamespace(MethodInfo method)
+        public void MustAdhereToConventions()
         {
-            method.DeclaringType.Namespace.ShouldBe(_configurationExtensionsNamespace);
-        }
+            var assemblies = new[]
+                             {
+                                 typeof(BusBuilderConfigurationExtensions).Assembly,
+                                 typeof(AutofacBusBuilderConfigurationExtensions).Assembly
+                             };
 
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBePublic(MethodInfo method)
-        {
-            method.IsPublic.ShouldBe(true);
-        }
+            var testCases = assemblies
+                            .SelectMany(a => a.DefinedTypes)
+                            .SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
+                            .Where(m => m.IsExtensionMethodFor<INimbusConfiguration>());
 
-        private class TestCases : IEnumerable<TestCaseData>
-        {
-            public IEnumerator<TestCaseData> GetEnumerator()
+            foreach (var method in testCases)
             {
-                var assemblies = new[]
-                                 {
-                                     typeof (BusBuilderConfigurationExtensions).Assembly,
-                                     typeof (AutofacBusBuilderConfigurationExtensions).Assembly,
-                                 };
+                method.IsPublic.ShouldBe(true);
 
-                var testCases = assemblies
-                    .SelectMany(a => a.DefinedTypes)
-                    .SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
-                    .Where(m => m.IsExtensionMethodFor<INimbusConfiguration>())
-                    .Select(m => new TestCaseData(m)
-                                .SetName("{0}.{1}".FormatWith(m.DeclaringType.FullName, m.Name))
-                    );
-
-                return testCases.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
+                // ReSharper disable once PossibleNullReferenceException
+                method.DeclaringType.Namespace.ShouldBe(_configurationExtensionsNamespace);
             }
         }
     }

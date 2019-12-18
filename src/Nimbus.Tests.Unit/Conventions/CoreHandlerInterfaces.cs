@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Nimbus.InfrastructureContracts.Handlers;
+﻿using Nimbus.InfrastructureContracts.Handlers;
 using NUnit.Framework;
 using Shouldly;
 
@@ -13,32 +9,19 @@ namespace Nimbus.Tests.Unit.Conventions
     public class CoreHandlerInterfaces
     {
         [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void MustBeInTheCorrectNamespaceNamespace(Type type)
+        public void MustAdhereToConventions()
         {
-            type.Namespace.ShouldBe("Nimbus.InfrastructureContracts.Handlers");
-        }
+            var coreInfrastructureInterfaces = new[]
+                                               {
+                                                   typeof(IHandleCommand<>),
+                                                   typeof(IHandleRequest<,>),
+                                                   typeof(IHandleMulticastEvent<>),
+                                                   typeof(IHandleCompetingEvent<>)
+                                               };
 
-        internal class TestCases : IEnumerable<TestCaseData>
-        {
-            public IEnumerator<TestCaseData> GetEnumerator()
+            foreach (var type in coreInfrastructureInterfaces)
             {
-                var coreInfrastructureInterfaces = new[]
-                                                   {
-                                                       typeof (IHandleCommand<>),
-                                                       typeof (IHandleRequest<,>),
-                                                       typeof (IHandleMulticastEvent<>),
-                                                       typeof (IHandleCompetingEvent<>)
-                                                   };
-
-                return coreInfrastructureInterfaces
-                    .Select(t => new TestCaseData(t).SetName(t.FullName))
-                    .GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
+                type.Namespace.ShouldBe("Nimbus.InfrastructureContracts.Handlers");
             }
         }
     }

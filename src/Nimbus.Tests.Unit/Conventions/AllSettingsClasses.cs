@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
+using Conventional;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Nimbus.Tests.Unit.Conventions
 {
@@ -13,39 +11,16 @@ namespace Nimbus.Tests.Unit.Conventions
     [Category("Convention")]
     public class AllSettingsClasses
     {
-        private readonly string _referenceNamespace = typeof (Setting<>).Namespace;
-
         [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBeInASettingsNamespaceUnderConfiguration(Type settingType)
+        public void MustAdhereToConventions()
         {
-            settingType.Namespace.ShouldContain(".Configuration.");
-            settingType.Namespace.ShouldEndWith(".Settings");
-        }
-
-        [Test]
-        [TestCaseSource(typeof (TestCases))]
-        public void ShouldBePublic(Type settingType)
-        {
-            settingType.IsPublic.ShouldBe(true);
-        }
-
-        internal class TestCases : IEnumerable<TestCaseData>
-        {
-            public IEnumerator<TestCaseData> GetEnumerator()
-            {
-                return typeof (Setting<>).Assembly
-                                         .GetTypes()
-                                         .Where(t => t.IsClosedTypeOf(typeof (Setting<>)))
-                                         .Select(t => new TestCaseData(t)
-                                                     .SetName(t.FullName))
-                                         .GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            typeof(Setting<>).Assembly
+                             .GetTypes()
+                             .Where(t => t.IsClosedTypeOf(typeof(Setting<>)))
+                             .MustConformTo(new MustBePublicConventionSpecification())
+                             .AndMustConformTo(new MustBeInMatchingNamespaceConventionSpecification(ns => ns.Contains(".Configuration.")))
+                             .AndMustConformTo(new MustBeInMatchingNamespaceConventionSpecification(ns => ns.EndsWith(".Settings")))
+                             .WithFailureAssertion(message => throw new Exception(message));
         }
     }
 }
