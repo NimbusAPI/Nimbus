@@ -21,7 +21,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
     internal class AzureQueueManager : IQueueManager
     {
         private readonly Func<ManagementClient> _managementClient;
-        private readonly Func<IConnectionManager> _messagingFactory;
+        private readonly IConnectionManager _connectionManager;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
         private readonly DefaultTimeoutSetting _defaultTimeout;
@@ -40,7 +40,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
 
         public AzureQueueManager(Func<ManagementClient> managementClient,
-                                 Func<IConnectionManager> messagingFactory,
+                                 IConnectionManager connectionManager,
                                  AutoDeleteOnIdleSetting autoDeleteOnIdle,
                                  DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
                                  DefaultTimeoutSetting defaultTimeout,
@@ -53,7 +53,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                  ITypeProvider typeProvider)
         {
             _managementClient = managementClient;
-            _messagingFactory = messagingFactory;
+            _connectionManager = connectionManager;
             _maxDeliveryAttempts = maxDeliveryAttempts;
             _retry = retry;
             _typeProvider = typeProvider;
@@ -72,21 +72,21 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         public Task<IMessageSender> CreateMessageSender(string queuePath)
         {
-            return Task.Run(async () =>
+            return Task.Run( () =>
                                   {
                                       EnsureQueueExists(queuePath);
-                                      var messageSender = await _messagingFactory().CreateMessageSenderAsync(queuePath);
+                                      var messageSender = _connectionManager.CreateMessageSender(queuePath);
                                       return messageSender;
                                   }).ConfigureAwaitFalse();
         }
 
         public Task<IMessageReceiver> CreateMessageReceiver(string queuePath)
         {
-            return Task.Run(async () =>
+            return Task.Run( () =>
                                   {
                                       EnsureQueueExists(queuePath);
-                                      var receiverAsync = await _messagingFactory().CreateMessageReceiverAsync(queuePath, ReceiveMode.ReceiveAndDelete);
-                                      return receiverAsync;
+                                      var receiver =  _connectionManager.CreateMessageReceiver(queuePath, ReceiveMode.ReceiveAndDelete);
+                                      return receiver;
                                   }).ConfigureAwaitFalse();
         }
 
@@ -96,9 +96,9 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                             {
                                 EnsureTopicExists(topicPath);
 
-                                return _retry.Do(async () =>
+                                return _retry.Do(() =>
                                                  {
-                                                     var topicClient = await _messagingFactory().CreateTopicClient(topicPath);
+                                                     var topicClient = _connectionManager.CreateTopicClient(topicPath);
                                                      return topicClient;
                                                  },
                                                  "Creating topic sender for " + topicPath);
@@ -118,7 +118,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
                                 return _retry.Do(() =>
                                                  {
-                                                     var subscriptionClient = _messagingFactory()
+                                                     var subscriptionClient = _connectionManager
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
                                                      //TODO
                                                      //subscriptionClient.ReplaceFilter("$Default", filterSql);

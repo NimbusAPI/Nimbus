@@ -11,10 +11,12 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.AzureServiceBus.ConnectionManagement;
 using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.DeadLetterOffice;
 using Nimbus.Transports.AzureServiceBus.DelayedDelivery;
 using Nimbus.Transports.AzureServiceBus.Filtering;
+using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus
 {
@@ -54,31 +56,34 @@ namespace Nimbus.Transports.AzureServiceBus
         protected override void RegisterComponents(PoorMansIoC container)
         {
             container.RegisterType<AzureServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
-
+            container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
             container.RegisterType<BrokeredBrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<AzureServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<SqlFilterExpressionGenerator>(ComponentLifetime.SingleInstance, typeof(ISqlFilterExpressionGenerator));
-            //
-            // container.Register(c =>
-            //                    {
-            //                        var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
-            //                            c.Resolve<ServerConnectionCountSetting>(),
-            //                            () =>
-            //                            {
-            //                                var namespaceManager = NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
-            //                                namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
-            //                                return namespaceManager;
-            //                            },
-            //                            nsm => false,
-            //                            nsm => { });
-            //
-            //                        return namespaceManagerRoundRobin;
-            //                    },
-            //                    ComponentLifetime.SingleInstance);
-            //
-            // container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext, ComponentLifetime.InstancePerDependency);
-            //
+            
+            container.RegisterType<ConnectionManager>(ComponentLifetime.SingleInstance, typeof(IConnectionManager));
+            container.Register(c =>
+                               {
+                                   var managerRoundRobin = new RoundRobin<ManagementClient>(
+                                       c.Resolve<ServerConnectionCountSetting>(),
+                                       () =>
+                                       {
+                                           var client = new ManagementClient(c.Resolve<ConnectionStringSetting>());
+                                           return client;
+                                           // var namespaceManager = ManagementClient.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
+                                           // namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
+                                           // return namespaceManager;
+                                       },
+                                       nsm => false,
+                                       nsm => { });
+            
+                                   return managerRoundRobin;
+                               },
+                               ComponentLifetime.SingleInstance);
+            
+            container.Register<Func<ManagementClient>>(c => c.Resolve<RoundRobin<ManagementClient>>().GetNext, ComponentLifetime.InstancePerDependency);
+            
             // container.Register(c =>
             //                    {
             //                        var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
