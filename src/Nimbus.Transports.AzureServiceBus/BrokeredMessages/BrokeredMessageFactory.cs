@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.InteropExtensions;
 using Nimbus.Configuration.LargeMessages.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
-using Nimbus.Extensions;
-using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.Transports.AzureServiceBus.Messages
+namespace Nimbus.Transports.AzureServiceBus.BrokeredMessages
 {
-    internal class BrokeredBrokeredMessageFactory : IBrokeredMessageFactory
+    internal class BrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
         private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
@@ -24,7 +24,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
         private readonly ITypeProvider _typeProvider;
         private readonly IClock _clock;
 
-        public BrokeredBrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
+        public BrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       IClock clock,
                                       ICompressor compressor,
@@ -43,12 +43,12 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
             _clock = clock;
         }
 
-        public Task<Message> BuildMessage(NimbusMessage message)
+        public Task<Message> BuildMessage(NimbusMessage nimbusMessage)
         {
             return Task.Run(async () =>
                                   {
                                       Message brokeredMessage;
-                                      var messageBodyBytes = SerializeNimbusMessage(message);
+                                      var messageBodyBytes = SerializeNimbusMessage(nimbusMessage);
 
                                       if (messageBodyBytes.Length > _maxLargeMessageSize)
                                       {
@@ -61,8 +61,8 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
                                       if (messageBodyBytes.Length > _maxSmallMessageSize)
                                       {
                                           brokeredMessage = new Message();
-                                          var expiresAfter = message.ExpiresAfter;
-                                          var blobIdentifier = await _largeMessageBodyStore.Store(message.MessageId, messageBodyBytes, expiresAfter);
+                                          var expiresAfter = nimbusMessage.ExpiresAfter;
+                                          var blobIdentifier = await _largeMessageBodyStore.Store(nimbusMessage.MessageId, messageBodyBytes, expiresAfter);
                                           brokeredMessage.UserProperties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                       }
                                       else
@@ -71,13 +71,13 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
                                       }
 
                                       var currentDispatchContext = _dispatchContextManager.GetCurrentDispatchContext();
-                                      brokeredMessage.MessageId = message.MessageId.ToString();
+                                      brokeredMessage.MessageId = nimbusMessage.MessageId.ToString();
                                       brokeredMessage.CorrelationId = currentDispatchContext.CorrelationId.ToString();
-                                      brokeredMessage.ReplyTo = message.From;
-                                      brokeredMessage.TimeToLive = message.ExpiresAfter.Subtract(DateTimeOffset.UtcNow);
-                                      brokeredMessage.ScheduledEnqueueTimeUtc = message.DeliverAfter.UtcDateTime;
+                                      brokeredMessage.ReplyTo = nimbusMessage.From;
+                                      brokeredMessage.TimeToLive = nimbusMessage.ExpiresAfter.Subtract(DateTimeOffset.UtcNow);
+                                      brokeredMessage.ScheduledEnqueueTimeUtc = nimbusMessage.DeliverAfter.UtcDateTime;
 
-                                      foreach (var property in message.Properties)
+                                      foreach (var property in nimbusMessage.Properties)
                                       {
                                           brokeredMessage.UserProperties[property.Key] = property.Value;
                                       }
@@ -114,7 +114,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
             }
             else
             {
-                compressedBytes = message.GetBody<byte[]>();
+                compressedBytes = message.Body;
             }
 
             var serializedBytes = _compressor.Decompress(compressedBytes);

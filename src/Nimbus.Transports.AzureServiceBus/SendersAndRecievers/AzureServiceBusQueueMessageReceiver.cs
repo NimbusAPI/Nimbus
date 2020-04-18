@@ -6,10 +6,10 @@ using Microsoft.Azure.ServiceBus.Core;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
@@ -72,10 +72,10 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
                     cancellationSemaphore.Release();
 
-                    var Message = await receiveTask;
-                    if (Message == null) return null;
+                    var message = await receiveTask;
+                    if (message == null) return null;
 
-                    var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(Message);
+                    var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
                     return nimbusMessage;
                 }
             }

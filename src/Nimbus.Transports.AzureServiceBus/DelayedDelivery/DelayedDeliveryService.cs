@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Transports.AzureServiceBus.Messages;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery

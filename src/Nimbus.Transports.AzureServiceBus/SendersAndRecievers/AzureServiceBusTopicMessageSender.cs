@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
-using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {

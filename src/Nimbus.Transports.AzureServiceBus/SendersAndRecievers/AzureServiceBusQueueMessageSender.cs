@@ -4,10 +4,10 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.Infrastructure.Retries;
-using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {

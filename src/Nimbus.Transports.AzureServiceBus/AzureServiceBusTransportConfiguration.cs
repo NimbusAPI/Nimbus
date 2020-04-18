@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Azure.ServiceBus.Management;
 using Nimbus.ConcurrentCollections;
+using Nimbus.Configuration;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
@@ -11,8 +12,8 @@ using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.ConnectionManagement;
-using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.DeadLetterOffice;
 using Nimbus.Transports.AzureServiceBus.DelayedDelivery;
 using Nimbus.Transports.AzureServiceBus.Filtering;
@@ -57,11 +58,11 @@ namespace Nimbus.Transports.AzureServiceBus
         {
             container.RegisterType<AzureServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
             container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
-            container.RegisterType<BrokeredBrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
+            container.RegisterType<BrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<AzureServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<SqlFilterExpressionGenerator>(ComponentLifetime.SingleInstance, typeof(ISqlFilterExpressionGenerator));
-            
+            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
             container.RegisterType<ConnectionManager>(ComponentLifetime.SingleInstance, typeof(IConnectionManager));
             container.Register(c =>
                                {

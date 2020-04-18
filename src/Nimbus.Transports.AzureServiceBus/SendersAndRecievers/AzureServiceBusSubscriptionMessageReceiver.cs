@@ -11,7 +11,7 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
-using Nimbus.Transports.AzureServiceBus.Messages;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 

@@ -10,7 +10,7 @@ using Nimbus.Infrastructure.Retries;
 using Nimbus.InfrastructureContracts;
 using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
-using Nimbus.Transports.AzureServiceBus.Messages;
+using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 using Nimbus.Transports.AzureServiceBus.SendersAndRecievers;
