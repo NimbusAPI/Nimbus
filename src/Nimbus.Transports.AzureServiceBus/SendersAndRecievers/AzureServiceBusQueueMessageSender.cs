@@ -13,33 +13,34 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
     internal class AzureServiceBusQueueMessageSender : INimbusMessageSender, IDisposable
     {
-        private readonly IMessageFactory _messageFactory;
-        private readonly IQueueManager _queueManager;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
+        private readonly IQueueManager _queueManager;
         private readonly IRetry _retry;
         private readonly string _queuePath;
 
-        private MessageSender _messageSender;
+        private IMessageSender _messageSender;
 
-        public AzureServiceBusQueueMessageSender(IMessageFactory messageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string queuePath)
+        public AzureServiceBusQueueMessageSender(IBrokeredMessageFactory brokeredMessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string queuePath)
         {
-            _messageFactory = messageFactory;
-            _queueManager = queueManager;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _retry = retry;
             _queuePath = queuePath;
             _logger = logger;
+            _queueManager = queueManager;
         }
 
         public async Task Send(NimbusMessage message)
         {
             await _retry.DoAsync(async () =>
                                        {
-                                           var Message = await _messageFactory.BuildMessage(message);
+                                           var brokeredMessage = await _brokeredMessageFactory.BuildMessage(message);
+                                           
 
                                            var messageSender = GetMessageSender();
                                            try
                                            {
-                                               await messageSender.SendAsync(Message);
+                                               await messageSender.SendAsync(brokeredMessage);
                                            }
                                            catch (MessagingEntityNotFoundException exc)
                                            {
@@ -57,7 +58,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                                  "Sending message to queue").ConfigureAwaitFalse();
         }
 
-        private MessageSender GetMessageSender()
+        private IMessageSender GetMessageSender()
         {
             if (_messageSender != null) return _messageSender;
 
@@ -65,7 +66,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             return _messageSender;
         }
 
-        private async Task DiscardMessageSender()
+        private async Task DiscardMessageSender()    
         {
             var messageSender = _messageSender;
             _messageSender = null;

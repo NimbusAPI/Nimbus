@@ -12,33 +12,33 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
     internal class AzureServiceBusTopicMessageSender : INimbusMessageSender, IDisposable
     {
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly ILogger _logger;
 
-        private TopicClient _topicClient;
+        private ITopicClient _topicClient;
         private readonly IRetry _retry;
 
-        public AzureServiceBusTopicMessageSender(IMessageFactory MessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string topicPath)
+        public AzureServiceBusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string topicPath)
         {
             _queueManager = queueManager;
             _retry = retry;
             _topicPath = topicPath;
             _logger = logger;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
-        public async Task Send(NimbusMessage message)
+        public async Task Send(NimbusMessage nimbusMessage)
         {
             await _retry.DoAsync(async () =>
                                        {
-                                           var Message = await _MessageFactory.BuildMessage(message);
+                                           var message = await _brokeredMessageFactory.BuildMessage(nimbusMessage);
 
                                            var topicClient = GetTopicClient();
                                            try
                                            {
-                                               await topicClient.SendAsync(Message);
+                                               await topicClient.SendAsync(message);
                                            }
                                            catch (MessagingEntityNotFoundException exc)
                                            {
@@ -56,7 +56,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                                  "Sending message to topic").ConfigureAwaitFalse();
         }
 
-        private TopicClient GetTopicClient()
+        private ITopicClient GetTopicClient()
         {
             if (_topicClient != null) return _topicClient;
 
@@ -70,12 +70,12 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _topicClient = null;
 
             if (topicClient == null) return;
-            if (topicClient.IsClosed) return;
+            if (topicClient.IsClosedOrClosing) return;
 
             try
             {
                 _logger.Debug("Discarding message sender for {TopicPath}", _topicPath);
-                topicClient.Close();
+                topicClient.CloseAsync();
             }
             catch (Exception exc)
             {

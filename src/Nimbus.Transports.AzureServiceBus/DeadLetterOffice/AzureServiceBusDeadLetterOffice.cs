@@ -9,12 +9,12 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
     internal class AzureServiceBusDeadLetterOffice : IDeadLetterOffice
     {
         readonly IQueueManager _queueManager;
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        public AzureServiceBusDeadLetterOffice(IQueueManager queueManager, IMessageFactory MessageFactory)
+        public AzureServiceBusDeadLetterOffice(IQueueManager queueManager, IBrokeredMessageFactory brokeredMessageFactory)
         {
             _queueManager = queueManager;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public async Task<NimbusMessage> Peek()
@@ -24,7 +24,7 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
             var Message = await messageReceiver.PeekAsync();
             if (Message == null) return null;
 
-            var nimbusMessage = await _MessageFactory.BuildNimbusMessage(Message);
+            var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(Message);
             return nimbusMessage;
         }
 
@@ -35,14 +35,14 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
             var Message = await messageReceiver.ReceiveAsync(TimeSpan.Zero);
             if (Message == null) return null;
 
-            var nimbusMessage = await _MessageFactory.BuildNimbusMessage(Message);
+            var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(Message);
             return nimbusMessage;
         }
 
         public async Task Post(NimbusMessage message)
         {
             var messageSender = await _queueManager.CreateDeadQueueMessageSender();
-            var Message = await _MessageFactory.BuildMessage(message);
+            var Message = await _brokeredMessageFactory.BuildMessage(message);
             await messageSender.SendAsync(Message);
         }
 
@@ -50,8 +50,8 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
         {
             var messageReceiver = await _queueManager.CreateDeadQueueMessageReceiver();
 
-            var Messages = await messageReceiver.PeekBatchAsync(int.MaxValue);
-            return Messages.Count();
+            var messages = await messageReceiver.PeekAsync(int.MaxValue);
+            return messages.Count;
         }
     }
 }

@@ -1,40 +1,32 @@
-// using System.Collections.Generic;
-// using ConfigInjector.QuickAndDirty;
-// using Nimbus.Configuration.LargeMessages;
-// using Nimbus.Configuration.Transport;
-// using Nimbus.Tests.Common.Configuration;
-// using Nimbus.Tests.Common.TestScenarioGeneration.ScenarioComposition;
-// using Nimbus.Transports.AzureServiceBus;
+using System.Collections.Generic;
+using Nimbus.Configuration.LargeMessages;
+using Nimbus.Configuration.Transport;
+using Nimbus.Tests.Integration.Configuration;
+using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
+using Nimbus.Transports.AzureServiceBus;
 
-// namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
-// {
-//     internal class AzureServiceBus : CompositeScenario, IConfigurationScenario<TransportConfiguration>
-//     {
-//         private readonly IConfigurationScenario<LargeMessageStorageConfiguration> _largeMessageScenario;
+namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports
+{
+    internal class AzureServiceBus : ConfigurationScenario<TransportConfiguration>
+    {
+        
+        protected override IEnumerable<string> AdditionalCategories
+        {
+            get { yield return "Slow"; }
+        }
 
-//         public AzureServiceBus(IConfigurationScenario<LargeMessageStorageConfiguration> largeMessageScenario)
-//             : base(largeMessageScenario)
-//         {
-//             _largeMessageScenario = largeMessageScenario;
-//         }
+        public override ScenarioInstance<TransportConfiguration> CreateInstance()
+        {
+            //var largeMessageStorageInstance = _largeMessageScenario.CreateInstance();
 
-//         protected override IEnumerable<string> AdditionalCategories
-//         {
-//             get { yield return "Slow"; }
-//         }
+            var azureServiceBusConnectionString =  AppSettingsLoader.Settings.Transports.AzureServiceBus.ConnectionString;
+            var configuration = new AzureServiceBusTransportConfiguration()
+                .WithConnectionString(azureServiceBusConnectionString);
+                //.WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
 
-//         public ScenarioInstance<TransportConfiguration> CreateInstance()
-//         {
-//             var largeMessageStorageInstance = _largeMessageScenario.CreateInstance();
+            var instance = new ScenarioInstance<TransportConfiguration>(configuration);
 
-//             var azureServiceBusConnectionString = DefaultSettingsReader.Get<AzureServiceBusConnectionString>();
-//             var configuration = new AzureServiceBusTransportConfiguration()
-//                 .WithConnectionString(azureServiceBusConnectionString)
-//                 .WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
-
-//             var instance = new ScenarioInstance<TransportConfiguration>(configuration);
-
-//             return instance;
-//         }
-//     }
-// }
+            return instance;
+        }
+    }
+}

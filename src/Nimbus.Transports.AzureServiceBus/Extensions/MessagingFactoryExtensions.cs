@@ -1,16 +1,17 @@
 ﻿using System.Reflection;
+using Nimbus.Transports.AzureServiceBus.Messages;
 
 namespace Nimbus.Transports.AzureServiceBus.Extensions
 {
     internal static class MessagingFactoryExtensions
     {
         private static readonly PropertyInfo _isFaultedProperty =
-            typeof (MessagingFactory).GetProperty("IsFaulted", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            typeof (BrokeredBrokeredMessageFactory).GetProperty("IsFaulted", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
         private static readonly PropertyInfo _isClosedOrClosingProperty =
-            typeof (MessagingFactory).GetProperty("IsClosedOrClosing", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            typeof (BrokeredBrokeredMessageFactory).GetProperty("IsClosedOrClosing", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-        internal static bool IsBorked(this MessagingFactory messagingFactory)
+        internal static bool IsBorked(this BrokeredBrokeredMessageFactory messagingFactory)
         {
             var isFaulted = (bool) _isFaultedProperty.GetValue(messagingFactory);
             if (isFaulted) return true;
@@ -21,11 +22,11 @@ namespace Nimbus.Transports.AzureServiceBus.Extensions
             return false;
         }
 
-        internal static void Dispose(this MessagingFactory messagingFactory)
+        internal static void Dispose(this BrokeredBrokeredMessageFactory messagingFactory)
         {
             try
             {
-                messagingFactory.Close();
+                //messagingFactory.Close();
             }
             catch
             {

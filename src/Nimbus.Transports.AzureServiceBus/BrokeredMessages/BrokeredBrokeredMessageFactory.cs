@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.InteropExtensions;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Dispatching;
@@ -12,7 +13,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.AzureServiceBus.Messages
 {
-    internal class MessageFactory : IMessageFactory
+    internal class BrokeredBrokeredMessageFactory : IBrokeredMessageFactory
     {
         private readonly MaxLargeMessageSizeSetting _maxLargeMessageSize;
         private readonly MaxSmallMessageSizeSetting _maxSmallMessageSize;
@@ -23,7 +24,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
         private readonly ITypeProvider _typeProvider;
         private readonly IClock _clock;
 
-        public MessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
+        public BrokeredBrokeredMessageFactory(MaxLargeMessageSizeSetting maxLargeMessageSize,
                                       MaxSmallMessageSizeSetting maxSmallMessageSize,
                                       IClock clock,
                                       ICompressor compressor,
@@ -62,7 +63,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
                                           brokeredMessage = new Message();
                                           var expiresAfter = message.ExpiresAfter;
                                           var blobIdentifier = await _largeMessageBodyStore.Store(message.MessageId, messageBodyBytes, expiresAfter);
-                                          brokeredMessage.Properties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
+                                          brokeredMessage.UserProperties[MessagePropertyKeys.LargeBodyBlobIdentifier] = blobIdentifier;
                                       }
                                       else
                                       {
@@ -78,7 +79,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
 
                                       foreach (var property in message.Properties)
                                       {
-                                          brokeredMessage.Properties[property.Key] = property.Value;
+                                          brokeredMessage.UserProperties[property.Key] = property.Value;
                                       }
 
                                       return brokeredMessage;
@@ -105,7 +106,7 @@ namespace Nimbus.Transports.AzureServiceBus.Messages
 
             object blobId;
             string storageKey = null;
-            var isLargeMessage = message.Properties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId);
+            var isLargeMessage = message.UserProperties.TryGetValue(MessagePropertyKeys.LargeBodyBlobIdentifier, out blobId);
             if (isLargeMessage)
             {
                 storageKey = (string) blobId;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -18,20 +19,23 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
     internal class AzureServiceBusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly ILogger _logger;
         private readonly IQueueManager _queueManager;
         private readonly string _topicPath;
         private readonly string _subscriptionName;
         private readonly IFilterCondition _filterCondition;
-        private SubscriptionClient _subscriptionClient;
+        private ISubscriptionClient _subscriptionClient;
+        private Queue<Message> _messages = new Queue<Message>();
+        readonly SemaphoreSlim _receiveSemaphore = new SemaphoreSlim(0, int.MaxValue);
+        private readonly TimeSpan _pollInterval = TimeSpan.FromSeconds(10);
 
         public AzureServiceBusSubscriptionMessageReceiver(IQueueManager queueManager,
                                                           string topicPath,
                                                           string subscriptionName,
                                                           IFilterCondition filterCondition,
                                                           ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                                          IMessageFactory MessageFactory,
+                                                          IBrokeredMessageFactory brokeredMessageFactory,
                                                           IGlobalHandlerThrottle globalHandlerThrottle,
                                                           ILogger logger)
             : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
@@ -40,7 +44,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _topicPath = topicPath;
             _subscriptionName = subscriptionName;
             _filterCondition = filterCondition;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _logger = logger;
         }
 
@@ -51,60 +55,90 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
         protected override async Task WarmUp()
         {
-            await GetSubscriptionClient();
+            var subscriptionClient = await GetSubscriptionClient();
+            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+                                        {
+                                            // Maximum number of concurrent calls to the callback ProcessMessagesAsync(), set to 1 for simplicity.
+                                            // Set it according to how many messages the application wants to process in parallel.
+                                            MaxConcurrentCalls = 1,
+
+                                            // Indicates whether the message pump should automatically complete the messages after returning from user callback.
+                                            // False below indicates the complete operation is handled by the user callback as in ProcessMessagesAsync().
+                                            AutoComplete = false
+                                        };
+            subscriptionClient.RegisterMessageHandler(OnMessageRecieved, messageHandlerOptions);
         }
 
-        private async Task CancellationTask(SemaphoreSlim cancellationSemaphore, CancellationToken cancellationToken)
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs arg)
         {
-            try
-            {
-                await cancellationSemaphore.WaitAsync(cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-            }
+            return null;
+
         }
 
-        protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
+        private Task OnMessageRecieved(Message message, CancellationToken cancellationToken)
         {
-            try
-            {
-                using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
-                {
-                    var subscriptionClient = await GetSubscriptionClient();
-
-                    var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
-                    var cancellationTask = Task.Run(async () => await CancellationTask(cancellationSemaphore, cancellationToken), cancellationToken).ConfigureAwaitFalse();
-                    await Task.WhenAny(receiveTask, cancellationTask);
-                    if (!receiveTask.IsCompleted) return null;
-
-                    cancellationSemaphore.Release();
-
-                    var Message = await receiveTask;
-                    if (Message == null) return null;
-
-                    var nimbusMessage = await _MessageFactory.BuildNimbusMessage(Message);
-                    nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
-
-                    return nimbusMessage;
-                }
-            }
-            catch (MessagingEntityNotFoundException exc)
-            {
-                _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
-                await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
-                DiscardSubscriptionClient();
-                throw;
-            }
-            catch (Exception exc)
-            {
-                _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");
-                DiscardSubscriptionClient();
-                throw;
-            }
+            _messages.Enqueue(message);
+            _receiveSemaphore.Release();
+            return Task.CompletedTask;
         }
 
-        private async Task<SubscriptionClient> GetSubscriptionClient()
+
+        protected override Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
+        {
+            return Task.Run(async () =>
+                                  {
+                                      await _receiveSemaphore.WaitAsync(_pollInterval, cancellationToken);
+
+                                      if (_messages.Count == 0)
+                                          return null;
+                                      
+                                      var message = _messages.Dequeue();
+                                      
+                                      var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
+                                      nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
+                                      
+                                      return nimbusMessage;
+                                  },
+                                  cancellationToken).ConfigureAwaitFalse();
+            // try
+            // {
+            //     using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
+            //     {
+            //         
+            //         
+            //
+            //         var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
+            //         var cancellationTask = Task.Run(async () => await CancellationTask(cancellationSemaphore, cancellationToken), cancellationToken).ConfigureAwaitFalse();
+            //         await Task.WhenAny(receiveTask, cancellationTask);
+            //         if (!receiveTask.IsCompleted) return null;
+            //
+            //         cancellationSemaphore.Release();
+            //
+            //         var message = await receiveTask;
+            //         if (message == null) return null;
+            //
+            //         var nimbusMessage = await _messageFactory.BuildNimbusMessage(message);
+            //         nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
+            //
+            //         return nimbusMessage;
+            //     }
+            // }
+            // catch (MessagingEntityNotFoundException exc)
+            // {
+            //     _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
+            //     await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
+            //     DiscardSubscriptionClient();
+            //     throw;
+            // }
+            // catch (Exception exc)
+            // {
+            //     _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");
+            //     DiscardSubscriptionClient();
+            //     throw;
+            // }
+        }
+
+        private async Task<ISubscriptionClient> GetSubscriptionClient()
         {
             if (_subscriptionClient != null) return _subscriptionClient;
 
@@ -119,11 +153,11 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _subscriptionClient = null;
 
             if (subscriptionClient == null) return;
-            if (subscriptionClient.IsClosed) return;
+            if (subscriptionClient.IsClosedOrClosing) return;
 
             try
             {
-                subscriptionClient.Close();
+                subscriptionClient.CloseAsync();
             }
             catch (Exception exc)
             {

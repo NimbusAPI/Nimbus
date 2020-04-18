@@ -4,7 +4,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.AzureServiceBus.Messages
 {
-    internal interface IMessageFactory
+    internal interface IBrokeredMessageFactory
     {
         Task<Message> BuildMessage(NimbusMessage message);
         Task<NimbusMessage> BuildNimbusMessage(Message message);

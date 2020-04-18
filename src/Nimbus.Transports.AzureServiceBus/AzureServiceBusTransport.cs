@@ -20,9 +20,8 @@ namespace Nimbus.Transports.AzureServiceBus
     internal class AzureServiceBusTransport : INimbusTransport, IDisposable
     {
         private readonly IQueueManager _queueManager;
-        private readonly Func<NamespaceManager> _namespaceManager;
         private readonly ConcurrentHandlerLimitSetting _concurrentHandlerLimit;
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IGlobalHandlerThrottle _globalHandlerThrottle;
         private readonly ILogger _logger;
 
@@ -36,21 +35,19 @@ namespace Nimbus.Transports.AzureServiceBus
         private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
 
         public AzureServiceBusTransport(ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                        IMessageFactory MessageFactory,
+                                        IBrokeredMessageFactory brokeredMessageFactory,
                                         IGlobalHandlerThrottle globalHandlerThrottle,
                                         ILogger logger,
                                         IQueueManager queueManager,
-                                        Func<NamespaceManager> namespaceManager,
                                         IRetry retry,
                                         IDependencyResolver dependencyResolver,
                                         ISqlFilterExpressionGenerator sqlFilterExpressionGenerator)
         {
             _queueManager = queueManager;
-            _namespaceManager = namespaceManager;
             _retry = retry;
             _dependencyResolver = dependencyResolver;
             _sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
             _globalHandlerThrottle = globalHandlerThrottle;
             _concurrentHandlerLimit = concurrentHandlerLimit;
             _logger = logger;
@@ -58,8 +55,7 @@ namespace Nimbus.Transports.AzureServiceBus
 
         public async Task TestConnection()
         {
-            var version = await _namespaceManager().GetVersionInfoAsync();
-            _logger.Debug("Azure Service Bus transport is online with API version {ApiVersion}", version);
+            _logger.Debug("Azure Service Bus transport is online");
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -85,14 +81,14 @@ namespace Nimbus.Transports.AzureServiceBus
 
         private INimbusMessageSender CreateQueueSender(string queuePath)
         {
-            var sender = new AzureServiceBusQueueMessageSender(_MessageFactory, _logger, _queueManager, _retry, queuePath);
+            var sender = new AzureServiceBusQueueMessageSender(_brokeredMessageFactory, _logger, _queueManager, _retry, queuePath);
             _garbageMan.Add(sender);
             return sender;
         }
 
         private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
         {
-            var receiver = new AzureServiceBusQueueMessageReceiver(_MessageFactory,
+            var receiver = new AzureServiceBusQueueMessageReceiver(_brokeredMessageFactory,
                                                                    _queueManager,
                                                                    queuePath,
                                                                    _concurrentHandlerLimit,
@@ -104,7 +100,7 @@ namespace Nimbus.Transports.AzureServiceBus
 
         private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            var sender = new AzureServiceBusTopicMessageSender(_MessageFactory, _logger, _queueManager, _retry, topicPath);
+            var sender = new AzureServiceBusTopicMessageSender(_brokeredMessageFactory, _logger, _queueManager, _retry, topicPath);
             _garbageMan.Add(sender);
             return sender;
         }
@@ -116,7 +112,7 @@ namespace Nimbus.Transports.AzureServiceBus
                                                                           subscriptionName,
                                                                           filterCondition,
                                                                           _concurrentHandlerLimit,
-                                                                          _MessageFactory,
+                                                                          _brokeredMessageFactory,
                                                                           _globalHandlerThrottle,
                                                                           _logger);
             _garbageMan.Add(receiver);

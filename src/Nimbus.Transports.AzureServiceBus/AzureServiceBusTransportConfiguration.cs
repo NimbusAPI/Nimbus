@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Azure.ServiceBus.Management;
 using Nimbus.ConcurrentCollections;
-using Nimbus.Configuration;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.LargeMessages.Settings;
 using Nimbus.Configuration.PoorMansIocContainer;
@@ -10,11 +10,11 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
+using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.AzureServiceBus.Messages;
 using Nimbus.Transports.AzureServiceBus.DeadLetterOffice;
 using Nimbus.Transports.AzureServiceBus.DelayedDelivery;
 using Nimbus.Transports.AzureServiceBus.Filtering;
-using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus
 {
@@ -55,51 +55,48 @@ namespace Nimbus.Transports.AzureServiceBus
         {
             container.RegisterType<AzureServiceBusTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
 
-            container.RegisterType<MessageFactory>(ComponentLifetime.SingleInstance, typeof (IMessageFactory));
-            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance);
-            container.RegisterType<AzureQueueManager>(ComponentLifetime.SingleInstance, typeof (IQueueManager));
+            container.RegisterType<BrokeredBrokeredMessageFactory>(ComponentLifetime.SingleInstance, typeof (IBrokeredMessageFactory));
             container.RegisterType<DelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<AzureServiceBusDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
-            container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
             container.RegisterType<SqlFilterExpressionGenerator>(ComponentLifetime.SingleInstance, typeof(ISqlFilterExpressionGenerator));
+            //
+            // container.Register(c =>
+            //                    {
+            //                        var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
+            //                            c.Resolve<ServerConnectionCountSetting>(),
+            //                            () =>
+            //                            {
+            //                                var namespaceManager = NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
+            //                                namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
+            //                                return namespaceManager;
+            //                            },
+            //                            nsm => false,
+            //                            nsm => { });
+            //
+            //                        return namespaceManagerRoundRobin;
+            //                    },
+            //                    ComponentLifetime.SingleInstance);
+            //
+            // container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext, ComponentLifetime.InstancePerDependency);
+            //
+            // container.Register(c =>
+            //                    {
+            //                        var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
+            //                            container.Resolve<ServerConnectionCountSetting>(),
+            //                            () =>
+            //                            {
+            //                                var messagingFactory = MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
+            //                                messagingFactory.PrefetchCount = c.Resolve<ConcurrentHandlerLimitSetting>();
+            //                                return messagingFactory;
+            //                            },
+            //                            mf => mf.IsBorked(),
+            //                            mf => mf.Dispose());
+            //
+            //                        return messagingFactoryRoundRobin;
+            //                    },
+            //                    ComponentLifetime.SingleInstance);
 
-            container.Register(c =>
-                               {
-                                   var namespaceManagerRoundRobin = new RoundRobin<NamespaceManager>(
-                                       c.Resolve<ServerConnectionCountSetting>(),
-                                       () =>
-                                       {
-                                           var namespaceManager = NamespaceManager.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
-                                           namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
-                                           return namespaceManager;
-                                       },
-                                       nsm => false,
-                                       nsm => { });
-
-                                   return namespaceManagerRoundRobin;
-                               },
-                               ComponentLifetime.SingleInstance);
-
-            container.Register<Func<NamespaceManager>>(c => c.Resolve<RoundRobin<NamespaceManager>>().GetNext, ComponentLifetime.InstancePerDependency);
-
-            container.Register(c =>
-                               {
-                                   var messagingFactoryRoundRobin = new RoundRobin<MessagingFactory>(
-                                       container.Resolve<ServerConnectionCountSetting>(),
-                                       () =>
-                                       {
-                                           var messagingFactory = MessagingFactory.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
-                                           messagingFactory.PrefetchCount = c.Resolve<ConcurrentHandlerLimitSetting>();
-                                           return messagingFactory;
-                                       },
-                                       mf => mf.IsBorked(),
-                                       mf => mf.Dispose());
-
-                                   return messagingFactoryRoundRobin;
-                               },
-                               ComponentLifetime.SingleInstance);
-
-            container.Register<Func<MessagingFactory>>(c => c.Resolve<RoundRobin<MessagingFactory>>().GetNext, ComponentLifetime.InstancePerDependency);
+           // container.Register<Func<MessagingFactory>>(c => c.Resolve<RoundRobin<MessagingFactory>>().GetNext, ComponentLifetime.InstancePerDependency);
         }
 
         public override IEnumerable<string> Validate()

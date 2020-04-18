@@ -10,12 +10,12 @@ namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery
     internal class DelayedDeliveryService : IDelayedDeliveryService
     {
         private readonly IQueueManager _queueManager;
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
 
-        public DelayedDeliveryService(IQueueManager queueManager, IMessageFactory MessageFactory)
+        public DelayedDeliveryService(IQueueManager queueManager, IBrokeredMessageFactory brokeredMessageFactory)
         {
             _queueManager = queueManager;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
@@ -24,7 +24,7 @@ namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery
             {
                 message.DeliverAfter = deliveryTime;
                 var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
-                var Message = await _MessageFactory.BuildMessage(message);
+                var Message = await _brokeredMessageFactory.BuildMessage(message);
                 await messageSender.SendAsync(Message);
                 return;
             }
@@ -33,7 +33,7 @@ namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery
             {
                 message.DeliverAfter = deliveryTime;
                 var topicSender = await _queueManager.CreateTopicSender(message.DeliverTo);
-                var Message2 = await _MessageFactory.BuildMessage(message);
+                var Message2 = await _brokeredMessageFactory.BuildMessage(message);
                 await topicSender.SendAsync(Message2);
                 return;
             }

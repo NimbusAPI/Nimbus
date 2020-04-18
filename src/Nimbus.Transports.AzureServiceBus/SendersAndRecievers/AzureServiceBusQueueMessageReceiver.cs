@@ -15,14 +15,14 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 {
     internal class AzureServiceBusQueueMessageReceiver : ThrottlingMessageReceiver
     {
-        private readonly IMessageFactory _MessageFactory;
+        private readonly IBrokeredMessageFactory _brokeredMessageFactory;
         private readonly IQueueManager _queueManager;
         private readonly string _queuePath;
         private readonly ILogger _logger;
 
-        private volatile MessageReceiver _messageReceiver;
+        private volatile IMessageReceiver _messageReceiver;
 
-        public AzureServiceBusQueueMessageReceiver(IMessageFactory MessageFactory,
+        public AzureServiceBusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
                                                      IQueueManager queueManager,
                                                      string queuePath,
                                                      ConcurrentHandlerLimitSetting concurrentHandlerLimit,
@@ -33,7 +33,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             _queueManager = queueManager;
             _queuePath = queuePath;
             _logger = logger;
-            _MessageFactory = MessageFactory;
+            _brokeredMessageFactory = brokeredMessageFactory;
         }
 
         public override string ToString()
@@ -75,7 +75,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                     var Message = await receiveTask;
                     if (Message == null) return null;
 
-                    var nimbusMessage = await _MessageFactory.BuildNimbusMessage(Message);
+                    var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(Message);
                     return nimbusMessage;
                 }
             }
@@ -94,7 +94,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             }
         }
 
-        private async Task<MessageReceiver> GetMessageReceiver()
+        private async Task<IMessageReceiver> GetMessageReceiver()
         {
             if (_messageReceiver != null) return _messageReceiver;
 
@@ -103,17 +103,18 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             return _messageReceiver;
         }
 
-        private void DiscardMessageReceiver()
+        private async Task DiscardMessageReceiver()
         {
             var messageReceiver = _messageReceiver;
             _messageReceiver = null;
 
             if (messageReceiver == null) return;
-            if (messageReceiver.IsClosed) return;
+            //TODO
+            if (messageReceiver.IsClosedOrClosing) return;
 
             try
             {
-                messageReceiver.Close();
+                await messageReceiver.CloseAsync();
             }
             catch (Exception exc)
             {
