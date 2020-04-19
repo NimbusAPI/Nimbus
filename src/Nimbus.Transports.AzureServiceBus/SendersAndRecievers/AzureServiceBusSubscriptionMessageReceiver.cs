@@ -69,10 +69,20 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             subscriptionClient.RegisterMessageHandler(OnMessageRecieved, messageHandlerOptions);
         }
 
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs arg)
+        private async Task ExceptionReceivedHandler(ExceptionReceivedEventArgs args)
         {
-            return null;
+            
+            if (args.Exception is MessagingEntityNotFoundException exc)
+            {
+                _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
+                await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
+                DiscardSubscriptionClient();
+                throw args.Exception;
+            }
 
+            _logger.Error(args.Exception, "Messaging operation failed. Discarding message receiver.");
+            DiscardSubscriptionClient();
+            throw args.Exception;
         }
 
         private Task OnMessageRecieved(Message message, CancellationToken cancellationToken)
@@ -82,24 +92,23 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             return Task.CompletedTask;
         }
 
-
         protected override Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             return Task.Run(async () =>
-                                  {
-                                      await _receiveSemaphore.WaitAsync(_pollInterval, cancellationToken);
+                            {
+                                await _receiveSemaphore.WaitAsync(_pollInterval, cancellationToken);
 
-                                      if (_messages.Count == 0)
-                                          return null;
-                                      
-                                      var message = _messages.Dequeue();
-                                      
-                                      var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
-                                      nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
-                                      
-                                      return nimbusMessage;
-                                  },
-                                  cancellationToken).ConfigureAwaitFalse();
+                                if (_messages.Count == 0)
+                                    return null;
+
+                                var message = _messages.Dequeue();
+
+                                var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
+                                nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
+
+                                return nimbusMessage;
+                            },
+                            cancellationToken).ConfigureAwaitFalse();
             // try
             // {
             //     using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
