@@ -67,6 +67,8 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                                             AutoComplete = false
                                         };
             subscriptionClient.RegisterMessageHandler(OnMessageRecieved, messageHandlerOptions);
+            
+            _logger.Debug("Client warmed up");
         }
 
         private async Task ExceptionReceivedHandler(ExceptionReceivedEventArgs args)
@@ -74,9 +76,9 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             
             if (args.Exception is MessagingEntityNotFoundException exc)
             {
-                _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
-                await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
-                DiscardSubscriptionClient();
+                //_logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
+                //await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
+                //DiscardSubscriptionClient();
                 throw args.Exception;
             }
 
@@ -97,6 +99,12 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
             return Task.Run(async () =>
                             {
                                 await _receiveSemaphore.WaitAsync(_pollInterval, cancellationToken);
+
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    await _subscriptionClient.CloseAsync();
+                                    return null;
+                                }
 
                                 if (_messages.Count == 0)
                                     return null;
@@ -163,9 +171,10 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
             if (subscriptionClient == null) return;
             if (subscriptionClient.IsClosedOrClosing) return;
-
             try
             {
+                
+                _logger.Debug($"Closing client for {_subscriptionName}");
                 subscriptionClient.CloseAsync();
             }
             catch (Exception exc)
@@ -176,6 +185,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
         protected override void Dispose(bool disposing)
         {
+            _logger.Debug($"Disposing client for {_subscriptionName}");
             try
             {
                 if (!disposing) return;

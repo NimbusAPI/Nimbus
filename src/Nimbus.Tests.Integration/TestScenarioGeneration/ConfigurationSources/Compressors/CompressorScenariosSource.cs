@@ -9,9 +9,10 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.C
     {
         public IEnumerator<ConfigurationScenario<ICompressor>> GetEnumerator()
         {
+            //TODO
             yield return new NullCompressorScenario();
-            yield return new GzipCompressorScenario();
-            yield return new DeflateCompressorScenario();
+            // yield return new GzipCompressorScenario();
+            // yield return new DeflateCompressorScenario();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

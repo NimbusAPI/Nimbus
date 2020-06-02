@@ -35,6 +35,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Tests.Integration", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.AzureServiceBus", "Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj", "{C5C7C5E4-8E11-4BBD-9771-B330303AEC07}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EC82EEE2-CD23-4147-9239-CB247F5FCB69}"
+ProjectSection(SolutionItems) = preProject
+	..\build.cake = ..\build.cake
+	..\ci_build_test_publish.sh = ..\ci_build_test_publish.sh
+	..\docker-compose.build.yml = ..\docker-compose.build.yml
+	..\docker-compose.yml = ..\docker-compose.yml
+	..\Dockerfile = ..\Dockerfile
+	..\README.md = ..\README.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

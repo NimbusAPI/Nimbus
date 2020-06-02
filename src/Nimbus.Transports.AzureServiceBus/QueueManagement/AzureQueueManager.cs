@@ -28,6 +28,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
         private readonly EnableDeadLetteringOnMessageExpirationSetting _enableDeadLetteringOnMessageExpiration;
         private readonly GlobalPrefixSetting _globalPrefix;
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
+        private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
@@ -47,6 +48,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                  EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
                                  GlobalPrefixSetting globalPrefix,
                                  MaxDeliveryAttemptSetting maxDeliveryAttempts,
+                                 ILogger logger,
                                  IPathFactory pathFactory,
                                  IRetry retry,
                                  ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
@@ -55,6 +57,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
             _managementClient = managementClient;
             _connectionManager = connectionManager;
             _maxDeliveryAttempts = maxDeliveryAttempts;
+            _logger = logger;
             _retry = retry;
             _typeProvider = typeProvider;
             _defaultMessageTimeToLive = defaultMessageTimeToLive;
@@ -99,6 +102,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                 return _retry.Do(() =>
                                                  {
                                                      var topicClient = _connectionManager.CreateTopicClient(topicPath);
+                                                     
                                                      return topicClient;
                                                  },
                                                  "Creating topic sender for " + topicPath);
@@ -120,9 +124,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                  {
                                                      var subscriptionClient = _connectionManager
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
-                                                     //TODO
-                                                     //subscriptionClient.ReplaceFilter("$Default", filterSql);
                                                      
+                                                     subscriptionClient.AddRuleAsync("$Default", new SqlFilter(filterSql));
                                                      return subscriptionClient;
                                                  },
                                                  "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
@@ -174,6 +177,8 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                                                   .OrderBy(p => p)
                                                                                   .ToArray());
 
+                                 _logger.Debug("Found {topicCount} existing topics", topicPaths.Count());
+                                 
                                  return topicPaths;
                              },
                              "Fetching existing topics");
@@ -272,13 +277,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                               catch (MessagingEntityAlreadyExistsException)
                               {
                               }
-                              // catch (MessagingException exc)
-                              // {
-                              //     if (!exc.Message.Contains("SubCode=40901")) throw;
-                              //
-                              //     // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
-                              //     if (await !_managementClient().TopicExistsAsync(topicPath)) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
-                              // }
+                              catch (Exception exc)
+                              {
+                                  if (!exc.Message.Contains("SubCode=40901")) throw;
+                              
+                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
+                                  var exists = await _managementClient().TopicExistsAsync(topicPath);
+                                  if (!exists) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+                              }
 
                               _knownTopics.Value.Add(topicPath);
                           },
@@ -315,15 +321,17 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                               }
                               catch (MessagingEntityAlreadyExistsException)
                               {
+                                  
                               }
-                              // catch (MessagingException exc)
-                              // {
-                              //     if (!exc.Message.Contains("SubCode=40901")) throw;
-                              //
-                              //     // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
-                              //     if (!_managementClient().SubscriptionExists(topicPath, subscriptionName))
-                              //         throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
-                              // }
+                              catch (Exception exc)
+                              {
+                                  if (!exc.Message.Contains("SubCode=40901")) throw;
+                              
+                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
+                                  var exists = await _managementClient().SubscriptionExistsAsync(topicPath, subscriptionName);
+                                  if (!exists)
+                                      throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+                              }
 
                               _knownSubscriptions.Value.Add(subscriptionKey);
                           },

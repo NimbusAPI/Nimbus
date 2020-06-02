@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transports;
-using Nimbus.Tests.Integration.Configuration;
 using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports
