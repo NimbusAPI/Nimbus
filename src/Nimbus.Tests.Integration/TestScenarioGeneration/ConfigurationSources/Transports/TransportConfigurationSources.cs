@@ -11,7 +11,7 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.T
         public IEnumerator<IConfigurationScenario<TransportConfiguration>> GetEnumerator()
         {
             // yield return new InProcess();
-            //yield return new Redis();
+            // yield return new Redis();
             yield return new AzureServiceBus();
         }
 

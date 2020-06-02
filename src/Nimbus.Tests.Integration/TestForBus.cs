@@ -15,7 +15,7 @@ namespace Nimbus.Tests.Integration
     [Timeout(TimeoutSeconds * 1000)]
     public abstract class TestForBus
     {
-        protected const int TimeoutSeconds = 5;
+        protected const int TimeoutSeconds = 50;
         protected readonly TimeSpan Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
         protected ScenarioInstance<BusBuilderConfiguration> Instance { get; private set; }

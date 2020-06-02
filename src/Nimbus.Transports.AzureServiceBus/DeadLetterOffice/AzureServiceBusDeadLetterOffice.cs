@@ -32,24 +32,23 @@ namespace Nimbus.Transports.AzureServiceBus.DeadLetterOffice
         {
             var messageReceiver = await _queueManager.CreateDeadQueueMessageReceiver();
 
-            var Message = await messageReceiver.ReceiveAsync(TimeSpan.Zero);
-            if (Message == null) return null;
-
-            var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(Message);
+            var message = await messageReceiver.ReceiveAsync(TimeSpan.FromMilliseconds(10));
+            if (message == null) return null;
+            
+            var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
             return nimbusMessage;
         }
 
-        public async Task Post(NimbusMessage message)
+        public async Task Post(NimbusMessage nimbusMessage)
         {
             var messageSender = await _queueManager.CreateDeadQueueMessageSender();
-            var Message = await _brokeredMessageFactory.BuildMessage(message);
-            await messageSender.SendAsync(Message);
+            var message = await _brokeredMessageFactory.BuildMessage(nimbusMessage);
+            await messageSender.SendAsync(message);
         }
 
         public async Task<int> Count()
         {
             var messageReceiver = await _queueManager.CreateDeadQueueMessageReceiver();
-
             var messages = await messageReceiver.PeekAsync(int.MaxValue);
             return messages.Count;
         }

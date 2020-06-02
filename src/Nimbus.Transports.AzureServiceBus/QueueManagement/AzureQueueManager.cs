@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
@@ -272,10 +273,16 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                               // update its configuration in a minute anyway.  -andrewh 8/12/2013
                               try
                               {
-                                  await _managementClient().CreateTopicAsync(topicDescription);
+                                  // var exists = await _managementClient().TopicExistsAsync(topicDescription.Path);
+                                  // if (!exists)
+                                  // {
+                                      await _managementClient().CreateTopicAsync(topicDescription);  
+                                  //}
+                                    
                               }
                               catch (MessagingEntityAlreadyExistsException)
                               {
+                                  _logger.Warn("Topic already exists. Continuing");
                               }
                               catch (Exception exc)
                               {

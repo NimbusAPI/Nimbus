@@ -24,8 +24,8 @@ namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery
             {
                 message.DeliverAfter = deliveryTime;
                 var messageSender = await _queueManager.CreateMessageSender(message.DeliverTo);
-                var Message = await _brokeredMessageFactory.BuildMessage(message);
-                await messageSender.SendAsync(Message);
+                var message2 = await _brokeredMessageFactory.BuildMessage(message);
+                await messageSender.SendAsync(message2);
                 return;
             }
 
@@ -33,8 +33,8 @@ namespace Nimbus.Transports.AzureServiceBus.DelayedDelivery
             {
                 message.DeliverAfter = deliveryTime;
                 var topicSender = await _queueManager.CreateTopicSender(message.DeliverTo);
-                var Message2 = await _brokeredMessageFactory.BuildMessage(message);
-                await topicSender.SendAsync(Message2);
+                var message2 = await _brokeredMessageFactory.BuildMessage(message);
+                await topicSender.SendAsync(message2);
                 return;
             }
 

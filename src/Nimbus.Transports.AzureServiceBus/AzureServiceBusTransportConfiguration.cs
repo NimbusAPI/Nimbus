@@ -72,9 +72,7 @@ namespace Nimbus.Transports.AzureServiceBus
                                        {
                                            var client = new ManagementClient(c.Resolve<ConnectionStringSetting>());
                                            return client;
-                                           // var namespaceManager = ManagementClient.CreateFromConnectionString(c.Resolve<ConnectionStringSetting>());
-                                           // namespaceManager.Settings.OperationTimeout = c.Resolve<DefaultTimeoutSetting>();
-                                           // return namespaceManager;
+                                           
                                        },
                                        nsm => false,
                                        nsm => { });

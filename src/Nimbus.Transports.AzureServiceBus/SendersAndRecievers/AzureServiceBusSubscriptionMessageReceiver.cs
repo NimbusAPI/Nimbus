@@ -73,13 +73,14 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
         private async Task ExceptionReceivedHandler(ExceptionReceivedEventArgs args)
         {
-            
-            if (args.Exception is MessagingEntityNotFoundException exc)
+            switch (args.Exception)
             {
-                //_logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
-                //await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
-                //DiscardSubscriptionClient();
-                throw args.Exception;
+                
+                case MessagingEntityNotFoundException ex:
+                    _logger.Warn(ex.Message);
+                    return;
+                case ServiceBusException sbe when sbe.IsTransient:
+                    return;
             }
 
             _logger.Error(args.Exception, "Messaging operation failed. Discarding message receiver.");
