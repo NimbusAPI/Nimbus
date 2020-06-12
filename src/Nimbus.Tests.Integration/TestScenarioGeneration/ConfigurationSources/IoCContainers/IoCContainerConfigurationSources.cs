@@ -9,7 +9,7 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.I
         public IEnumerator<IConfigurationScenario<ContainerConfiguration>> GetEnumerator()
         {
             //TODO
-            //yield return new NoContainerScenario();
+            yield return new NoContainerScenario();
             yield return new AutofacScenario();
             // yield return new NinjectScenario();
             // yield return new WindsorScenario();

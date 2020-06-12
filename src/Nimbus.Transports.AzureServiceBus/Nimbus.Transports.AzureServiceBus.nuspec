@@ -10,7 +10,10 @@
     <description>Azure Service Bus transport layer for Nimbus</description>
     <releaseNotes>.</releaseNotes>
     <copyright>Copyright 2013</copyright>
-    <tags>.NET service bus messaging Windows Service Bus Azure Service Bus WSB ASB</tags>
+    <tags>.NET service bus messaging Azure Service Bus ASB</tags>
     <projectUrl>http://nimbusapi.com/</projectUrl>
+    <dependencies>
+      <dependency id="microsoft.azure.servicebus" version="4.1.2" />
+    </dependencies>
   </metadata>
 </package>
