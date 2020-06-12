@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nimbus.Transports.AzureServiceBus</id>
+    <version>$version$$nugetPackageSuffix$</version>
+    <title>Nimbus.Transports.AzureServiceBus</title>
+    <authors>Damian Maclennan and Andrew Harcourt</authors>
+    <owners>Damian Maclennan</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Azure Service Bus transport layer for Nimbus</description>
+    <releaseNotes>.</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>.NET service bus messaging Azure Service Bus ASB</tags>
+    <projectUrl>http://nimbusapi.com/</projectUrl>
+    <dependencies>
+      <dependency id="microsoft.azure.servicebus" version="4.1.2" />
+    </dependencies>
+  </metadata>
+</package>

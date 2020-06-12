@@ -81,6 +81,7 @@ namespace Nimbus.Configuration
             logger.Debug("Removing all existing namespace elements. IMPORTANT: This should only be done in your regression test suites.");
             var cleanser = container.Resolve<INamespaceCleanser>();
             await cleanser.RemoveAllExistingNamespaceElements();
+            logger.Debug("Namespace elements removed");
         }
     }
 }

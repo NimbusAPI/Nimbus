@@ -21,11 +21,11 @@ namespace Nimbus.Tests.Unit.CompressionTests
 
         protected override async Task<NimbusMessageFactory> Given()
         {
-            _defaultNimbusMessageFactory = BuildBrokeredMessageFactory(new NullCompressor());
-            return BuildBrokeredMessageFactory(new DeflateCompressor());
+            _defaultNimbusMessageFactory = BuildMessageFactory(new NullCompressor());
+            return BuildMessageFactory(new DeflateCompressor());
         }
 
-        private NimbusMessageFactory BuildBrokeredMessageFactory(ICompressor compressor)
+        private NimbusMessageFactory BuildMessageFactory(ICompressor compressor)
         {
             var typeProvider = new TestHarnessTypeProvider(new[] {GetType().Assembly}, new[] {GetType().Namespace});
             var serializer = new DataContractSerializer(typeProvider);

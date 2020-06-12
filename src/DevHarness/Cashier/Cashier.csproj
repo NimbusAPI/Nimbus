@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj" />
+    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="..\..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
+    <ProjectReference Include="..\..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
+    <ProjectReference Include="..\..\Nimbus\Nimbus.csproj" />
+    <ProjectReference Include="..\Cafe.Messages\Cafe.Messages.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.9.4" />
+    <PackageReference Include="autofacserilogintegration" Version="2.1.0" />
+    <PackageReference Include="serilog.sinks.console" Version="3.1.1" />
+    <PackageReference Include="serilog.sinks.seq" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

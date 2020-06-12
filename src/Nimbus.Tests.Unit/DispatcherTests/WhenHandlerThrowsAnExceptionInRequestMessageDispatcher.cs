@@ -15,13 +15,13 @@ namespace Nimbus.Tests.Unit.DispatcherTests
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             var dispatcher = GetRequestMessageDispatcher<ExceptingRequest, ExceptingResponse, ExceptingRequestHandler>(interceptor);
-            var brokeredMessage = NimbusMessageFactory.Create("nullQueue", new ExceptingRequest()).Result;
+            var Message = NimbusMessageFactory.Create("nullQueue", new ExceptingRequest()).Result;
 
-            dispatcher.Dispatch(brokeredMessage).Wait();
+            dispatcher.Dispatch(Message).Wait();
 
             interceptor
                 .Received()
-                .OnRequestHandlerError(Arg.Any<ExceptingRequest>(), brokeredMessage, Arg.Any<Exception>());
+                .OnRequestHandlerError(Arg.Any<ExceptingRequest>(), Message, Arg.Any<Exception>());
         }
     }
 }

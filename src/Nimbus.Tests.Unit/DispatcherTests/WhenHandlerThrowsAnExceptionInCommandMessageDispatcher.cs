@@ -15,11 +15,11 @@ namespace Nimbus.Tests.Unit.DispatcherTests
         {
             var interceptor = Substitute.For<IInboundInterceptor>();
             var dispatcher = GetCommandMessageDispatcher<ExceptingCommand, ExceptingCommandHandler>(interceptor);
-            var brokeredMessage = NimbusMessageFactory.Create("someQueue", new ExceptingCommand()).Result;
+            var Message = NimbusMessageFactory.Create("someQueue", new ExceptingCommand()).Result;
 
             try
             {
-                dispatcher.Dispatch(brokeredMessage).Wait();
+                dispatcher.Dispatch(Message).Wait();
             }
             catch (AggregateException)
             {
@@ -28,7 +28,7 @@ namespace Nimbus.Tests.Unit.DispatcherTests
 
             interceptor
                 .Received()
-                .OnCommandHandlerError(Arg.Any<ExceptingCommand>(), brokeredMessage, Arg.Any<Exception>());
+                .OnCommandHandlerError(Arg.Any<ExceptingCommand>(), Message, Arg.Any<Exception>());
         }
     }
 }

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   seq:
-    image: datalust/seq
+    image: datalust/seq:preview
     ports:
       - "5341:80"
     environment:
