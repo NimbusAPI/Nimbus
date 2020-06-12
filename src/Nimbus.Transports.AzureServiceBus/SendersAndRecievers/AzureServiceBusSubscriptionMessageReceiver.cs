@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
         private readonly string _subscriptionName;
         private readonly IFilterCondition _filterCondition;
         private ISubscriptionClient _subscriptionClient;
-        private Queue<Message> _messages = new Queue<Message>();
+        private BlockingCollection<Message> _messages = new BlockingCollection<Message>();
         readonly SemaphoreSlim _receiveSemaphore = new SemaphoreSlim(0, int.MaxValue);
         private readonly TimeSpan _pollInterval = TimeSpan.FromSeconds(10);
 
@@ -88,7 +89,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
         private Task OnMessageRecieved(Message message, CancellationToken cancellationToken)
         {
-            _messages.Enqueue(message);
+            _messages.Add(message, cancellationToken);
             _receiveSemaphore.Release();
             return Task.CompletedTask;
         }
@@ -108,7 +109,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                                 if (_messages.Count == 0)
                                     return null;
 
-                                var message = _messages.Dequeue();
+                                var message = _messages.Take();
 
                                 var nimbusMessage = await _brokeredMessageFactory.BuildNimbusMessage(message);
                                 nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
