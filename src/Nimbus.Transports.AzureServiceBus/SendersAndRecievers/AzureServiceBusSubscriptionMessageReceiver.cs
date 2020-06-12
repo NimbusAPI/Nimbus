@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
@@ -12,7 +10,6 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
-using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
 namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
@@ -80,6 +77,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                     _logger.Warn(ex.Message);
                     return;
                 case ServiceBusException sbe when sbe.IsTransient:
+                    _logger.Warn(sbe.Message);
                     return;
             }
 
@@ -118,42 +116,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
                                 return nimbusMessage;
                             },
                             cancellationToken).ConfigureAwaitFalse();
-            // try
-            // {
-            //     using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
-            //     {
-            //         
-            //         
-            //
-            //         var receiveTask = subscriptionClient.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
-            //         var cancellationTask = Task.Run(async () => await CancellationTask(cancellationSemaphore, cancellationToken), cancellationToken).ConfigureAwaitFalse();
-            //         await Task.WhenAny(receiveTask, cancellationTask);
-            //         if (!receiveTask.IsCompleted) return null;
-            //
-            //         cancellationSemaphore.Release();
-            //
-            //         var message = await receiveTask;
-            //         if (message == null) return null;
-            //
-            //         var nimbusMessage = await _messageFactory.BuildNimbusMessage(message);
-            //         nimbusMessage.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
-            //
-            //         return nimbusMessage;
-            //     }
-            // }
-            // catch (MessagingEntityNotFoundException exc)
-            // {
-            //     _logger.Error(exc, "The referenced topic subscription {TopicPath}/{SubscriptionName} no longer exists", _topicPath, _subscriptionName);
-            //     await _queueManager.MarkSubscriptionAsNonExistent(_topicPath, _subscriptionName);
-            //     DiscardSubscriptionClient();
-            //     throw;
-            // }
-            // catch (Exception exc)
-            // {
-            //     _logger.Error(exc, "Messaging operation failed. Discarding message receiver.");
-            //     DiscardSubscriptionClient();
-            //     throw;
-            // }
+            
         }
 
         private async Task<ISubscriptionClient> GetSubscriptionClient()
