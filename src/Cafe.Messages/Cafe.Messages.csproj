@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
   </ItemGroup>
 
 </Project>

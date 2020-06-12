@@ -31,7 +31,7 @@ Task ("Clean")
 // Run dotnet restore to restore all package references.
 Task ("Restore")
     .Does (() => {
-        var settings = new DotNetCoreRestoreSettings { };
+        var settings = new DotNetCoreRestoreSettings();
         DotNetCoreRestore ("./src", settings);
     });
 
