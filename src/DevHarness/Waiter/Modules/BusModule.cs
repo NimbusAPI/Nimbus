@@ -23,7 +23,7 @@ namespace Waiter.Modules
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
                                                  .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString("Endpoint=sb://bazaario.servicebus.windows.net/;SharedAccessKeyName=Test;SharedAccessKey=qhdYJZhV6x7z9UzMXXtswDNRVjbEXSEiJWl2bxW/iZE=")
+                                                     new AzureServiceBusTransportConfiguration().WithConnectionString("")
                                                      )
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
