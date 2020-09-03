@@ -8,6 +8,7 @@ using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AzureServiceBus;
+using Nimbus.Transports.Redis;
 using Serilog;
 
 namespace Cashier.Modules
@@ -22,9 +23,12 @@ namespace Cashier.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
+                                                 //     )
                                                  .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString("")
-                                                     )
+                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
+                                                 )
                                                  .WithNames("Cashier", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

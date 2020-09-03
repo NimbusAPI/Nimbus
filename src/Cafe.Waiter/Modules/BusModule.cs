@@ -8,6 +8,7 @@ using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AzureServiceBus;
+using Nimbus.Transports.Redis;
 using Serilog;
 
 namespace Waiter.Modules
@@ -22,9 +23,12 @@ namespace Waiter.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
+                                                 //     )
                                                  .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString("")
-                                                     )
+                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
+                                                 )
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

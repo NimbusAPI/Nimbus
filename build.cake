@@ -121,6 +121,12 @@ Task ("PushPackages")
             Information ($"Pushing package {file}");
             DotNetCoreNuGetPush ($"{file}", settings);
         }
+        packages = GetFiles ($"./**/bin/Release/Nimbus.{version}.nupkg");
+        foreach (var file in packages) {
+            Information ($"Pushing package {file}");
+            DotNetCoreNuGetPush ($"{file}", settings);
+        }
+        
     });
 
 // A meta-task that runs all the steps to Build and Test the app

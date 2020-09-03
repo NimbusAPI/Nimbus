@@ -7,6 +7,7 @@ using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AzureServiceBus;
+using Nimbus.Transports.Redis;
 
 namespace Barista.Modules
 {
@@ -19,8 +20,13 @@ namespace Barista.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
+                                                 //     )
                                                  .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString("")
+                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
+                                                     )                                                 .WithTransport(
+                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
                                                      )
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
