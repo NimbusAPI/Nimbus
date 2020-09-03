@@ -120,13 +120,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                                                        new IsNullCondition(MessagePropertyKeys.RedeliveryToSubscriptionName));
                                 var combinedCondition = new AndCondition(filterCondition, myOwnSubscriptionFilterCondition);
                                 var filterSql = _sqlFilterExpressionGenerator.GenerateFor(combinedCondition);
-
-                                return _retry.Do(() =>
+                                
+                                return _retry.Do(async () =>
                                                  {
+                                                     
                                                      var subscriptionClient = _connectionManager
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
                                                      
-                                                     subscriptionClient.AddRuleAsync("$Default", new SqlFilter(filterSql));
+                                                     await subscriptionClient.AddRuleAsync("$Default", new SqlFilter(filterSql));
                                                      return subscriptionClient;
                                                  },
                                                  "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
@@ -276,9 +277,11 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                   // var exists = await _managementClient().TopicExistsAsync(topicDescription.Path);
                                   // if (!exists)
                                   // {
-                                      await _managementClient().CreateTopicAsync(topicDescription);  
-                                  //}
-                                    
+                                  _logger.Debug("Creating topic {topic}", topicDescription.Path);
+                                  await _managementClient().CreateTopicAsync(topicDescription); 
+                                  _logger.Debug("Topic created {topic}", topicDescription.Path);
+                                      //}
+
                               }
                               catch (MessagingEntityAlreadyExistsException)
                               {

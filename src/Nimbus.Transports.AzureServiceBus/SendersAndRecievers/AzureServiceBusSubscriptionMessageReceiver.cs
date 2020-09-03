@@ -126,6 +126,7 @@ namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
 
             _subscriptionClient = await _queueManager.CreateSubscriptionReceiver(_topicPath, _subscriptionName, _filterCondition);
             _subscriptionClient.PrefetchCount = ConcurrentHandlerLimit;
+            
             return _subscriptionClient;
         }
 

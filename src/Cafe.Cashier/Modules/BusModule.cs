@@ -23,12 +23,12 @@ namespace Cashier.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
-                                                 // .WithTransport(
-                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
-                                                 //     )
                                                  .WithTransport(
-                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
-                                                 )
+                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                     )
+                                                 // .WithTransport(
+                                                 //     new RedisTransportConfiguration().WithConnectionString("localhost")
+                                                 // )
                                                  .WithNames("Cashier", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
