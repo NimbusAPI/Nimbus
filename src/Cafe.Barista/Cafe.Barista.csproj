@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
     <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
     <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
     <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
     <ProjectReference Include="..\Cafe.Messages\Cafe.Messages.csproj" />
   </ItemGroup>
