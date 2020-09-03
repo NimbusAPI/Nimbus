@@ -23,9 +23,7 @@ namespace Barista.Modules
                                                  .WithTransport(
                                                      new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
                                                      )
-                                                 // .WithTransport(
-                                                 //     new RedisTransportConfiguration().WithConnectionString("localhost")
-                                                 //     )
+
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
