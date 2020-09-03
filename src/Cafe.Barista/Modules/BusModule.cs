@@ -20,14 +20,10 @@ namespace Barista.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
-                                                 // .WithTransport(
-                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
-                                                 //     )
                                                  .WithTransport(
-                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
-                                                     )                                                 .WithTransport(
-                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
+                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
                                                      )
+
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

@@ -27,8 +27,8 @@ namespace Waiter.Modules
                                                  //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
                                                  //     )
                                                  .WithTransport(
-                                                     new RedisTransportConfiguration().WithConnectionString("localhost")
-                                                 )
+                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                     )
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
