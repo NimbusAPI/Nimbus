@@ -129,12 +129,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
                                                      var rules = await subscriptionClient.GetRulesAsync();
                                                      
+
                                                      if (rules.Any(r => r.Name == ruleName))
                                                      {
                                                          await subscriptionClient.RemoveRuleAsync(ruleName);    
                                                      }
                                                      
                                                      await subscriptionClient.AddRuleAsync(ruleName, new SqlFilter(filterSql));
+
                                                      return subscriptionClient;
                                                  },
                                                  "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
