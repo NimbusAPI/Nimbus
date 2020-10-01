@@ -101,7 +101,6 @@ Task ("IntegrationTest")
 Task("Test")
     .IsDependentOn("ConventionTest")
     .IsDependentOn("UnitTest")
-    .IsDependentOn("IntegrationTest")
     ;
 
 Task ("PushPackages")
@@ -134,6 +133,7 @@ Task ("BuildAndTest")
     .IsDependentOn ("Clean")
     .IsDependentOn ("Build")
     .IsDependentOn ("Test")
+    .IsDependentOn ("IntegrationTest")
     ;
 
 Task ("CI")
