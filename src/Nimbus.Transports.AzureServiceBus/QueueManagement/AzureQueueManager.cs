@@ -112,6 +112,7 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
 
         public Task<ISubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
         {
+            const string ruleName = "$Default";
             return Task.Run(() =>
                             {
                                 EnsureSubscriptionExists(topicPath, subscriptionName);
@@ -126,8 +127,14 @@ namespace Nimbus.Transports.AzureServiceBus.QueueManagement
                                                      
                                                      var subscriptionClient = _connectionManager
                                                          .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
+                                                     var rules = await subscriptionClient.GetRulesAsync();
                                                      
-                                                     await subscriptionClient.AddRuleAsync("$Default", new SqlFilter(filterSql));
+                                                     if (rules.Any(r => r.Name == ruleName))
+                                                     {
+                                                         await subscriptionClient.RemoveRuleAsync(ruleName);    
+                                                     }
+                                                     
+                                                     await subscriptionClient.AddRuleAsync(ruleName, new SqlFilter(filterSql));
                                                      return subscriptionClient;
                                                  },
                                                  "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +

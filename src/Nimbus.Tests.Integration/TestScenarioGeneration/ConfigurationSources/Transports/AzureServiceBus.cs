@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.Transport;
@@ -9,7 +10,6 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
 {
     internal class AzureServiceBus : ConfigurationScenario<TransportConfiguration>
     {
-        
         protected override IEnumerable<string> AdditionalCategories
         {
             get { yield return "Slow"; }
@@ -18,11 +18,15 @@ namespace Nimbus.Tests.Common.TestScenarioGeneration.ConfigurationSources.Transp
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
             //var largeMessageStorageInstance = _largeMessageScenario.CreateInstance();
+            var azureServiceBusConnectionString = Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING");
+            if (string.IsNullOrEmpty(azureServiceBusConnectionString))
+            {
+                azureServiceBusConnectionString = AppSettingsLoader.Settings.Transports.AzureServiceBus.ConnectionString;
+            }
 
-            var azureServiceBusConnectionString =  AppSettingsLoader.Settings.Transports.AzureServiceBus.ConnectionString;
             var configuration = new AzureServiceBusTransportConfiguration()
                 .WithConnectionString(azureServiceBusConnectionString);
-                //.WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
+            //.WithLargeMessageStorage(largeMessageStorageInstance.Configuration);
 
             var instance = new ScenarioInstance<TransportConfiguration>(configuration);
 
