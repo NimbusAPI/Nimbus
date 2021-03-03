@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
-using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 
-namespace Nimbus.DevelopmentStubs
+namespace Nimbus.Infrastructure.DeliveryRetries
 {
-    internal class StubDeliveryRetryStrategy : IDeliveryRetryStrategy
+    internal class NoWaitDeliveryRetryStrategy : IDeliveryRetryStrategy
     {
         public DateTimeOffset CalculateNextRetryTime(NimbusMessage message)
         {
