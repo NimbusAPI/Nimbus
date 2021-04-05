@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "octoversion.tool": {
+      "version": "0.2.421",
+      "commands": [
+        "octoversion"
+      ]
+    }
+  }
+}
