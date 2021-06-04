@@ -5,13 +5,11 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
 
     public class ConnectionManager : IConnectionManager
     {
-        private readonly ConnectionStringSetting _connectionStringSetting;
         private readonly ServiceBusClient _serviceBusClient;
 
         public ConnectionManager(ConnectionStringSetting connectionStringSetting)
         {
-            this._connectionStringSetting = connectionStringSetting;
-            this._serviceBusClient = new ServiceBusClient(this._connectionStringSetting);
+            this._serviceBusClient = new ServiceBusClient(connectionStringSetting);
         }
 
         public ServiceBusSender CreateMessageSender(string queuePath)
@@ -40,6 +38,7 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
                           {
                               ReceiveMode = receiveMode
                           };
+            
             return this._serviceBusClient.CreateProcessor(topicPath, subscriptionName, options);
         }
     }
