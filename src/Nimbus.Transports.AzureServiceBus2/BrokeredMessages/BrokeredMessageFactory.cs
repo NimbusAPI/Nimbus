@@ -85,7 +85,7 @@
                                   });
         }
 
-        public async Task<NimbusMessage> BuildNimbusMessage(ServiceBusMessage message)
+        public async Task<NimbusMessage> BuildNimbusMessage(ServiceBusReceivedMessage message)
         {
             var nimbusMessage = await this.DeserializeNimbusMessage(message);
             return nimbusMessage;
@@ -99,7 +99,7 @@
             return compressedBytes;
         }
 
-        public async Task<NimbusMessage> DeserializeNimbusMessage(ServiceBusMessage message)
+        public async Task<NimbusMessage> DeserializeNimbusMessage(ServiceBusReceivedMessage message)
         {
             byte[] compressedBytes;
 

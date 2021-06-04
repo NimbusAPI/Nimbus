@@ -27,9 +27,9 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
             return this._serviceBusClient.CreateReceiver(queuePath, options);
         }
 
-        public ServiceBusProcessor CreateTopicClient(string topicPath)
+        public ServiceBusSender CreateTopicClient(string topicPath)
         {
-            return this._serviceBusClient.CreateProcessor(topicPath);
+            return this._serviceBusClient.CreateSender(topicPath);
         }
 
         public ServiceBusProcessor CreateSubscriptionClient(string topicPath, string subscriptionName, ServiceBusReceiveMode receiveMode)

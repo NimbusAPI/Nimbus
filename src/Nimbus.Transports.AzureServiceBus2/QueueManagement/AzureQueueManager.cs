@@ -96,7 +96,7 @@
                 }).ConfigureAwaitFalse();
         }
 
-        public Task<ServiceBusProcessor> CreateTopicSender(string topicPath)
+        public Task<ServiceBusSender> CreateTopicSender(string topicPath)
         {
             return Task.Run(
                 () =>

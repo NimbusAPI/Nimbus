@@ -1,25 +1,36 @@
 ﻿namespace Nimbus.Transports.AzureServiceBus2.Extensions
 {
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus;
-    using Microsoft.Azure.ServiceBus.Management;
+    using Azure.Messaging.ServiceBus;
+    using Azure.Messaging.ServiceBus.Administration;
 
     internal static class SubscriptionClientFilteringExtensions
     {
-        internal static async Task ReplaceFilter(this SubscriptionClient subscriptionClient, string filterName, string filterExpression)
+        internal static async Task ReplaceFilter(
+            this ServiceBusAdministrationClient administrationClient,
+            string filterName,
+            string filterExpression,
+            string topicName,
+            string subscriptionName)
         {
             try
             {
-                await subscriptionClient.RemoveRuleAsync(filterName);
+                await administrationClient.DeleteRuleAsync(topicName, subscriptionName, filterName);
             }
-            catch (MessagingEntityNotFoundException)
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
             {
             }
+
             try
             {
-                await subscriptionClient.AddRuleAsync(filterName, new SqlFilter(filterExpression));
+                var options = new CreateRuleOptions()
+                              {
+                                  Name = filterName,
+                                  Filter = new SqlRuleFilter(filterExpression)
+                              };
+                await administrationClient.CreateRuleAsync(topicName, subscriptionName, options);
             }
-            catch (MessagingEntityAlreadyExistsException)
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
             {
             }
         }

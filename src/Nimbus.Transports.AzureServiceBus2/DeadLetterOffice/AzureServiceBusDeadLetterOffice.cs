@@ -21,10 +21,10 @@ namespace Nimbus.Transports.AzureServiceBus2.DeadLetterOffice
         {
             var messageReceiver = await this._queueManager.CreateDeadQueueMessageReceiver();
 
-            var Message = await messageReceiver.PeekAsync();
-            if (Message == null) return null;
+            var message = await messageReceiver.PeekMessageAsync();
+            if (message == null) return null;
 
-            var nimbusMessage = await this._brokeredMessageFactory.BuildNimbusMessage(Message);
+            var nimbusMessage = await this._brokeredMessageFactory.BuildNimbusMessage(message);
             return nimbusMessage;
         }
 
@@ -32,7 +32,7 @@ namespace Nimbus.Transports.AzureServiceBus2.DeadLetterOffice
         {
             var messageReceiver = await this._queueManager.CreateDeadQueueMessageReceiver();
 
-            var message = await messageReceiver.ReceiveAsync(TimeSpan.FromMilliseconds(10));
+            var message = await messageReceiver.ReceiveMessageAsync(TimeSpan.FromMilliseconds(10));
             if (message == null) return null;
             
             var nimbusMessage = await this._brokeredMessageFactory.BuildNimbusMessage(message);
@@ -43,13 +43,13 @@ namespace Nimbus.Transports.AzureServiceBus2.DeadLetterOffice
         {
             var messageSender = await this._queueManager.CreateDeadQueueMessageSender();
             var message = await this._brokeredMessageFactory.BuildMessage(nimbusMessage);
-            await messageSender.SendAsync(message);
+            await messageSender.SendMessageAsync(message);
         }
 
         public async Task<int> Count()
         {
             var messageReceiver = await this._queueManager.CreateDeadQueueMessageReceiver();
-            var messages = await messageReceiver.PeekAsync(int.MaxValue);
+            var messages = await messageReceiver.PeekMessagesAsync(int.MaxValue);
             return messages.Count;
         }
     }

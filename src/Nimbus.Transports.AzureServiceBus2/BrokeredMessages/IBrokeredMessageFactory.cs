@@ -7,6 +7,6 @@
     internal interface IBrokeredMessageFactory
     {
         Task<ServiceBusMessage> BuildMessage(NimbusMessage nimbusMessage);
-        Task<NimbusMessage> BuildNimbusMessage(ServiceBusMessage message);
+        Task<NimbusMessage> BuildNimbusMessage(ServiceBusReceivedMessage message);
     }
 }

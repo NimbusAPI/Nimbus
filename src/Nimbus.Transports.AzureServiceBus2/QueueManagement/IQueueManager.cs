@@ -9,7 +9,7 @@
         Task<ServiceBusSender> CreateMessageSender(string queuePath);
         Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath);
 
-        Task<ServiceBusProcessor> CreateTopicSender(string topicPath);
+        Task<ServiceBusSender> CreateTopicSender(string topicPath);
         Task<ServiceBusProcessor> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition);
 
         Task MarkQueueAsNonExistent(string queuePath);
