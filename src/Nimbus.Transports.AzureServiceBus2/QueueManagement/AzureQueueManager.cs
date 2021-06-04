@@ -85,7 +85,7 @@
                 }).ConfigureAwaitFalse();
         }
 
-        public Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath, int preFetchCount)
+        public Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath, int preFetchCount = 0)
         {
             return Task.Run(
                 () =>
