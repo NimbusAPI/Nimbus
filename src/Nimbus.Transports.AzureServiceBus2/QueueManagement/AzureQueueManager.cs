@@ -135,18 +135,35 @@
                     return this._retry.Do(
                         async () =>
                         {
-                            var subscriptionClient = this._connectionManager
-                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete, preFetchCount);
-                            var rules = await subscriptionClient.GetRulesAsync();
+                            var rulesAsync = this._administrationClient().GetRulesAsync(topicPath, subscriptionName);
+
+                            var pages = rulesAsync.AsPages();
+                            var rules = new List<RuleProperties>();
+                            await foreach (var rulePage in pages)
+                            {
+                                foreach (var rule in rulePage.Values)
+                                {
+                                    if (rule.Name.StartsWith(this._globalPrefix.Value))
+                                    {
+                                        rules.Add(rule);
+                                    }
+                                }
+                            }
 
                             if (rules.Any(r => r.Name == ruleName))
                             {
-                                await subscriptionClient.RemoveRuleAsync(ruleName);
+                                await this._administrationClient().DeleteRuleAsync(topicPath, subscriptionName, ruleName);
                             }
 
-                            await subscriptionClient.AddRuleAsync(ruleName, new SqlFilter(filterSql));
+                            var options = new CreateRuleOptions()
+                                          {
+                                              Filter = new SqlRuleFilter(filterSql),
+                                              Name = ruleName
+                                          };
+                            await this._administrationClient().CreateRuleAsync(topicPath, subscriptionName, options);
 
-                            return subscriptionClient;
+                            return this._connectionManager
+                                       .CreateSubscriptionClient(topicPath, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete, preFetchCount);
                         },
                         "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
                         filterCondition);
@@ -435,7 +452,8 @@
                         }
                         catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
                         {
-                            await this._administrationClient().UpdateQueueAsync(queueDescription);
+                            // Patrick TODO: How to update this?!?!?!
+                            // await this._administrationClient().UpdateQueueAsync(queueDescription);
                         }
 
                         value.Add(queuePath);
