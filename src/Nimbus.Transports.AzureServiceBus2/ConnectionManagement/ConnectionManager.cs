@@ -33,11 +33,16 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
             return this._serviceBusClient.CreateSender(topicPath);
         }
 
-        public ServiceBusProcessor CreateSubscriptionClient(string topicPath, string subscriptionName, ServiceBusReceiveMode receiveMode)
+        public ServiceBusProcessor CreateSubscriptionClient(
+            string topicPath,
+            string subscriptionName,
+            ServiceBusReceiveMode receiveMode,
+            int preFetchCount)
         {
             var options = new ServiceBusProcessorOptions()
                           {
-                              ReceiveMode = receiveMode
+                              ReceiveMode = receiveMode,
+                              PrefetchCount = preFetchCount.Value
                           };
 
             return this._serviceBusClient.CreateProcessor(topicPath, subscriptionName, options);

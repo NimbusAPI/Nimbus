@@ -8,6 +8,10 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
         ServiceBusSender CreateMessageSender(string queuePath);
         ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, ConcurrentHandlerLimitSetting preFetchCount);
         ServiceBusSender CreateTopicClient(string topicPath);
-        ServiceBusProcessor CreateSubscriptionClient(string topicPath, string subscriptionName, ServiceBusReceiveMode receiveMode);
+        ServiceBusProcessor CreateSubscriptionClient(
+            string topicPath,
+            string subscriptionName,
+            ServiceBusReceiveMode receiveMode,
+            int preFetchCount);
     }
 }
