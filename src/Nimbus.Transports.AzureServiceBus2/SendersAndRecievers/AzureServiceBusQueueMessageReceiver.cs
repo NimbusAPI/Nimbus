@@ -3,8 +3,7 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus;
-    using Microsoft.Azure.ServiceBus.Core;
+    using Azure.Messaging.ServiceBus;
     using Nimbus.Configuration.Settings;
     using Nimbus.Extensions;
     using Nimbus.Infrastructure;
@@ -20,7 +19,7 @@
         private readonly string _queuePath;
         private readonly ILogger _logger;
 
-        private volatile IMessageReceiver _messageReceiver;
+        private volatile ServiceBusReceiver _messageReceiver;
 
         public AzureServiceBusQueueMessageReceiver(IBrokeredMessageFactory brokeredMessageFactory,
                                                      IQueueManager queueManager,
@@ -64,7 +63,7 @@
                 using (var cancellationSemaphore = new SemaphoreSlim(0, int.MaxValue))
                 {
                     var messageReceiver = await this.GetMessageReceiver();
-                    var receiveTask = messageReceiver.ReceiveAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
+                    var receiveTask = messageReceiver.ReceiveMessageAsync(TimeSpan.FromSeconds(300)).ConfigureAwaitFalse();
                     var cancellationTask = Task.Run(async () => await this.CancellationTask(cancellationSemaphore, cancellationToken), cancellationToken).ConfigureAwaitFalse();
 
                     await Task.WhenAny(receiveTask, cancellationTask);
@@ -79,9 +78,9 @@
                     return nimbusMessage;
                 }
             }
-            catch (MessagingEntityNotFoundException exc)
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
             {
-                this._logger.Error(exc, "The referenced queue {QueuePath} no longer exists", this._queuePath);
+                this._logger.Error(ex, "The referenced queue {QueuePath} no longer exists", this._queuePath);
                 await this._queueManager.MarkQueueAsNonExistent(this._queuePath);
                 this.DiscardMessageReceiver();
                 throw;
@@ -94,12 +93,11 @@
             }
         }
 
-        private async Task<IMessageReceiver> GetMessageReceiver()
+        private async Task<ServiceBusReceiver> GetMessageReceiver()
         {
             if (this._messageReceiver != null) return this._messageReceiver;
 
-            this._messageReceiver = await this._queueManager.CreateMessageReceiver(this._queuePath);
-            this._messageReceiver.PrefetchCount = this.ConcurrentHandlerLimit;
+            this._messageReceiver = await this._queueManager.CreateMessageReceiver(this._queuePath, this.ConcurrentHandlerLimit);
             return this._messageReceiver;
         }
 
@@ -110,7 +108,7 @@
 
             if (messageReceiver == null) return;
             //TODO
-            if (messageReceiver.IsClosedOrClosing) return;
+            if (messageReceiver.IsClosed) return;
 
             try
             {
@@ -130,7 +128,7 @@
 
                 this.DiscardMessageReceiver();
             }
-            catch (MessagingEntityNotFoundException)
+            catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
             {
             }
             catch (ObjectDisposedException)

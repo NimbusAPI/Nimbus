@@ -85,13 +85,13 @@
                 }).ConfigureAwaitFalse();
         }
 
-        public Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath)
+        public Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath, ConcurrentHandlerLimitSetting preFetchCount)
         {
             return Task.Run(
                 () =>
                 {
                     this.EnsureQueueExists(queuePath);
-                    var receiver = this._connectionManager.CreateMessageReceiver(queuePath, ServiceBusReceiveMode.ReceiveAndDelete);
+                    var receiver = this._connectionManager.CreateMessageReceiver(queuePath, ServiceBusReceiveMode.ReceiveAndDelete, preFetchCount);
                     return receiver;
                 }).ConfigureAwaitFalse();
         }

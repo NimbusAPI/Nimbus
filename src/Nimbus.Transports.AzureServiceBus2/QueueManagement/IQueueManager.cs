@@ -2,12 +2,13 @@
 {
     using System.Threading.Tasks;
     using Azure.Messaging.ServiceBus;
+    using Nimbus.Configuration.Settings;
     using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
     internal interface IQueueManager
     {
         Task<ServiceBusSender> CreateMessageSender(string queuePath);
-        Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath);
+        Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath, ConcurrentHandlerLimitSetting preFetchCount);
 
         Task<ServiceBusSender> CreateTopicSender(string topicPath);
         Task<ServiceBusProcessor> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition);

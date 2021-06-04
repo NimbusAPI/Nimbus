@@ -17,10 +17,11 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
             return this._serviceBusClient.CreateSender(queuePath);
         }
 
-        public ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode)
+        public ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, ConcurrentHandlerLimitSetting preFetchCount)
         {
             var options = new ServiceBusReceiverOptions()
                           {
+                              PrefetchCount = preFetchCount,
                               ReceiveMode = receiveMode
                           };
 
@@ -38,7 +39,7 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
                           {
                               ReceiveMode = receiveMode
                           };
-            
+
             return this._serviceBusClient.CreateProcessor(topicPath, subscriptionName, options);
         }
     }
