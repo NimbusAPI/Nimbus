@@ -10,4 +10,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Nimbus.Transports.InProcess")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.Redis")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.AzureServiceBus")]
+[assembly: InternalsVisibleTo("Nimbus.Transports.AzureServiceBus2")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2", AllInternalsVisible = true)]

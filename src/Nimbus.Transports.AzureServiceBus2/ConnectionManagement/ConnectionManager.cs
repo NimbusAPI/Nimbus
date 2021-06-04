@@ -1,0 +1,46 @@
+namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
+{
+    using Azure.Messaging.ServiceBus;
+    using Nimbus.Configuration.Settings;
+
+    public class ConnectionManager : IConnectionManager
+    {
+        private readonly ConnectionStringSetting _connectionStringSetting;
+        private readonly ServiceBusClient _serviceBusClient;
+
+        public ConnectionManager(ConnectionStringSetting connectionStringSetting)
+        {
+            this._connectionStringSetting = connectionStringSetting;
+            this._serviceBusClient = new ServiceBusClient(this._connectionStringSetting);
+        }
+
+        public ServiceBusSender CreateMessageSender(string queuePath)
+        {
+            return this._serviceBusClient.CreateSender(queuePath);
+        }
+
+        public ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode)
+        {
+            var options = new ServiceBusReceiverOptions()
+                          {
+                              ReceiveMode = receiveMode
+                          };
+
+            return this._serviceBusClient.CreateReceiver(queuePath, options);
+        }
+
+        public ServiceBusProcessor CreateTopicClient(string topicPath)
+        {
+            return this._serviceBusClient.CreateProcessor(topicPath);
+        }
+
+        public ServiceBusProcessor CreateSubscriptionClient(string topicPath, string subscriptionName, ServiceBusReceiveMode receiveMode)
+        {
+            var options = new ServiceBusProcessorOptions()
+                          {
+                              ReceiveMode = receiveMode
+                          };
+            return this._serviceBusClient.CreateProcessor(topicPath, subscriptionName, options);
+        }
+    }
+}
