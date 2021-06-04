@@ -17,7 +17,7 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
             return this._serviceBusClient.CreateSender(queuePath);
         }
 
-        public ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, ConcurrentHandlerLimitSetting preFetchCount)
+        public ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, int preFetchCount = 0)
         {
             var options = new ServiceBusReceiverOptions()
                           {

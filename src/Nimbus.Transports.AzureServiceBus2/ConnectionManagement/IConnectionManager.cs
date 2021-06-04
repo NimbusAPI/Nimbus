@@ -6,7 +6,7 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
     public interface IConnectionManager
     {
         ServiceBusSender CreateMessageSender(string queuePath);
-        ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, ConcurrentHandlerLimitSetting preFetchCount);
+        ServiceBusReceiver CreateMessageReceiver(string queuePath, ServiceBusReceiveMode receiveMode, int preFetchCount);
         ServiceBusSender CreateTopicClient(string topicPath);
         ServiceBusProcessor CreateSubscriptionClient(
             string topicPath,
