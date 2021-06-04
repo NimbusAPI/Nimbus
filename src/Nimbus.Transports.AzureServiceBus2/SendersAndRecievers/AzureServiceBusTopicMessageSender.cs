@@ -2,7 +2,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
 {
     using System;
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus;
+    using Azure.Messaging.ServiceBus;
     using Nimbus.Extensions;
     using Nimbus.Infrastructure.MessageSendersAndReceivers;
     using Nimbus.Infrastructure.Retries;
@@ -17,7 +17,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
         private readonly string _topicPath;
         private readonly ILogger _logger;
 
-        private ITopicClient _topicClient;
+        private ServiceBusSender _topicClient;
         private readonly IRetry _retry;
 
         public AzureServiceBusTopicMessageSender(IBrokeredMessageFactory brokeredMessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string topicPath)
@@ -38,9 +38,9 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
                                            var topicClient = this.GetTopicClient();
                                            try
                                            {
-                                               await topicClient.SendAsync(message);
+                                               await topicClient.SendMessageAsync(message);
                                            }
-                                           catch (MessagingEntityNotFoundException exc)
+                                           catch (ServiceBusException exc) when(exc.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
                                            {
                                                this._logger.Error(exc, "The referenced topic path {TopicPath} no longer exists", this._topicPath);
                                                await this._queueManager.MarkTopicAsNonExistent(this._topicPath);
@@ -56,7 +56,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
                                  "Sending message to topic").ConfigureAwaitFalse();
         }
 
-        private ITopicClient GetTopicClient()
+        private ServiceBusSender GetTopicClient()
         {
             if (this._topicClient != null) return this._topicClient;
 
@@ -70,7 +70,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
             this._topicClient = null;
 
             if (topicClient == null) return;
-            if (topicClient.IsClosedOrClosing) return;
+            if (topicClient.IsClosed) return;
 
             try
             {
