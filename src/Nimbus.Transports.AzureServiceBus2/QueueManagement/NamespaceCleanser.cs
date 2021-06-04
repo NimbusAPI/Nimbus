@@ -1,8 +1,9 @@
 namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus.Management;
+    using Azure.Messaging.ServiceBus.Administration;
     using Nimbus.ConcurrentCollections;
     using Nimbus.Configuration;
     using Nimbus.Configuration.Settings;
@@ -14,7 +15,7 @@ namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
         private readonly GlobalPrefixSetting _globalPrefix;
         private readonly ILogger _logger;
 
-        private readonly ThreadSafeLazy<ManagementClient> _namespaceManager;
+        private readonly ThreadSafeLazy<ServiceBusAdministrationClient> _namespaceManager;
 
         public NamespaceCleanser(ConnectionStringSetting connectionString, GlobalPrefixSetting globalPrefix, ILogger logger)
         {
@@ -22,7 +23,7 @@ namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
             this._globalPrefix = globalPrefix;
             this._logger = logger;
 
-            this._namespaceManager = new ThreadSafeLazy<ManagementClient>(() => new ManagementClient(connectionString));
+            this._namespaceManager = new ThreadSafeLazy<ServiceBusAdministrationClient>(() => new ServiceBusAdministrationClient(connectionString));
         }
 
         /// <summary>
@@ -30,29 +31,63 @@ namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
         /// </summary>
         public async Task RemoveAllExistingNamespaceElements()
         {
-            var queueDeletionTasks = (await this._namespaceManager.Value.GetQueuesAsync())
-                                                      .Select(q => q.Path)
-                                                      .Select(this.DeleteQueue)
-                                                      .ToArray();
-            
-            var topicDeletionTasks = (await this._namespaceManager.Value.GetTopicsAsync())
-                                                      .Select(t => t.Path)
-                                                      .Select(this.DeleteTopic)
-                                                      .ToArray();
+            var queuesAsync = this._namespaceManager.Value.GetQueuesAsync();
+            var queuePages = queuesAsync.AsPages();
+            var queues = new List<QueueProperties>();
+            await foreach (var queuePage in queuePages)
+            {
+                foreach (var queue in queuePage.Values)
+                {
+                    queues.Add(queue);
+                }
+            }
+
+            var queueDeletionTasks = queues
+                                     .Select(q => q.Name)
+                                     .Select(this.DeleteQueue)
+                                     .ToArray();
+
+            var topicsAsync = this._namespaceManager.Value.GetTopicsAsync();
+            var topicPages = topicsAsync.AsPages();
+            var topics = new List<TopicProperties>();
+            await foreach (var topicPage in topicPages)
+            {
+                foreach (var topic in topicPage.Values)
+                {
+                    topics.Add(topic);
+                }
+            }
+
+            var topicDeletionTasks = topics
+                                     .Select(q => q.Name)
+                                     .Select(this.DeleteTopic)
+                                     .ToArray();
+
             var allDeletionTasks = new Task[0]
-                .Union(queueDeletionTasks)
-                .Union(topicDeletionTasks)
-                .ToArray();
+                                   .Union(queueDeletionTasks)
+                                   .Union(topicDeletionTasks)
+                                   .ToArray();
 
             await Task.WhenAll(allDeletionTasks);
-            
         }
 
         private async Task DeleteTopic(string topicPath)
         {
             if (!topicPath.StartsWith(this._globalPrefix.Value)) return;
+            
+            var subscriptionsAsync = this._namespaceManager.Value.GetSubscriptionsAsync(topicPath);
+            var subscriptionPages = subscriptionsAsync.AsPages();
+            var subscriptions = new List<SubscriptionProperties>();
+            await foreach (var subscriptionPage in subscriptionPages)
+            {
+                foreach (var subscription in subscriptionPage.Values)
+                {
+                    subscriptions.Add(subscription);
+                }
+            }
+            
+            
 
-            var subscriptions = await this._namespaceManager.Value.GetSubscriptionsAsync(topicPath);
             var subscriptionDeletionTasks = subscriptions
                                             .Select(s => this.DeleteSubscription(topicPath, s.SubscriptionName))
                                             .ToArray();
@@ -63,7 +98,6 @@ namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
             this._logger.Debug("Deleting topic {0}", topicPath);
             await this._namespaceManager.Value.DeleteTopicAsync(topicPath);
             this._logger.Debug("Deleted topic {0}", topicPath);
-            
         }
 
         private async Task DeleteSubscription(string topicPath, string subscriptionName)
