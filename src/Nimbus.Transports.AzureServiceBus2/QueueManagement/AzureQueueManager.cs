@@ -31,7 +31,7 @@
         private readonly ILogger _logger;
 
         private readonly ThreadSafeLazy<Task<ConcurrentSet<string>>> _knownTopics;
-        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
+        private readonly ThreadSafeLazy<Task<ConcurrentSet<string>>> _knownSubscriptions;
         private readonly ThreadSafeLazy<Task<ConcurrentSet<string>>> _knownQueues;
         private readonly IPathFactory _pathFactory;
         private readonly IRetry _retry;
@@ -70,7 +70,7 @@
             this._pathFactory = pathFactory;
 
             this._knownTopics = new ThreadSafeLazy<Task<ConcurrentSet<string>>>(this.FetchExistingTopics);
-            this._knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(this.FetchExistingSubscriptions);
+            this._knownSubscriptions = new ThreadSafeLazy<Task<ConcurrentSet<string>>>(this.FetchExistingSubscriptions);
             this._knownQueues = new ThreadSafeLazy<Task<ConcurrentSet<string>>>(this.FetchExistingQueues);
         }
 
@@ -114,7 +114,11 @@
                 }).ConfigureAwaitFalse();
         }
 
-        public Task<ServiceBusProcessor> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
+        public Task<ServiceBusProcessor> CreateSubscriptionReceiver(
+            string topicPath,
+            string subscriptionName,
+            IFilterCondition filterCondition,
+            int preFetchCount)
         {
             const string ruleName = "$Default";
             return Task.Run(
@@ -132,7 +136,7 @@
                         async () =>
                         {
                             var subscriptionClient = this._connectionManager
-                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete);
+                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete, preFetchCount);
                             var rules = await subscriptionClient.GetRulesAsync();
 
                             if (rules.Any(r => r.Name == ruleName))
@@ -149,26 +153,25 @@
                 }).ConfigureAwaitFalse();
         }
 
-        public Task MarkQueueAsNonExistent(string queuePath)
+        public async Task MarkQueueAsNonExistent(string queuePath)
         {
-            return Task.Run(() => this._knownQueues.Value.Remove(queuePath)).ConfigureAwaitFalse();
+            var value = await this._knownQueues.Value;
+            value.Remove(queuePath);
         }
 
-        public Task MarkTopicAsNonExistent(string topicPath)
+        public async Task MarkTopicAsNonExistent(string topicPath)
         {
-            return Task.Run(() => this._knownTopics.Value.Remove(topicPath)).ConfigureAwaitFalse();
+            var value = await this._knownTopics.Value;
+            value.Remove(topicPath);
         }
 
-        public Task MarkSubscriptionAsNonExistent(string topicPath, string subscriptionName)
+        public async Task MarkSubscriptionAsNonExistent(string topicPath, string subscriptionName)
         {
-            return Task.Run(
-                () =>
-                {
-                    this._knownSubscriptions.Value
-                        .Where(path => path.StartsWith(topicPath))
-                        .Do(key => this._knownSubscriptions.Value.Remove(key))
-                        .Done();
-                }).ConfigureAwaitFalse();
+            var value = await this._knownSubscriptions.Value;
+            value
+                .Where(path => path.StartsWith(topicPath))
+                .Do(key => value.Remove(key))
+                .Done();
         }
 
         public Task<ServiceBusSender> CreateDeadQueueMessageSender()
@@ -351,18 +354,19 @@
             }
         }
 
-        private void EnsureSubscriptionExists(string topicPath, string subscriptionName)
+        private async Task EnsureSubscriptionExists(string topicPath, string subscriptionName)
         {
             var subscriptionKey = BuildSubscriptionKey(topicPath, subscriptionName);
 
-            if (this._knownSubscriptions.Value.Contains(subscriptionKey)) return;
+            var value = await this._knownSubscriptions.Value;
+            if (value.Contains(subscriptionKey)) return;
             lock (this.LockFor(subscriptionKey))
             {
-                if (this._knownSubscriptions.Value.Contains(subscriptionKey)) return;
+                if (value.Contains(subscriptionKey)) return;
 
                 this.EnsureTopicExists(topicPath);
 
-                this._retry.Do(
+                this._retry.DoAsync(
                     async () =>
                     {
                         var subscriptionDescription = new CreateSubscriptionOptions(topicPath, subscriptionName)
@@ -392,7 +396,7 @@
                                 throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
                         }
 
-                        this._knownSubscriptions.Value.Add(subscriptionKey);
+                        value.Add(subscriptionKey);
                     },
                     "Creating subscription " + subscriptionName + " for topic " + topicPath);
             }

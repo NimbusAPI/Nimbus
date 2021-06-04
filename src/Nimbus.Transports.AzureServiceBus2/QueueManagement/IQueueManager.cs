@@ -11,7 +11,11 @@
         Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath, ConcurrentHandlerLimitSetting preFetchCount);
 
         Task<ServiceBusSender> CreateTopicSender(string topicPath);
-        Task<ServiceBusProcessor> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition);
+        Task<ServiceBusProcessor> CreateSubscriptionReceiver(
+            string topicPath,
+            string subscriptionName,
+            IFilterCondition filterCondition,
+            int preFetchCount);
 
         Task MarkQueueAsNonExistent(string queuePath);
         Task MarkTopicAsNonExistent(string topicPath);
