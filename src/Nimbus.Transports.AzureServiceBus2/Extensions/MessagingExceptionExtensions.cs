@@ -4,13 +4,13 @@ namespace Nimbus.Transports.AzureServiceBus2.Extensions
 
     internal static class MessagingExceptionExtensions
     {
-        internal static bool IsTransientFault(this ServiceBusFailureReason reason)
+        internal static bool IsTransientFault(this ServiceBusException exception)
         {
             return
-                reason is ServiceBusFailureReason.ServiceTimeout ||
-                reason is ServiceBusFailureReason.ServiceBusy ||
-                reason is ServiceBusFailureReason.QuotaExceeded ||
-                reason is ServiceBusFailureReason.MessagingEntityDisabled;
+                exception.Reason is ServiceBusFailureReason.ServiceTimeout ||
+                exception.Reason is ServiceBusFailureReason.ServiceBusy ||
+                exception.Reason is ServiceBusFailureReason.QuotaExceeded ||
+                exception.Reason is ServiceBusFailureReason.MessagingEntityDisabled;
         }
     }
 }
