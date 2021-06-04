@@ -1,11 +1,11 @@
 ﻿namespace Nimbus.Transports.AzureServiceBus2.QueueManagement
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus;
-    using Microsoft.Azure.ServiceBus.Core;
-    using Microsoft.Azure.ServiceBus.Management;
+    using Azure.Messaging.ServiceBus;
+    using Azure.Messaging.ServiceBus.Administration;
     using Nimbus.ConcurrentCollections;
     using Nimbus.Configuration.Settings;
     using Nimbus.Extensions;
@@ -20,7 +20,7 @@
 
     internal class AzureQueueManager : IQueueManager
     {
-        private readonly Func<ManagementClient> _managementClient;
+        private readonly Func<ServiceBusAdministrationClient> _administrationClient;
         private readonly IConnectionManager _connectionManager;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
         private readonly DefaultMessageTimeToLiveSetting _defaultMessageTimeToLive;
@@ -30,9 +30,9 @@
         private readonly MaxDeliveryAttemptSetting _maxDeliveryAttempts;
         private readonly ILogger _logger;
 
-        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownTopics;
+        private readonly ThreadSafeLazy<Task<ConcurrentSet<string>>> _knownTopics;
         private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownSubscriptions;
-        private readonly ThreadSafeLazy<ConcurrentSet<string>> _knownQueues;
+        private readonly ThreadSafeLazy<Task<ConcurrentSet<string>>> _knownQueues;
         private readonly IPathFactory _pathFactory;
         private readonly IRetry _retry;
         private readonly ISqlFilterExpressionGenerator _sqlFilterExpressionGenerator;
@@ -40,21 +40,22 @@
 
         private readonly ThreadSafeDictionary<string, object> _locks = new ThreadSafeDictionary<string, object>();
 
-        public AzureQueueManager(Func<ManagementClient> managementClient,
-                                 IConnectionManager connectionManager,
-                                 AutoDeleteOnIdleSetting autoDeleteOnIdle,
-                                 DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
-                                 DefaultTimeoutSetting defaultTimeout,
-                                 EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
-                                 GlobalPrefixSetting globalPrefix,
-                                 MaxDeliveryAttemptSetting maxDeliveryAttempts,
-                                 ILogger logger,
-                                 IPathFactory pathFactory,
-                                 IRetry retry,
-                                 ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
-                                 ITypeProvider typeProvider)
+        public AzureQueueManager(
+            Func<ServiceBusAdministrationClient> administrationClient,
+            IConnectionManager connectionManager,
+            AutoDeleteOnIdleSetting autoDeleteOnIdle,
+            DefaultMessageTimeToLiveSetting defaultMessageTimeToLive,
+            DefaultTimeoutSetting defaultTimeout,
+            EnableDeadLetteringOnMessageExpirationSetting enableDeadLetteringOnMessageExpiration,
+            GlobalPrefixSetting globalPrefix,
+            MaxDeliveryAttemptSetting maxDeliveryAttempts,
+            ILogger logger,
+            IPathFactory pathFactory,
+            IRetry retry,
+            ISqlFilterExpressionGenerator sqlFilterExpressionGenerator,
+            ITypeProvider typeProvider)
         {
-            this._managementClient = managementClient;
+            this._administrationClient = administrationClient;
             this._connectionManager = connectionManager;
             this._maxDeliveryAttempts = maxDeliveryAttempts;
             this._logger = logger;
@@ -68,79 +69,84 @@
             this._sqlFilterExpressionGenerator = sqlFilterExpressionGenerator;
             this._pathFactory = pathFactory;
 
-            this._knownTopics = new ThreadSafeLazy<ConcurrentSet<string>>(this.FetchExistingTopics);
+            this._knownTopics = new ThreadSafeLazy<Task<ConcurrentSet<string>>>(this.FetchExistingTopics);
             this._knownSubscriptions = new ThreadSafeLazy<ConcurrentSet<string>>(this.FetchExistingSubscriptions);
-            this._knownQueues = new ThreadSafeLazy<ConcurrentSet<string>>(this.FetchExistingQueues);
+            this._knownQueues = new ThreadSafeLazy<Task<ConcurrentSet<string>>>(this.FetchExistingQueues);
         }
 
-        public Task<IMessageSender> CreateMessageSender(string queuePath)
+        public Task<ServiceBusSender> CreateMessageSender(string queuePath)
         {
-            return Task.Run( () =>
-                                  {
-                                      this.EnsureQueueExists(queuePath);
-                                      var messageSender = this._connectionManager.CreateMessageSender(queuePath);
-                                      return messageSender;
-                                  }).ConfigureAwaitFalse();
+            return Task.Run(
+                () =>
+                {
+                    this.EnsureQueueExists(queuePath);
+                    var messageSender = this._connectionManager.CreateMessageSender(queuePath);
+                    return messageSender;
+                }).ConfigureAwaitFalse();
         }
 
-        public Task<IMessageReceiver> CreateMessageReceiver(string queuePath)
+        public Task<ServiceBusReceiver> CreateMessageReceiver(string queuePath)
         {
-            return Task.Run( () =>
-                                  {
-                                      this.EnsureQueueExists(queuePath);
-                                      var receiver =  this._connectionManager.CreateMessageReceiver(queuePath, ReceiveMode.ReceiveAndDelete);
-                                      return receiver;
-                                  }).ConfigureAwaitFalse();
+            return Task.Run(
+                () =>
+                {
+                    this.EnsureQueueExists(queuePath);
+                    var receiver = this._connectionManager.CreateMessageReceiver(queuePath, ServiceBusReceiveMode.ReceiveAndDelete);
+                    return receiver;
+                }).ConfigureAwaitFalse();
         }
 
-        public Task<ITopicClient> CreateTopicSender(string topicPath)
+        public Task<ServiceBusProcessor> CreateTopicSender(string topicPath)
         {
-            return Task.Run(() =>
-                            {
-                                this.EnsureTopicExists(topicPath);
+            return Task.Run(
+                () =>
+                {
+                    this.EnsureTopicExists(topicPath);
 
-                                return this._retry.Do(() =>
-                                                 {
-                                                     var topicClient = this._connectionManager.CreateTopicClient(topicPath);
-                                                     
-                                                     return topicClient;
-                                                 },
-                                                 "Creating topic sender for " + topicPath);
-                            }).ConfigureAwaitFalse();
+                    return this._retry.Do(
+                        () =>
+                        {
+                            var topicClient = this._connectionManager.CreateTopicClient(topicPath);
+
+                            return topicClient;
+                        },
+                        "Creating topic sender for " + topicPath);
+                }).ConfigureAwaitFalse();
         }
 
-        public Task<ISubscriptionClient> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
+        public Task<ServiceBusProcessor> CreateSubscriptionReceiver(string topicPath, string subscriptionName, IFilterCondition filterCondition)
         {
             const string ruleName = "$Default";
-            return Task.Run(() =>
+            return Task.Run(
+                () =>
+                {
+                    this.EnsureSubscriptionExists(topicPath, subscriptionName);
+
+                    var myOwnSubscriptionFilterCondition = new OrCondition(
+                        new MatchCondition(MessagePropertyKeys.RedeliveryToSubscriptionName, subscriptionName),
+                        new IsNullCondition(MessagePropertyKeys.RedeliveryToSubscriptionName));
+                    var combinedCondition = new AndCondition(filterCondition, myOwnSubscriptionFilterCondition);
+                    var filterSql = this._sqlFilterExpressionGenerator.GenerateFor(combinedCondition);
+
+                    return this._retry.Do(
+                        async () =>
+                        {
+                            var subscriptionClient = this._connectionManager
+                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete);
+                            var rules = await subscriptionClient.GetRulesAsync();
+
+                            if (rules.Any(r => r.Name == ruleName))
                             {
-                                this.EnsureSubscriptionExists(topicPath, subscriptionName);
+                                await subscriptionClient.RemoveRuleAsync(ruleName);
+                            }
 
-                                var myOwnSubscriptionFilterCondition = new OrCondition(new MatchCondition(MessagePropertyKeys.RedeliveryToSubscriptionName, subscriptionName),
-                                                                                       new IsNullCondition(MessagePropertyKeys.RedeliveryToSubscriptionName));
-                                var combinedCondition = new AndCondition(filterCondition, myOwnSubscriptionFilterCondition);
-                                var filterSql = this._sqlFilterExpressionGenerator.GenerateFor(combinedCondition);
-                                
-                                return this._retry.Do(async () =>
-                                                 {
-                                                     
-                                                     var subscriptionClient = this._connectionManager
-                                                         .CreateSubscriptionClient(topicPath, subscriptionName, ReceiveMode.ReceiveAndDelete);
-                                                     var rules = await subscriptionClient.GetRulesAsync();
-                                                     
+                            await subscriptionClient.AddRuleAsync(ruleName, new SqlFilter(filterSql));
 
-                                                     if (rules.Any(r => r.Name == ruleName))
-                                                     {
-                                                         await subscriptionClient.RemoveRuleAsync(ruleName);    
-                                                     }
-                                                     
-                                                     await subscriptionClient.AddRuleAsync(ruleName, new SqlFilter(filterSql));
-
-                                                     return subscriptionClient;
-                                                 },
-                                                 "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
-                                                 filterCondition);
-                            }).ConfigureAwaitFalse();
+                            return subscriptionClient;
+                        },
+                        "Creating subscription receiver for topic " + topicPath + " and subscription " + subscriptionName + " with filter expression " +
+                        filterCondition);
+                }).ConfigureAwaitFalse();
         }
 
         public Task MarkQueueAsNonExistent(string queuePath)
@@ -155,118 +161,153 @@
 
         public Task MarkSubscriptionAsNonExistent(string topicPath, string subscriptionName)
         {
-            return Task.Run(() =>
-                            {
-                                this._knownSubscriptions.Value
-                                                   .Where(path => path.StartsWith(topicPath))
-                                                   .Do(key => this._knownSubscriptions.Value.Remove(key))
-                                                   .Done();
-                            }).ConfigureAwaitFalse();
+            return Task.Run(
+                () =>
+                {
+                    this._knownSubscriptions.Value
+                        .Where(path => path.StartsWith(topicPath))
+                        .Do(key => this._knownSubscriptions.Value.Remove(key))
+                        .Done();
+                }).ConfigureAwaitFalse();
         }
 
-        public Task<IMessageSender> CreateDeadQueueMessageSender()
+        public Task<ServiceBusSender> CreateDeadQueueMessageSender()
         {
             return this.CreateMessageSender(this._pathFactory.DeadLetterOfficePath());
         }
 
-        public Task<IMessageReceiver> CreateDeadQueueMessageReceiver()
+        public Task<ServiceBusReceiver> CreateDeadQueueMessageReceiver()
         {
             return this.CreateMessageReceiver(this._pathFactory.DeadLetterOfficePath());
         }
 
-        private ConcurrentSet<string> FetchExistingTopics()
+        private Task<ConcurrentSet<string>> FetchExistingTopics()
         {
-            return this._retry.Do(() =>
-                             {
-                                 var topicsAsync = this._managementClient().GetTopicsAsync();
-                                 if (!topicsAsync.Wait(this._defaultTimeout)) throw new TimeoutException("Fetching existing topics failed. Messaging endpoint did not respond in time.");
+            return Task.Run(
+                () =>
+                {
+                    return this._retry.DoAsync(
+                        async () =>
+                        {
+                            var topicsAsync = this._administrationClient().GetTopicsAsync();
 
-                                 var topics = topicsAsync.Result;
-                                 var topicPaths = new ConcurrentSet<string>(topics.Select(t => t.Path)
-                                                                                  .Where(p => p.StartsWith(this._globalPrefix.Value))
-                                                                                  .OrderBy(p => p)
-                                                                                  .ToArray());
+                            var pages = topicsAsync.AsPages();
+                            var topicPaths = new List<string>();
+                            await foreach (Azure.Page<TopicProperties> topicPage in pages)
+                            {
+                                foreach (var topicProperties in topicPage.Values)
+                                {
+                                    if (topicProperties.Name.StartsWith(this._globalPrefix.Value))
+                                    {
+                                        topicPaths.Add(topicProperties.Name);
+                                    }
+                                }
+                            }
 
-                                 this._logger.Debug("Found {topicCount} existing topics", topicPaths.Count());
-                                 
-                                 return topicPaths;
-                             },
-                             "Fetching existing topics");
+                            this._logger.Debug("Found {topicCount} existing topics", new ConcurrentSet<string>(topicPaths.OrderBy(p => p).ToArray()).Count());
+
+                            return new ConcurrentSet<string>(topicPaths.OrderBy(p => p).ToArray());
+                        },
+                        "Fetching existing topics");
+                }).ConfigureAwaitFalse();
         }
 
-        private ConcurrentSet<string> FetchExistingSubscriptions()
+        private Task<ConcurrentSet<string>> FetchExistingSubscriptions()
         {
-            return this._retry.Do(() =>
-                             {
-                                 var subscriptionTasks = this._knownTopics.Value
-                                                                     .Where(this.WeHaveAHandler)
-                                                                     .Select(this.FetchExistingTopicSubscriptions)
-                                                                     .ToArray();
+            return this._retry.DoAsync(
+                async () =>
+                {
+                    var value = await this._knownTopics.Value;
+                    var subscriptionTasks = value.Where(this.WeHaveAHandler)
+                                                 .Select(this.FetchExistingTopicSubscriptions)
+                                                 .ToArray();
 
-                                 Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
+                    Task.WaitAll(subscriptionTasks.Cast<Task>().ToArray());
 
-                                 var subscriptionKeys = subscriptionTasks
-                                     .SelectMany(t => t.Result)
-                                     .OrderBy(k => k)
-                                     .ToArray();
+                    var subscriptionKeys = subscriptionTasks
+                                           .SelectMany(t => t.Result)
+                                           .OrderBy(k => k)
+                                           .ToArray();
 
-                                 return new ConcurrentSet<string>(subscriptionKeys);
-                             },
-                             "Fetching existing subscriptions");
+                    return new ConcurrentSet<string>(subscriptionKeys);
+                },
+                "Fetching existing subscriptions");
         }
 
         private Task<string[]> FetchExistingTopicSubscriptions(string topicPath)
         {
-            return Task.Run(() =>
+            return Task.Run(
+                () =>
+                {
+                    return this._retry.DoAsync(
+                        async () =>
+                        {
+                            var subscriptionsAsync = this._administrationClient().GetSubscriptionsAsync(topicPath);
+
+                            var subscriptionPages = subscriptionsAsync.AsPages();
+                            var subscriptions = new List<string>();
+                            await foreach (var subscriptionPage in subscriptionPages)
                             {
-                                return this._retry.DoAsync(async () =>
-                                                            {
-                                                                var subscriptions = await this._managementClient().GetSubscriptionsAsync(topicPath);
+                                foreach (var subscription in subscriptionPage.Values)
+                                {
+                                    subscriptions.Add(subscription.SubscriptionName);
+                                }
+                            }
 
-                                                                return subscriptions
-                                                                    .Select(s => s.SubscriptionName)
-                                                                    .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
-                                                                    .ToArray();
-                                                            },
-                                                      "Fetching topic subscriptions for " + topicPath);
-                            }).ConfigureAwaitFalse();
+                            return subscriptions
+                                   .Select(subscriptionName => BuildSubscriptionKey(topicPath, subscriptionName))
+                                   .ToArray();
+                        },
+                        "Fetching topic subscriptions for " + topicPath);
+                }).ConfigureAwaitFalse();
         }
 
-        private ConcurrentSet<string> FetchExistingQueues()
+        private Task<ConcurrentSet<string>> FetchExistingQueues()
         {
-            return this._retry.Do(() =>
-                             {
-                                 var queuesAsync = this._managementClient().GetQueuesAsync();
-                                 if (!queuesAsync.Wait(this._defaultTimeout)) throw new TimeoutException("Fetching existing queues failed. Messaging endpoint did not respond in time.");
+            return this._retry.DoAsync(
+                async () =>
+                {
+                    var queuesAsync = this._administrationClient().GetQueuesAsync();
 
-                                 var queues = queuesAsync.Result;
-                                 var queuePaths = queues.Select(q => q.Path)
-                                                        .Where(p => p.StartsWith(this._globalPrefix.Value))
-                                                        .OrderBy(p => p)
-                                                        .ToArray();
-                                 return new ConcurrentSet<string>(queuePaths);
-                             },
-                             "Fetching existing queues");
+                    var queuePages = queuesAsync.AsPages();
+                    var queues = new List<string>();
+                    await foreach (var queuePage in queuePages)
+                    {
+                        foreach (var queue in queuePage.Values)
+                        {
+                            queues.Add(queue.Name);
+                        }
+                    }
+
+                    var queuePaths = queues.Where(p => p.StartsWith(this._globalPrefix.Value))
+                                           .OrderBy(p => p)
+                                           .ToArray();
+                    return new ConcurrentSet<string>(queuePaths);
+                },
+                "Fetching existing queues");
         }
 
-        public Task<bool> QueueExists(string queuePath)
+        public async Task<bool> QueueExists(string queuePath)
         {
-            return Task.Run(() => this._knownQueues.Value.Contains(queuePath)).ConfigureAwaitFalse();
+            var value = await this._knownQueues.Value;
+            return value.Contains(queuePath);
         }
 
-        public Task<bool> TopicExists(string topicPath)
+        public async Task<bool> TopicExists(string topicPath)
         {
-            return Task.Run(() => this._knownTopics.Value.Contains(topicPath)).ConfigureAwaitFalse();
+            var value = await this._knownTopics.Value;
+            return value.Contains(topicPath);
         }
 
-        private void EnsureTopicExists(string topicPath)
+        private async Task EnsureTopicExists(string topicPath)
         {
-            if (this._knownTopics.Value.Contains(topicPath)) return;
+            var value = await this._knownTopics.Value;
+            if (value.Contains(topicPath)) return;
             lock (this.LockFor(topicPath))
             {
-                if (this._knownTopics.Value.Contains(topicPath)) return;
+                if (value.Contains(topicPath)) return;
 
-                var topicDescription = new TopicDescription(topicPath)
+                var topicDescription = new CreateTopicOptions(topicPath)
                                        {
                                            DefaultMessageTimeToLive = this._defaultMessageTimeToLive,
                                            EnableBatchedOperations = true,
@@ -275,38 +316,38 @@
                                            AutoDeleteOnIdle = this._autoDeleteOnIdle
                                        };
 
-                this._retry.Do(async () =>
-                          {
-                              // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
-                              // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-                              // update its configuration in a minute anyway.  -andrewh 8/12/2013
-                              try
-                              {
-                                  // var exists = await _managementClient().TopicExistsAsync(topicDescription.Path);
-                                  // if (!exists)
-                                  // {
-                                  this._logger.Debug("Creating topic {topic}", topicDescription.Path);
-                                  await this._managementClient().CreateTopicAsync(topicDescription); 
-                                  this._logger.Debug("Topic created {topic}", topicDescription.Path);
-                                      //}
+                this._retry.DoAsync(
+                    async () =>
+                    {
+                        // We don't check for topic existence here because that introduces a race condition with any other bus participant that's
+                        // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                        // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                        try
+                        {
+                            // var exists = await _managementClient().TopicExistsAsync(topicDescription.Path);
+                            // if (!exists)
+                            // {
+                            this._logger.Debug("Creating topic {topic}", topicDescription.Name);
+                            await this._administrationClient().CreateTopicAsync(topicDescription);
+                            this._logger.Debug("Topic created {topic}", topicDescription.Name);
+                            //}
+                        }
+                        catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
+                        {
+                            this._logger.Warn("Topic already exists. Continuing");
+                        }
+                        catch (Exception exc)
+                        {
+                            if (!exc.Message.Contains("SubCode=40901")) throw;
 
-                              }
-                              catch (MessagingEntityAlreadyExistsException)
-                              {
-                                  this._logger.Warn("Topic already exists. Continuing");
-                              }
-                              catch (Exception exc)
-                              {
-                                  if (!exc.Message.Contains("SubCode=40901")) throw;
-                              
-                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
-                                  var exists = await this._managementClient().TopicExistsAsync(topicPath);
-                                  if (!exists) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
-                              }
+                            // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the topic for us.
+                            var exists = await this._administrationClient().TopicExistsAsync(topicPath);
+                            if (!exists) throw new BusException("Topic creation for '{0}' failed".FormatWith(topicPath));
+                        }
 
-                              this._knownTopics.Value.Add(topicPath);
-                          },
-                          "Creating topic " + topicPath);
+                        value.Add(topicPath);
+                    },
+                    "Creating topic " + topicPath);
             }
         }
 
@@ -321,88 +362,81 @@
 
                 this.EnsureTopicExists(topicPath);
 
-                this._retry.Do(async () =>
-                          {
-                              var subscriptionDescription = new SubscriptionDescription(topicPath, subscriptionName)
-                                                            {
-                                                                MaxDeliveryCount = this._maxDeliveryAttempts,
-                                                                DefaultMessageTimeToLive = this._defaultMessageTimeToLive,
-                                                                EnableDeadLetteringOnMessageExpiration = this._enableDeadLetteringOnMessageExpiration,
-                                                                EnableBatchedOperations = true,
-                                                                RequiresSession = false,
-                                                                AutoDeleteOnIdle = this._autoDeleteOnIdle
-                                                            };
+                this._retry.Do(
+                    async () =>
+                    {
+                        var subscriptionDescription = new CreateSubscriptionOptions(topicPath, subscriptionName)
+                                                      {
+                                                          MaxDeliveryCount = this._maxDeliveryAttempts,
+                                                          DefaultMessageTimeToLive = this._defaultMessageTimeToLive,
+                                                          DeadLetteringOnMessageExpiration = this._enableDeadLetteringOnMessageExpiration,
+                                                          EnableBatchedOperations = true,
+                                                          RequiresSession = false,
+                                                          AutoDeleteOnIdle = this._autoDeleteOnIdle
+                                                      };
 
-                              try
-                              {
-                                  await this._managementClient().CreateSubscriptionAsync(subscriptionDescription);
-                              }
-                              catch (MessagingEntityAlreadyExistsException)
-                              {
-                                  
-                              }
-                              catch (Exception exc)
-                              {
-                                  if (!exc.Message.Contains("SubCode=40901")) throw;
-                              
-                                  // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
-                                  var exists = await this._managementClient().SubscriptionExistsAsync(topicPath, subscriptionName);
-                                  if (!exists)
-                                      throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
-                              }
+                        try
+                        {
+                            await this._administrationClient().CreateSubscriptionAsync(subscriptionDescription);
+                        }
+                        catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
+                        {
+                        }
+                        catch (Exception exc)
+                        {
+                            if (!exc.Message.Contains("SubCode=40901")) throw;
 
-                              this._knownSubscriptions.Value.Add(subscriptionKey);
-                          },
-                          "Creating subscription " + subscriptionName + " for topic " + topicPath);
+                            // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the subscription for us.
+                            var exists = await this._administrationClient().SubscriptionExistsAsync(topicPath, subscriptionName);
+                            if (!exists)
+                                throw new BusException("Subscription creation for '{0}/{1}' failed".FormatWith(topicPath, subscriptionName));
+                        }
+
+                        this._knownSubscriptions.Value.Add(subscriptionKey);
+                    },
+                    "Creating subscription " + subscriptionName + " for topic " + topicPath);
             }
         }
 
-        internal void EnsureQueueExists(string queuePath)
+        internal async Task EnsureQueueExists(string queuePath)
         {
-            if (this._knownQueues.Value.Contains(queuePath)) return;
+            var value = await this._knownQueues.Value;
+            if (value.Contains(queuePath)) return;
 
             lock (this.LockFor(queuePath))
             {
-                if (this._knownQueues.Value.Contains(queuePath)) return;
+                if (value.Contains(queuePath)) return;
 
-                this._retry.Do(async () =>
-                          {
-                              var queueDescription = new QueueDescription(queuePath)
-                                                     {
-                                                         MaxDeliveryCount = this._maxDeliveryAttempts,
-                                                         DefaultMessageTimeToLive = this._defaultMessageTimeToLive,
-                                                         EnableDeadLetteringOnMessageExpiration = true,
-                                                         EnableBatchedOperations = true,
-                                                         RequiresDuplicateDetection = false,
-                                                         RequiresSession = false,
-                                                         //SupportOrdering = false,
-                                                         AutoDeleteOnIdle = this._autoDeleteOnIdle
-                                                     };
+                this._retry.DoAsync(
+                    async () =>
+                    {
+                        var queueDescription = new CreateQueueOptions(queuePath)
+                                               {
+                                                   MaxDeliveryCount = this._maxDeliveryAttempts,
+                                                   DefaultMessageTimeToLive = this._defaultMessageTimeToLive,
+                                                   DeadLetteringOnMessageExpiration = true,
+                                                   EnableBatchedOperations = true,
+                                                   RequiresDuplicateDetection = false,
+                                                   RequiresSession = false,
+                                                   //SupportOrdering = false,
+                                                   AutoDeleteOnIdle = this._autoDeleteOnIdle
+                                               };
 
-                              // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
-                              // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
-                              // update its configuration in a minute anyway.  -andrewh 8/12/2013
-                              try
-                              {
-                                  await this._managementClient().CreateQueueAsync(queueDescription);
-                              }
-                              catch (MessagingEntityAlreadyExistsException)
-                              {
-                                  await this._managementClient().UpdateQueueAsync(queueDescription);
-                              }
-                              // catch (MessagingException exc)
-                              // {
-                              //     if (!exc.Message.Contains("SubCode=40901")) throw;
-                              //
-                              //     // SubCode=40901. Another conflicting operation is in progress. Let's see if it's created the queue for us.
-                              //     if (!_managementClient().QueueExists(queuePath))
-                              //         throw new BusException($"Queue creation for '{queuePath}' failed due to a conflicting operation and that queue does not already exist.", exc)
-                              //             .WithData("QueuePath", queuePath);
-                              // }
+                        // We don't check for queue existence here because that introduces a race condition with any other bus participant that's
+                        // launching at the same time. If it doesn't exist, we'll create it. If it does, we'll just continue on with life and
+                        // update its configuration in a minute anyway.  -andrewh 8/12/2013
+                        try
+                        {
+                            await this._administrationClient().CreateQueueAsync(queueDescription);
+                        }
+                        catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityAlreadyExists)
+                        {
+                            await this._administrationClient().UpdateQueueAsync(queueDescription);
+                        }
 
-                              this._knownQueues.Value.Add(queuePath);
-                          },
-                          "Creating queue " + queuePath);
+                        value.Add(queuePath);
+                    },
+                    "Creating queue " + queuePath);
             }
         }
 
