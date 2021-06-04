@@ -42,7 +42,7 @@ namespace Nimbus.Transports.AzureServiceBus2.ConnectionManagement
             var options = new ServiceBusProcessorOptions()
                           {
                               ReceiveMode = receiveMode,
-                              PrefetchCount = preFetchCount.Value
+                              PrefetchCount = preFetchCount
                           };
 
             return this._serviceBusClient.CreateProcessor(topicPath, subscriptionName, options);

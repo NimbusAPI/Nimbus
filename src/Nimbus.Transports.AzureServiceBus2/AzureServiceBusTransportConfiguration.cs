@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using Microsoft.Azure.ServiceBus.Management;
+    using Azure.Messaging.ServiceBus.Administration;
     using Nimbus.ConcurrentCollections;
     using Nimbus.Configuration;
     using Nimbus.Configuration.LargeMessages;
@@ -66,11 +66,11 @@
             container.RegisterType<ConnectionManager>(ComponentLifetime.SingleInstance, typeof(IConnectionManager));
             container.Register(c =>
                                {
-                                   var managerRoundRobin = new RoundRobin<ManagementClient>(
+                                   var managerRoundRobin = new RoundRobin<ServiceBusAdministrationClient>(
                                        c.Resolve<ServerConnectionCountSetting>(),
                                        () =>
                                        {
-                                           var client = new ManagementClient(c.Resolve<ConnectionStringSetting>());
+                                           var client = new ServiceBusAdministrationClient(c.Resolve<ConnectionStringSetting>());
                                            return client;
                                            
                                        },
@@ -81,7 +81,7 @@
                                },
                                ComponentLifetime.SingleInstance);
             
-            container.Register<Func<ManagementClient>>(c => c.Resolve<RoundRobin<ManagementClient>>().GetNext, ComponentLifetime.InstancePerDependency);
+            container.Register<Func<ServiceBusAdministrationClient>>(c => c.Resolve<RoundRobin<ServiceBusAdministrationClient>>().GetNext, ComponentLifetime.InstancePerDependency);
             
             // container.Register(c =>
             //                    {
