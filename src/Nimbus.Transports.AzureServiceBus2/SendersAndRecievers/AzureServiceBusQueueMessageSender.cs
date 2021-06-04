@@ -2,8 +2,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
 {
     using System;
     using System.Threading.Tasks;
-    using Microsoft.Azure.ServiceBus;
-    using Microsoft.Azure.ServiceBus.Core;
+    using Azure.Messaging.ServiceBus;
     using Nimbus.Extensions;
     using Nimbus.Infrastructure.MessageSendersAndReceivers;
     using Nimbus.Infrastructure.Retries;
@@ -19,7 +18,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
         private readonly IRetry _retry;
         private readonly string _queuePath;
 
-        private IMessageSender _messageSender;
+        private ServiceBusSender _messageSender;
 
         public AzureServiceBusQueueMessageSender(IBrokeredMessageFactory brokeredMessageFactory, ILogger logger, IQueueManager queueManager, IRetry retry, string queuePath)
         {
@@ -40,11 +39,11 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
                                            var messageSender = this.GetMessageSender();
                                            try
                                            {
-                                               await messageSender.SendAsync(brokeredMessage);
+                                               await messageSender.SendMessageAsync(brokeredMessage);
                                            }
-                                           catch (MessagingEntityNotFoundException exc)
+                                           catch (ServiceBusException ex) when (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
                                            {
-                                               this._logger.Error(exc, "The referenced queue {QueuePath} no longer exists", this._queuePath);
+                                               this._logger.Error(ex, "The referenced queue {QueuePath} no longer exists", this._queuePath);
                                                await this._queueManager.MarkQueueAsNonExistent(this._queuePath);
                                                await this.DiscardMessageSender();
                                                throw;
@@ -58,7 +57,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
                                  "Sending message to queue").ConfigureAwaitFalse();
         }
 
-        private IMessageSender GetMessageSender()
+        private ServiceBusSender GetMessageSender()
         {
             if (this._messageSender != null) return this._messageSender;
 
@@ -72,7 +71,7 @@ namespace Nimbus.Transports.AzureServiceBus2.SendersAndRecievers
             this._messageSender = null;
 
             if (messageSender == null) return;
-            if (messageSender.IsClosedOrClosing) return;
+            if (messageSender.IsClosed) return;
 
             try
             {
