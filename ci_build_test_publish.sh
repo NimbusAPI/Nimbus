@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-export BUILD_NUMBER=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.3.5-linux-alpine.3.10-x64-netcoreapp3.1 /repo /showvariable semver | tr -dc '[[:print:]]')
-echo $BUILD_NUMBER
 DOCKER_COMPOSE="docker-compose -f docker-compose.yml -f docker-compose.build.yml"
-$DOCKER_COMPOSE build --build-arg $BUILD_NUMBER
+$DOCKER_COMPOSE build --build-arg $GITVERSION_SEMVER
 $DOCKER_COMPOSE up -d
 
 $DOCKER_COMPOSE run --rm nimbus dotnet cake --Target="Test"
