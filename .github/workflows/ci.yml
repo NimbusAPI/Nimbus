@@ -31,7 +31,8 @@ jobs:
         echo "SemVer: $GITVERSION_SEMVER"
         
     - name: Run Docker Compose build
+      env: 
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./ci_build_test_publish.sh
-
 
 
