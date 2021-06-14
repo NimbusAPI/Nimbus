@@ -7,6 +7,7 @@ using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Compression;
+using Nimbus.Infrastructure.DeliveryRetries;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
@@ -38,7 +39,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
-        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
+        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new NoWaitDeliveryRetryStrategy();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }
