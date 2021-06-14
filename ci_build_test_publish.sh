@@ -2,7 +2,7 @@
 set -ex
 
 DOCKER_COMPOSE="docker-compose -f docker-compose.yml -f docker-compose.build.yml"
-$DOCKER_COMPOSE build --build-arg BUILD_NUMBER=$GITVERSION_SEMVER
+$DOCKER_COMPOSE build --build-arg BUILD_NUMBER=$GITVERSION_LEGACYSEMVER
 $DOCKER_COMPOSE up -d
 
 $DOCKER_COMPOSE run --rm nimbus dotnet cake --Target="Test"
