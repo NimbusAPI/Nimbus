@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-      <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj"/>
     </ItemGroup>
-     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
         <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
         <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
         <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
