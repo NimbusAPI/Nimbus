@@ -1,5 +1,5 @@
 # Build image
-FROM mcr.microsoft.com/dotnet/core/sdk:5.0 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-0.0.0}
