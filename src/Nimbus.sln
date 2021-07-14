@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cafe.Messages", "Cafe.Messa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cafe.Waiter", "Cafe.Waiter\Cafe.Waiter.csproj", "{658944B3-F287-48B8-B75E-6FC3D59FD6F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nimbus.Transports.Amqp", "Nimbus.Transports.Amqp\Nimbus.Transports.Amqp.csproj", "{CDD862AC-A805-4935-B970-BDCC0E956B24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{658944B3-F287-48B8-B75E-6FC3D59FD6F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{658944B3-F287-48B8-B75E-6FC3D59FD6F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{658944B3-F287-48B8-B75E-6FC3D59FD6F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDD862AC-A805-4935-B970-BDCC0E956B24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDD862AC-A805-4935-B970-BDCC0E956B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDD862AC-A805-4935-B970-BDCC0E956B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDD862AC-A805-4935-B970-BDCC0E956B24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

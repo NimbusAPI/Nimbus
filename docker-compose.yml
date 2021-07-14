@@ -16,3 +16,12 @@ services:
       - "6379:6379"
     expose:
       - 6379
+        
+  activemq:
+    image: vromero/activemq-artemis
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    expose:
+      - 61616
+      - 8161

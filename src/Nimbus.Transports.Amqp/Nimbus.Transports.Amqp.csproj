@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="amqpnetlite" Version="2.4.3" />
+    </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+        <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RootNamespace>Nimbus.Transports.AMQP</RootNamespace>
+    </PropertyGroup>
+</Project>
