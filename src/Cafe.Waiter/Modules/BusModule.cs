@@ -7,6 +7,7 @@ using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
+using Nimbus.Transports.Amqp;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 using Serilog;
@@ -26,9 +27,10 @@ namespace Waiter.Modules
                                                  // .WithTransport(
                                                  //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
                                                  //     )
-                                                 .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
-                                                     )
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                 //     )
+                                                 .WithTransport(new AmqpTransportConfiguration())
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

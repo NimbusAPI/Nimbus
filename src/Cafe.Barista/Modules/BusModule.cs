@@ -6,6 +6,7 @@ using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json.Configuration;
+using Nimbus.Transports.Amqp;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 
@@ -20,10 +21,10 @@ namespace Barista.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
-                                                 .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
-                                                     )
-
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                 //     )
+                                                 .WithTransport(new AmqpTransportConfiguration())
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
