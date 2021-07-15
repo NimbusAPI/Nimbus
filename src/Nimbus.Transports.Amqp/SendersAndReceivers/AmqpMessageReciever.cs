@@ -6,23 +6,28 @@ using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.Amqp.ConnectionManagement;
+using Nimbus.Transports.Amqp.Messages;
 
 namespace Nimbus.Transports.Amqp.SendersAndReceivers
 {
     internal class AmqpMessageReceiver : ThrottlingMessageReceiver
     {
+        private readonly IConnectionManager _connectionManager;
         private readonly string _queuePath;
-        private readonly ISerializer _serializer;
-        private ReceiverLink _receiver;
-        private Connection _connection;
-        private Session _session;
+        private readonly IMessageFactory _messageFactory;
+        private IReceiverLink _receiver;
 
-        public AmqpMessageReceiver(string queuePath, ISerializer serializer,
-            ConcurrentHandlerLimitSetting concurrentHandlerLimit, IGlobalHandlerThrottle globalHandlerThrottle,
-            ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
+        public AmqpMessageReceiver(IConnectionManager connectionManager,
+                                   string queuePath,
+                                   IMessageFactory messageFactory,
+                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+                                   IGlobalHandlerThrottle globalHandlerThrottle,
+                                   ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
+            _connectionManager = connectionManager;
             _queuePath = queuePath;
-            _serializer = serializer;
+            _messageFactory = messageFactory;
         }
 
         protected override Task WarmUp()
@@ -41,8 +46,7 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
             {
                 receiver.Accept(brokerMessage);
 
-                message =
-                    (NimbusMessage) _serializer.Deserialize(brokerMessage.Body.ToString(), typeof(NimbusMessage));
+                message = await _messageFactory.BuildNimbusMessage(brokerMessage);
             }
 
             return message;
@@ -62,15 +66,11 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
             }
         }
 
-        private ReceiverLink GetMessageReceiver()
+        private IReceiverLink GetMessageReceiver()
         {
             if (_receiver != null) return _receiver;
 
-            var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
-            _connection = new Connection(address);
-            _session = new Session(_connection);
-            _receiver = new ReceiverLink(_session, "test", _queuePath);
-            _receiver.SetCredit(10);
+            _receiver = _connectionManager.CreateMessageReceiver(_queuePath);
 
             return _receiver;
         }
@@ -78,8 +78,6 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
         private async void DiscardMessageReceiver()
         {
             await _receiver.CloseAsync();
-            await _session.CloseAsync();
-            await _connection.CloseAsync();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Cashier.Modules
                                                  //
                                                  //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
                                                  //     )
-                                                 .WithTransport(new AmqpTransportConfiguration())
+                                                 .WithTransport(new AmqpTransportConfiguration().WithConnectionString("amqp://artemis:simetraehcapa@localhost:61616"))
                                                  .WithNames("Cashier", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

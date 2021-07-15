@@ -1,51 +1,50 @@
 using System;
 using System.Threading.Tasks;
 using Amqp;
-using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.Amqp.ConnectionManagement;
+using Nimbus.Transports.Amqp.Messages;
 
 namespace Nimbus.Transports.Amqp.SendersAndReceivers
 {
     public class AmqpMessageSender : INimbusMessageSender, IDisposable
     {
+        private readonly IConnectionManager _connectionManager;
         private readonly string _queuePath;
-        private readonly ISerializer _serializer;
-        private Connection _connection;
-        private Session _session;
-        private SenderLink _sender;
+        private readonly IMessageFactory _messageFactory;
+        private ISenderLink _sender;
 
-        internal AmqpMessageSender(string queuePath, ISerializer serializer)
+        internal AmqpMessageSender(IConnectionManager connectionManager, string queuePath, IMessageFactory messageFactory)
         {
+            _connectionManager = connectionManager;
             _queuePath = queuePath;
-            _serializer = serializer;
+            _messageFactory = messageFactory;
         }
 
         public async Task Send(NimbusMessage message)
         {
             var sender = GetSender();
 
-            var payload = _serializer.Serialize(message);
-            var brokerMessage = new Message(payload);
-            await sender.SendAsync(brokerMessage);
+            var brokerMessage = await _messageFactory.BuildMessage(message);
+            sender.Send(brokerMessage);
+            
         }
 
         private async void DiscardMessageSender()
         {
             await _sender.CloseAsync();
-            await _session.CloseAsync();
-            await _connection.CloseAsync();
         }
 
-        private SenderLink GetSender()
+        private ISenderLink GetSender()
         {
             if (_sender != null)
                 return _sender;
-
-            var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
-            _connection = new Connection(address);
-            _session = new Session(_connection);
-            _sender = new SenderLink(_session, "test", _queuePath);
+            // var address = new Address("amqp://artemis:simetraehcapa@localhost:61616");
+            // _connection = new Connection(address);
+            // _session = new Session(_connection);
+            // _sender = new SenderLink(_session, "test", _queuePath);
+            _sender = _connectionManager.CreateMessageSender(_queuePath);
             return _sender;
         }
 
