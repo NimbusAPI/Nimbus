@@ -27,7 +27,7 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
             var sender = GetSender();
 
             var brokerMessage = await _messageFactory.BuildMessage(message);
-            sender.Send(brokerMessage);
+            await sender.SendAsync(brokerMessage);
             
         }
 
