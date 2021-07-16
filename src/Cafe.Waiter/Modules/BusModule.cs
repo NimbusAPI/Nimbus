@@ -5,12 +5,8 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
-using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.Amqp;
-using Nimbus.Transports.AzureServiceBus;
-using Nimbus.Transports.Redis;
-using Serilog;
 
 namespace Waiter.Modules
 {
@@ -30,7 +26,7 @@ namespace Waiter.Modules
                                                  // .WithTransport(
                                                  //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
                                                  //     )
-                                                 .WithTransport(new AmqpTransportConfiguration())
+                                                 .WithTransport(new AmqpTransportConfiguration().WithConnectionString("amqp://artemis:simetraehcapa@localhost:61616"))
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

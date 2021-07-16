@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
@@ -13,7 +12,7 @@ using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
-namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
+namespace Nimbus.Transports.AzureServiceBus.SendersAndReceivers
 {
     internal class AzureServiceBusSubscriptionMessageReceiver : ThrottlingMessageReceiver
     {

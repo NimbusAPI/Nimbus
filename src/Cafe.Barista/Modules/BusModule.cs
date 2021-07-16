@@ -7,8 +7,6 @@ using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.Amqp;
-using Nimbus.Transports.AzureServiceBus;
-using Nimbus.Transports.Redis;
 
 namespace Barista.Modules
 {
@@ -24,7 +22,7 @@ namespace Barista.Modules
                                                  // .WithTransport(
                                                  //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
                                                  //     )
-                                                 .WithTransport(new AmqpTransportConfiguration())
+                                                 .WithTransport(new AmqpTransportConfiguration().WithConnectionString("amqp://artemis:simetraehcapa@localhost:61616"))
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Nimbus.Configuration.Settings;
+using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
-using Nimbus.Transports.AzureServiceBus.QueueManagement;
-using Nimbus.Extensions;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
+using Nimbus.Transports.AzureServiceBus.QueueManagement;
 
-namespace Nimbus.Transports.AzureServiceBus.SendersAndRecievers
+namespace Nimbus.Transports.AzureServiceBus.SendersAndReceivers
 {
     internal class AzureServiceBusQueueMessageReceiver : ThrottlingMessageReceiver
     {

@@ -5,12 +5,8 @@ using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Logger.Serilog.Configuration;
-using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.Amqp;
-using Nimbus.Transports.AzureServiceBus;
-using Nimbus.Transports.Redis;
-using Serilog;
 
 namespace Cashier.Modules
 {

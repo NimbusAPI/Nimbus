@@ -11,19 +11,22 @@ using Nimbus.Transports.Amqp.Messages;
 
 namespace Nimbus.Transports.Amqp.SendersAndReceivers
 {
-    internal class AmqpMessageReceiver : ThrottlingMessageReceiver
+    internal class AmqpQueueReceiver : ThrottlingMessageReceiver
     {
         private readonly IConnectionManager _connectionManager;
         private readonly string _queuePath;
         private readonly IMessageFactory _messageFactory;
+
         private IReceiverLink _receiver;
 
-        public AmqpMessageReceiver(IConnectionManager connectionManager,
-                                   string queuePath,
-                                   IMessageFactory messageFactory,
-                                   ConcurrentHandlerLimitSetting concurrentHandlerLimit,
-                                   IGlobalHandlerThrottle globalHandlerThrottle,
-                                   ILogger logger) : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
+        public AmqpQueueReceiver(
+            IConnectionManager connectionManager,
+            string queuePath,
+            IMessageFactory messageFactory,
+            ConcurrentHandlerLimitSetting concurrentHandlerLimit,
+            IGlobalHandlerThrottle globalHandlerThrottle,
+            ILogger logger)
+            : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _connectionManager = connectionManager;
             _queuePath = queuePath;
@@ -38,7 +41,6 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
-
             var receiver = GetMessageReceiver();
             NimbusMessage message = null;
             var brokerMessage = await receiver.ReceiveAsync(TimeSpan.FromSeconds(300));
@@ -68,9 +70,10 @@ namespace Nimbus.Transports.Amqp.SendersAndReceivers
 
         private IReceiverLink GetMessageReceiver()
         {
-            if (_receiver != null) return _receiver;
+            if (_receiver != null && !_receiver.IsClosed)
+                return _receiver;
 
-            _receiver = _connectionManager.CreateMessageReceiver(_queuePath);
+            _receiver = _connectionManager.CreateQueueReceiver(_queuePath);
 
             return _receiver;
         }

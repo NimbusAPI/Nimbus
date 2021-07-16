@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration.Settings;
@@ -15,7 +14,6 @@ namespace Nimbus.Transports.Amqp
     internal class AmqpTransport : INimbusTransport
     {
         private readonly IConnectionManager _connectionManager;
-        private readonly ISerializer _serializer;
         private readonly ILogger _logger;
         private readonly IMessageFactory _messageFactory;
 
@@ -24,10 +22,12 @@ namespace Nimbus.Transports.Amqp
         private readonly ThreadSafeDictionary<string, INimbusMessageSender> _topicMessageSenders = new ThreadSafeDictionary<string, INimbusMessageSender>();
         private readonly ThreadSafeDictionary<string, INimbusMessageReceiver> _topicMessageReceivers = new ThreadSafeDictionary<string, INimbusMessageReceiver>();
 
-        public AmqpTransport(IConnectionManager connectionManager, ISerializer serializer, ILogger logger, IMessageFactory messageFactory)
+        public AmqpTransport(
+            IConnectionManager connectionManager,
+            ILogger logger,
+            IMessageFactory messageFactory)
         {
             _connectionManager = connectionManager;
-            _serializer = serializer;
             _logger = logger;
             _messageFactory = messageFactory;
         }
@@ -39,38 +39,58 @@ namespace Nimbus.Transports.Amqp
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
-            return _queueMessageSenders.GetOrAdd(queuePath, CreateQueueSender);
-        }
-
-        public INimbusMessageReceiver GetQueueReceiver(string queuePath)
-        {
-            return _queueMessageReceivers.GetOrAdd(queuePath, CreateQueueReceiver);
+            _logger.Debug("AMQP: Attempting to get Queue {QueuePath} sender.", queuePath);
+            return _queueMessageSenders.GetOrAdd(queuePath, CreateMessageSender);
         }
 
         public INimbusMessageSender GetTopicSender(string topicPath)
         {
-            throw new NotImplementedException();
+            _logger.Debug("AMQP: Attempting to get Topic {TopicPath} sender.", topicPath);
+            return _topicMessageSenders.GetOrAdd(topicPath, CreateTopicSender);
+        }
+
+        public INimbusMessageReceiver GetQueueReceiver(string queuePath)
+        {
+            _logger.Debug("AMQP: Attempting to get Queue {QueuePath} receiver.", queuePath);
+            return _queueMessageReceivers.GetOrAdd(queuePath, CreateQueueReceiver);
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
-            throw new NotImplementedException();
+            _logger.Debug("AMQP: Attempting to get {TopicPath} for {SubscriptionName} receiver.", topicPath, subscriptionName);
+            return _topicMessageReceivers.GetOrAdd(topicPath, CreateTopicReceiver);
         }
 
-        private INimbusMessageSender CreateQueueSender(string queuePath)
+        private INimbusMessageSender CreateMessageSender(string queuePath)
         {
-            return new AmqpMessageSender(_connectionManager, queuePath, _messageFactory);
+            return new AmqpQueueSender(_connectionManager, _messageFactory, _logger, queuePath);
         }
-        
-        public INimbusMessageReceiver CreateQueueReceiver(string queuePath)
+
+        private INimbusMessageSender CreateTopicSender(string topicPath)
         {
-            return new AmqpMessageReceiver(_connectionManager,
-                                           queuePath,
-                                           _messageFactory,
-                                           new ConcurrentHandlerLimitSetting {Value = 10},
-                                           new GlobalHandlerThrottle(new GlobalConcurrentHandlerLimitSetting
-                                                                     {Value = 10}),
-                                           _logger);
+            return new AmqpQueueSender(_connectionManager, _messageFactory, _logger, topicPath);
+        }
+
+        private INimbusMessageReceiver CreateQueueReceiver(string queuePath)
+        {
+            return new AmqpQueueReceiver(_connectionManager,
+                                         queuePath,
+                                         _messageFactory,
+                                         new ConcurrentHandlerLimitSetting {Value = 10},
+                                         new GlobalHandlerThrottle(new GlobalConcurrentHandlerLimitSetting
+                                                                   {Value = 10}),
+                                         _logger);
+        }
+
+        private INimbusMessageReceiver CreateTopicReceiver(string topicPath)
+        {
+            return new AmqpTopicReceiver(_connectionManager,
+                                         _messageFactory,
+                                         topicPath,
+                                         new ConcurrentHandlerLimitSetting {Value = 10},
+                                         new GlobalHandlerThrottle(new GlobalConcurrentHandlerLimitSetting
+                                                                   {Value = 10}),
+                                         _logger);
         }
     }
 }

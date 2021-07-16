@@ -13,7 +13,7 @@ using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.AzureServiceBus.BrokeredMessages;
 using Nimbus.Transports.AzureServiceBus.Filtering;
 using Nimbus.Transports.AzureServiceBus.QueueManagement;
-using Nimbus.Transports.AzureServiceBus.SendersAndRecievers;
+using Nimbus.Transports.AzureServiceBus.SendersAndReceivers;
 
 namespace Nimbus.Transports.AzureServiceBus
 {

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Amqp;
 using Nimbus.Configuration.Settings;
 
@@ -6,33 +5,27 @@ namespace Nimbus.Transports.Amqp.ConnectionManagement
 {
     public interface IConnectionManager
     {
-        ISenderLink CreateMessageSender(string queuePath);
-        IReceiverLink CreateMessageReceiver(string queuePath);
-        
-        //IMessageReceiver CreateMessageReceiver(string queuePath, ReceiveMode receiveMode)
+        ISenderLink CreateQueueSender(string queuePath);
+
+        IReceiverLink CreateQueueReceiver(string queuePath);
+
+        ISenderLink CreateTopicSender(string topicPath);
+
+        IReceiverLink CreateTopicReceiver(string topicPath);
+
     }
+
     public class ConnectionManager : IConnectionManager
     {
         private readonly ConnectionStringSetting _connectionStringSetting;
+        private readonly ApplicationNameSetting _applicationName;
         private Connection _connection;
 
-        public ConnectionManager(ConnectionStringSetting connectionStringSetting)
+        public ConnectionManager(ConnectionStringSetting connectionStringSetting, 
+                                 ApplicationNameSetting applicationName)
         {
             _connectionStringSetting = connectionStringSetting;
-        }
-
-        public ISenderLink CreateMessageSender(string queuePath)
-        {
-            var session = new Session(GetConnection());
-            var link = new SenderLink(session, queuePath, queuePath);
-            return link;
-        }
-
-        public IReceiverLink CreateMessageReceiver(string queuePath)
-        {
-            var session = new Session(GetConnection());
-            var link = new ReceiverLink(session, queuePath, queuePath);
-            return link;
+            _applicationName = applicationName;
         }
 
 
@@ -43,7 +36,36 @@ namespace Nimbus.Transports.Amqp.ConnectionManagement
                 var address = new Address(_connectionStringSetting.Value);
                 _connection = new Connection(address);
             }
+
             return _connection;
+        }
+
+        public ISenderLink CreateQueueSender(string queuePath)
+        {
+            var session = new Session(GetConnection());
+            var link = new SenderLink(session, _applicationName, queuePath);
+            return link;
+        }
+
+        public IReceiverLink CreateQueueReceiver(string queuePath)
+        {
+            var session = new Session(GetConnection());
+            var link = new ReceiverLink(session, _applicationName, queuePath);
+            return link;
+        }
+
+        public ISenderLink CreateTopicSender(string topicPath)
+        {
+            var session = new Session(GetConnection());
+            var link = new SenderLink(session, _applicationName, topicPath);
+            return link;
+        }
+
+        public IReceiverLink CreateTopicReceiver(string topicPath)
+        {
+            var session = new Session(GetConnection());
+            var link = new ReceiverLink(session, _applicationName, topicPath);
+            return link;
         }
     }
 }
