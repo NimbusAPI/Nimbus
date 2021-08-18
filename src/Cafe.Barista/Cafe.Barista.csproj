@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj" />
     <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.LargeMessages.Azure\Nimbus.LargeMessages.Azure.csproj" />
     <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
     <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
     <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />

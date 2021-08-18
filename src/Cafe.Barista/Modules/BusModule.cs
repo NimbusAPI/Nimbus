@@ -4,6 +4,7 @@ using Cafe.Messages;
 using Nimbus.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
+using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AzureServiceBus;
@@ -22,6 +23,10 @@ namespace Barista.Modules
                                                  .Configure()
                                                  .WithTransport(
                                                      new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                                                                .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
+                                                                                                    .UsingStorageAccountConnectionString(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONNECTIONSTRING"))
+                                                                                                    .UsingBlobStorageContainerName(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
+                                                                                                )
                                                      )
 
                                                  .WithNames("Barista", Environment.MachineName)
