@@ -29,5 +29,5 @@ COPY src ./
 
 # Compile and package
 WORKDIR /build
-RUN dotnet cake --Target="CI" --buildVersion="$BUILD_NUMBER"
+RUN dotnet cake --Target="Build" --buildVersion="$BUILD_NUMBER"
 

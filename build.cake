@@ -35,9 +35,23 @@ Task ("Restore")
         DotNetCoreRestore ("./src", settings);
     });
 
+// Sets version from GitVersion
+Task("SetVersion")
+    .Does(() =>
+    {
+        var settings = new GitVersionSettings();
+        if(IsRunningOnUnix())
+        {
+            settings.ToolPath = "/usr/local/bin/gitversion";
+        }
+        var result = GitVersion(settings);
+        version = result.NuGetVersion;
+
+        Information($"Set version to {version}");
+    });
+
 // Build using the build configuration specified as an argument.
 Task ("Build")
-    .IsDependentOn ("Restore")
     .Does (() => {
         DotNetCoreBuild ("./src",
             new DotNetCoreBuildSettings () {
@@ -49,6 +63,7 @@ Task ("Build")
                 }
             });
     });
+
 
 Task ("ConventionTest")
     .Does (() => {
@@ -103,29 +118,10 @@ Task("Test")
     .IsDependentOn("UnitTest")
     ;
 
-Task ("PushPackages")
-    .Does (() => {
-
-        if (String.IsNullOrEmpty (nugetApiKey)) {
-            Information ($"No Nuget keys found. Skipping step");
-            return;
-        }
-
-        var settings = new DotNetCoreNuGetPushSettings {
-            ApiKey = nugetApiKey,
-            Source = "https://www.myget.org/F/nimbusapi/api/v2/package"
-        };
+Task ("CollectPackages")
+    .Does(()=>{
         var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
-        foreach (var file in packages) {
-            Information ($"Pushing package {file}");
-            DotNetCoreNuGetPush ($"{file}", settings);
-        }
-        packages = GetFiles ($"./**/bin/Release/Nimbus.{version}.nupkg");
-        foreach (var file in packages) {
-            Information ($"Pushing package {file}");
-            DotNetCoreNuGetPush ($"{file}", settings);
-        }
-        
+        CopyFiles(packages, packageDirectory);
     });
 
 // A meta-task that runs all the steps to Build and Test the app
@@ -133,11 +129,13 @@ Task ("BuildAndTest")
     .IsDependentOn ("Clean")
     .IsDependentOn ("Build")
     .IsDependentOn ("Test")
-    .IsDependentOn ("IntegrationTest")
     ;
 
 Task ("CI")
-    .IsDependentOn ("Build")
+    .IsDependentOn("SetVersion")
+    .IsDependentOn ("BuildAndTest")
+    .IsDependentOn ("IntegrationTest")
+    .IsDependentOn ("CollectPackages")
     ;
 
 // The default task to run if none is explicitly specified. In this case, we want
