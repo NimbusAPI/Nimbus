@@ -46,4 +46,4 @@ jobs:
         ports:
           - 5341:80
         env:
-          - ACCEPT_EULA=Y
+          ACCEPT_EULA: Y
