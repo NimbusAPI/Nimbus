@@ -1,6 +1,6 @@
 var target = Argument ("Target", "Default");
 var configuration = Argument ("Configuration", "Release");
-var version = EnvironmentVariable ("BUILD_NUMBER") ?? Argument ("buildVersion", "0.0.0");
+var version = EnvironmentVariable ("GITVERSION_NUGETVERSIONV2") ?? Argument ("buildVersion", "0.0.0");
 var nugetApiKey = EnvironmentVariable ("NUGET_API_KEY") ?? Argument ("nugetApiKey", "");
 
 Information ($"Running target {target} in configuration {configuration} with version {version}");
@@ -33,21 +33,6 @@ Task ("Restore")
     .Does (() => {
         var settings = new DotNetCoreRestoreSettings();
         DotNetCoreRestore ("./src", settings);
-    });
-
-// Sets version from GitVersion
-Task("SetVersion")
-    .Does(() =>
-    {
-        var settings = new GitVersionSettings();
-        if(IsRunningOnUnix())
-        {
-            settings.ToolPath = "/usr/local/bin/gitversion";
-        }
-        var result = GitVersion(settings);
-        version = result.NuGetVersion;
-
-        Information($"Set version to {version}");
     });
 
 // Build using the build configuration specified as an argument.
@@ -132,7 +117,6 @@ Task ("BuildAndTest")
     ;
 
 Task ("CI")
-    .IsDependentOn("SetVersion")
     .IsDependentOn ("BuildAndTest")
     .IsDependentOn ("IntegrationTest")
     .IsDependentOn ("CollectPackages")
