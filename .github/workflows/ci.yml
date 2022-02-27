@@ -30,6 +30,10 @@ jobs:
       run: |
         echo "SemVer: $GITVERSION_SEMVER"
         
+    - name: Install cale
+      run: dotnet tool install Cake.Tool
+      
+      
     - name: Run the Cake script
       uses: cake-build/cake-action@v1
       with:
