@@ -112,6 +112,7 @@ Task ("CollectPackages")
 // A meta-task that runs all the steps to Build and Test the app
 Task ("BuildAndTest")
     .IsDependentOn ("Clean")
+    .IsDependentOn ("Restore")
     .IsDependentOn ("Build")
     .IsDependentOn ("Test")
     ;
