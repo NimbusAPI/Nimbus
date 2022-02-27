@@ -31,7 +31,7 @@ jobs:
         echo "SemVer: $GITVERSION_SEMVER"
         
     - name: Install cale
-      run: dotnet tool install Cake.Tool
+      run: dotnet tool install --global Cake.Tool
       
       
     - name: Run the Cake script
