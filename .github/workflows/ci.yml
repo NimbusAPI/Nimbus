@@ -39,6 +39,11 @@ jobs:
       with:
         script-path: build.cake
         target: CI
+
+    - name: Collect Package Artifacts
+      uses: actions/upload-artifact@v2.3.1
+      with:
+        path: ./dist_package/*.nupkg
         
     services:
       redis:
