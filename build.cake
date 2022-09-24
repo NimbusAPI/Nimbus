@@ -1,3 +1,5 @@
+#tool nuget:?package=NunitXml.TestLogger&version=3.0.117
+
 var target = Argument ("Target", "Default");
 var configuration = Argument ("Configuration", "Release");
 var version = EnvironmentVariable ("GITVERSION_NUGETVERSIONV2") ?? Argument ("buildVersion", "0.0.0");
@@ -57,14 +59,16 @@ Task ("ConventionTest")
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
-            Filter = "Category=\"Convention\""
+            Filter = "Category=\"Convention\"",
+            ResultsDirectory = packageDirectory.Path.Combine("ConventionTests"), 
+            Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
 
             Information ("Testing project " + project);
             DotNetCoreTest (project.FullPath, settings);
         }
-    });
+    }); 
 
 Task ("UnitTest")
     .Does (() => {
@@ -73,7 +77,9 @@ Task ("UnitTest")
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
-            Filter = "Category=\"UnitTest\""
+            Filter = "Category=\"UnitTest\"",
+            // ResultsDirectory = packageDirectory.Path.Combine("UnitTests"), 
+            // Loggers = new []{"nunit"},
         };
         foreach (var project in projects) {
 
@@ -89,7 +95,9 @@ Task ("IntegrationTest")
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
-            Filter = "Category!=\"Convention\" & Category!=\"UnitTest\""
+            Filter = "Category!=\"Convention\" & Category!=\"UnitTest\"",
+            ResultsDirectory = packageDirectory.Path.Combine("IntegrationTests"), 
+            Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
 
@@ -120,6 +128,11 @@ Task ("BuildAndTest")
 Task ("CI")
     .IsDependentOn ("BuildAndTest")
     .IsDependentOn ("IntegrationTest")
+    .IsDependentOn ("CollectPackages")
+    ;
+
+Task ("FastCI")
+    .IsDependentOn ("BuildAndTest")
     .IsDependentOn ("CollectPackages")
     ;
 
