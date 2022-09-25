@@ -20,3 +20,4 @@ tools
 # build stuff
 dist_package/
 **/*/AssemblyInfo.cs
+.config

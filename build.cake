@@ -1,4 +1,3 @@
-#tool nuget:?package=NunitXml.TestLogger&version=3.0.117
 
 var target = Argument ("Target", "Default");
 var configuration = Argument ("Configuration", "Release");
@@ -22,8 +21,8 @@ private IEnumerable<FilePath> GetAllProjects () {
 Task ("Clean")
     .Does (() => {
         CleanDirectory (packageDirectory);
-        DotNetCoreClean ("./src",
-            new DotNetCoreCleanSettings () {
+        DotNetClean ("./src",
+            new DotNetCleanSettings () {
             Configuration = configuration,
             ArgumentCustomization = builder => builder
                 .Append($"/p:Version={version}")
@@ -33,20 +32,20 @@ Task ("Clean")
 // Run dotnet restore to restore all package references.
 Task ("Restore")
     .Does (() => {
-        var settings = new DotNetCoreRestoreSettings();
-        DotNetCoreRestore ("./src", settings);
+        var settings = new DotNetRestoreSettings();
+        DotNetRestore ("./src", settings);
     });
 
 // Build using the build configuration specified as an argument.
 Task ("Build")
     .Does (() => {
-        DotNetCoreBuild ("./src",
-            new DotNetCoreBuildSettings () {
+        DotNetBuild ("./src",
+            new DotNetBuildSettings () {
                 Configuration = configuration,
                 ArgumentCustomization = builder => builder
                     .Append($"/p:Version={version}"),
                 NoRestore = true,
-                MSBuildSettings = new DotNetCoreMSBuildSettings {
+                MSBuildSettings = new DotNetMSBuildSettings {
                 }
             });
     });
@@ -55,7 +54,7 @@ Task ("Build")
 Task ("ConventionTest")
     .Does (() => {
         var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
-        var settings = new DotNetCoreTestSettings {
+        var settings = new DotNetTestSettings {
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
@@ -66,32 +65,32 @@ Task ("ConventionTest")
         foreach (var project in projects) {
 
             Information ("Testing project " + project);
-            DotNetCoreTest (project.FullPath, settings);
+            DotNetTest (project.FullPath, settings);
         }
     }); 
 
 Task ("UnitTest")
     .Does (() => {
         var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
-        var settings = new DotNetCoreTestSettings {
+        var settings = new DotNetTestSettings {
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
             Filter = "Category=\"UnitTest\"",
-            // ResultsDirectory = packageDirectory.Path.Combine("UnitTests"), 
-            // Loggers = new []{"nunit"},
+            ResultsDirectory = packageDirectory.Path.Combine("UnitTests"), 
+            Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
 
             Information ("Testing project " + project);
-            DotNetCoreTest (project.FullPath, settings);
+            DotNetTest (project.FullPath, settings);
         }
     });
 
 Task ("IntegrationTest")
     .Does (() => {
         var projects = GetFiles ("./src/Nimbus.Tests.*/Nimbus.Tests.*.csproj");
-        var settings = new DotNetCoreTestSettings {
+        var settings = new DotNetTestSettings {
             NoBuild = true,
             NoRestore = true,
             Configuration = configuration,
@@ -102,7 +101,8 @@ Task ("IntegrationTest")
         foreach (var project in projects) {
 
             Information ("Testing project " + project);
-            DotNetCoreTest (project.FullPath, settings);
+            DotNetTest (project.FullPath, settings);
+            
         }
     });
 
