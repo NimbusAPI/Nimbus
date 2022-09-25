@@ -50,7 +50,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        files: ./dist_packages/**/*.trx        
+        files: ./dist_package/**/*.trx        
         
     services:
       redis:
