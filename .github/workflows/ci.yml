@@ -51,7 +51,13 @@ jobs:
       if: always()
       with:
         trx_files: ./dist_package/**/*.trx
- 
+
+    - name: Publish NuGet Packages
+      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/develop')
+      uses: cake-build/cake-action@v1
+      with:
+        script-path: build.cake
+        target: pushpackages
         
     services:
       redis:

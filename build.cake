@@ -106,16 +106,38 @@ Task ("IntegrationTest")
         }
     });
 
-Task("Test")
-    .IsDependentOn("ConventionTest")
-    .IsDependentOn("UnitTest")
-    ;
 
 Task ("CollectPackages")
     .Does(()=>{
         var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
         CopyFiles(packages, packageDirectory);
     });
+
+Task("PushPackages")
+    .Does(() => {
+
+        var settings = new DotNetCoreNuGetPushSettings
+        {
+            Source = "https://api.nuget.org/v3/index.json",
+            ApiKey = nugetApiKey,
+        };
+
+        var packages = GetFiles( $"{packageDirectory}/Nimbus*.nupkg");
+
+        foreach (var package in packages)
+        {
+            Information("Pushing " + package);
+            DotNetCoreNuGetPush(package, settings);
+        };       
+        
+
+    });
+
+Task("Test")
+    .IsDependentOn("ConventionTest")
+    .IsDependentOn("UnitTest")
+    ;
+
 
 // A meta-task that runs all the steps to Build and Test the app
 Task ("BuildAndTest")
