@@ -46,11 +46,12 @@ jobs:
         name: nuget-packages
         path: ./dist_package/Nimbus.*.nupkg
 
-    - name: Publish Unit Test Results
+    - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        files: ./dist_package/**/*.trx        
+        trx_files: ./dist_package/**/*.trx
+ 
         
     services:
       redis:
