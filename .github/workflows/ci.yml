@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, build-workflow ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, build-workflow ]
 
 jobs:
 
@@ -17,7 +17,11 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: |
+          5.0.x
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.7
       with:
@@ -34,7 +38,26 @@ jobs:
       uses: cake-build/cake-action@v1
       with:
         script-path: build.cake
-        target: CI
+        target: ci
+
+    - name: Collect Package Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-packages
+        path: ./dist_package/Nimbus.*.nupkg
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        trx_files: ./dist_package/**/*.trx
+
+    - name: Publish NuGet Packages
+      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/develop')
+      uses: cake-build/cake-action@v1
+      with:
+        script-path: build.cake
+        target: pushpackages
         
     services:
       redis:
