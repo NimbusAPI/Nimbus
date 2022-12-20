@@ -116,7 +116,7 @@ Task ("CollectPackages")
 Task("PushPackages")
     .Does(() => {
 
-        var settings = new DotNetCoreNuGetPushSettings
+        var settings = new DotNetNuGetPushSettings
         {
             Source = "https://api.nuget.org/v3/index.json",
             ApiKey = nugetApiKey,
@@ -127,7 +127,7 @@ Task("PushPackages")
         foreach (var package in packages)
         {
             Information("Pushing " + package);
-            DotNetCoreNuGetPush(package, settings);
+            DotNetNuGetPush(package, settings);
         };       
         
 
