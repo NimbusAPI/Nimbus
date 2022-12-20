@@ -109,7 +109,7 @@ Task ("IntegrationTest")
 
 Task ("CollectPackages")
     .Does(()=>{
-        var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
+        var packages = GetFiles ($"./**/bin/Release/Nimbus*.{version}.nupkg");
         CopyFiles(packages, packageDirectory);
     });
 
