@@ -10,21 +10,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj"/>
-        <ProjectReference Include="..\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj"/>
-        <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj"/>
-        <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj"/>
-        <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj"/>
-        <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj"/>
-        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj" />
+        <ProjectReference Include="..\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj" />
+        <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
+        <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
+        <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj" />
+        <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
+        <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="4.9.4"/>
-        <PackageReference Include="nunit" Version="3.12.0"/>
-        <PackageReference Include="shouldly" Version="3.0.2"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="3.15.0"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0"/>
+        <PackageReference Include="Autofac" Version="6.5.0" />
+        <PackageReference Include="nunit" Version="3.13.3" />
+        <PackageReference Include="shouldly" Version="3.0.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     </ItemGroup>
 
     <ItemGroup>

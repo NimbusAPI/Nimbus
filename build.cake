@@ -149,7 +149,7 @@ Task ("BuildAndTest")
 
 Task ("CI")
     .IsDependentOn ("BuildAndTest")
-    .IsDependentOn ("IntegrationTest")
+    //.IsDependentOn ("IntegrationTest")
     .IsDependentOn ("CollectPackages")
     ;
 
