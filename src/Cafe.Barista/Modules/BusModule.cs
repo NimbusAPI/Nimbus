@@ -21,14 +21,16 @@ namespace Barista.Modules
             builder.RegisterNimbus(handlerTypesProvider);
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
-                                                 .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
-                                                                                                .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
-                                                                                                    .UsingStorageAccountConnectionString(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONNECTIONSTRING"))
-                                                                                                    .UsingBlobStorageContainerName(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
-                                                                                                )
-                                                     )
+                                                 // .WithTransport(
+                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                 //                                                .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
+                                                 //                                                    .UsingStorageAccountConnectionString(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONNECTIONSTRING"))
+                                                 //                                                    .UsingBlobStorageContainerName(Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
+                                                 //                                                )
+                                                 //     )
 
+                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("bus.iymtwr.0001.apse2.cache.amazonaws.com"))
+                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
