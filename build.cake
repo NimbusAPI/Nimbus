@@ -118,7 +118,8 @@ Task("PushPackages")
 
         var settings = new DotNetNuGetPushSettings
         {
-            Source = "https://api.nuget.org/v3/index.json",
+            //Source = "https://api.nuget.org/v3/index.json",
+            Source = "https://www.myget.org/F/nimbusapi/api/v3/index.json"
             ApiKey = nugetApiKey,
         };
 

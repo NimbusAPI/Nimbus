@@ -59,7 +59,7 @@ jobs:
         script-path: build.cake
         target: pushpackages
       env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        NUGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
         
     services:
       redis:
