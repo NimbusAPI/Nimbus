@@ -16,7 +16,7 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.I
                                                              {
                                                                  var updater = new ContainerBuilder();
                                                                  updater.RegisterNimbus(bbc.TypeProvider);
-                                                                 updater.Update(container);
+                                                                 //updater.Update(container);
                                                                  return bbc.WithAutofacDefaults(container);
                                                              }
                                 };

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop, build-workflow ]
+    branches: [ main, develop, build-workflow, update-redis-client ]
   pull_request:
     branches: [ main, develop, build-workflow ]
 
@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: |
-          5.0.x
+          6.0.x
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.7
       with:
@@ -59,7 +59,7 @@ jobs:
         script-path: build.cake
         target: pushpackages
       env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        NUGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
         
     services:
       redis:

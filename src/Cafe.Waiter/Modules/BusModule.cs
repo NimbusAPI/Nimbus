@@ -24,18 +24,16 @@ namespace Waiter.Modules
             builder.Register(componentContext => new BusBuilder()
                                                  .Configure()
                                                  // .WithTransport(
-                                                 //     new AzureServiceBusTransportConfiguration().WithConnectionString("")
-                                                 //     )
-                                                 .WithTransport(
-                                                     new AzureServiceBusTransportConfiguration()
-                                                         .WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
-                                                         .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
-                                                                                  .UsingStorageAccountConnectionString(
-                                                                                      Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONNECTIONSTRING"))
-                                                                                  .UsingBlobStorageContainerName(
-                                                                                      Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
-                                                         )
-                                                 )
+                                                 //     new AzureServiceBusTransportConfiguration()
+                                                 //         .WithConnectionString(Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CONNECTIONSTRING"))
+                                                 //         .WithLargeMessageStorage(new AzureBlobStorageLargeMessageStorageConfiguration()
+                                                 //                                  .UsingStorageAccountConnectionString(
+                                                 //                                      Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONNECTIONSTRING"))
+                                                 //                                  .UsingBlobStorageContainerName(
+                                                 //                                      Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
+                                                 //         )
+                                                 // )
+                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

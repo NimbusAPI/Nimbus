@@ -109,16 +109,17 @@ Task ("IntegrationTest")
 
 Task ("CollectPackages")
     .Does(()=>{
-        var packages = GetFiles ($"./**/bin/Release/Nimbus.*.{version}.nupkg");
+        var packages = GetFiles ($"./**/bin/Release/Nimbus*.{version}.nupkg");
         CopyFiles(packages, packageDirectory);
     });
 
 Task("PushPackages")
     .Does(() => {
 
-        var settings = new DotNetCoreNuGetPushSettings
+        var settings = new DotNetNuGetPushSettings
         {
-            Source = "https://api.nuget.org/v3/index.json",
+            //Source = "https://api.nuget.org/v3/index.json",
+            Source = "https://www.myget.org/F/nimbusapi/api/v3/index.json"
             ApiKey = nugetApiKey,
         };
 
@@ -127,7 +128,7 @@ Task("PushPackages")
         foreach (var package in packages)
         {
             Information("Pushing " + package);
-            DotNetCoreNuGetPush(package, settings);
+            DotNetNuGetPush(package, settings);
         };       
         
 
@@ -149,7 +150,7 @@ Task ("BuildAndTest")
 
 Task ("CI")
     .IsDependentOn ("BuildAndTest")
-    .IsDependentOn ("IntegrationTest")
+    //.IsDependentOn ("IntegrationTest")
     .IsDependentOn ("CollectPackages")
     ;
 
