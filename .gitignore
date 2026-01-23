@@ -21,3 +21,6 @@ tools
 dist_package/
 **/*/AssemblyInfo.cs
 .config
+
+.claude
+data/

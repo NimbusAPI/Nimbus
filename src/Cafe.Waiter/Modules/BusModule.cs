@@ -8,6 +8,7 @@ using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json;
 using Nimbus.Serializers.Json.Configuration;
+using Nimbus.Transports.AMQP;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 using Serilog;
@@ -33,7 +34,15 @@ namespace Waiter.Modules
                                                  //                                      Environment.GetEnvironmentVariable("AZURE_BLOB_STORE_CONTAINERNAME"))
                                                  //         )
                                                  // )
-                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+
+                                                 // Redis Transport
+                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+
+                                                 // ActiveMQ Transport
+                                                 .WithTransport(new AMQPTransportConfiguration()
+                                                     .WithBrokerUri("amqp://localhost:5672")
+                                                     .WithCredentials("admin", "admin"))
+
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

@@ -4,5 +4,6 @@ namespace Nimbus.Tests.Integration.Configuration
     {
         public RedisSettings Redis { get; set; }
         public AzureServiceBusSettings AzureServiceBus { get; set; }
+        public ActiveMQSettings ActiveMQ { get; set; }
     }
 }

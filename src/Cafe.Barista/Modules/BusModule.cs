@@ -7,6 +7,7 @@ using Nimbus.InfrastructureContracts;
 using Nimbus.LargeMessages.Azure.Client;
 using Nimbus.Logger.Serilog.Configuration;
 using Nimbus.Serializers.Json.Configuration;
+using Nimbus.Transports.AMQP;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 
@@ -29,8 +30,15 @@ namespace Barista.Modules
                                                  //                                                )
                                                  //     )
 
+                                                 // Redis Transport
                                                  //.WithTransport(new RedisTransportConfiguration().WithConnectionString("bus.iymtwr.0001.apse2.cache.amazonaws.com"))
-                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+
+                                                 // ActiveMQ Transport
+                                                 .WithTransport(new AMQPTransportConfiguration()
+                                                     .WithBrokerUri("amqp://localhost:5672")
+                                                     .WithCredentials("admin", "admin"))
+
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)

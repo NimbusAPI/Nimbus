@@ -1,161 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5CAED275-3485-449A-9EFC-6127B9257D82}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Nimbus.StressTests</RootNamespace>
     <AssemblyName>Nimbus.StressTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="ConfigInjector, Version=2.1.1058.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ConfigInjector.2.1.1058.0\lib\net45\ConfigInjector.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.2.5.0\lib\net45\Serilog.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.Formatting.Compact, Version=1.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.Formatting.Compact.1.0.0\lib\net45\Serilog.Formatting.Compact.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.Sinks.File.4.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.Sinks.PeriodicBatching, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.Sinks.PeriodicBatching.2.1.1\lib\net45\Serilog.Sinks.PeriodicBatching.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.Sinks.RollingFile, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.Sinks.RollingFile.3.3.0\lib\net45\Serilog.Sinks.RollingFile.dll</HintPath>
-    </Reference>
-    <Reference Include="Serilog.Sinks.Seq, Version=3.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Serilog.Sinks.Seq.3.4.0\lib\net45\Serilog.Sinks.Seq.dll</HintPath>
-    </Reference>
-    <Reference Include="Shouldly">
-      <HintPath>..\..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="ConfigInjector" Version="2.1.1058.0" />
+    <PackageReference Include="nunit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageReference Include="Serilog" Version="2.5.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="3.4.0" />
+    <PackageReference Include="Shouldly" Version="3.0.2" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StartupPerformanceTests\WhenCreatingABigBus.cs" />
-    <Compile Include="AssemblySetUp.cs" />
-    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\Handlers\CommandThatWillBlockTheThreadHandler.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingACommand.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingACommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingBCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingBCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\DoThingCCommand.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\Handlers\DoThingCCommandHandler.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingAHappenedEvent.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingAHappenedEventHandler.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\MessageContracts\ThingBHappenedEvent.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\Handlers\ThingBHappenedEventHandler.cs" />
-    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\MessageContracts\CommandThatWillBlockTheThread.cs" />
-    <Compile Include="SpecificationForBusAsync.cs" />
-    <Compile Include="ThreadStarvationTests\Cascades\WhenCreatingALargeMessageCascade.cs" />
-    <Compile Include="ThreadStarvationTests\BadlyBehavedHandlersThatDoNotKnowAboutAsync\WhenSendingABunchOfCommandsThatWillSaturateTheThreadPool.cs" />
-    <Compile Include="ThroughputTests\EventHandlers\StressTestMessageHandler.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\BarCommand.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\BarEvent.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\BazCommand.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\BazEvent.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\FooCommand.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\FooEvent.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\FooRequest.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\FooResponse.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\QuxCommand.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\QuxEvent.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\StressTestMessage.cs" />
-    <Compile Include="ThroughputTests\MessageContracts\StressTestResponseMessage.cs" />
-    <Compile Include="ThroughputTests\ThroughputSpecificationForBus.cs" />
-    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfDifferentTypes.cs" />
-    <Compile Include="ThroughputTests\WhenPublishingManyEventsOfTheSameType.cs" />
-    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfDifferentTypes.cs" />
-    <Compile Include="ThroughputTests\WhenSendingManyCommandsOfTheSameType.cs" />
-    <Compile Include="ThroughputTests\WhenSendingManyIndividualRequestsOfTheSameType.cs" />
-    <Compile Include="ThroughputTests\WhenSendingManyLargeCommandsOfTheSameType.cs" />
-    <Compile Include="ThroughputTests\WhenSendingManyRequestsOfTheSameType.cs" />
+    <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj" />
+    <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Extensions\Nimbus.LargeMessages.FileSystem\Nimbus.LargeMessages.FileSystem.csproj">
-      <Project>{7FEB8D9E-1451-4132-8E3B-30D8E7F84126}</Project>
-      <Name>Nimbus.LargeMessages.FileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj">
-      <Project>{6B665505-3C52-49D3-914A-7C295AF3F877}</Project>
-      <Name>Nimbus.Logger.Serilog</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj">
-      <Project>{49b432f5-093e-454f-9bf5-76ab28cfb396}</Project>
-      <Name>Nimbus.Transports.InProcess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Extensions\Nimbus.Transports.WindowsServiceBus\Nimbus.Transports.WindowsServiceBus.csproj">
-      <Project>{717c9174-b5f4-449c-a542-b8d7082a8d5d}</Project>
-      <Name>Nimbus.Transports.WindowsServiceBus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj">
-      <Project>{D59397D3-F595-45AB-9BF8-4615C298545B}</Project>
-      <Name>Nimbus.InfrastructureContracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj">
-      <Project>{702A4F7E-97C5-4651-B704-65C6D0D70C1C}</Project>
-      <Name>Nimbus.MessageContracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Nimbus\Nimbus.csproj">
-      <Project>{1B793C01-E824-4449-B93D-277626B1791F}</Project>
-      <Name>Nimbus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj">
-      <Project>{14AA0204-59C2-488D-BF5E-205CCA59E99D}</Project>
-      <Name>Nimbus.Tests.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

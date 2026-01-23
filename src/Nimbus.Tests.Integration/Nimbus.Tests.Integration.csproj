@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -15,6 +15,7 @@
         <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
         <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
         <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj" />
+        <ProjectReference Include="..\Nimbus.Transports.AMQP\Nimbus.Transports.AMQP.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
         <ProjectReference Include="..\Nimbus\Nimbus.csproj" />

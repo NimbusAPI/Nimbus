@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Damian Hickey and contributors</Authors>
+    <Company>NimbusAPI</Company>
+    <Product>Nimbus</Product>
+    <Description>AMQP transport for Nimbus messaging framework using Apache NMS AMQP (supports Artemis, ActiveMQ, and other AMQP brokers)</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/NimbusAPI/Nimbus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/NimbusAPI/Nimbus</RepositoryUrl>
+    <PackageTags>nimbus;messaging;amqp;artemis;activemq;nms</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Apache.NMS.AMQP" Version="2.4.0" />
+  </ItemGroup>
+
+</Project>
