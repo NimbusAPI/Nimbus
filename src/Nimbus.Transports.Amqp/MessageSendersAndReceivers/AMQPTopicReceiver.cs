@@ -8,9 +8,9 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
-using Nimbus.Transports.AMQP.ConnectionManagement;
 using Nimbus.Transports.AMQP.MessageConversion;
 using Nimbus.Transports.AMQP.QueueManagement;
+using static Nimbus.Infrastructure.MessagePropertyKeys;
 
 namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
 {
@@ -18,32 +18,29 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
     {
         private readonly string _topicPath;
         private readonly string _subscriptionName;
+        private readonly string _durableSubscriptionName;
         private readonly IFilterCondition _filterCondition;
         private readonly IQueueManager _queueManager;
         private readonly INmsMessageFactory _messageFactory;
-        private readonly AMQPTransportConfiguration _configuration;
         private readonly ILogger _logger;
-        private PooledConnection _pooledConnection;
         private ISession _session;
         private IMessageConsumer _consumer;
 
-        public AMQPTopicReceiver(string topicPath,
-                                     string subscriptionName,
+        public AMQPTopicReceiver(Subscription subscription,
                                      IFilterCondition filterCondition,
                                      IQueueManager queueManager,
                                      INmsMessageFactory messageFactory,
-                                     AMQPTransportConfiguration configuration,
                                      ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                      IGlobalHandlerThrottle globalHandlerThrottle,
                                      ILogger logger)
             : base(concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
-            _topicPath = topicPath;
-            _subscriptionName = subscriptionName;
+            _topicPath = subscription.TopicPath;
+            _subscriptionName = subscription.SubscriptionName;
+            _durableSubscriptionName = $"{subscription.SubscriptionName}.{subscription.TopicPath}";
             _filterCondition = filterCondition;
             _queueManager = queueManager;
             _messageFactory = messageFactory;
-            _configuration = configuration;
             _logger = logger;
         }
 
@@ -52,28 +49,18 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
             _logger.Debug("Warming up topic receiver for {TopicPath} with subscription {SubscriptionName}",
                 _topicPath, _subscriptionName);
 
-            _pooledConnection = await _queueManager.GetConnection();
-
-            // For durable subscriptions, we need to set the client ID
-            if (!string.IsNullOrWhiteSpace(_configuration.ClientId))
-            {
-                _pooledConnection.Connection.ClientId = _configuration.ClientId;
-            }
-
-            _session = await _pooledConnection.Connection.CreateSessionAsync(AcknowledgementMode.ClientAcknowledge);
+            _session = await _queueManager.CreateSession(AcknowledgementMode.ClientAcknowledge);
             var topic = await _queueManager.GetTopic(_session, _topicPath);
 
-            // Create durable subscriber with subscription name
-            // Note: NMS AMQP creates durable subscriptions when subscription name is provided
             var selector = BuildMessageSelector(_filterCondition);
 
             if (string.IsNullOrWhiteSpace(selector))
             {
-                _consumer = await _session.CreateDurableConsumerAsync(topic, _subscriptionName, null, false);
+                _consumer = await _session.CreateDurableConsumerAsync(topic, _durableSubscriptionName, null, false);
             }
             else
             {
-                _consumer = await _session.CreateDurableConsumerAsync(topic, _subscriptionName, selector, false);
+                _consumer = await _session.CreateDurableConsumerAsync(topic, _durableSubscriptionName, selector, false);
             }
 
             _logger.Info("Topic receiver for {TopicPath} with subscription {SubscriptionName} is ready",
@@ -98,6 +85,10 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
 
                 var nimbusMessage = await _messageFactory.CreateNimbusMessage(nmsMessage);
 
+                // Tag with subscription name so retries are routed back to this
+                // specific subscription via the JMS selector, not broadcast to all.
+                nimbusMessage.Properties[RedeliveryToSubscriptionName] = _subscriptionName;
+
                 // Acknowledge the message after successful conversion
                 await nmsMessage.AcknowledgeAsync();
 
@@ -117,10 +108,9 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
 
         private string BuildMessageSelector(IFilterCondition filterCondition)
         {
-            // AMQP supports JMS selectors
-            // For now, we'll return null (no filtering) since Nimbus filtering is typically done at the handler level
-            // This could be extended to convert Nimbus filter conditions to JMS selectors
-            return null;
+            // Accept original messages (property absent) or retries targeted at this subscription.
+            // This mirrors the Azure Service Bus subscription filter approach.
+            return $"({RedeliveryToSubscriptionName} = '{_subscriptionName}' OR {RedeliveryToSubscriptionName} IS NULL)";
         }
 
         protected override void Dispose(bool disposing)
@@ -149,16 +139,6 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Error disposing session for {TopicPath} subscription {SubscriptionName}",
-                        _topicPath, _subscriptionName);
-                }
-
-                try
-                {
-                    _pooledConnection?.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn(ex, "Error returning pooled connection for {TopicPath} subscription {SubscriptionName}",
                         _topicPath, _subscriptionName);
                 }
             }

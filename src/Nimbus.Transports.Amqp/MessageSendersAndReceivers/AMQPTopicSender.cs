@@ -31,11 +31,10 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
         {
             try
             {
-                using var pooledConnection = await _queueManager.GetConnection();
-                using var session = await pooledConnection.Connection.CreateSessionAsync(AcknowledgementMode.AutoAcknowledge);
+                using var session = await _queueManager.CreateSession(AcknowledgementMode.AutoAcknowledge);
                 var topic = await _queueManager.GetTopic(session, _topicPath);
 
-                using var producer = await session.CreateProducerAsync(topic);
+                using var producer = session.CreateProducer(topic);
                 var nmsMessage = await _messageFactory.CreateNmsMessage(message, session);
 
                 _logger.Debug("Publishing message {MessageId} to topic {TopicPath}", message.MessageId, _topicPath);

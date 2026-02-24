@@ -63,7 +63,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
                 try
                 {
-                    await _workerTask;
+                    if (_workerTask != null)
+                        await _workerTask;
                 }
                 catch (OperationCanceledException)
                 {

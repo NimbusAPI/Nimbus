@@ -7,7 +7,6 @@ using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Transports.AMQP.ConnectionManagement;
 using Nimbus.Transports.AMQP.MessageConversion;
 using Nimbus.Transports.AMQP.QueueManagement;
 
@@ -19,7 +18,6 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
         private readonly IQueueManager _queueManager;
         private readonly INmsMessageFactory _messageFactory;
         private readonly ILogger _logger;
-        private PooledConnection _pooledConnection;
         private ISession _session;
         private IMessageConsumer _consumer;
 
@@ -41,8 +39,7 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
         {
             _logger.Debug("Warming up queue receiver for {QueuePath}", _queuePath);
 
-            _pooledConnection = await _queueManager.GetConnection();
-            _session = await _pooledConnection.Connection.CreateSessionAsync(AcknowledgementMode.ClientAcknowledge);
+            _session = await _queueManager.CreateSession(AcknowledgementMode.ClientAcknowledge);
             var queue = await _queueManager.GetQueue(_session, _queuePath);
             _consumer = await _session.CreateConsumerAsync(queue);
 
@@ -106,15 +103,6 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Error disposing session for {QueuePath}", _queuePath);
-                }
-
-                try
-                {
-                    _pooledConnection?.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn(ex, "Error returning pooled connection for {QueuePath}", _queuePath);
                 }
             }
 

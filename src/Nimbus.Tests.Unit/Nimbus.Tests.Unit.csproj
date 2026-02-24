@@ -22,8 +22,14 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj"/>
+        <ProjectReference Include="..\Nimbus.LargeMessages.Azure\Nimbus.LargeMessages.Azure.csproj"/>
+        <ProjectReference Include="..\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj"/>
+        <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj"/>
+        <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj"/>
         <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj"/>
         <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.Transports.Amqp\Nimbus.Transports.AMQP.csproj"/>
+        <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj"/>
         <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.MessageContracts\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.csproj"/>
         <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.Handlers\Nimbus.Tests.Unit.TestAssemblies.Handlers.csproj"/>
         <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization.csproj"/>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Transport;
 using Nimbus.Tests.Common.Stubs;
 using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Compressors;
 using Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.IoCContainers;
@@ -27,46 +28,50 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.B
         [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
         public IEnumerator<IConfigurationScenario<BusBuilderConfiguration>> GetEnumerator()
         {
-            var typeProvider = new TestHarnessTypeProvider(new[] {_testFixtureType.Assembly}, new[] {_testFixtureType.Namespace});
+            var typeProvider = new TestHarnessTypeProvider(
+                [_testFixtureType.Assembly],
+                [_testFixtureType.Namespace]);
             var logger = TestHarnessLoggerFactory.Create(Guid.NewGuid(), GetType().FullName);
 
-            foreach (var syncContext in new SynchronizationContextConfigurationSources())
-            {
-                // in-process transport with all other combinations
-                foreach (var transport in new TransportConfigurationSources().Take(1))
-                {
-                    foreach (var router in new RouterConfigurationSources())
-                    {
-                        foreach (var serializer in new SerializerConfigurationSources(typeProvider))
-                        {
-                            foreach (var iocContainer in new IoCContainerConfigurationSources())
-                            {
-                                foreach (var compressor in new CompressorScenariosSource())
-                                {
-                                    yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer, syncContext);
-                                }
-                            }
-                        }
-                    }
-                }
+            // Default configurations (first of each)
+            var defaultRouter = new RouterConfigurationSources().First();
+            var defaultSerializer = new SerializerConfigurationSources(typeProvider).First();
+            var defaultIoC = new IoCContainerConfigurationSources().First();
+            var defaultCompressor = new CompressorScenariosSource().First();
+            var defaultSyncContext = new SynchronizationContextConfigurationSources().First();
 
-                // all transports with defaults for everything else
-                foreach (var transport in new TransportConfigurationSources().Skip(1))
-                {
-                    foreach (var router in new RouterConfigurationSources().Take(1))
-                    {
-                        foreach (var serializer in new SerializerConfigurationSources(typeProvider).Take(1))
-                        {
-                            foreach (var iocContainer in new IoCContainerConfigurationSources().Take(1))
-                            {
-                                foreach (var compressor in new CompressorScenariosSource().Take(1))
-                                {
-                                    yield return new BusBuilderScenario(typeProvider, logger, transport, router, serializer, compressor, iocContainer, syncContext);
-                                }
-                            }
-                        }
-                    }
-                }
+            // Generate scenarios based on selected transport
+            foreach (var transport in GetSelectedTransports())
+            {
+                yield return new BusBuilderScenario(
+                    typeProvider,
+                    logger,
+                    transport,
+                    defaultRouter,
+                    defaultSerializer,
+                    defaultCompressor,
+                    defaultIoC,
+                    defaultSyncContext);
+            }
+        }
+
+        private IEnumerable<IConfigurationScenario<TransportConfiguration>> GetSelectedTransports()
+        {
+            var allTransports = new TransportConfigurationSources().ToList();
+
+            switch (TransportSelector.SelectedTransport)
+            {
+                case TestTransport.InProcess:
+                    return allTransports.Where(t => t.Name == "InProcess");
+                case TestTransport.Redis:
+                    return allTransports.Where(t => t.Name == "Redis");
+                case TestTransport.Amqp:
+                    return allTransports.Where(t => t.Name == "Amqp");
+                case TestTransport.AzureServiceBus:
+                    return allTransports.Where(t => t.Name == "AzureServiceBus");
+                case TestTransport.All:
+                default:
+                    return allTransports;
             }
         }
 

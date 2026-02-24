@@ -31,8 +31,7 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
         {
             try
             {
-                using var pooledConnection = await _queueManager.GetConnection();
-                using var session = await pooledConnection.Connection.CreateSessionAsync(AcknowledgementMode.AutoAcknowledge);
+                using var session = await _queueManager.CreateSession(AcknowledgementMode.AutoAcknowledge);
                 var queue = await _queueManager.GetQueue(session, _queuePath);
 
                 using var producer = session.CreateProducer(queue);

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Nimbus.Infrastructure;
-using Nimbus.Infrastructure.Logging;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.AMQP.DelayedDelivery
@@ -31,8 +31,20 @@ namespace Nimbus.Transports.AMQP.DelayedDelivery
             _logger.Debug("Scheduling message {MessageId} for delivery at {DeliveryTime} to {DeliverTo}",
                 message.MessageId, deliveryTime, message.DeliverTo);
 
-            // Send to the queue - AMQP will hold it until the scheduled time
-            var sender = _transport.GetQueueSender(message.DeliverTo);
+            // If the message came from a topic subscription, re-publish to the topic.
+            // The RedeliveryToSubscriptionName property (carried as an NMS message property)
+            // will be matched by the JMS selector on the originating subscription so only
+            // that subscription receives the retry.
+            INimbusMessageSender sender;
+            if (message.Properties.ContainsKey(MessagePropertyKeys.RedeliveryToSubscriptionName))
+            {
+                sender = _transport.GetTopicSender(message.DeliverTo);
+            }
+            else
+            {
+                sender = _transport.GetQueueSender(message.DeliverTo);
+            }
+
             await sender.Send(message);
 
             _logger.Debug("Message {MessageId} scheduled successfully", message.MessageId);

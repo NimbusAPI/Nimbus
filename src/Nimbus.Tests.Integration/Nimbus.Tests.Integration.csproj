@@ -23,17 +23,14 @@
 
     <ItemGroup>
         <PackageReference Include="Autofac" Version="6.5.0" />
-        <PackageReference Include="nunit" Version="3.13.3" />
-        <PackageReference Include="shouldly" Version="3.0.2" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+        <PackageReference Include="nunit" Version="4.4.0" />
+        <PackageReference Include="shouldly" Version="4.3.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     </ItemGroup>
 
     <ItemGroup>
         <None Update="appsettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="appsettings.Development.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>

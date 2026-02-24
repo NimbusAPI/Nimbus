@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Extensions;
@@ -15,8 +16,11 @@ namespace Nimbus.Tests.Unit.Conventions
         [Test]
         public void MustAdhereToConventions()
         {
-            var types = typeof(Bus).Assembly    //TODO scan all Nimbus assemblies
-                                   .GetTypes();
+            var outputDir = Path.GetDirectoryName(typeof(NimbusCode).Assembly.Location)!;
+            var types = Directory.GetFiles(outputDir, "Nimbus*.dll")
+                                 .Where(f => !Path.GetFileNameWithoutExtension(f).Contains("Test", StringComparison.OrdinalIgnoreCase))
+                                 .SelectMany(f => Assembly.LoadFrom(f).GetTypes())
+                                 .ToArray();
 
             foreach (var type in types)
             {

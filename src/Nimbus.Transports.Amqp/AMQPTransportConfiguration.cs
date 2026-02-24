@@ -8,6 +8,7 @@ using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.AMQP.ConnectionManagement;
+using Nimbus.Transports.AMQP.DeadLetter;
 using Nimbus.Transports.AMQP.DelayedDelivery;
 using Nimbus.Transports.AMQP.MessageConversion;
 using Nimbus.Transports.AMQP.MessageSendersAndReceivers;
@@ -20,9 +21,9 @@ namespace Nimbus.Transports.AMQP
         internal string BrokerUri { get; private set; }
         internal string Username { get; private set; }
         internal string Password { get; private set; }
-        internal int ConnectionPoolSize { get; private set; } = 10;
         internal string[] FailoverUris { get; private set; } = new string[0];
         internal string ClientId { get; private set; }
+        internal string ManagementUri { get; private set; }
 
         public AMQPTransportConfiguration WithBrokerUri(string brokerUri)
         {
@@ -34,13 +35,6 @@ namespace Nimbus.Transports.AMQP
         {
             Username = username;
             Password = password;
-            return this;
-        }
-
-        public AMQPTransportConfiguration WithConnectionPoolSize(int poolSize)
-        {
-            if (poolSize < 1) throw new ArgumentException("Pool size must be at least 1", nameof(poolSize));
-            ConnectionPoolSize = poolSize;
             return this;
         }
 
@@ -56,6 +50,12 @@ namespace Nimbus.Transports.AMQP
             return this;
         }
 
+        public AMQPTransportConfiguration WithManagementUri(string managementUri)
+        {
+            ManagementUri = managementUri;
+            return this;
+        }
+
         public AMQPTransportConfiguration WithArtemisDefaults()
         {
             return this;
@@ -64,11 +64,10 @@ namespace Nimbus.Transports.AMQP
         protected override void RegisterComponents(PoorMansIoC container)
         {
             container.Register(c => this, ComponentLifetime.SingleInstance);
-            // Register configuration
-            container.RegisterType<AMQPTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
+
             // Register connection management
             container.RegisterType<NmsConnectionFactory>(ComponentLifetime.SingleInstance);
-            container.RegisterType<NmsConnectionPool>(ComponentLifetime.SingleInstance);
+            container.RegisterType<NmsConnectionManager>(ComponentLifetime.SingleInstance);
 
             // Register message conversion
             container.RegisterType<NmsMessageFactory>(ComponentLifetime.SingleInstance, typeof(INmsMessageFactory));

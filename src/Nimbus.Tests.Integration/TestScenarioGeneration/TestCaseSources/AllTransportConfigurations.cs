@@ -12,9 +12,10 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.TestCaseSources
         public IEnumerator<TestCaseData> GetEnumerator()
         {
             return new TransportConfigurationSources()
-                .Select(scenario => scenario.BuildTestCase())
-                .OrderBy(tc => tc.TestName)
-                .GetEnumerator();
+                   .Where(t => TransportSelector.ShouldRunTransport(t.Name))
+                   .Select(scenario => scenario.BuildTestCase())
+                   .OrderBy(tc => tc.TestName)
+                   .GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

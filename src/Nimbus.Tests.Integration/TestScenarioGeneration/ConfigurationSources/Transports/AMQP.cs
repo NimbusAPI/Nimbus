@@ -5,16 +5,16 @@ using Nimbus.Transports.AMQP;
 
 namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.Transports
 {
-    internal class ActiveMQ : ConfigurationScenario<TransportConfiguration>
+    internal class Amqp : ConfigurationScenario<TransportConfiguration>
     {
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            var settings = AppSettingsLoader.Settings.Transports.ActiveMQ;
+            var settings = AppSettingsLoader.Settings.Transports.Amqp;
 
             var configuration = new AMQPTransportConfiguration()
                 .WithBrokerUri(settings.BrokerUri)
                 .WithCredentials(settings.Username, settings.Password)
-                .WithConnectionPoolSize(5);
+                .WithManagementUri(settings.ManagementUri);
 
             var instance = new ScenarioInstance<TransportConfiguration>(configuration);
 

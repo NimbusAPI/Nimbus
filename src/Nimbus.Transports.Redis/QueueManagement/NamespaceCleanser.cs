@@ -30,15 +30,13 @@ namespace Nimbus.Transports.Redis.QueueManagement
             return Task.Run(() =>
                             {
                                 var multiplexer = _multiplexerFunc();
-                                var configuration = ConfigurationOptions.Parse(multiplexer.Configuration);
-                                var databaseNumber = configuration.DefaultDatabase ?? 0;
-                                var database = multiplexer.GetDatabase(databaseNumber);
+                                var database = multiplexer.GetDatabase();
 
-                                configuration.EndPoints
-                                             .AsParallel()
-                                             .SelectMany(endpoint => FetchAllKeys(multiplexer, endpoint))
-                                             .Do(redisKey => DeleteKey(database, redisKey))
-                                             .Done();
+                                multiplexer.GetEndPoints()
+                                           .AsParallel()
+                                           .SelectMany(endpoint => FetchAllKeys(multiplexer, endpoint))
+                                           .Do(redisKey => DeleteKey(database, redisKey))
+                                           .Done();
                             }).ConfigureAwaitFalse();
         }
 

@@ -7,12 +7,12 @@ namespace Nimbus.Transports.AMQP.QueueManagement
 {
     internal class AMQPQueueManager : IQueueManager
     {
-        private readonly NmsConnectionPool _connectionPool;
+        private readonly NmsConnectionManager _connectionManager;
         private readonly ILogger _logger;
 
-        public AMQPQueueManager(NmsConnectionPool connectionPool, ILogger logger)
+        public AMQPQueueManager(NmsConnectionManager connectionManager, ILogger logger)
         {
-            _connectionPool = connectionPool;
+            _connectionManager = connectionManager;
             _logger = logger;
         }
 
@@ -36,9 +36,9 @@ namespace Nimbus.Transports.AMQP.QueueManagement
             });
         }
 
-        public Task<PooledConnection> GetConnection()
+        public Task<ISession> CreateSession(AcknowledgementMode acknowledgementMode)
         {
-            return _connectionPool.GetConnection();
+            return _connectionManager.CreateSession(acknowledgementMode);
         }
     }
 }

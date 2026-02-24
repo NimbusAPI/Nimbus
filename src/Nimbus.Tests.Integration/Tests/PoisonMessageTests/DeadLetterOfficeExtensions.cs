@@ -23,13 +23,14 @@ namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests
         public static async Task<NimbusMessage[]> PopAll(this IDeadLetterOffice deadLetterOffice, int numMessagesExpected, TimeSpan timeout)
         {
             var messages = new List<NimbusMessage>();
+            var deadline = DateTimeOffset.UtcNow + timeout;
 
-            while (true)
+            while (DateTimeOffset.UtcNow < deadline)
             {
                 var message = await deadLetterOffice.Pop();
                 if (message == null)
                 {
-                    if (messages.Count == numMessagesExpected) break;
+                    if (messages.Count >= numMessagesExpected) break;
                     await Task.Delay(TimeSpan.FromMilliseconds(100));
                     continue;
                 }
