@@ -41,7 +41,7 @@ await bus.Start();
 ```bash
 git clone <this repository>
 docker-compose up -d --build
-dotnet test
+dotnet build
 ```
 
 ### Development Infrastructure
