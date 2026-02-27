@@ -6,5 +6,6 @@ namespace Nimbus.Tests.Integration.Configuration
         public AzureServiceBusSettings AzureServiceBus { get; set; }
         public AMQPSettings Amqp { get; set; }
         public SqlServerSettings SqlServer { get; set; }
+        public PostgresSettings Postgres { get; set; }
     }
 }

@@ -11,7 +11,8 @@ public enum TestTransport
     Redis,
     Amqp,
     AzureServiceBus,
-    SqlServer
+    SqlServer,
+    Postgres
 }
 
 public static class TransportSelector

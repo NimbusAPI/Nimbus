@@ -11,6 +11,7 @@ using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AMQP;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
+using Nimbus.Transports.Postgres;
 using Nimbus.Transports.SqlServer;
 using Serilog;
 
@@ -45,8 +46,13 @@ namespace Cashier.Modules
                                                  //    .WithCredentials("admin", "admin"))
 
                                                  // SQL Server Transport
-                                                 .WithTransport(new SqlServerTransportConfiguration()
-                                                     .WithConnectionString("Server=localhost,1433;Database=Nimbus;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;")
+                                                 //.WithTransport(new SqlServerTransportConfiguration()
+                                                 //    .WithConnectionString("Server=localhost,1433;Database=Nimbus;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;")
+                                                 //    .WithAutoCreateSchema())
+
+                                                 // Postgres Transport
+                                                 .WithTransport(new PostgresTransportConfiguration()
+                                                     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
                                                      .WithAutoCreateSchema())
 
                                                  .WithNames("Cashier", Environment.MachineName)

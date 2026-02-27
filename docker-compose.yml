@@ -39,3 +39,14 @@ services:
       MSSQL_PID: Developer
     expose:
       - 1433
+
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: nimbus
+      POSTGRES_USER: nimbus
+      POSTGRES_PASSWORD: Nimbus_Dev_123!
+    expose:
+      - 5432
