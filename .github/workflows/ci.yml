@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop, build-workflow, update-redis-client, new-build-approach ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop, build-workflow ]
+    branches: [ main, develop ]
 
 jobs:
 
