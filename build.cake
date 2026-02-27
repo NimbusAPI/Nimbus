@@ -1,10 +1,8 @@
 
 var target = Argument ("Target", "Default");
 var configuration = Argument ("Configuration", "Release");
-var version = EnvironmentVariable ("GITVERSION_NUGETVERSIONV2") ?? Argument ("buildVersion", "0.0.0");
-var nugetApiKey = EnvironmentVariable ("NUGET_API_KEY") ?? Argument ("nugetApiKey", "");
-
-Information ($"Running target {target} in configuration {configuration} with version {version}");
+var buildNumber = Argument ("buildNumber", "");
+var versionSuffix = string.IsNullOrEmpty(buildNumber) ? "" : $"ci.{buildNumber}";
 
 var packageDirectory = Directory ("./dist_package");
 
@@ -24,8 +22,6 @@ Task ("Clean")
         DotNetClean ("./src",
             new DotNetCleanSettings () {
             Configuration = configuration,
-            ArgumentCustomization = builder => builder
-                .Append($"/p:Version={version}")
             });
     });
 
@@ -39,15 +35,14 @@ Task ("Restore")
 // Build using the build configuration specified as an argument.
 Task ("Build")
     .Does (() => {
-        DotNetBuild ("./src",
-            new DotNetBuildSettings () {
-                Configuration = configuration,
-                ArgumentCustomization = builder => builder
-                    .Append($"/p:Version={version}"),
-                NoRestore = true,
-                MSBuildSettings = new DotNetMSBuildSettings {
-                }
-            });
+        var settings = new DotNetBuildSettings () {
+            Configuration = configuration,
+            NoRestore = true,
+            MSBuildSettings = new DotNetMSBuildSettings {}
+        };
+        if (!string.IsNullOrEmpty(versionSuffix))
+            settings.ArgumentCustomization = builder => builder.Append($"/p:VersionSuffix={versionSuffix}");
+        DotNetBuild ("./src", settings);
     });
 
 
@@ -59,7 +54,7 @@ Task ("ConventionTest")
             NoRestore = true,
             Configuration = configuration,
             Filter = "Category=\"Convention\"",
-            ResultsDirectory = packageDirectory.Path.Combine("ConventionTests"), 
+            ResultsDirectory = packageDirectory.Path.Combine("ConventionTests"),
             Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
@@ -67,7 +62,7 @@ Task ("ConventionTest")
             Information ("Testing project " + project);
             DotNetTest (project.FullPath, settings);
         }
-    }); 
+    });
 
 Task ("UnitTest")
     .Does (() => {
@@ -77,7 +72,7 @@ Task ("UnitTest")
             NoRestore = true,
             Configuration = configuration,
             Filter = "Category=\"UnitTest\"",
-            ResultsDirectory = packageDirectory.Path.Combine("UnitTests"), 
+            ResultsDirectory = packageDirectory.Path.Combine("UnitTests"),
             Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
@@ -95,43 +90,23 @@ Task ("IntegrationTest")
             NoRestore = true,
             Configuration = configuration,
             Filter = "Category!=\"Convention\" & Category!=\"UnitTest\"",
-            ResultsDirectory = packageDirectory.Path.Combine("IntegrationTests"), 
+            ResultsDirectory = packageDirectory.Path.Combine("IntegrationTests"),
             Loggers = new []{"trx"},
         };
         foreach (var project in projects) {
 
             Information ("Testing project " + project);
             DotNetTest (project.FullPath, settings);
-            
+
         }
     });
 
 
 Task ("CollectPackages")
     .Does(()=>{
-        var packages = GetFiles ($"./**/bin/Release/Nimbus*.{version}.nupkg");
+        var packages = GetFiles ("./**/bin/Release/Nimbus*.nupkg")
+            .Where(p => !p.FullPath.Contains("/Tests/") && !p.FullPath.Contains(".Tests."));
         CopyFiles(packages, packageDirectory);
-    });
-
-Task("PushPackages")
-    .Does(() => {
-
-        var settings = new DotNetNuGetPushSettings
-        {
-            Source = "https://api.nuget.org/v3/index.json",
-            //Source = "https://www.myget.org/F/nimbusapi/api/v3/index.json",
-            ApiKey = nugetApiKey,
-        };
-
-        var packages = GetFiles( $"{packageDirectory}/Nimbus*.nupkg");
-
-        foreach (var package in packages)
-        {
-            Information("Pushing " + package);
-            DotNetNuGetPush(package, settings);
-        };       
-        
-
     });
 
 Task("Test")
@@ -148,9 +123,25 @@ Task ("BuildAndTest")
     .IsDependentOn ("Test")
     ;
 
+// Build and collect packages without running tests — used by the release workflow
+Task ("Package")
+    .IsDependentOn ("Clean")
+    .IsDependentOn ("Restore")
+    .IsDependentOn ("Build")
+    .IsDependentOn ("CollectPackages")
+    ;
+
+// Build + integration tests only (no unit/convention tests) — used by nightly workflow
+Task ("NightlyTest")
+    .IsDependentOn ("Clean")
+    .IsDependentOn ("Restore")
+    .IsDependentOn ("Build")
+    .IsDependentOn ("IntegrationTest")
+    ;
+
 Task ("CI")
     .IsDependentOn ("BuildAndTest")
-    //.IsDependentOn ("IntegrationTest")
+    .IsDependentOn ("IntegrationTest")
     .IsDependentOn ("CollectPackages")
     ;
 

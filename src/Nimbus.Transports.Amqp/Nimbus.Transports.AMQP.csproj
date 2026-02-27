@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <Version>1.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Damian Hickey and contributors</Authors>
+    <Authors>Damian Maclennan</Authors>
     <Company>NimbusAPI</Company>
     <Product>Nimbus</Product>
     <Description>AMQP transport for Nimbus messaging framework using Apache NMS AMQP (supports Artemis, ActiveMQ, and other AMQP brokers)</Description>

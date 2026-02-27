@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
       <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
       <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
@@ -8,24 +8,13 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      
+
       <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
       <PackageReference Include="mono.cecil" Version="0.11.2" />
       <PackageReference Include="nullguard.fody" Version="2.1.0" />
       <PackageReference Include="virtuosity.fody" Version="3.1.0" />
     </ItemGroup>
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-        <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-        <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-    <PropertyGroup>
-      <NoWarn>1701;1702;1998</NoWarn>
     </PropertyGroup>
 </Project>

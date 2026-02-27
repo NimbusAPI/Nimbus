@@ -1,0 +1,106 @@
+name: Release NuGet Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Component to publish'
+        required: true
+        type: choice
+        options:
+          - core
+          - inprocess
+          - redis
+          - azure
+          - amqp
+          - sqlserver
+          - all
+
+permissions:
+  contents: write  # required to push git tags
+
+jobs:
+
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Build, test, and collect packages
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: CI
+
+    - name: Push packages to NuGet and tag release
+      shell: bash
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        COMPONENT: ${{ inputs.component }}
+      run: |
+        set -e
+        DIST=./dist_package
+
+        case "$COMPONENT" in
+          core)
+            GLOBS=("$DIST/Nimbus.[0-9]*.nupkg" "$DIST/Nimbus.MessageContracts.*.nupkg" "$DIST/Nimbus.InfrastructureContracts.*.nupkg")
+            ;;
+          inprocess)
+            GLOBS=("$DIST/Nimbus.Transports.InProcess.*.nupkg")
+            ;;
+          redis)
+            GLOBS=("$DIST/Nimbus.Transports.Redis.*.nupkg")
+            ;;
+          azure)
+            GLOBS=("$DIST/Nimbus.Transports.AzureServiceBus.*.nupkg")
+            ;;
+          amqp)
+            GLOBS=("$DIST/Nimbus.Transports.AMQP.*.nupkg")
+            ;;
+          sqlserver)
+            GLOBS=("$DIST/Nimbus.Transports.SqlServer.*.nupkg")
+            ;;
+          all)
+            GLOBS=("$DIST/Nimbus*.nupkg")
+            ;;
+        esac
+
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+
+        for GLOB in "${GLOBS[@]}"; do
+          for PKG in $GLOB; do
+            if [ -f "$PKG" ]; then
+              echo "Pushing $PKG"
+              dotnet nuget push "$PKG" \
+                --source https://api.nuget.org/v3/index.json \
+                --api-key "$NUGET_API_KEY" \
+                --skip-duplicate
+
+              # Derive tag from filename: Nimbus.Transports.AMQP.1.0.0.nupkg → Nimbus.Transports.AMQP/1.0.0
+              FILENAME=$(basename "$PKG" .nupkg)
+              VERSION=$(echo "$FILENAME" | grep -oP '\d+\.\d+\.\d+(-\S+)?$')
+              NAME="${FILENAME%.$VERSION}"
+              TAG="$NAME/$VERSION"
+              echo "Tagging $TAG"
+              git tag "$TAG" || echo "Tag $TAG already exists, skipping"
+              git push origin "$TAG" || echo "Tag $TAG already pushed, skipping"
+            fi
+          done
+        done
+
+    - name: Upload packages as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: released-nuget-packages
+        path: ./dist_package/Nimbus*.nupkg

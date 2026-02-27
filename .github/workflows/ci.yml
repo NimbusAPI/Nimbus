@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop, build-workflow, update-redis-client ]
+    branches: [ main, develop, build-workflow, update-redis-client, new-build-approach ]
   pull_request:
     branches: [ main, develop, build-workflow ]
 
@@ -14,34 +14,25 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 1
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
-          6.0.x
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.7
-      with:
-        versionSpec: '5.x'
+          9.x
 
-    - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.9.7
-
-    - name: Display SemVer
-      run: |
-        echo "SemVer: $GITVERSION_SEMVER"
-      
     - name: Run the Cake script
-      uses: cake-build/cake-action@v1
+      uses: cake-build/cake-action@v3
       with:
         script-path: build.cake
         target: ci
+        arguments: |
+          buildNumber: ${{ github.run_number }}
 
     - name: Collect Package Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-packages
         path: ./dist_package/Nimbus.*.nupkg
@@ -51,24 +42,3 @@ jobs:
       if: always()
       with:
         trx_files: ./dist_package/**/*.trx
-
-    - name: Publish NuGet Packages
-      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/develop')
-      uses: cake-build/cake-action@v1
-      with:
-        script-path: build.cake
-        target: pushpackages
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-      seq:
-        image: datalust/seq:latest
-        ports:
-          - 5341:80
-        env:
-          ACCEPT_EULA: Y
