@@ -69,6 +69,8 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.B
                     return allTransports.Where(t => t.Name == "Amqp");
                 case TestTransport.AzureServiceBus:
                     return allTransports.Where(t => t.Name == "AzureServiceBus");
+                case TestTransport.SqlServer:
+                    return allTransports.Where(t => t.Name == "SqlServer");
                 case TestTransport.All:
                 default:
                     return allTransports;

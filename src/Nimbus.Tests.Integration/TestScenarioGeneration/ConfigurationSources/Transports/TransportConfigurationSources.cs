@@ -14,6 +14,7 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.T
             yield return new Redis();
             yield return new Amqp();
             yield return new AzureServiceBus();
+            yield return new SqlServer();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

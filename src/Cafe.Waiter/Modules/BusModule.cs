@@ -11,6 +11,7 @@ using Nimbus.Serializers.Json.Configuration;
 using Nimbus.Transports.AMQP;
 using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
+using Nimbus.Transports.SqlServer;
 using Serilog;
 
 namespace Waiter.Modules
@@ -39,9 +40,15 @@ namespace Waiter.Modules
                                                  //.WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
 
                                                  // ActiveMQ Transport
-                                                 .WithTransport(new AMQPTransportConfiguration()
-                                                     .WithBrokerUri("amqp://localhost:5672")
-                                                     .WithCredentials("admin", "admin"))
+                                                 //.WithTransport(new AMQPTransportConfiguration()
+                                                 //    .WithBrokerUri("amqp://localhost:5672")
+                                                 //    .WithCredentials("admin", "admin"))
+
+                                                 // SQL Server Transport
+                                                 .WithTransport(new SqlServerTransportConfiguration()
+                                                     .WithConnectionString("Server=localhost,1433;Database=Nimbus;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;")
+                                                     .WithPollInterval(TimeSpan.FromMilliseconds(100))
+                                                     .WithAutoCreateSchema())
 
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)

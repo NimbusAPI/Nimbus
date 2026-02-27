@@ -16,6 +16,7 @@
         <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
         <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.AMQP\Nimbus.Transports.AMQP.csproj" />
+        <ProjectReference Include="..\Nimbus.Transports.SqlServer\Nimbus.Transports.SqlServer.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
         <ProjectReference Include="..\Nimbus\Nimbus.csproj" />

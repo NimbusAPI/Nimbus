@@ -11,4 +11,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Nimbus.Transports.Redis")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.AzureServiceBus")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.AMQP")]
+[assembly: InternalsVisibleTo("Nimbus.Transports.SqlServer")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2", AllInternalsVisible = true)]

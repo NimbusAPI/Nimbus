@@ -27,3 +27,15 @@ services:
     expose:
       - 5672
       - 8161
+
+  sqlserver:
+    build:
+      context: docker/sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Nimbus_Dev_123!"
+      MSSQL_PID: Developer
+    expose:
+      - 1433

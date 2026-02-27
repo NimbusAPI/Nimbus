@@ -10,7 +10,8 @@ public enum TestTransport
     InProcess,
     Redis,
     Amqp,
-    AzureServiceBus
+    AzureServiceBus,
+    SqlServer
 }
 
 public static class TransportSelector
