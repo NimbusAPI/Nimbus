@@ -19,7 +19,7 @@ private IEnumerable<FilePath> GetAllProjects () {
 Task ("Clean")
     .Does (() => {
         CleanDirectory (packageDirectory);
-        DotNetClean ("./src",
+        DotNetClean ("./Nimbus.sln",
             new DotNetCleanSettings () {
             Configuration = configuration,
             });
@@ -29,7 +29,7 @@ Task ("Clean")
 Task ("Restore")
     .Does (() => {
         var settings = new DotNetRestoreSettings();
-        DotNetRestore ("./src", settings);
+        DotNetRestore ("./Nimbus.sln", settings);
     });
 
 // Build using the build configuration specified as an argument.
@@ -42,7 +42,7 @@ Task ("Build")
         };
         if (!string.IsNullOrEmpty(versionSuffix))
             settings.ArgumentCustomization = builder => builder.Append($"/p:VersionSuffix={versionSuffix}");
-        DotNetBuild ("./src", settings);
+        DotNetBuild ("./Nimbus.sln", settings);
     });
 
 
