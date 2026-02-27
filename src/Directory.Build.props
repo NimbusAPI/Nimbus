@@ -10,7 +10,7 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <NoWarn>1701;1702;1998</NoWarn>
     <!-- Default version for core packages and extensions. Transports override this in their own .csproj -->
-    <Version>4.2.0</Version>
+    <Version>4.2.2</Version>
     <!-- NuGet package metadata shared by all publishable projects -->
     <Authors>Damian Maclennan, Andrew Harcourt, and contributors</Authors>
     <Company>NimbusAPI</Company>

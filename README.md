@@ -1,24 +1,73 @@
 # Nimbus
 
-Nimbus is a .NET client library to provide an easy abstraction over common messaging frameworks.
+Nimbus is a .NET messaging framework that provides a clean abstraction over multiple messaging transports, supporting commands, events (pub/sub), and request/response patterns.
 
-## Developing using Nimbus
+> **Documentation:** [https://nimbusapi.com](https://nimbusapi.com)
 
-For more information go to [The Nimbus website](http://nimbusapi.com/) or our [Documentation Wiki](https://github.com/NimbusAPI/Nimbus/wiki)
+## Supported Transports
 
-## Developing Nimbus itself
+| Transport | Package |
+|-----------|---------|
+| Azure Service Bus | `Nimbus.Transports.AzureServiceBus` |
+| Redis | `Nimbus.Transports.Redis` |
+| PostgreSQL | `Nimbus.Transports.Postgres` |
+| SQL Server | `Nimbus.Transports.SqlServer` |
+| AMQP | `Nimbus.Transports.AMQP` |
+| In-Process (testing) | `Nimbus.Transports.InProcess` |
+
+## Message Patterns
+
+- **Commands** — fire-and-forget, single handler
+- **Events** — pub/sub with competing or multicast consumers
+- **Requests** — request/response, single or multicast
+
+## Quick Start
+
+```csharp
+var bus = new BusBuilder()
+    .Configure()
+    .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+    .WithNames("MyApp", Environment.MachineName)
+    .WithTypesFrom(typeProvider)
+    .WithAutofacDefaults(componentContext)
+    .WithJsonSerializer()
+    .Build();
+
+await bus.Start();
+```
+
+## Developing Nimbus
 
 ```bash
 git clone <this repository>
-docker-compose up -d
+docker-compose up -d --build
 dotnet test
 ```
 
-### Development infrastructure
+### Development Infrastructure
 
-There are two docker-compose files. The `docker-compose.yml` file will spin up:
+`docker-compose up -d --build` starts:
 
-- a [Seq](https://datalust.co) server at <http://localhost:5341>
-- a [Redis](https://redis.io/) server at `localhost:6379`
+| Service | URL / Port |
+|---------|-----------|
+| [Seq](https://datalust.co) log server | `http://localhost:5341` |
+| [Redis](https://redis.io/) | `localhost:6379` |
+| [Apache ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) (AMQP) | `localhost:5672`, console at `http://localhost:8161` |
+| SQL Server | `localhost:1433` |
+| PostgreSQL | `localhost:5432` |
 
-The integration tests are configured to run via the `appsettings.json` file within the build pipeline using standard Docker single-token service names. Locally, test configuration is overridden via the `appsettings.Development.json` file that points all of the services to the ports on localhost exposed by Docker.
+SQL Server uses a custom Docker image (in `docker/sqlserver`) — the `--build` flag ensures it is built before starting.
+
+Integration tests use `appsettings.json` in the pipeline and `appsettings.Development.json` locally (not committed) to point at localhost ports.
+
+### Sample Application
+
+The `Cafe` sample app demonstrates Nimbus messaging patterns through a simple café scenario (cashier, barista, waiter). Run it with:
+
+```bash
+dotnet run --project src/Cafe.Cashier
+dotnet run --project src/Cafe.Barista
+dotnet run --project src/Cafe.Waiter
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
