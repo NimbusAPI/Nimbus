@@ -11,7 +11,6 @@ namespace Nimbus.Tests.Integration.Configuration
         private static AppSettings Build () {
             var config = new ConfigurationBuilder ()
                 .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables ("NIMBUS_")
                 .Build ();
         
             var appSettings = new AppSettings();

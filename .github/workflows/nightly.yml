@@ -45,6 +45,7 @@ jobs:
         env:
           SA_PASSWORD: Nimbus_Dev_123!
           ACCEPT_EULA: Y
+          MSSQL_PID: Developer
         ports:
           - 1433:1433
         options: >-
