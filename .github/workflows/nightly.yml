@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NIMBUS_TEST_TRANSPORT: SqlServer
-      TRANSPORTS__SQLSERVER__CONNECTIONSTRING: "Server=localhost,1433;Database=Nimbus;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;"
+      TRANSPORTS__SQLSERVER__CONNECTIONSTRING: "Server=localhost,1433;Database=master;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;"
     services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
@@ -114,6 +114,9 @@ jobs:
     services:
       artemis:
         image: apache/activemq-artemis:latest
+        env:
+          ARTEMIS_USER: admin
+          ARTEMIS_PASSWORD: admin
         ports:
           - 5672:5672
           - 8161:8161
