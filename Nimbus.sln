@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimbus.Transports.InProcess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimbus.Transports.Redis", "src\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj", "{5A4F14B8-D794-4B79-B550-DB06F2629C33}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimbus.Transports.AMQP", "src\Nimbus.Transports.AMQP\Nimbus.Transports.AMQP.csproj", "{7B8C9A12-3D4E-4F5A-8B6C-9E7D8A1B2C3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimbus.Transports.AMQP", "src\Nimbus.Transports.Amqp\Nimbus.Transports.AMQP.csproj", "{7B8C9A12-3D4E-4F5A-8B6C-9E7D8A1B2C3D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nimbus.Transports.SqlServer", "src\Nimbus.Transports.SqlServer\Nimbus.Transports.SqlServer.csproj", "{3F4A5B6C-7D8E-9F0A-1B2C-3D4E5F6A7B8C}"
 EndProject
