@@ -7,5 +7,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>log4net logging integration for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;log4net;logging</PackageTags>
     </PropertyGroup>
 </Project>

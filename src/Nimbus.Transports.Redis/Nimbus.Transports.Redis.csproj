@@ -9,5 +9,7 @@
     <PropertyGroup>
         <Version>4.2.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Redis transport for the Nimbus messaging framework using StackExchange.Redis.</Description>
+        <PackageTags>nimbus;messaging;transport;redis</PackageTags>
     </PropertyGroup>
 </Project>

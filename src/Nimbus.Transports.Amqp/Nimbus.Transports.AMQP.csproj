@@ -3,14 +3,8 @@
   <PropertyGroup>
     <Version>1.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Damian Maclennan</Authors>
-    <Company>NimbusAPI</Company>
-    <Product>Nimbus</Product>
-    <Description>AMQP transport for Nimbus messaging framework using Apache NMS AMQP (supports Artemis, ActiveMQ, and other AMQP brokers)</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/NimbusAPI/Nimbus</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/NimbusAPI/Nimbus</RepositoryUrl>
-    <PackageTags>nimbus;messaging;amqp;artemis;activemq;nms</PackageTags>
+    <Description>AMQP transport for the Nimbus messaging framework using Apache NMS AMQP (supports Artemis, ActiveMQ, and other AMQP brokers).</Description>
+    <PackageTags>nimbus;messaging;transport;amqp;artemis;activemq;nms</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,5 +4,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Core abstractions for the Nimbus messaging framework — IBus, handler interfaces, IDependencyResolver, interceptors, and more.</Description>
+        <PackageTags>nimbus;messaging;contracts;abstractions</PackageTags>
     </PropertyGroup>
 </Project>

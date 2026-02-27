@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Azure Blob Storage large message body store for the Nimbus messaging framework.</Description>
+    <PackageTags>nimbus;messaging;azure;blob-storage;large-messages</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

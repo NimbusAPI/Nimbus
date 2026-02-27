@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Message contract marker interfaces for the Nimbus messaging framework (IBusCommand, IBusEvent, IBusRequest, and more).</Description>
+        <PackageTags>nimbus;messaging;contracts</PackageTags>
     </PropertyGroup>
 
 </Project>

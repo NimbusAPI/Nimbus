@@ -16,5 +16,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Nimbus is a .NET messaging framework providing an abstraction over message-based transports with support for commands, events, and request/response patterns.</Description>
+        <PackageTags>nimbus;messaging;servicebus;commands;events;request-response;cqrs</PackageTags>
     </PropertyGroup>
 </Project>

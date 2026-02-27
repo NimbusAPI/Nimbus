@@ -9,5 +9,7 @@
     <PropertyGroup>
         <Version>4.2.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Azure Service Bus transport for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;transport;azure;servicebus;azure-service-bus</PackageTags>
     </PropertyGroup>
 </Project>

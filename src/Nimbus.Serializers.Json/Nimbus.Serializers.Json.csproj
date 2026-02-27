@@ -8,5 +8,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>JSON serializer for the Nimbus messaging framework using Newtonsoft.Json.</Description>
+        <PackageTags>nimbus;messaging;json;serialization;newtonsoft</PackageTags>
     </PropertyGroup>
 </Project>

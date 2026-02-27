@@ -7,5 +7,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Autofac dependency injection integration for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;autofac;ioc;dependency-injection</PackageTags>
     </PropertyGroup>
 </Project>
