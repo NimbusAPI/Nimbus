@@ -7,6 +7,7 @@
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Nicholas Blumhardt</Authors>
         <Description>Serilog logging integration for the Nimbus messaging framework.</Description>
         <PackageTags>nimbus;messaging;serilog;logging</PackageTags>
     </PropertyGroup>
