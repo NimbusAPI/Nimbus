@@ -1,5 +1,6 @@
 ﻿using System;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Logging
 {

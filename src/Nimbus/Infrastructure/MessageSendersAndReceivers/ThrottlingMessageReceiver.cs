@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure.Heartbeat.PerformanceCounters;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 {
@@ -62,7 +63,8 @@ namespace Nimbus.Infrastructure.MessageSendersAndReceivers
 
                 try
                 {
-                    await _workerTask;
+                    if (_workerTask != null)
+                        await _workerTask;
                 }
                 catch (OperationCanceledException)
                 {

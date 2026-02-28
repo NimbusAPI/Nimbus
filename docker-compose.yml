@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: true
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+
+  artemis:
+    image: apache/activemq-artemis:latest
+    ports:
+      - "5672:5672"    # AMQP
+      - "8161:8161"    # Web Console
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+    expose:
+      - 5672
+      - 8161
+
+  sqlserver:
+    build:
+      context: docker/sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Nimbus_Dev_123!"
+      MSSQL_PID: Developer
+    expose:
+      - 1433
+
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: nimbus
+      POSTGRES_USER: nimbus
+      POSTGRES_PASSWORD: Nimbus_Dev_123!
+    expose:
+      - 5432

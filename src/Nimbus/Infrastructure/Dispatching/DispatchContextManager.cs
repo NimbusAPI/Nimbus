@@ -1,7 +1,7 @@
 using System;
-using System.Runtime.Remoting.Messaging;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Dispatching
 {

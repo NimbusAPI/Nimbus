@@ -1,6 +1,6 @@
-using Nimbus.Filtering.Conditions;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
-namespace Nimbus.Filtering
+namespace Nimbus.InfrastructureContracts.Filtering
 {
     public interface ISubscriptionFilter
     {

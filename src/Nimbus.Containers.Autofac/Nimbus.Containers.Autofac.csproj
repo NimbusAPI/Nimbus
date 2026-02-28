@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autofac" Version="4.9.4"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Autofac dependency injection integration for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;autofac;ioc;dependency-injection</PackageTags>
+    </PropertyGroup>
+</Project>

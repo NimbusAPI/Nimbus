@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nimbus
+namespace Nimbus.InfrastructureContracts
 {
     [Serializable]
     public class NimbusMessage

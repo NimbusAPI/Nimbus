@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>1701;1702;1998</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Autofac" Version="4.9.4"/>
+        <PackageReference Include="Best.Conventional" Version="6.0.0"/>
+        <PackageReference Include="NSubstitute" Version="4.2.1"/>
+        <PackageReference Include="nunit" Version="3.14.0"/>
+        <PackageReference Include="shouldly" Version="4.2.1"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj"/>
+        <ProjectReference Include="..\Nimbus.LargeMessages.Azure\Nimbus.LargeMessages.Azure.csproj"/>
+        <ProjectReference Include="..\Nimbus.Logger.Log4net\Nimbus.Logger.Log4net.csproj"/>
+        <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj"/>
+        <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj"/>
+        <ProjectReference Include="..\Nimbus.Tests.Common\Nimbus.Tests.Common.csproj"/>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.Transports.Amqp\Nimbus.Transports.AMQP.csproj"/>
+        <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj"/>
+        <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.MessageContracts\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.csproj"/>
+        <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.Handlers\Nimbus.Tests.Unit.TestAssemblies.Handlers.csproj"/>
+        <ProjectReference Include="..\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization\Nimbus.Tests.Unit.TestAssemblies.MessageContracts.Serialization.csproj"/>
+    </ItemGroup>
+
+</Project>

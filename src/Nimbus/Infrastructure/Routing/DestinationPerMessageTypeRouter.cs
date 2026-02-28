@@ -1,6 +1,6 @@
 using System;
 using Nimbus.Extensions;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Infrastructure.Routing
 {

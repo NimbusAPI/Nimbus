@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Nimbus.Filtering;
-using Nimbus.Filtering.Conditions;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
 namespace Nimbus.Infrastructure
 {

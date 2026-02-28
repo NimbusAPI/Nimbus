@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>JSON serializer for the Nimbus messaging framework using Newtonsoft.Json.</Description>
+        <PackageTags>nimbus;messaging;json;serialization;newtonsoft</PackageTags>
+    </PropertyGroup>
+</Project>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nimbus.Filtering.Attributes
+namespace Nimbus.InfrastructureContracts.Filtering.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class SubscriptionFilterAttribute : Attribute

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Extensions;
 using Nimbus.ConcurrentCollections;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {

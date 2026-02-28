@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure
 {

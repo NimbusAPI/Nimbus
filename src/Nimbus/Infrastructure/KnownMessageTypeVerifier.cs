@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure

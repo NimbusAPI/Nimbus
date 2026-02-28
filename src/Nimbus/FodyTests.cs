@@ -1,5 +1,4 @@
 ﻿using Nimbus.Properties;
-
 namespace Nimbus
 {
     /// <summary>
@@ -7,6 +6,7 @@ namespace Nimbus
     ///     use Fody and apply it across the board. This is a test class (which needs to be in the core Nimbus assembly)
     ///     that allows our test suite to confirm that Fody is correctly injecting its NullGuard aspect.
     /// </summary>
+
     internal class FodyTests
     {
         // ReSharper disable once UnusedParameter.Local

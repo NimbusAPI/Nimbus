@@ -3,11 +3,11 @@ using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
-using Nimbus.DependencyResolution;
 using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Compression;
+using Nimbus.Infrastructure.DeliveryRetries;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Dispatching;
 using Nimbus.Infrastructure.Events;
@@ -20,9 +20,11 @@ using Nimbus.Infrastructure.RequestResponse;
 using Nimbus.Infrastructure.Retries;
 using Nimbus.Infrastructure.Routing;
 using Nimbus.Infrastructure.Serialization;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Routing;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
-using Nimbus.Routing;
 
 namespace Nimbus.Configuration
 {
@@ -37,7 +39,7 @@ namespace Nimbus.Configuration
         internal ISerializer Serializer { get; set; }
         internal ICompressor Compressor { get; set; } = new NullCompressor();
         internal IRouter Router { get; set; } = new DestinationPerMessageTypeRouter();
-        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new StubDeliveryRetryStrategy();
+        internal IDeliveryRetryStrategy DeliveryRetryStrategy { get; set; } = new NoWaitDeliveryRetryStrategy();
 
         internal ApplicationNameSetting ApplicationName { get; set; }
         internal InstanceNameSetting InstanceName { get; set; }

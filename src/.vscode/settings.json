@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "**/_Nimbus*": true,
+        "dist_package": true
+    }
+}

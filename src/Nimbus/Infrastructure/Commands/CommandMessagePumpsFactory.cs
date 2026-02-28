@@ -2,8 +2,9 @@
 using System.Linq;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Infrastructure.Commands
 {

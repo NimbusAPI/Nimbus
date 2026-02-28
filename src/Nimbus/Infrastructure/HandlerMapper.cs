@@ -4,7 +4,8 @@ using System.Linq;
 using Nimbus.ConcurrentCollections;
 using Nimbus.Configuration;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
 
 namespace Nimbus.Infrastructure
 {

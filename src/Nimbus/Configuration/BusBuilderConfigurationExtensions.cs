@@ -2,12 +2,13 @@
 using Nimbus.Configuration.Debug;
 using Nimbus.Configuration.Settings;
 using Nimbus.Configuration.Transport;
-using Nimbus.DependencyResolution;
 using Nimbus.Infrastructure.Compression;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Infrastructure.Logging;
 using Nimbus.Infrastructure.Routing;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Configuration
 {

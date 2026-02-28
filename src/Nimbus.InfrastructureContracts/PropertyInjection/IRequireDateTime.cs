@@ -1,6 +1,6 @@
 using System;
 
-namespace Nimbus.PropertyInjection
+namespace Nimbus.InfrastructureContracts.PropertyInjection
 {
     public interface IRequireDateTime
     {

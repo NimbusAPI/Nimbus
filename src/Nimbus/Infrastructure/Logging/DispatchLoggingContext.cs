@@ -1,4 +1,4 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Logging
 {

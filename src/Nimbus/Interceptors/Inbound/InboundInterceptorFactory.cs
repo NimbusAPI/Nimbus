@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Nimbus.Configuration.Settings;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 
 namespace Nimbus.Interceptors.Inbound
 {

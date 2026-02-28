@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="serilog" Version="2.8.0"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Nicholas Blumhardt</Authors>
+        <Description>Serilog logging integration for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;serilog;logging</PackageTags>
+    </PropertyGroup>
+</Project>

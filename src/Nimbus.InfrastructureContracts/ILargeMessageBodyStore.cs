@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Nimbus
+namespace Nimbus.InfrastructureContracts
 {
     public interface ILargeMessageBodyStore
     {

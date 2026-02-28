@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Nimbus.Configuration.Settings;
 using Nimbus.Extensions;
-using Nimbus.Filtering.Attributes;
 using Nimbus.Infrastructure.Dispatching;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using NullGuard;
 
@@ -29,7 +29,7 @@ namespace Nimbus.Infrastructure
             _dispatchContextManager = dispatchContextManager;
         }
 
-        public Task<NimbusMessage> Create(string destinationPath, [AllowNull] object payload)
+        public Task<NimbusMessage> Create(string destinationPath,  [AllowNull] object payload)
         {
             var nimbusMessage = new NimbusMessage(destinationPath, payload);
             var expiresAfter = _clock.UtcNow.AddSafely(_timeToLive.Value);

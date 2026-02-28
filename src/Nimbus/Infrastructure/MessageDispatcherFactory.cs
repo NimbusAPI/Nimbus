@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Filtering;
 using Nimbus.Infrastructure.PropertyInjection;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.Interceptors.Inbound;
 using Nimbus.Interceptors.Outbound;
 

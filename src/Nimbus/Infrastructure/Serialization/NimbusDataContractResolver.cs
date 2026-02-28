@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts;
+using NullGuard;
 
 namespace Nimbus.Infrastructure.Serialization
 {
@@ -39,7 +41,7 @@ namespace Nimbus.Infrastructure.Serialization
             return knownTypeResolver.TryResolveType(type, declaredType, null, out typeName, out typeNamespace);
         }
 
-        public override Type ResolveName(string typeName, string typeNamespace, Type declaredType, DataContractResolver knownTypeResolver)
+        public override Type ResolveName(string typeName, string typeNamespace, [AllowNull]Type declaredType, DataContractResolver knownTypeResolver)
         {
             if (string.Compare(typeNamespace, _xmlNamespace, StringComparison.OrdinalIgnoreCase) == 0)
             {

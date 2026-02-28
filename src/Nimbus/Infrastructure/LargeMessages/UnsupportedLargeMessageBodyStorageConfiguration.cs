@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Nimbus.Configuration.LargeMessages;
 using Nimbus.Configuration.PoorMansIocContainer;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.LargeMessages
 {

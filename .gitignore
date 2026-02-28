@@ -7,3 +7,21 @@ _ReSharper.*
 *.ncrunchproject
 .gitignore
 .vs
+.idea
+*.stackdump
+
+# Cake Bits
+tools
+
+#Mac stuff
+.DS_Store
+
+
+# build stuff
+dist_package/
+**/*/AssemblyInfo.cs
+.config
+
+.claude
+data/
+CLAUDE.md

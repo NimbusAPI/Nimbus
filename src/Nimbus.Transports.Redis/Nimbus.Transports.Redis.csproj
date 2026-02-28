@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="StackExchange.Redis" Version="2.8.0" />
+    </ItemGroup>
+    <PropertyGroup>
+        <Version>4.2.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Redis transport for the Nimbus messaging framework using StackExchange.Redis.</Description>
+        <PackageTags>nimbus;messaging;transport;redis</PackageTags>
+    </PropertyGroup>
+</Project>

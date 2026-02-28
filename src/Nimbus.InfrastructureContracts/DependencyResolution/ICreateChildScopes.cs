@@ -1,4 +1,4 @@
-﻿namespace Nimbus.DependencyResolution
+﻿namespace Nimbus.InfrastructureContracts.DependencyResolution
 {
     public interface ICreateChildScopes
     {

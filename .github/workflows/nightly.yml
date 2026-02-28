@@ -1,0 +1,159 @@
+name: Nightly Integration Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+
+  redis:
+    name: Redis
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: Redis
+      TRANSPORTS__REDIS__CONNECTIONSTRING: localhost
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  sqlserver:
+    name: SQL Server
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: SqlServer
+      TRANSPORTS__SQLSERVER__CONNECTIONSTRING: "Server=localhost,1433;Database=master;User Id=sa;Password=Nimbus_Dev_123!;TrustServerCertificate=true;"
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          SA_PASSWORD: Nimbus_Dev_123!
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Nimbus_Dev_123!' -Q 'SELECT 1' -No"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  postgres:
+    name: PostgreSQL
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: Postgres
+      TRANSPORTS__POSTGRES__CONNECTIONSTRING: Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: nimbus
+          POSTGRES_USER: nimbus
+          POSTGRES_PASSWORD: Nimbus_Dev_123!
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nimbus -d nimbus"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  amqp:
+    name: AMQP (Artemis)
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: Amqp
+      TRANSPORTS__AMQP__BROKERURI: amqp://localhost:5672
+      TRANSPORTS__AMQP__USERNAME: admin
+      TRANSPORTS__AMQP__PASSWORD: admin
+      TRANSPORTS__AMQP__MANAGEMENTURI: http://localhost:8161
+    services:
+      artemis:
+        image: apache/activemq-artemis:latest
+        env:
+          ARTEMIS_USER: admin
+          ARTEMIS_PASSWORD: admin
+        ports:
+          - 5672:5672
+          - 8161:8161
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  azure-service-bus:
+    name: Azure Service Bus
+    runs-on: ubuntu-latest
+    if: vars.AZURE_SERVICE_BUS_ENABLED == 'true'
+    env:
+      NIMBUS_TEST_TRANSPORT: AzureServiceBus
+      TRANSPORTS__AZURESERVICEBUS__CONNECTIONSTRING: ${{ secrets.AZURE_SERVICE_BUS_CONNECTION_STRING }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}

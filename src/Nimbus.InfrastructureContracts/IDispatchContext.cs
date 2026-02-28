@@ -1,6 +1,6 @@
 using System;
 
-namespace Nimbus
+namespace Nimbus.InfrastructureContracts
 {
     public interface IDispatchContext
     {

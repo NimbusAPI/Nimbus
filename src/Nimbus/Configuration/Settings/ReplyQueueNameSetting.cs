@@ -1,5 +1,5 @@
 ﻿using Nimbus.Infrastructure;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Configuration.Settings
 {

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.IO.Compression;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Infrastructure.Compression
 {

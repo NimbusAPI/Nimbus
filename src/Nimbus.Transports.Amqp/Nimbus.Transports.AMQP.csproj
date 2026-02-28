@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>AMQP transport for the Nimbus messaging framework using Apache NMS AMQP (supports Artemis, ActiveMQ, and other AMQP brokers).</Description>
+    <PackageTags>nimbus;messaging;transport;amqp;artemis;activemq;nms</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
+    <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Apache.NMS.AMQP" Version="2.4.0" />
+  </ItemGroup>
+
+</Project>

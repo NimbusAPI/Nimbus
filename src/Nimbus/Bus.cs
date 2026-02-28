@@ -8,6 +8,7 @@ using Nimbus.Infrastructure.Commands;
 using Nimbus.Infrastructure.Events;
 using Nimbus.Infrastructure.Heartbeat;
 using Nimbus.Infrastructure.RequestResponse;
+using Nimbus.InfrastructureContracts;
 using Nimbus.MessageContracts;
 using Nimbus.MessageContracts.Exceptions;
 

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nimbus.DependencyResolution;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure.Filtering;
 using Nimbus.Infrastructure.PropertyInjection;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Handlers;
 using Nimbus.Interceptors.Inbound;
 
 namespace Nimbus.Infrastructure.Events

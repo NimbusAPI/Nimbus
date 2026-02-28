@@ -1,0 +1,18 @@
+﻿using Nimbus.MessageContracts;
+
+namespace Nimbus.Tests.Integration.Tests.PoisonMessageTests.MessageContracts
+{
+    public class GoBangCommand : IBusCommand
+    {
+        public string SomeContent { get; set; }
+
+        public GoBangCommand()
+        {
+        }
+
+        public GoBangCommand(string someContent)
+        {
+            SomeContent = someContent;
+        }
+    }
+}

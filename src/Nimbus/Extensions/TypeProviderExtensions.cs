@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Nimbus.Handlers;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
 
 namespace Nimbus.Extensions
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nimbus.MessageContracts;
 
-namespace Nimbus
+namespace Nimbus.InfrastructureContracts
 {
     public interface IBus
     {

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj"/>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="microsoft.azure.servicebus" Version="5.1.3"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <Version>4.2.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Azure Service Bus transport for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;transport;azure;servicebus;azure-service-bus</PackageTags>
+    </PropertyGroup>
+</Project>

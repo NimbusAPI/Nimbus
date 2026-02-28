@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Nimbus.DependencyResolution;
 using Nimbus.Extensions;
+using Nimbus.InfrastructureContracts.DependencyResolution;
 using Nimbus.MessageContracts.Exceptions;
 
 namespace Nimbus.Infrastructure.DependencyResolution

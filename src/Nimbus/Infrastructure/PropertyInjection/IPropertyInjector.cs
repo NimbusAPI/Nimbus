@@ -1,3 +1,5 @@
+using Nimbus.InfrastructureContracts;
+
 namespace Nimbus.Infrastructure.PropertyInjection
 {
     internal interface IPropertyInjector

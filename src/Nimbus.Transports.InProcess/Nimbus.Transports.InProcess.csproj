@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj"/>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <Version>4.2.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>In-process (in-memory) transport for the Nimbus messaging framework. Ideal for testing and single-process scenarios.</Description>
+        <PackageTags>nimbus;messaging;transport;in-process;in-memory;testing</PackageTags>
+    </PropertyGroup>
+</Project>

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using Nimbus.Configuration.Settings;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Infrastructure
 {

@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Nimbus.DependencyResolution;
-using Nimbus.Filtering;
-using Nimbus.Filtering.Attributes;
-using Nimbus.Filtering.Conditions;
+using Nimbus.InfrastructureContracts.DependencyResolution;
+using Nimbus.InfrastructureContracts.Filtering;
+using Nimbus.InfrastructureContracts.Filtering.Attributes;
+using Nimbus.InfrastructureContracts.Filtering.Conditions;
 
 namespace Nimbus.Infrastructure.Filtering
 {

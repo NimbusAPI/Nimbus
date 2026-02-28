@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Settings;
-using Nimbus.Handlers;
 using Nimbus.Infrastructure.Filtering;
-using Nimbus.Routing;
+using Nimbus.InfrastructureContracts;
+using Nimbus.InfrastructureContracts.Handlers;
+using Nimbus.InfrastructureContracts.Routing;
 
 namespace Nimbus.Infrastructure.RequestResponse
 {

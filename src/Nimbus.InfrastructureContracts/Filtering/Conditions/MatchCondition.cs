@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Nimbus.Filtering.Conditions
+namespace Nimbus.InfrastructureContracts.Filtering.Conditions
 {
     public class MatchCondition : IFilterCondition
     {

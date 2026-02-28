@@ -1,4 +1,6 @@
-﻿namespace Nimbus.Infrastructure.Compression
+﻿using Nimbus.InfrastructureContracts;
+
+namespace Nimbus.Infrastructure.Compression
 {
     public class NullCompressor : ICompressor
     {
