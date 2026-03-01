@@ -111,7 +111,7 @@ Nimbus is provided as-is under [An MIT License](LICENSE.md). Community support i
 - Custom feature development
 - Training or workshops
 
-Let's talk about a consulting arrangement: [your contact method]
+Let's talk about a [consulting arrangement](https://damianm.com/consulting/).
 
 Many companies get great value from Nimbus - paying for dedicated support time helps sustain the project and gets you the help you need.
 
