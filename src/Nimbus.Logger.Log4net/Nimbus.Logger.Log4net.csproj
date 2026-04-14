@@ -3,7 +3,7 @@
         <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="log4net" Version="2.0.10"/>
+        <PackageReference Include="log4net" Version="3.3.0"/>
     </ItemGroup>
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
