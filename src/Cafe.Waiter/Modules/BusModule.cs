@@ -13,6 +13,7 @@ using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 using Nimbus.Transports.Postgres;
 using Nimbus.Transports.SqlServer;
+using Nimbus.Transports.Nats;
 using Serilog;
 
 namespace Waiter.Modules
@@ -52,10 +53,13 @@ namespace Waiter.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // Postgres Transport
-                                                 .WithTransport(new PostgresTransportConfiguration()
-                                                     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
-                                                     .WithPollInterval(TimeSpan.FromMilliseconds(100))
-                                                     .WithAutoCreateSchema())
+                                                 //.WithTransport(new PostgresTransportConfiguration()
+                                                 //    .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
+                                                 //    .WithPollInterval(TimeSpan.FromMilliseconds(100))
+                                                 //    .WithAutoCreateSchema())
+
+                                                 // NATS Transport
+                                                 .WithNatsTransport("nats://localhost:4222")
 
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)

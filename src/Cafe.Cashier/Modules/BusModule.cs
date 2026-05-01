@@ -13,6 +13,7 @@ using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 using Nimbus.Transports.Postgres;
 using Nimbus.Transports.SqlServer;
+using Nimbus.Transports.Nats;
 using Serilog;
 
 namespace Cashier.Modules
@@ -51,9 +52,12 @@ namespace Cashier.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // Postgres Transport
-                                                 .WithTransport(new PostgresTransportConfiguration()
-                                                     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
-                                                     .WithAutoCreateSchema())
+                                                 //.WithTransport(new PostgresTransportConfiguration()
+                                                 //    .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
+                                                 //    .WithAutoCreateSchema())
+
+                                                 // NATS Transport
+                                                 .WithNatsTransport("nats://localhost:4222")
 
                                                  .WithNames("Cashier", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
