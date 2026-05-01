@@ -1,3 +1,4 @@
+using NATS.Client.JetStream.Models;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
@@ -12,6 +13,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected override string StreamName { get; }
         protected override string Subject => _queuePath;
         protected override string ConsumerName { get; }
+        protected override StreamConfigRetention StreamRetention => StreamConfigRetention.Workqueue;
 
         public NatsJetStreamQueueReceiver(string queuePath,
                                           NatsJetStreamContextFactory jsContextFactory,

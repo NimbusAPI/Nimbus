@@ -26,7 +26,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         {
             await _jsContextFactory.EnsureStreamAsync(_streamName, _topicPath);
             var bytes = Encoding.UTF8.GetBytes(_serializer.Serialize(message));
-            await _jsContextFactory.GetConnection().PublishAsync(_topicPath, bytes);
+            await _jsContextFactory.PublishAsync(_topicPath, bytes);
         }
 
         private static string SanitiseName(string path)

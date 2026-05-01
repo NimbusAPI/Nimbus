@@ -1,3 +1,4 @@
+using NATS.Client.JetStream.Models;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
@@ -15,6 +16,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected override string StreamName { get; }
         protected override string Subject => _subscription.TopicPath;
         protected override string ConsumerName { get; }
+        protected override StreamConfigRetention StreamRetention => StreamConfigRetention.Limits;
 
         public NatsJetStreamTopicReceiver(NatsSubscription subscription,
                                           NatsJetStreamContextFactory jsContextFactory,

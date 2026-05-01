@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using NATS.Client.Core;
 using Nimbus.Configuration;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Transport;
-using Nimbus.DevelopmentStubs;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.LargeMessages;
 using Nimbus.InfrastructureContracts;
@@ -72,6 +70,9 @@ namespace Nimbus.Transports.Nats
                 container.RegisterType<NatsJetStreamQueueReceiver>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsJetStreamTopicSender>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsJetStreamTopicReceiver>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsJetStreamDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
+                container.RegisterType<NatsJetStreamDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
+                container.RegisterType<NatsJetStreamNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             }
             else
             {
@@ -79,11 +80,10 @@ namespace Nimbus.Transports.Nats
                 container.RegisterType<NatsQueueReceiver>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsTopicSender>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsTopicReceiver>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
+                container.RegisterType<NatsDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
+                container.RegisterType<NatsNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             }
-
-            container.RegisterType<NatsDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
-            container.RegisterType<NatsDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice), typeof(NatsDeadLetterOffice));
-            container.RegisterType<NatsNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof(ILargeMessageBodyStore));
 
             container.RegisterType<NatsTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));

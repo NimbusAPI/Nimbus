@@ -1,4 +1,5 @@
 using System.Text;
+using NATS.Client.JetStream.Models;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Nimbus.Transports.Nats.ConnectionManagement;
@@ -24,9 +25,9 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 
         public async Task Send(NimbusMessage message)
         {
-            await _jsContextFactory.EnsureStreamAsync(_streamName, _queuePath);
+            await _jsContextFactory.EnsureStreamAsync(_streamName, _queuePath, StreamConfigRetention.Workqueue);
             var bytes = Encoding.UTF8.GetBytes(_serializer.Serialize(message));
-            await _jsContextFactory.GetConnection().PublishAsync(_queuePath, bytes);
+            await _jsContextFactory.PublishAsync(_queuePath, bytes);
         }
 
         private static string SanitiseName(string path)

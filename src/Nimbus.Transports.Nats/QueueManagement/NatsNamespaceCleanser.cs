@@ -1,22 +1,21 @@
 using System.Threading.Tasks;
 using Nimbus.Configuration;
-using Nimbus.Transports.Nats.DeadLetterOffice;
+using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.Nats.QueueManagement
 {
     internal class NatsNamespaceCleanser : INamespaceCleanser
     {
-        private readonly NatsDeadLetterOffice _deadLetterOffice;
+        private readonly IDeadLetterOffice _deadLetterOffice;
 
-        public NatsNamespaceCleanser(NatsDeadLetterOffice deadLetterOffice)
+        public NatsNamespaceCleanser(IDeadLetterOffice deadLetterOffice)
         {
             _deadLetterOffice = deadLetterOffice;
         }
 
         public Task RemoveAllExistingNamespaceElements()
         {
-            _deadLetterOffice.Clear();
-            return Task.CompletedTask;
+            return _deadLetterOffice.Purge();
         }
     }
 }

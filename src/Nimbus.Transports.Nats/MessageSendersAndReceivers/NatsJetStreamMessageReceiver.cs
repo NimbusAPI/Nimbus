@@ -19,6 +19,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected abstract string StreamName { get; }
         protected abstract string Subject { get; }
         protected abstract string ConsumerName { get; }
+        protected abstract StreamConfigRetention StreamRetention { get; }
 
         protected NatsJetStreamMessageReceiver(
             NatsJetStreamContextFactory jsContextFactory,
@@ -35,7 +36,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 
         protected override async Task WarmUp()
         {
-            await _jsContextFactory.EnsureStreamAsync(StreamName, Subject);
+            await _jsContextFactory.EnsureStreamAsync(StreamName, Subject, StreamRetention);
             _consumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
             {
                 Name = ConsumerName,

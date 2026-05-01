@@ -37,9 +37,10 @@ namespace Nimbus.Transports.Nats.DeadLetterOffice
             return Task.Run(() => _messages.Count).ConfigureAwaitFalse();
         }
 
-        internal void Clear()
+        public Task Purge()
         {
             _messages.Clear();
+            return Task.CompletedTask;
         }
     }
 }

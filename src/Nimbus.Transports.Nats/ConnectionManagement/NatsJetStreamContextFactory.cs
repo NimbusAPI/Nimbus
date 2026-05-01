@@ -17,8 +17,6 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
             _connectionFactory = connectionFactory;
         }
 
-        public NatsConnection GetConnection() => _connectionFactory.GetConnection();
-
         public async Task<INatsJSContext> GetContextAsync(CancellationToken ct = default)
         {
             if (_jsContext != null) return _jsContext;
@@ -37,11 +35,36 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
             }
         }
 
-        public async Task EnsureStreamAsync(string streamName, string subject, CancellationToken ct = default)
+        public async Task PublishAsync(string subject, byte[] data, NatsHeaders? headers = null, CancellationToken ct = default)
+        {
+            var ctx = await GetContextAsync(ct);
+            await ctx.PublishAsync(subject, data, headers: headers, cancellationToken: ct);
+        }
+
+        public async Task EnsureStreamAsync(string streamName, string subject, StreamConfigRetention retention = StreamConfigRetention.Limits, CancellationToken ct = default)
         {
             if (_ensuredStreams.ContainsKey(streamName)) return;
             var ctx = await GetContextAsync(ct);
-            await ctx.CreateOrUpdateStreamAsync(new StreamConfig { Name = streamName, Subjects = [subject] }, ct);
+            await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+            {
+                Name = streamName,
+                Subjects = [subject, subject + ".sched"],
+                AllowMsgSchedules = true,
+                Retention = retention,
+            }, ct);
+            _ensuredStreams.TryAdd(streamName, 0);
+        }
+
+        public async Task EnsureDeadLetterStreamAsync(string streamName, string subject, CancellationToken ct = default)
+        {
+            if (_ensuredStreams.ContainsKey(streamName)) return;
+            var ctx = await GetContextAsync(ct);
+            await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+            {
+                Name = streamName,
+                Subjects = [subject],
+                Retention = StreamConfigRetention.Workqueue,
+            }, ct);
             _ensuredStreams.TryAdd(streamName, 0);
         }
 
@@ -49,6 +72,23 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
         {
             var ctx = await GetContextAsync(ct);
             return await ctx.CreateOrUpdateConsumerAsync(streamName, config, ct);
+        }
+
+        public async Task<INatsJSStream> GetStreamAsync(string streamName, CancellationToken ct = default)
+        {
+            var ctx = await GetContextAsync(ct);
+            return await ctx.GetStreamAsync(streamName, cancellationToken: ct);
+        }
+
+        public async Task DeleteAllStreamsAsync(CancellationToken ct = default)
+        {
+            var ctx = await GetContextAsync(ct);
+            await foreach (var stream in ctx.ListStreamsAsync(cancellationToken: ct))
+            {
+                var name = stream.Info.Config.Name;
+                if (name != null) await ctx.DeleteStreamAsync(name, ct);
+            }
+            _ensuredStreams.Clear();
         }
     }
 }
