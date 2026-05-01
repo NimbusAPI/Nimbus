@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.Channels;
+using NATS.Client.Core;
 using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
@@ -36,21 +37,29 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected override async Task WarmUp()
         {
             _subscriptionCts = new CancellationTokenSource();
-            _channel = Channel.CreateUnbounded<NimbusMessage>(new UnboundedChannelOptions { SingleWriter = true });
+            // SingleWriter = false because subclasses may add additional NATS subscriptions
+            // that all write to the same channel concurrently.
+            _channel = Channel.CreateUnbounded<NimbusMessage>(new UnboundedChannelOptions { SingleWriter = false });
             var ct = _subscriptionCts.Token;
 
             var connection = _connectionFactory.GetConnection();
             await connection.ConnectAsync();
 
-            // SubscribeCoreAsync sends the SUB command and completes once the subscription is registered.
-            // We store it so the background loop can iterate Msgs and so Dispose can clean it up.
-            var sub = await connection.SubscribeCoreAsync<byte[]>(Subject, queueGroup: QueueGroup, cancellationToken: ct);
+            await AddNatsSubscription(connection, Subject, QueueGroup, ct);
+            await OnWarmingUp(connection, ct);
 
             // PingAsync gives a PING/PONG round-trip, confirming the server has processed the SUB
             // before WarmUp returns and the test starts publishing.
             await connection.PingAsync(ct);
+        }
 
-            var channel = _channel;
+        // Override to subscribe to additional NATS subjects (e.g. a per-subscription retry subject).
+        protected virtual Task OnWarmingUp(NatsConnection connection, CancellationToken ct) => Task.CompletedTask;
+
+        protected async Task AddNatsSubscription(NatsConnection connection, string subject, string queueGroup, CancellationToken ct)
+        {
+            var sub = await connection.SubscribeCoreAsync<byte[]>(subject, queueGroup: queueGroup, cancellationToken: ct);
+            var channel = _channel!;
             _ = Task.Run(async () =>
             {
                 try
@@ -66,11 +75,10 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                 catch (OperationCanceledException) { }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "NATS subscription loop failed for {Subject}/{QueueGroup}", Subject, QueueGroup);
+                    _logger.Error(ex, "NATS subscription loop failed for {Subject}/{QueueGroup}", subject, queueGroup);
                 }
                 finally
                 {
-                    channel.Writer.TryComplete();
                     await sub.DisposeAsync();
                 }
             }, CancellationToken.None);

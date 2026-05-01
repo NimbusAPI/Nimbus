@@ -29,8 +29,14 @@ namespace Nimbus.Transports.Nats.DelayedDelivery
                 if (delay < TimeSpan.Zero) delay = TimeSpan.Zero;
                 await Task.Delay(delay);
 
-                _logger.Debug("Re-delivering {MessageId} (attempt {Attempt})", message.MessageId, message.DeliveryAttempts.Length);
-                var sender = _transport.GetQueueSender(message.DeliverTo);
+                // For topic subscribers, route to the per-subscription retry subject so only
+                // the failing subscription receives the retry, not all subscribers.
+                var destination = message.Properties.TryGetValue(MessagePropertyKeys.RedeliveryToSubscriptionName, out var sub)
+                    ? (string) sub!
+                    : message.DeliverTo;
+
+                _logger.Debug("Re-delivering {MessageId} (attempt {Attempt}) to {Destination}", message.MessageId, message.DeliveryAttempts.Length, destination);
+                var sender = _transport.GetQueueSender(destination);
                 await sender.Send(message);
             }).ConfigureAwaitFalse();
 
