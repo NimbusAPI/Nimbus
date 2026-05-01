@@ -1,18 +1,17 @@
 using NATS.Client.Core;
 using Nimbus.InfrastructureContracts;
-using Nimbus.Transports.Nats.Configuration;
 
 namespace Nimbus.Transports.Nats.ConnectionManagement
 {
     internal class NatsConnectionFactory : IDisposable
     {
-        private readonly NatsUrl _natsUrl;
+        private readonly NatsTransportConfiguration _config;
         private readonly ILogger _logger;
         private readonly Lazy<NatsConnection> _connection;
 
-        public NatsConnectionFactory(NatsUrl natsUrl, ILogger logger)
+        public NatsConnectionFactory(NatsTransportConfiguration config, ILogger logger)
         {
-            _natsUrl = natsUrl;
+            _config = config;
             _logger = logger;
             _connection = new Lazy<NatsConnection>(CreateConnection);
         }
@@ -21,21 +20,27 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
 
         public async Task TestConnection()
         {
-            var opts = new NatsOpts { Url = _natsUrl.Value };
+            var opts = BuildOpts();
             await using var conn = new NatsConnection(opts);
             await conn.ConnectAsync();
-            _logger.Debug("NATS connection test succeeded for {NatsUrl}", _natsUrl.Value);
+            _logger.Debug("NATS connection test succeeded for {NatsUrl}", _config.NatsUrl.Value);
         }
 
         private NatsConnection CreateConnection()
         {
-            var opts = new NatsOpts { Url = _natsUrl.Value };
+            var opts = BuildOpts();
             var conn = new NatsConnection(opts);
-            conn.ConnectionOpened += (_, _) => { _logger.Debug("NATS connection opened to {NatsUrl}", _natsUrl.Value); return ValueTask.CompletedTask; };
+            conn.ConnectionOpened += (_, _) => { _logger.Debug("NATS connection opened to {NatsUrl}", _config.NatsUrl.Value); return ValueTask.CompletedTask; };
             conn.ConnectionDisconnected += (_, _) => { _logger.Debug("NATS connection disconnected"); return ValueTask.CompletedTask; };
             conn.ReconnectFailed += (_, e) => { _logger.Warn("NATS reconnect failed: {Message}", e.Message); return ValueTask.CompletedTask; };
             return conn;
         }
+
+        private NatsOpts BuildOpts() => new NatsOpts
+        {
+            Url = _config.NatsUrl.Value,
+            AuthOpts = _config.NatsAuthOpts,
+        };
 
         public void Dispose()
         {

@@ -75,6 +75,8 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.B
                     return allTransports.Where(t => t.Name == "Postgres");
                 case TestTransport.Nats:
                     return allTransports.Where(t => t.Name == "Nats");
+                case TestTransport.NatsJetStream:
+                    return allTransports.Where(t => t.Name == "NatsJetStream");
                 case TestTransport.All:
                 default:
                     return allTransports;

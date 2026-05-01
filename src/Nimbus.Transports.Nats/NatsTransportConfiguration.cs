@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NATS.Client.Core;
 using Nimbus.Configuration;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Configuration.Transport;
@@ -18,6 +19,8 @@ namespace Nimbus.Transports.Nats
     public class NatsTransportConfiguration : TransportConfiguration
     {
         internal NatsUrl NatsUrl { get; set; } = new NatsUrl { Value = "nats://localhost:4222" };
+        internal NatsAuthOpts NatsAuthOpts { get; private set; } = NatsAuthOpts.Default;
+        internal bool IsJetStream { get; private set; }
 
         public NatsTransportConfiguration WithUrl(string url)
         {
@@ -25,14 +28,58 @@ namespace Nimbus.Transports.Nats
             return this;
         }
 
+        public NatsTransportConfiguration WithCredentials(string username, string password)
+        {
+            NatsAuthOpts = new NatsAuthOpts { Username = username, Password = password };
+            return this;
+        }
+
+        public NatsTransportConfiguration WithToken(string token)
+        {
+            NatsAuthOpts = new NatsAuthOpts { Token = token };
+            return this;
+        }
+
+        public NatsTransportConfiguration WithNKey(string seed)
+        {
+            NatsAuthOpts = new NatsAuthOpts { Seed = seed };
+            return this;
+        }
+
+        public NatsTransportConfiguration WithCredentialsFile(string path)
+        {
+            NatsAuthOpts = new NatsAuthOpts { CredsFile = path };
+            return this;
+        }
+
+        public NatsTransportConfiguration WithJetStream()
+        {
+            IsJetStream = true;
+            return this;
+        }
+
         protected override void RegisterComponents(PoorMansIoC container)
         {
+            // Register self so NatsConnectionFactory and NatsTransport can take it as a dependency.
+            container.Register(this);
+
             container.RegisterType<NatsConnectionFactory>(ComponentLifetime.SingleInstance);
 
-            container.RegisterType<NatsQueueSender>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<NatsQueueReceiver>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<NatsTopicSender>(ComponentLifetime.InstancePerDependency);
-            container.RegisterType<NatsTopicReceiver>(ComponentLifetime.InstancePerDependency);
+            if (IsJetStream)
+            {
+                container.RegisterType<NatsJetStreamContextFactory>(ComponentLifetime.SingleInstance);
+                container.RegisterType<NatsJetStreamQueueSender>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsJetStreamQueueReceiver>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsJetStreamTopicSender>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsJetStreamTopicReceiver>(ComponentLifetime.InstancePerDependency);
+            }
+            else
+            {
+                container.RegisterType<NatsQueueSender>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsQueueReceiver>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsTopicSender>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsTopicReceiver>(ComponentLifetime.InstancePerDependency);
+            }
 
             container.RegisterType<NatsDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
             container.RegisterType<NatsDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice), typeof(NatsDeadLetterOffice));

@@ -12,11 +12,13 @@ namespace Nimbus.Transports.Nats
     {
         private readonly PoorMansIoC _container;
         private readonly NatsConnectionFactory _connectionFactory;
+        private readonly bool _isJetStream;
 
-        public NatsTransport(PoorMansIoC container, NatsConnectionFactory connectionFactory)
+        public NatsTransport(PoorMansIoC container, NatsConnectionFactory connectionFactory, NatsTransportConfiguration config)
         {
             _container = container;
             _connectionFactory = connectionFactory;
+            _isJetStream = config.IsJetStream;
         }
 
         public Task TestConnection()
@@ -26,23 +28,31 @@ namespace Nimbus.Transports.Nats
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
-            return _container.ResolveWithOverrides<NatsQueueSender>(queuePath);
+            return _isJetStream
+                ? _container.ResolveWithOverrides<NatsJetStreamQueueSender>(queuePath)
+                : _container.ResolveWithOverrides<NatsQueueSender>(queuePath);
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
         {
-            return _container.ResolveWithOverrides<NatsQueueReceiver>(queuePath);
+            return _isJetStream
+                ? _container.ResolveWithOverrides<NatsJetStreamQueueReceiver>(queuePath)
+                : _container.ResolveWithOverrides<NatsQueueReceiver>(queuePath);
         }
 
         public INimbusMessageSender GetTopicSender(string topicPath)
         {
-            return _container.ResolveWithOverrides<NatsTopicSender>(topicPath);
+            return _isJetStream
+                ? _container.ResolveWithOverrides<NatsJetStreamTopicSender>(topicPath)
+                : _container.ResolveWithOverrides<NatsTopicSender>(topicPath);
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
         {
             var subscription = new NatsSubscription(topicPath, subscriptionName);
-            return _container.ResolveWithOverrides<NatsTopicReceiver>(subscription);
+            return _isJetStream
+                ? _container.ResolveWithOverrides<NatsJetStreamTopicReceiver>(subscription)
+                : _container.ResolveWithOverrides<NatsTopicReceiver>(subscription);
         }
     }
 }

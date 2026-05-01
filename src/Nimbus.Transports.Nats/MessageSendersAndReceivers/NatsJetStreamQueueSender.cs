@@ -1,0 +1,38 @@
+using System.Text;
+using Nimbus.Infrastructure.MessageSendersAndReceivers;
+using Nimbus.InfrastructureContracts;
+using Nimbus.Transports.Nats.ConnectionManagement;
+
+namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
+{
+    internal class NatsJetStreamQueueSender : INimbusMessageSender
+    {
+        private readonly string _queuePath;
+        private readonly string _streamName;
+        private readonly NatsJetStreamContextFactory _jsContextFactory;
+        private readonly ISerializer _serializer;
+
+        public NatsJetStreamQueueSender(string queuePath,
+                                        NatsJetStreamContextFactory jsContextFactory,
+                                        ISerializer serializer)
+        {
+            _queuePath = queuePath;
+            _streamName = $"Q_{SanitiseName(queuePath)}";
+            _jsContextFactory = jsContextFactory;
+            _serializer = serializer;
+        }
+
+        public async Task Send(NimbusMessage message)
+        {
+            await _jsContextFactory.EnsureStreamAsync(_streamName, _queuePath);
+            var bytes = Encoding.UTF8.GetBytes(_serializer.Serialize(message));
+            await _jsContextFactory.GetConnection().PublishAsync(_queuePath, bytes);
+        }
+
+        private static string SanitiseName(string path)
+        {
+            var safe = System.Text.RegularExpressions.Regex.Replace(path, @"[^a-zA-Z0-9_-]", "_");
+            return safe.Length > 240 ? safe[..240] : safe;
+        }
+    }
+}
