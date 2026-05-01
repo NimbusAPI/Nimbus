@@ -10,12 +10,14 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
         private readonly NatsConnectionFactory _connectionFactory;
         private readonly SemaphoreSlim _contextLock = new(1, 1);
         private readonly ConcurrentDictionary<string, byte> _ensuredStreams = new();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> _streamLocks = new();
         private INatsJSContext? _jsContext;
 
         public NatsJetStreamContextFactory(NatsConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }
+
 
         public async Task<INatsJSContext> GetContextAsync(CancellationToken ct = default)
         {
@@ -44,34 +46,60 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
         public async Task EnsureStreamAsync(string streamName, string subject, StreamConfigRetention retention = StreamConfigRetention.Limits, CancellationToken ct = default)
         {
             if (_ensuredStreams.ContainsKey(streamName)) return;
-            var ctx = await GetContextAsync(ct);
-            await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+            var streamLock = _streamLocks.GetOrAdd(streamName, _ => new SemaphoreSlim(1, 1));
+            await streamLock.WaitAsync(ct);
+            try
             {
-                Name = streamName,
-                Subjects = [subject, subject + ".sched"],
-                AllowMsgSchedules = true,
-                Retention = retention,
-            }, ct);
-            _ensuredStreams.TryAdd(streamName, 0);
+                if (_ensuredStreams.ContainsKey(streamName)) return;
+                var ctx = await GetContextAsync(ct);
+                await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+                {
+                    Name = streamName,
+                    Subjects = [subject, subject + ".sched"],
+                    AllowMsgSchedules = true,
+                    Retention = retention,
+                }, ct);
+                _ensuredStreams.TryAdd(streamName, 0);
+            }
+            finally
+            {
+                streamLock.Release();
+            }
         }
 
         public async Task EnsureDeadLetterStreamAsync(string streamName, string subject, CancellationToken ct = default)
         {
             if (_ensuredStreams.ContainsKey(streamName)) return;
-            var ctx = await GetContextAsync(ct);
-            await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+            var streamLock = _streamLocks.GetOrAdd(streamName, _ => new SemaphoreSlim(1, 1));
+            await streamLock.WaitAsync(ct);
+            try
             {
-                Name = streamName,
-                Subjects = [subject],
-                Retention = StreamConfigRetention.Workqueue,
-            }, ct);
-            _ensuredStreams.TryAdd(streamName, 0);
+                if (_ensuredStreams.ContainsKey(streamName)) return;
+                var ctx = await GetContextAsync(ct);
+                await ctx.CreateOrUpdateStreamAsync(new StreamConfig
+                {
+                    Name = streamName,
+                    Subjects = [subject],
+                    Retention = StreamConfigRetention.Workqueue,
+                }, ct);
+                _ensuredStreams.TryAdd(streamName, 0);
+            }
+            finally
+            {
+                streamLock.Release();
+            }
         }
 
         public async Task<INatsJSConsumer> EnsureConsumerAsync(string streamName, ConsumerConfig config, CancellationToken ct = default)
         {
             var ctx = await GetContextAsync(ct);
             return await ctx.CreateOrUpdateConsumerAsync(streamName, config, ct);
+        }
+
+        public async Task PingAsync(CancellationToken ct = default)
+        {
+            var conn = _connectionFactory.GetConnection();
+            await conn.PingAsync(ct);
         }
 
         public async Task<INatsJSStream> GetStreamAsync(string streamName, CancellationToken ct = default)

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Channels;
 using NATS.Client.JetStream;
 using NATS.Client.JetStream.Models;
 using Nimbus.Configuration.Settings;
@@ -11,10 +12,12 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 {
     internal abstract class NatsJetStreamMessageReceiver : ThrottlingMessageReceiver
     {
-        private readonly NatsJetStreamContextFactory _jsContextFactory;
+        protected readonly NatsJetStreamContextFactory _jsContextFactory;
         private readonly ISerializer _serializer;
         protected readonly ILogger _logger;
-        private INatsJSConsumer? _consumer;
+
+        private Channel<NimbusMessage>? _channel;
+        private CancellationTokenSource? _cts;
 
         protected abstract string StreamName { get; }
         protected abstract string Subject { get; }
@@ -36,8 +39,12 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 
         protected override async Task WarmUp()
         {
+            _cts = new CancellationTokenSource();
+            // SingleWriter = false: subclasses may add additional consumer loops writing concurrently.
+            _channel = Channel.CreateUnbounded<NimbusMessage>(new UnboundedChannelOptions { SingleWriter = false });
+
             await _jsContextFactory.EnsureStreamAsync(StreamName, Subject, StreamRetention);
-            _consumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
+            var consumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
             {
                 Name = ConsumerName,
                 DurableName = ConsumerName,
@@ -45,41 +52,91 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                 AckPolicy = ConsumerConfigAckPolicy.Explicit,
                 DeliverPolicy = ConsumerConfigDeliverPolicy.All,
             });
+
+            StartConsumerLoop(consumer);
+            await OnWarmingUp();
+
+            // PingAsync gives a PING/PONG round-trip confirming the server has processed all
+            // setup (stream, consumer) before WarmUp returns and the test starts publishing.
+            await _jsContextFactory.PingAsync();
+        }
+
+        // Override to start additional consumer loops (e.g. a per-subscription retry consumer).
+        protected virtual Task OnWarmingUp() => Task.CompletedTask;
+
+        protected void StartConsumerLoop(INatsJSConsumer consumer)
+        {
+            var ct = _cts!.Token;
+            var channel = _channel!;
+            _ = Task.Run(async () =>
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await foreach (var msg in consumer.ConsumeAsync<byte[]>(cancellationToken: ct))
+                        {
+                            await msg.AckAsync(cancellationToken: ct);
+                            if (msg.Data == null) continue;
+                            var nimbusMessage = (NimbusMessage)_serializer.Deserialize(
+                                Encoding.UTF8.GetString(msg.Data), typeof(NimbusMessage));
+                            await channel.Writer.WriteAsync(OnMessageReceived(nimbusMessage), CancellationToken.None);
+                        }
+                    }
+                    catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception) when (ct.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "JetStream consume loop failed for {Consumer}", ConsumerName);
+                        await Task.Delay(TimeSpan.FromSeconds(3), CancellationToken.None);
+                    }
+                }
+            }, CancellationToken.None);
         }
 
         protected override async Task<NimbusMessage?> Fetch(CancellationToken cancellationToken)
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(TimeSpan.FromSeconds(10));
+            if (_channel == null) return null;
 
             try
             {
-                await foreach (var msg in _consumer!.FetchAsync<byte[]>(
-                    new NatsJSFetchOpts { MaxMsgs = 1, Expires = TimeSpan.FromSeconds(9) },
-                    cancellationToken: cts.Token))
-                {
-                    await msg.AckAsync();
-                    if (msg.Data == null) continue;
-                    var nimbusMessage = (NimbusMessage)_serializer.Deserialize(
-                        Encoding.UTF8.GetString(msg.Data), typeof(NimbusMessage));
-                    return OnMessageReceived(nimbusMessage);
-                }
-                return null;
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(10));
+                return await _channel.Reader.ReadAsync(cts.Token);
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
                 return null;
             }
+            catch (ChannelClosedException)
+            {
+                return null;
+            }
         }
 
-        // Override to decorate the received message before returning it to the pump.
         protected virtual NimbusMessage OnMessageReceived(NimbusMessage message) => message;
 
-        // Sanitise an arbitrary Nimbus path into a name safe for NATS stream / consumer names.
         protected static string SanitiseName(string path)
         {
             var safe = System.Text.RegularExpressions.Regex.Replace(path, @"[^a-zA-Z0-9_-]", "_");
             return safe.Length > 240 ? safe[..240] : safe;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _channel?.Writer.TryComplete();
+            }
+            base.Dispose(disposing);
         }
     }
 }

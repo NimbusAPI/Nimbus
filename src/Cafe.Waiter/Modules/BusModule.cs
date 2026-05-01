@@ -59,7 +59,9 @@ namespace Waiter.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // NATS Transport
-                                                 .WithNatsTransport("nats://localhost:4222")
+                                                 .WithTransport(new NatsTransportConfiguration()
+                                                     .WithUrl("nats://localhost:4222")
+                                                     .WithJetStream())
 
                                                  .WithNames("Waiter", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)

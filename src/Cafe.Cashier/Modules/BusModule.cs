@@ -57,7 +57,9 @@ namespace Cashier.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // NATS Transport
-                                                 .WithNatsTransport("nats://localhost:4222")
+                                                 .WithTransport(new NatsTransportConfiguration()
+                                                     .WithUrl("nats://localhost:4222")
+                                                     .WithJetStream())
 
                                                  .WithNames("Cashier", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)

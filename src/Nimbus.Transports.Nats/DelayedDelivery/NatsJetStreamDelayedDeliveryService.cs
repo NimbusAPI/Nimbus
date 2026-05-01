@@ -27,6 +27,8 @@ namespace Nimbus.Transports.Nats.DelayedDelivery
 
         public async Task DeliverAfter(NimbusMessage message, DateTimeOffset deliveryTime)
         {
+            // For topic subscribers, RedeliveryToSubscriptionName is the per-subscription retry
+            // subject (a workqueue). For queue messages it falls back to DeliverTo.
             var destination = message.Properties.TryGetValue(MessagePropertyKeys.RedeliveryToSubscriptionName, out var sub)
                 ? (string)sub!
                 : message.DeliverTo;

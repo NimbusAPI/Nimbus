@@ -10,13 +10,16 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
     {
         private readonly NatsSubscription _subscription;
 
-        // Each subscription gets its own durable consumer on the shared topic stream.
-        // Multiple instances with the same subscription name compete for messages within
-        // that subscription group (fan-out across groups, competing within a group).
         protected override string StreamName { get; }
         protected override string Subject => _subscription.TopicPath;
         protected override string ConsumerName { get; }
         protected override StreamConfigRetention StreamRetention => StreamConfigRetention.Limits;
+
+        // Dedicated per-subscription subject for retries so that a failed handler
+        // requeues only to its own subscription, not fan-out to all subscribers.
+        private string RetrySubject => $"{_subscription.TopicPath}.{SanitiseName(_subscription.SubscriptionName)}.retry";
+        private string RetryStreamName => $"Q_{SanitiseName(RetrySubject)}";
+        private string RetryConsumerName => ConsumerName + "_retry";
 
         public NatsJetStreamTopicReceiver(NatsSubscription subscription,
                                           NatsJetStreamContextFactory jsContextFactory,
@@ -31,10 +34,24 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             ConsumerName = SanitiseName(subscription.SubscriptionName);
         }
 
+        protected override async Task OnWarmingUp()
+        {
+            await _jsContextFactory.EnsureStreamAsync(RetryStreamName, RetrySubject, StreamConfigRetention.Workqueue);
+            var retryConsumer = await _jsContextFactory.EnsureConsumerAsync(RetryStreamName, new ConsumerConfig
+            {
+                Name = RetryConsumerName,
+                DurableName = RetryConsumerName,
+                FilterSubject = RetrySubject,
+                AckPolicy = ConsumerConfigAckPolicy.Explicit,
+                DeliverPolicy = ConsumerConfigDeliverPolicy.All,
+            });
+            StartConsumerLoop(retryConsumer);
+        }
+
         protected override NimbusMessage OnMessageReceived(NimbusMessage message)
         {
-            // Route retries back to the topic subject so JetStream captures and fans-out again.
-            message.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscription.TopicPath;
+            // Route retries to the per-subscription retry subject, not back to the topic.
+            message.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = RetrySubject;
             return message;
         }
     }
