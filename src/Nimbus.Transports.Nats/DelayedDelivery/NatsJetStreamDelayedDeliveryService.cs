@@ -35,7 +35,7 @@ namespace Nimbus.Transports.Nats.DelayedDelivery
             _logger.Debug("Scheduling {MessageId} for JetStream delivery at {DeliverAt} via {Destination}",
                 message.MessageId, deliveryTime, destination);
 
-            var streamName = $"Q_{SanitiseName(destination)}";
+            var streamName = SanitiseName(destination);
             await _jsContextFactory.EnsureStreamAsync(streamName, destination, StreamConfigRetention.Workqueue);
 
             var headers = new NatsHeaders();

@@ -18,7 +18,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         // Dedicated per-subscription subject for retries so that a failed handler
         // requeues only to its own subscription, not fan-out to all subscribers.
         private string RetrySubject => $"{_subscription.TopicPath}.{SanitiseName(_subscription.SubscriptionName)}.retry";
-        private string RetryStreamName => $"Q_{SanitiseName(RetrySubject)}";
+        private string RetryStreamName => SanitiseName(RetrySubject);
         private string RetryConsumerName => ConsumerName + "_retry";
 
         public NatsJetStreamTopicReceiver(NatsSubscription subscription,
@@ -30,7 +30,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             : base(jsContextFactory, serializer, concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _subscription = subscription;
-            StreamName = $"T_{SanitiseName(subscription.TopicPath)}";
+            StreamName = SanitiseName(subscription.TopicPath);
             ConsumerName = SanitiseName(subscription.SubscriptionName);
         }
 

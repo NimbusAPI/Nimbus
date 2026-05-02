@@ -18,7 +18,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                                         ISerializer serializer)
         {
             _queuePath = queuePath;
-            _streamName = $"Q_{SanitiseName(queuePath)}";
+            _streamName = SanitiseName(queuePath);
             _jsContextFactory = jsContextFactory;
             _serializer = serializer;
         }

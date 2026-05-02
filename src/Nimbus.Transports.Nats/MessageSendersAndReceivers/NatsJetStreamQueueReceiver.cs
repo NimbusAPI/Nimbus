@@ -24,7 +24,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             : base(jsContextFactory, serializer, concurrentHandlerLimit, globalHandlerThrottle, logger)
         {
             _queuePath = queuePath;
-            StreamName = $"Q_{SanitiseName(queuePath)}";
+            StreamName = SanitiseName(queuePath);
             ConsumerName = SanitiseName(queuePath);
         }
     }
