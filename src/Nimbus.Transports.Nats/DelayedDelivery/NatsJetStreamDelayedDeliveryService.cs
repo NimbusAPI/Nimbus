@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NATS.Client.Core;
 using NATS.Client.JetStream.Models;
@@ -47,10 +46,6 @@ namespace Nimbus.Transports.Nats.DelayedDelivery
             await _jsContextFactory.PublishAsync(destination + ".sched", bytes, headers);
         }
 
-        private static string SanitiseName(string path)
-        {
-            var safe = Regex.Replace(path, @"[^a-zA-Z0-9_-]", "_");
-            return safe.Length > 240 ? safe[..240] : safe;
-        }
+        private static string SanitiseName(string path) => NatsNameSanitiser.Sanitise(path);
     }
 }

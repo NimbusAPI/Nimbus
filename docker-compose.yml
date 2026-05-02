@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   seq:
     image: datalust/seq:latest
@@ -59,4 +57,18 @@ services:
     expose:
       - 4222
       - 8222
-    command: "-js"
+    command: "-js -m 8222"
+    
+  nats-dashboard:
+    image: mdawar/nats-dashboard:latest
+    ports:
+      - "8000:80"
+    environment:
+      # Some UIs allow pre-configuring the server URL
+      - NATS_URL=http://nats:8222
+    depends_on:
+      - nats
+    
+networks:
+  default:
+    name: "nimbus-dev"

@@ -3,7 +3,7 @@ using Nimbus.InfrastructureContracts;
 
 namespace Nimbus.Transports.Nats.ConnectionManagement
 {
-    internal class NatsConnectionFactory : IDisposable
+    internal class NatsConnectionFactory : IDisposable, IAsyncDisposable
     {
         private readonly NatsTransportConfiguration _config;
         private readonly ILogger _logger;
@@ -42,10 +42,12 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
             AuthOpts = _config.NatsAuthOpts,
         };
 
-        public void Dispose()
+        public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+        public async ValueTask DisposeAsync()
         {
             if (_connection.IsValueCreated)
-                _connection.Value.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                await _connection.Value.DisposeAsync();
         }
     }
 }

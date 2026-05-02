@@ -114,11 +114,11 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                     {
                         await foreach (var msg in consumer.ConsumeAsync<byte[]>(cancellationToken: ct))
                         {
-                            await msg.AckAsync(cancellationToken: ct);
-                            if (msg.Data == null) continue;
+                            if (msg.Data == null) { await msg.AckAsync(cancellationToken: ct); continue; }
                             var nimbusMessage = (NimbusMessage)_serializer.Deserialize(
                                 Encoding.UTF8.GetString(msg.Data), typeof(NimbusMessage));
                             await channel.Writer.WriteAsync(OnMessageReceived(nimbusMessage), CancellationToken.None);
+                            await msg.AckAsync(cancellationToken: ct);
                         }
                     }
                     catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -140,11 +140,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 
         protected virtual NimbusMessage OnMessageReceived(NimbusMessage message) => message;
 
-        protected static string SanitiseName(string path)
-        {
-            var safe = System.Text.RegularExpressions.Regex.Replace(path, @"[^a-zA-Z0-9_-]", "_");
-            return safe.Length > 240 ? safe[..240] : safe;
-        }
+        protected static string SanitiseName(string path) => NatsNameSanitiser.Sanitise(path);
 
         protected override void Dispose(bool disposing)
         {

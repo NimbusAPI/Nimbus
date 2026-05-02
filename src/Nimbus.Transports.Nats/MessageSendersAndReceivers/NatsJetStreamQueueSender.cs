@@ -30,10 +30,6 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             await _jsContextFactory.PublishAsync(_queuePath, bytes);
         }
 
-        private static string SanitiseName(string path)
-        {
-            var safe = System.Text.RegularExpressions.Regex.Replace(path, @"[^a-zA-Z0-9_-]", "_");
-            return safe.Length > 240 ? safe[..240] : safe;
-        }
+        private static string SanitiseName(string path) => NatsNameSanitiser.Sanitise(path);
     }
 }
