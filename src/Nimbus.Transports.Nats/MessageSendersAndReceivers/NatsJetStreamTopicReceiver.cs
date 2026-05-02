@@ -45,7 +45,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                 AckPolicy = ConsumerConfigAckPolicy.Explicit,
                 DeliverPolicy = ConsumerConfigDeliverPolicy.All,
             });
-            StartConsumerLoop(retryConsumer);
+            RegisterAdditionalConsumer(retryConsumer);
         }
 
         protected override NimbusMessage OnMessageReceived(NimbusMessage message)

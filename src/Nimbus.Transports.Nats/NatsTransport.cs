@@ -30,7 +30,7 @@ namespace Nimbus.Transports.Nats
         {
             return _isJetStream
                 ? _container.ResolveWithOverrides<NatsJetStreamQueueSender>(queuePath)
-                : _container.ResolveWithOverrides<NatsQueueSender>(queuePath);
+                : _container.ResolveWithOverrides<NatsMessageSender>(queuePath);
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
@@ -44,7 +44,7 @@ namespace Nimbus.Transports.Nats
         {
             return _isJetStream
                 ? _container.ResolveWithOverrides<NatsJetStreamTopicSender>(topicPath)
-                : _container.ResolveWithOverrides<NatsTopicSender>(topicPath);
+                : _container.ResolveWithOverrides<NatsMessageSender>(topicPath);
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)

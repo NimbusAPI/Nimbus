@@ -17,7 +17,9 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected readonly ILogger _logger;
 
         private Channel<NimbusMessage>? _channel;
-        private CancellationTokenSource? _cts;
+        private INatsJSConsumer? _mainConsumer;
+        private readonly List<INatsJSConsumer> _additionalConsumers = new();
+        private bool _loopStarted;
 
         protected abstract string StreamName { get; }
         protected abstract string Subject { get; }
@@ -39,12 +41,13 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
 
         protected override async Task WarmUp()
         {
-            _cts = new CancellationTokenSource();
-            // SingleWriter = false: subclasses may add additional consumer loops writing concurrently.
+            _loopStarted = false;
+            _additionalConsumers.Clear();
+            // SingleWriter = false: multiple consumer loops (main + retry) write concurrently.
             _channel = Channel.CreateUnbounded<NimbusMessage>(new UnboundedChannelOptions { SingleWriter = false });
 
             await _jsContextFactory.EnsureStreamAsync(StreamName, Subject, StreamRetention);
-            var consumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
+            _mainConsumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
             {
                 Name = ConsumerName,
                 DurableName = ConsumerName,
@@ -53,7 +56,6 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                 DeliverPolicy = ConsumerConfigDeliverPolicy.All,
             });
 
-            StartConsumerLoop(consumer);
             await OnWarmingUp();
 
             // PingAsync gives a PING/PONG round-trip confirming the server has processed all
@@ -61,12 +63,48 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             await _jsContextFactory.PingAsync();
         }
 
-        // Override to start additional consumer loops (e.g. a per-subscription retry consumer).
+        // Override to register additional consumers (e.g. a per-subscription retry consumer).
+        // Use RegisterAdditionalConsumer() — loops are started lazily in Fetch() so they use
+        // the base class's cancellation token and stop cleanly when Stop() is called.
         protected virtual Task OnWarmingUp() => Task.CompletedTask;
 
-        protected void StartConsumerLoop(INatsJSConsumer consumer)
+        protected void RegisterAdditionalConsumer(INatsJSConsumer consumer)
         {
-            var ct = _cts!.Token;
+            _additionalConsumers.Add(consumer);
+        }
+
+        protected override async Task<NimbusMessage?> Fetch(CancellationToken cancellationToken)
+        {
+            if (_channel == null) return null;
+
+            // Start consumer loops on the first Fetch, using the base class's cancellation token.
+            // This ties loop lifetime to Stop() — when Stop() cancels its token, loops cancel too.
+            if (!_loopStarted)
+            {
+                _loopStarted = true;
+                StartConsumerLoop(_mainConsumer!, cancellationToken);
+                foreach (var consumer in _additionalConsumers)
+                    StartConsumerLoop(consumer, cancellationToken);
+            }
+
+            try
+            {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(10));
+                return await _channel.Reader.ReadAsync(cts.Token);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
+            catch (ChannelClosedException)
+            {
+                return null;
+            }
+        }
+
+        private void StartConsumerLoop(INatsJSConsumer consumer, CancellationToken ct)
+        {
             var channel = _channel!;
             _ = Task.Run(async () =>
             {
@@ -94,30 +132,10 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                     catch (Exception ex)
                     {
                         _logger.Error(ex, "JetStream consume loop failed for {Consumer}", ConsumerName);
-                        await Task.Delay(TimeSpan.FromSeconds(3), CancellationToken.None);
+                        await Task.Delay(TimeSpan.FromSeconds(1), CancellationToken.None);
                     }
                 }
             }, CancellationToken.None);
-        }
-
-        protected override async Task<NimbusMessage?> Fetch(CancellationToken cancellationToken)
-        {
-            if (_channel == null) return null;
-
-            try
-            {
-                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(TimeSpan.FromSeconds(10));
-                return await _channel.Reader.ReadAsync(cts.Token);
-            }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
-            catch (ChannelClosedException)
-            {
-                return null;
-            }
         }
 
         protected virtual NimbusMessage OnMessageReceived(NimbusMessage message) => message;
@@ -132,8 +150,6 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         {
             if (disposing)
             {
-                _cts?.Cancel();
-                _cts?.Dispose();
                 _channel?.Writer.TryComplete();
             }
             base.Dispose(disposing);

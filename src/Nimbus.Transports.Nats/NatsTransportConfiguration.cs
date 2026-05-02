@@ -76,9 +76,8 @@ namespace Nimbus.Transports.Nats
             }
             else
             {
-                container.RegisterType<NatsQueueSender>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsQueueReceiver>(ComponentLifetime.InstancePerDependency);
-                container.RegisterType<NatsTopicSender>(ComponentLifetime.InstancePerDependency);
+                container.RegisterType<NatsMessageSender>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsTopicReceiver>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
                 container.RegisterType<NatsDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
