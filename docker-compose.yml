@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   seq:
     image: datalust/seq:latest
@@ -50,3 +48,27 @@ services:
       POSTGRES_PASSWORD: Nimbus_Dev_123!
     expose:
       - 5432
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    expose:
+      - 4222
+      - 8222
+    command: "-js -m 8222 --user admin --pass password"
+    
+  nats-dashboard:
+    image: mdawar/nats-dashboard:latest
+    ports:
+      - "8000:80"
+    environment:
+      # Some UIs allow pre-configuring the server URL
+      - NATS_URL=http://nats:8222
+    depends_on:
+      - nats
+    
+networks:
+  default:
+    name: "nimbus-dev"

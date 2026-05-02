@@ -12,6 +12,7 @@ using Nimbus.Transports.AzureServiceBus;
 using Nimbus.Transports.Redis;
 using Nimbus.Transports.Postgres;
 using Nimbus.Transports.SqlServer;
+using Nimbus.Transports.Nats;
 
 namespace Barista.Modules
 {
@@ -47,9 +48,14 @@ namespace Barista.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // Postgres Transport
-                                                 .WithTransport(new PostgresTransportConfiguration()
-                                                     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
-                                                     .WithAutoCreateSchema())
+                                                 //.WithTransport(new PostgresTransportConfiguration()
+                                                 //    .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
+                                                 //    .WithAutoCreateSchema())
+
+                                                 // NATS Transport
+                                                 .WithTransport(new NatsTransportConfiguration()
+                                                     .WithUrl("nats://localhost:4222")
+                                                     .WithJetStream())
 
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)

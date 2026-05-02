@@ -8,5 +8,6 @@ namespace Nimbus.InfrastructureContracts
         Task<NimbusMessage> Pop();
         Task Post(NimbusMessage message);
         Task<int> Count();
+        Task Purge() => Task.CompletedTask;
     }
 }

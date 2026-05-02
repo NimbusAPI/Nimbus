@@ -1,6 +1,4 @@
 using System;
-using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Integration.TestScenarioGeneration;
 
@@ -12,7 +10,9 @@ public enum TestTransport
     Amqp,
     AzureServiceBus,
     SqlServer,
-    Postgres
+    Postgres,
+    Nats,
+    NatsJetStream
 }
 
 public static class TransportSelector

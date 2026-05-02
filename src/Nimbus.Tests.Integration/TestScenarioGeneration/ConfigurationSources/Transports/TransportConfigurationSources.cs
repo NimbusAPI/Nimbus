@@ -16,6 +16,8 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.T
             yield return new AzureServiceBus();
             yield return new SqlServer();
             yield return new Postgres();
+            yield return new Nats();
+            yield return new NatsJetStream();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

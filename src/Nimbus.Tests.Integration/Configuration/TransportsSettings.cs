@@ -7,5 +7,6 @@ namespace Nimbus.Tests.Integration.Configuration
         public AMQPSettings Amqp { get; set; }
         public SqlServerSettings SqlServer { get; set; }
         public PostgresSettings Postgres { get; set; }
+        public NatsSettings Nats { get; set; }
     }
 }
