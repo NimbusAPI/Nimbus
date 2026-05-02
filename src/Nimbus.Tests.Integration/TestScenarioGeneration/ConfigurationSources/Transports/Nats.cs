@@ -9,10 +9,11 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.T
     {
         public override ScenarioInstance<TransportConfiguration> CreateInstance()
         {
-            var url = AppSettingsLoader.Settings.Transports.Nats.Url;
+            var nats = AppSettingsLoader.Settings.Transports.Nats;
 
             var configuration = new NatsTransportConfiguration()
-                .WithUrl(url);
+                .WithUrl(nats.Url)
+                .WithCredentials(nats.Username, nats.Password);
 
             return new ScenarioInstance<TransportConfiguration>(configuration);
         }

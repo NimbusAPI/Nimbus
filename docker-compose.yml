@@ -57,7 +57,7 @@ services:
     expose:
       - 4222
       - 8222
-    command: "-js -m 8222"
+    command: "-js -m 8222 --user admin --pass password"
     
   nats-dashboard:
     image: mdawar/nats-dashboard:latest
