@@ -136,6 +136,56 @@ jobs:
         arguments: |
           buildNumber: ${{ github.run_number }}
 
+  nats:
+    name: NATS (Core)
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: Nats
+      TRANSPORTS__NATS__URL: nats://localhost:4222
+      TRANSPORTS__NATS__USERNAME: admin
+      TRANSPORTS__NATS__PASSWORD: password
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Start NATS
+      run: docker run -d -p 4222:4222 nats:latest --user admin --pass password
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  nats-jetstream:
+    name: NATS (JetStream)
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: NatsJetStream
+      TRANSPORTS__NATS__URL: nats://localhost:4222
+      TRANSPORTS__NATS__USERNAME: admin
+      TRANSPORTS__NATS__PASSWORD: password
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Start NATS
+      run: docker run -d -p 4222:4222 nats:latest -js --user admin --pass password
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
   azure-service-bus:
     name: Azure Service Bus
     runs-on: ubuntu-latest
