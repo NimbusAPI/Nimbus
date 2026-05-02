@@ -6,14 +6,15 @@ Nimbus is a .NET messaging framework that provides a clean abstraction over mult
 
 ## Supported Transports
 
-| Transport | Package |
-|-----------|---------|
-| Azure Service Bus | `Nimbus.Transports.AzureServiceBus` |
-| Redis | `Nimbus.Transports.Redis` |
-| PostgreSQL | `Nimbus.Transports.Postgres` |
-| SQL Server | `Nimbus.Transports.SqlServer` |
-| AMQP | `Nimbus.Transports.AMQP` |
-| In-Process (testing) | `Nimbus.Transports.InProcess` |
+| Transport            | Package                             |
+|----------------------|-------------------------------------|
+| Azure Service Bus    | `Nimbus.Transports.AzureServiceBus` |
+| Redis                | `Nimbus.Transports.Redis`           |
+| PostgreSQL           | `Nimbus.Transports.Postgres`        |
+| SQL Server           | `Nimbus.Transports.SqlServer`       |
+| AMQP                 | `Nimbus.Transports.AMQP`            |
+| Nats                 | `Nimbus.Transports.Nats`            |
+| In-Process (testing) | `Nimbus.Transports.InProcess`       |
 
 ## Message Patterns
 
@@ -48,13 +49,15 @@ dotnet build
 
 `docker-compose up -d --build` starts:
 
-| Service | URL / Port |
-|---------|-----------|
-| [Seq](https://datalust.co) log server | `http://localhost:5341` |
-| [Redis](https://redis.io/) | `localhost:6379` |
+| Service                                                                           | URL / Port                                           |
+|-----------------------------------------------------------------------------------|------------------------------------------------------|
+| [Seq](https://datalust.co) log server                                             | `http://localhost:5341`                              |
+| [Redis](https://redis.io/)                                                        | `localhost:6379`                                     |
 | [Apache ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) (AMQP) | `localhost:5672`, console at `http://localhost:8161` |
-| SQL Server | `localhost:1433` |
-| PostgreSQL | `localhost:5432` |
+| SQL Server                                                                        | `localhost:1433`                                     |
+| PostgreSQL                                                                        | `localhost:5432`                                     |
+| [Nats](https://nats.io/)                                                          | `localhost:8222` and `localhost:6222`                |
+| [Nats Dashboard](https://natsdashboard.com/)                                                                | `localhost:8000`                                     |
 
 SQL Server uses a custom Docker image (in `docker/sqlserver`) — the `--build` flag ensures it is built before starting.
 
