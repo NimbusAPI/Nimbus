@@ -19,7 +19,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         private Channel<NimbusMessage>? _channel;
         private INatsJSConsumer? _mainConsumer;
         private readonly List<INatsJSConsumer> _additionalConsumers = new();
-        private bool _loopStarted;
+        private volatile bool _loopStarted;
 
         protected abstract string StreamName { get; }
         protected abstract string Subject { get; }

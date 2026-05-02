@@ -49,13 +49,13 @@ namespace Nimbus.Transports.Nats.DeadLetterOffice
             await stream.RefreshAsync();
             if (stream.Info.State.Messages == 0) return null!;
 
+            var consumer = await stream.CreateOrderedConsumerAsync(new NatsJSOrderedConsumerOpts
+            {
+                FilterSubjects = [Subject],
+                DeliverPolicy = ConsumerConfigDeliverPolicy.All,
+            });
             try
             {
-                var consumer = await stream.CreateOrderedConsumerAsync(new NatsJSOrderedConsumerOpts
-                {
-                    FilterSubjects = [Subject],
-                    DeliverPolicy = ConsumerConfigDeliverPolicy.All,
-                });
                 await foreach (var msg in consumer.FetchAsync<byte[]>(new NatsJSFetchOpts { MaxMsgs = 1, Expires = TimeSpan.FromSeconds(2) }))
                 {
                     if (msg.Data == null) return null!;
@@ -63,9 +63,9 @@ namespace Nimbus.Transports.Nats.DeadLetterOffice
                 }
                 return null!;
             }
-            catch
+            finally
             {
-                return null!;
+                if (consumer is IAsyncDisposable d) await d.DisposeAsync();
             }
         }
 

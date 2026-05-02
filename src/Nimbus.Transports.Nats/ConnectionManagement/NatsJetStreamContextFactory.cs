@@ -11,7 +11,7 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
         private readonly SemaphoreSlim _contextLock = new(1, 1);
         private readonly ConcurrentDictionary<string, byte> _ensuredStreams = new();
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _streamLocks = new();
-        private INatsJSContext? _jsContext;
+        private volatile INatsJSContext? _jsContext;
 
         public NatsJetStreamContextFactory(NatsConnectionFactory connectionFactory)
         {
