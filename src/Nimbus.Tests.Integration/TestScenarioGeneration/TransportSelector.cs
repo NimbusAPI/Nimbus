@@ -1,6 +1,4 @@
 using System;
-using Nimbus.Configuration.Transport;
-using Nimbus.Tests.Integration.TestScenarioGeneration.ScenarioComposition;
 
 namespace Nimbus.Tests.Integration.TestScenarioGeneration;
 

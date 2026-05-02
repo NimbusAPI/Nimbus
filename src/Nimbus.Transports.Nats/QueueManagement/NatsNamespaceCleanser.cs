@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Nimbus.Configuration;
 using Nimbus.InfrastructureContracts;
 
