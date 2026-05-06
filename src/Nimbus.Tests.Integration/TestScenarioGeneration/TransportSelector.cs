@@ -23,7 +23,7 @@ public static class TransportSelector
 
     private static TestTransport LoadFromEnvironment()
     {
-        var envVar = Environment.GetEnvironmentVariable("NIMBUS_TEST_TRANSPORT") ?? "InProcess";
+        var envVar = Environment.GetEnvironmentVariable("NIMBUS_TEST_TRANSPORT") ?? "InMemory";
 
         if (Enum.TryParse<TestTransport>(envVar, ignoreCase: true, out var transport))
             return transport;
