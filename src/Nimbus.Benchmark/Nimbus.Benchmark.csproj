@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
+    <ProjectReference Include="..\Nimbus.Containers.Autofac\Nimbus.Containers.Autofac.csproj" />
+    <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj" />
+    <ProjectReference Include="..\Nimbus.Logger.Serilog\Nimbus.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\Nimbus.Serializers.Json\Nimbus.Serializers.Json.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.InProcess\Nimbus.Transports.InProcess.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.Amqp\Nimbus.Transports.AMQP.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.SqlServer\Nimbus.Transports.SqlServer.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.Postgres\Nimbus.Transports.Postgres.csproj" />
+    <ProjectReference Include="..\Nimbus.Transports.Nats\Nimbus.Transports.Nats.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.9.4" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>
