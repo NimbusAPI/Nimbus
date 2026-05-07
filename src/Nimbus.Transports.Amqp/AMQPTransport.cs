@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
@@ -16,6 +17,8 @@ namespace Nimbus.Transports.AMQP
         private readonly PoorMansIoC _container;
         private readonly ILogger _logger;
         private readonly NmsConnectionManager _connectionManager;
+        private readonly ConcurrentDictionary<string, AMQPQueueSender> _queueSenders = new();
+        private readonly ConcurrentDictionary<string, AMQPTopicSender> _topicSenders = new();
         private bool _disposed;
 
         public AMQPTransport(PoorMansIoC container, ILogger logger, NmsConnectionManager connectionManager)
@@ -34,8 +37,11 @@ namespace Nimbus.Transports.AMQP
 
         public INimbusMessageSender GetQueueSender(string queuePath)
         {
-            _logger.Debug("Creating queue sender for {QueuePath}", queuePath);
-            return _container.ResolveWithOverrides<AMQPQueueSender>(queuePath);
+            return _queueSenders.GetOrAdd(queuePath, path =>
+            {
+                _logger.Debug("Creating queue sender for {QueuePath}", path);
+                return _container.ResolveWithOverrides<AMQPQueueSender>(path);
+            });
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
@@ -46,8 +52,11 @@ namespace Nimbus.Transports.AMQP
 
         public INimbusMessageSender GetTopicSender(string topicPath)
         {
-            _logger.Debug("Creating topic sender for {TopicPath}", topicPath);
-            return _container.ResolveWithOverrides<AMQPTopicSender>(topicPath);
+            return _topicSenders.GetOrAdd(topicPath, path =>
+            {
+                _logger.Debug("Creating topic sender for {TopicPath}", path);
+                return _container.ResolveWithOverrides<AMQPTopicSender>(path);
+            });
         }
 
         public INimbusMessageReceiver GetTopicReceiver(string topicPath, string subscriptionName, IFilterCondition filter)
@@ -64,6 +73,12 @@ namespace Nimbus.Transports.AMQP
             _disposed = true;
 
             _logger.Info("Disposing AMQP transport");
+
+            foreach (var sender in _queueSenders.Values)
+                try { sender.Dispose(); } catch { /* ignore */ }
+
+            foreach (var sender in _topicSenders.Values)
+                try { sender.Dispose(); } catch { /* ignore */ }
 
             try
             {
