@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj"/>
+        <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Cronos" Version="0.8.*"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <Version>1.0.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Cron-scheduled message firing extension for the Nimbus messaging framework.</Description>
+        <PackageTags>nimbus;messaging;pulse;cron;scheduling</PackageTags>
+    </PropertyGroup>
+</Project>
