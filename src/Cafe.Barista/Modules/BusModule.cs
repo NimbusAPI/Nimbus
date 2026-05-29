@@ -55,6 +55,7 @@ namespace Barista.Modules
                                                  // NATS Transport
                                                  .WithTransport(new NatsTransportConfiguration()
                                                      .WithUrl("nats://localhost:4222")
+                                                     .WithCredentials("admin", "password")
                                                      .WithJetStream())
 
                                                  .WithNames("Barista", Environment.MachineName)
