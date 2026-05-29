@@ -15,6 +15,7 @@ on:
           - amqp
           - sqlserver
           - nats
+          - pulse
           - all
 
 permissions:
@@ -73,6 +74,9 @@ jobs:
             ;;
           nats)
             GLOBS=("$DIST/Nimbus.Transports.Nats.*.nupkg")
+            ;;
+          pulse)
+            GLOBS=("$DIST/Nimbus.Extensions.Pulse.*.nupkg")
             ;;
           all)
             GLOBS=("$DIST/Nimbus*.nupkg")

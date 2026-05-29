@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nimbus.Extensions.Pulse\Nimbus.Extensions.Pulse.csproj" />
     <ProjectReference Include="..\Nimbus.MessageContracts\Nimbus.MessageContracts.csproj" />
   </ItemGroup>
 

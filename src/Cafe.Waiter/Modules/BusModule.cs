@@ -2,6 +2,7 @@ using System;
 using Autofac;
 using Cafe.Messages;
 using Nimbus.Configuration;
+using Nimbus.Extensions.Pulse.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.LargeMessages.Azure.Client;
@@ -61,6 +62,7 @@ namespace Waiter.Modules
                                                  // NATS Transport
                                                  .WithTransport(new NatsTransportConfiguration()
                                                      .WithUrl("nats://localhost:4222")
+                                                     .WithCredentials("admin", "password")
                                                      .WithJetStream())
 
                                                  .WithNames("Waiter", Environment.MachineName)
@@ -68,6 +70,8 @@ namespace Waiter.Modules
                                                  .WithAutofacDefaults(componentContext)
                                                  .WithSerilogLogger()
                                                  .WithJsonSerializer()
+                                                 .WithPulse(("*/5 * * * *", new CleanTheTablesCommand()))
+                                                 
 //                                                 .WithGlobalInboundInterceptorTypes(typeof(CorrelationIdInterceptor))
                                                  .Build())
                    .As<IBus>()
