@@ -12,7 +12,9 @@ public enum TestTransport
     SqlServer,
     Postgres,
     Nats,
-    NatsJetStream
+    NatsJetStream,
+    RabbitMq,
+    LavinMq
 }
 
 public static class TransportSelector
@@ -23,7 +25,7 @@ public static class TransportSelector
 
     private static TestTransport LoadFromEnvironment()
     {
-        var envVar = Environment.GetEnvironmentVariable("NIMBUS_TEST_TRANSPORT") ?? "InMemory";
+        var envVar = Environment.GetEnvironmentVariable("NIMBUS_TEST_TRANSPORT") ?? "InProcess";
 
         if (Enum.TryParse<TestTransport>(envVar, ignoreCase: true, out var transport))
             return transport;

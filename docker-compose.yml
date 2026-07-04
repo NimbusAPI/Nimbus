@@ -59,6 +59,29 @@ services:
       - 8222
     command: "-js -m 8222 --user admin --pass password"
     
+  rabbitmq:
+    build:
+      context: docker/rabbitmq
+    ports:
+      - "5674:5672"    # AMQP (offset to avoid clash with artemis on 5672)
+      - "15674:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    expose:
+      - 5672
+      - 15672
+
+  lavinmq:
+    image : cloudamqp/lavinmq
+    ports:
+      - "5673:5672"    # AMQP (non-standard host port)
+      - "15673:15672"  # Management UI (non-standard host port)
+    environment:
+      LAVINMQ_USER: guest
+      LAVINMQ_PASSWORD: guest
+
+
   nats-dashboard:
     image: mdawar/nats-dashboard:latest
     ports:

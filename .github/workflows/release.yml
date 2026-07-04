@@ -15,6 +15,7 @@ on:
           - amqp
           - sqlserver
           - nats
+          - rabbitmq
           - pulse
           - all
 
@@ -74,6 +75,9 @@ jobs:
             ;;
           nats)
             GLOBS=("$DIST/Nimbus.Transports.Nats.*.nupkg")
+            ;;
+          rabbitmq)
+            GLOBS=("$DIST/Nimbus.Transports.RabbitMQ.*.nupkg")
             ;;
           pulse)
             GLOBS=("$DIST/Nimbus.Extensions.Pulse.*.nupkg")

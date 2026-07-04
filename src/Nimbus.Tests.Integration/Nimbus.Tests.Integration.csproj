@@ -21,6 +21,7 @@
         <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
         <ProjectReference Include="..\Nimbus.Transports.Nats\Nimbus.Transports.Nats.csproj" />
+        <ProjectReference Include="..\Nimbus.Transports.RabbitMQ\Nimbus.Transports.RabbitMQ.csproj" />
         <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
     </ItemGroup>
 
