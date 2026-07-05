@@ -8,5 +8,7 @@ namespace Nimbus.Tests.Integration.Configuration
         public SqlServerSettings SqlServer { get; set; }
         public PostgresSettings Postgres { get; set; }
         public NatsSettings Nats { get; set; }
+        public RabbitMqSettings RabbitMq { get; set; }
+        public RabbitMqSettings LavinMq { get; set; }
     }
 }

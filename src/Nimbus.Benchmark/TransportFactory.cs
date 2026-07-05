@@ -3,6 +3,7 @@ using Nimbus.Transports.AMQP;
 using Nimbus.Transports.InProcess;
 using Nimbus.Transports.Nats;
 using Nimbus.Transports.Postgres;
+using Nimbus.Transports.RabbitMQ;
 using Nimbus.Transports.Redis;
 using Nimbus.Transports.SqlServer;
 
@@ -12,7 +13,7 @@ public static class TransportFactory
 {
     public static readonly string[] ValidNames =
     [
-        "InProcess", "Redis", "Nats", "NatsJetStream", "Amqp", "SqlServer", "Postgres"
+        "InProcess", "Redis", "Nats", "NatsJetStream", "Amqp", "SqlServer", "Postgres", "RabbitMq", "LavinMq"
     ];
 
     public static TransportConfiguration Create(string name) => name.ToLowerInvariant() switch
@@ -44,6 +45,18 @@ public static class TransportFactory
             .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
             .WithPollInterval(TimeSpan.FromMilliseconds(50))
             .WithAutoCreateSchema(),
+
+        "rabbitmq" => new RabbitMqTransportConfiguration()
+            .WithHost("localhost")
+            .WithPort(5674)
+            .WithManagementPort(15674)
+            .WithCredentials("admin", "admin"),
+
+        "lavinmq" => new RabbitMqTransportConfiguration()
+            .WithHost("localhost")
+            .WithPort(5673)
+            .WithManagementPort(15673)
+            .WithCredentials("guest", "guest"),
 
         _ => throw new ArgumentException(
             $"Unknown transport '{name}'. Valid options: {string.Join(", ", ValidNames)}")

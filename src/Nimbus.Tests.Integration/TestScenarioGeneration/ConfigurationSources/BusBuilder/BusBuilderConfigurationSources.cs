@@ -77,6 +77,10 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.B
                     return allTransports.Where(t => t.Name == "Nats");
                 case TestTransport.NatsJetStream:
                     return allTransports.Where(t => t.Name == "NatsJetStream");
+                case TestTransport.RabbitMq:
+                    return allTransports.Where(t => t.Name == "RabbitMq");
+                case TestTransport.LavinMq:
+                    return allTransports.Where(t => t.Name == "LavinMq");
                 case TestTransport.All:
                 default:
                     return allTransports;

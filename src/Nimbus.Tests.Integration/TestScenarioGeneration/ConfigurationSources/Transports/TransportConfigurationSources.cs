@@ -18,6 +18,8 @@ namespace Nimbus.Tests.Integration.TestScenarioGeneration.ConfigurationSources.T
             yield return new Postgres();
             yield return new Nats();
             yield return new NatsJetStream();
+            yield return new RabbitMq();
+            yield return new LavinMq();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

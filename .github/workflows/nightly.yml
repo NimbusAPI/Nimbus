@@ -186,6 +186,74 @@ jobs:
         arguments: |
           buildNumber: ${{ github.run_number }}
 
+  rabbitmq:
+    name: RabbitMQ
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: RabbitMq
+      TRANSPORTS__RABBITMQ__HOST: localhost
+      TRANSPORTS__RABBITMQ__PORT: 5672
+      TRANSPORTS__RABBITMQ__MANAGEMENTPORT: 15672
+      TRANSPORTS__RABBITMQ__USERNAME: admin
+      TRANSPORTS__RABBITMQ__PASSWORD: admin
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Build RabbitMQ image
+      run: docker build -t nimbus-rabbitmq ./docker/rabbitmq
+    - name: Start RabbitMQ
+      run: docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin nimbus-rabbitmq
+    - name: Wait for RabbitMQ
+      run: |
+        until docker exec rabbitmq rabbitmqctl status 2>/dev/null; do
+          echo "Waiting for RabbitMQ..."
+          sleep 5
+        done
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
+  lavinmq:
+    name: LavinMQ
+    runs-on: ubuntu-latest
+    env:
+      NIMBUS_TEST_TRANSPORT: LavinMq
+      TRANSPORTS__LAVINMQ__HOST: localhost
+      TRANSPORTS__LAVINMQ__PORT: 5672
+      TRANSPORTS__LAVINMQ__MANAGEMENTPORT: 15672
+      TRANSPORTS__LAVINMQ__USERNAME: guest
+      TRANSPORTS__LAVINMQ__PASSWORD: guest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+    - name: Start LavinMQ
+      run: docker run -d --name lavinmq -p 5672:5672 -p 15672:15672 cloudamqp/lavinmq
+    - name: Wait for LavinMQ
+      run: |
+        until curl -sf http://localhost:15672/api/healthchecks/node 2>/dev/null; do
+          echo "Waiting for LavinMQ..."
+          sleep 5
+        done
+    - name: Run integration tests
+      uses: cake-build/cake-action@v3
+      with:
+        script-path: build.cake
+        target: NightlyTest
+        arguments: |
+          buildNumber: ${{ github.run_number }}
+
   azure-service-bus:
     name: Azure Service Bus
     runs-on: ubuntu-latest
