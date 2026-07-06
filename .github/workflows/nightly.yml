@@ -239,7 +239,7 @@ jobs:
       run: docker run -d --name lavinmq -p 5672:5672 -p 15672:15672 cloudamqp/lavinmq
     - name: Wait for LavinMQ
       run: |
-        timeout 120 bash -c 'until curl -sf -u guest:guest http://localhost:15672/api/healthchecks/node; do echo "Waiting for LavinMQ..."; sleep 5; done'
+        timeout 120 bash -c 'until curl -sf -u guest:guest http://localhost:15672/api/aliveness-test/%2F; do echo "Waiting for LavinMQ..."; sleep 5; done'
     - name: Run integration tests
       uses: cake-build/cake-action@v3
       with:
