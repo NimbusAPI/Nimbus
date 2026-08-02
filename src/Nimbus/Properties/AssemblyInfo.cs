@@ -15,4 +15,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Nimbus.Transports.Postgres")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.Nats")]
 [assembly: InternalsVisibleTo("Nimbus.Transports.RabbitMQ")]
+[assembly: InternalsVisibleTo("Nimbus.Extensions.Pulse")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2", AllInternalsVisible = true)]

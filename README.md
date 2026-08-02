@@ -14,6 +14,7 @@ Nimbus is a .NET messaging framework that provides a clean abstraction over mult
 | SQL Server           | `Nimbus.Transports.SqlServer`       |
 | AMQP                 | `Nimbus.Transports.AMQP`            |
 | Nats                 | `Nimbus.Transports.Nats`            |
+| RabbitMQ / LavinMQ   | `Nimbus.Transports.RabbitMQ`        |
 | In-Process (testing) | `Nimbus.Transports.InProcess`       |
 
 ## Message Patterns

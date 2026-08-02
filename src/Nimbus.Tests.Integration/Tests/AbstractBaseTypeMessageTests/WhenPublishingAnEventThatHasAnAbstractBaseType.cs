@@ -14,6 +14,7 @@ namespace Nimbus.Tests.Integration.Tests.AbstractBaseTypeMessageTests
 {
     [TestFixture]
     [FilterTestCasesBy(typeof(InProcessScenariosFilter))]
+    [AllowNoTestCases("Abstract base types are only supported by the InProcess transport, so this fixture generates nothing when another transport is selected.")]
     public class WhenPublishingAnEventThatHasAnAbstractBaseType : TestForBus
     {
         protected override async Task When()
