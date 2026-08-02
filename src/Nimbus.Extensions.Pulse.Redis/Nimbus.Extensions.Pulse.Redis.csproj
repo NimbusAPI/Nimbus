@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Nimbus\Nimbus.csproj"/>
+        <ProjectReference Include="..\Nimbus.Extensions.Pulse\Nimbus.Extensions.Pulse.csproj"/>
+        <ProjectReference Include="..\Nimbus.InfrastructureContracts\Nimbus.InfrastructureContracts.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="StackExchange.Redis" Version="2.8.0"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <Version>1.0.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Redis-backed occurrence coordinator for Nimbus Pulse. Ensures a scheduled message fires once across all instances of an application, regardless of which transport the bus uses.</Description>
+        <PackageTags>nimbus;messaging;pulse;cron;scheduling;redis</PackageTags>
+    </PropertyGroup>
+</Project>

@@ -1,31 +1,47 @@
 using System;
-using System.Linq;
-using Cronos;
 using Nimbus.Configuration;
-using Nimbus.MessageContracts;
 
 namespace Nimbus.Extensions.Pulse.Configuration
 {
     public static class BusBuilderConfigurationPulseExtensions
     {
+        /// <summary>
+        ///     Configures cron schedules, optionally naming them.
+        /// </summary>
+        /// <example>
+        ///     <code>
+        ///     .WithPulse(p => p.Add("0 3 * * *", new NightlyRollupCommand())
+        ///                      .Add("0 4 * * *", new NightlyRollupCommand(), name: "rollup-retry")
+        ///                      .Add("*/30 * * * * *", new HeartbeatCommand()))
+        ///     </code>
+        ///     Five-field expressions are minute-resolution; a six-field expression adds a leading
+        ///     seconds field.
+        /// </example>
+        public static PulseEnabledBusBuilderConfiguration WithPulse(
+            this BusBuilderConfiguration config,
+            Action<PulseScheduleCollection> configureSchedules)
+        {
+            if (configureSchedules == null) throw new ArgumentNullException(nameof(configureSchedules));
+
+            var schedules = new PulseScheduleCollection();
+            configureSchedules(schedules);
+
+            return new PulseEnabledBusBuilderConfiguration(config, schedules.Build());
+        }
+
+        /// <summary>
+        ///     Configures cron schedules whose names are derived from the message type and cron
+        ///     expression. Use the <see cref="PulseScheduleCollection" /> overload if you need to name one.
+        /// </summary>
         public static PulseEnabledBusBuilderConfiguration WithPulse(
             this BusBuilderConfiguration config,
             params (string cronExpression, object message)[] schedules)
         {
-            var entries = schedules.Select(s =>
-            {
-                if (s.message is not IBusCommand && s.message is not IBusEvent)
-                    throw new ArgumentException(
-                        $"Pulse message '{s.message.GetType().Name}' must implement either IBusCommand or IBusEvent.",
-                        nameof(schedules));
-
-                return new PulseScheduleEntry(
-                    CronExpression.Parse(s.cronExpression),
-                    s.message,
-                    s.message is IBusCommand);
-            }).ToArray();
-
-            return new PulseEnabledBusBuilderConfiguration(config, entries);
+            return config.WithPulse(p =>
+                                    {
+                                        foreach (var schedule in schedules)
+                                            p.Add(schedule.cronExpression, schedule.message);
+                                    });
         }
     }
 }
