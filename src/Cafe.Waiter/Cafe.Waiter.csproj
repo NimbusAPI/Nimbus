@@ -18,6 +18,8 @@
     <ProjectReference Include="..\Nimbus.Transports.AzureServiceBus\Nimbus.Transports.AzureServiceBus.csproj" />
     <ProjectReference Include="..\Nimbus.Transports.Redis\Nimbus.Transports.Redis.csproj" />
     <ProjectReference Include="..\Nimbus.Transports.Nats\Nimbus.Transports.Nats.csproj" />
+    <ProjectReference Include="..\Nimbus.Extensions.Pulse\Nimbus.Extensions.Pulse.csproj" />
+    <ProjectReference Include="..\Nimbus.Extensions.Pulse.Redis\Nimbus.Extensions.Pulse.Redis.csproj" />
     <ProjectReference Include="..\Nimbus\Nimbus.csproj" />
     <ProjectReference Include="..\Cafe.Messages\Cafe.Messages.csproj" />
   </ItemGroup>

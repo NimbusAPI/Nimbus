@@ -3,6 +3,7 @@ using Autofac;
 using Cafe.Messages;
 using Nimbus.Configuration;
 using Nimbus.Extensions.Pulse.Configuration;
+using Nimbus.Extensions.Pulse.Redis.Configuration;
 using Nimbus.Infrastructure;
 using Nimbus.InfrastructureContracts;
 using Nimbus.LargeMessages.Azure.Client;
@@ -71,6 +72,8 @@ namespace Waiter.Modules
                                                  .WithSerilogLogger()
                                                  .WithJsonSerializer()
                                                  .WithPulse(("*/5 * * * *", new CleanTheTablesCommand()))
+                                                 .WithRedisCoordinator("localhost:6379")
+                                                     
                                                  
 //                                                 .WithGlobalInboundInterceptorTypes(typeof(CorrelationIdInterceptor))
                                                  .Build())
