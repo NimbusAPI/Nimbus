@@ -55,9 +55,15 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _logger.Debug("Redis notification received in receiver for {RedisKey}", _redisKey);
             _receiveSemaphore.Release();
         }
+        
+        protected virtual void OnPoll()
+        {
+        }
 
         protected override async Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
+            OnPoll();
+            
             if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(_redisPollInterval, cancellationToken).ConfigureAwaitFalse();
 
             var database = _databaseFunc();

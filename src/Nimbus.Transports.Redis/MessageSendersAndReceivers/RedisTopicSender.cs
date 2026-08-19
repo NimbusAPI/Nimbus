@@ -27,18 +27,28 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
 
             var subscribersRedisKey = Subscription.TopicSubscribersRedisKeyFor(_topicPath);
             var subscribers = database.SetMembers(subscribersRedisKey)
-                                      .Select(s => s.ToString())
-                                      .ToArray();
+                .Select(s => s.ToString())
+                .ToArray();
 
             await subscribers
                 .Select(subscriberPath => Task.Run(() =>
-                                                   {
-                                                       var clone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
-                                                       clone.DeliverTo = subscriberPath;
-                                                       var serialized = _serializer.Serialize(clone);
-                                                       database.ListRightPush(subscriberPath, serialized);
-                                                       database.Publish(subscriberPath, string.Empty);
-                                                   }).ConfigureAwaitFalse())
+                {
+                    
+                    var aliveKey = Subscription.SubscriberAliveRedisKeyFor(subscriberPath);
+                    if (!database.KeyExists(aliveKey))
+                    {
+                        database.SetRemove(subscribersRedisKey, subscriberPath);
+                        database.KeyDelete(subscriberPath);
+                        return;
+                    }
+                    
+                    var clone = (NimbusMessage)_serializer.Deserialize(_serializer.Serialize(message),
+                        typeof(NimbusMessage));
+                    clone.DeliverTo = subscriberPath;
+                    var serialized = _serializer.Serialize(clone);
+                    database.ListRightPush(subscriberPath, serialized);
+                    database.Publish(subscriberPath, string.Empty);
+                }).ConfigureAwaitFalse())
                 .WhenAll();
         }
     }

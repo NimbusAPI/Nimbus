@@ -34,8 +34,7 @@ namespace Barista.Modules
                                                  //     )
 
                                                  // Redis Transport
-                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("bus.iymtwr.0001.apse2.cache.amazonaws.com"))
-                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost")).WithAutoDeleteOnIdle(TimeSpan.FromMinutes(10))
 
                                                  // ActiveMQ Transport
                                                  //.WithTransport(new AMQPTransportConfiguration()
@@ -53,10 +52,10 @@ namespace Barista.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // NATS Transport
-                                                 .WithTransport(new NatsTransportConfiguration()
-                                                     .WithUrl("nats://localhost:4222")
-                                                     .WithCredentials("admin", "password")
-                                                     .WithJetStream())
+                                                 // .WithTransport(new NatsTransportConfiguration()
+                                                 //     .WithUrl("nats://localhost:4222")
+                                                 //     .WithCredentials("admin", "password")
+                                                 //     .WithJetStream())
 
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
