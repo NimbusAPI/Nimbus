@@ -54,6 +54,7 @@ namespace Nimbus.Transports.Redis
             container.RegisterType<RedisDelayedDeliveryService>(ComponentLifetime.SingleInstance, typeof (IDelayedDeliveryService));
             container.RegisterType<RedisDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof (IDeadLetterOffice));
             container.RegisterType<NamespaceCleanser>(ComponentLifetime.SingleInstance, typeof (INamespaceCleanser));
+            container.RegisterType<RedisIdleSubscriptionReaper>(ComponentLifetime.SingleInstance);
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof (ILargeMessageBodyStore));
 
             container.RegisterType<RedisTransport>(ComponentLifetime.SingleInstance, typeof (INimbusTransport));
