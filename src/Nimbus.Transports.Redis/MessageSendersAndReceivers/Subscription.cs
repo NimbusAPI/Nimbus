@@ -8,6 +8,7 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         public string SubscriptionName { get; }
         public string TopicSubscribersRedisKey { get; }
         public string SubscriptionMessagesRedisKey { get; }
+        public string SubscriberAliveRedisKey { get; }
 
         public Subscription(string topicPath, string subscriptionName)
         {
@@ -15,11 +16,17 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             SubscriptionName = subscriptionName;
             TopicSubscribersRedisKey = TopicSubscribersRedisKeyFor(topicPath);
             SubscriptionMessagesRedisKey = $"{topicPath}.{subscriptionName}";
+            SubscriberAliveRedisKey = SubscriberAliveRedisKeyFor(SubscriptionMessagesRedisKey);
         }
 
         public static string TopicSubscribersRedisKeyFor(string topicPath)
         {
             return $"{SubscriptionsPrefix}.{topicPath}";
+        }
+
+        public static string SubscriberAliveRedisKeyFor(string subscriptionMessagesRedisKey)
+        {
+            return $"{subscriptionMessagesRedisKey}.alive";
         }
     }
 }

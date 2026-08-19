@@ -33,6 +33,16 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             await subscribers
                 .Select(subscriberPath => Task.Run(() =>
                                                    {
+                                                       // A dead subscriber's liveness key has expired but its Set membership hasn't
+                                                       // been reaped yet. Don't push another message into a list nobody will ever read.
+                                                       var aliveKey = Subscription.SubscriberAliveRedisKeyFor(subscriberPath);
+                                                       if (!database.KeyExists(aliveKey))
+                                                       {
+                                                           database.SetRemove(subscribersRedisKey, subscriberPath);
+                                                           database.KeyDelete(subscriberPath);
+                                                           return;
+                                                       }
+
                                                        var clone = (NimbusMessage) _serializer.Deserialize(_serializer.Serialize(message), typeof (NimbusMessage));
                                                        clone.DeliverTo = subscriberPath;
                                                        var serialized = _serializer.Serialize(clone);

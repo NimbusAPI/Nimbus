@@ -59,10 +59,16 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _receiveSemaphore.Release();
         }
 
+        protected virtual void OnPoll()
+        {
+        }
+
         protected override Task<NimbusMessage> Fetch(CancellationToken cancellationToken)
         {
             return Task.Run(async () =>
                                   {
+                                      OnPoll();
+
                                       if (_haveFetchedAllPreExistingMessages) await _receiveSemaphore.WaitAsync(_redisPollInterval, cancellationToken);
 
                                       var database = _databaseFunc();

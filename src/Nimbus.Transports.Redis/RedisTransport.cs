@@ -1,27 +1,37 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.Redis.ConnectionManagement;
 using Nimbus.Transports.Redis.MessageSendersAndReceivers;
+using Nimbus.Transports.Redis.QueueManagement;
 
 namespace Nimbus.Transports.Redis
 {
-    internal class RedisTransport : INimbusTransport
+    internal class RedisTransport : INimbusTransport, IDisposable
     {
         private readonly PoorMansIoC _container;
         private readonly ConnectionMultiplexerFactory _connectionMultiplexerFactory;
+        private readonly RedisIdleSubscriptionReaper _idleSubscriptionReaper;
 
-        public RedisTransport(PoorMansIoC container, ConnectionMultiplexerFactory connectionMultiplexerFactory)
+        public RedisTransport(PoorMansIoC container, ConnectionMultiplexerFactory connectionMultiplexerFactory, RedisIdleSubscriptionReaper idleSubscriptionReaper)
         {
             _container = container;
             _connectionMultiplexerFactory = connectionMultiplexerFactory;
+            _idleSubscriptionReaper = idleSubscriptionReaper;
         }
 
-        public Task TestConnection()
+        public async Task TestConnection()
         {
-            return _connectionMultiplexerFactory.TestConnection();
+            await _connectionMultiplexerFactory.TestConnection();
+            _idleSubscriptionReaper.Start();
+        }
+
+        public void Dispose()
+        {
+            _idleSubscriptionReaper.Dispose();
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)

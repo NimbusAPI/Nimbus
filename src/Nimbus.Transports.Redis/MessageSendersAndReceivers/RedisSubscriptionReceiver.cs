@@ -13,6 +13,12 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
         private readonly Subscription _subscription;
         private readonly Func<IDatabase> _databaseFunc;
         private readonly IRetry _retry;
+        private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
+
+        // Refreshed well inside the TTL so a receiver never sits an entire heartbeat interval away
+        // from expiry — a missed poll or two shouldn't be enough to make a live subscriber look dead.
+        private readonly TimeSpan _heartbeatRefreshInterval;
+        private DateTime _nextHeartbeatRefreshUtc = DateTime.MinValue;
 
         public RedisSubscriptionReceiver(Subscription subscription,
                                          Func<ConnectionMultiplexer> connectionMultiplexerFunc,
@@ -21,7 +27,8 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
                                          ConcurrentHandlerLimitSetting concurrentHandlerLimit,
                                          IGlobalHandlerThrottle globalHandlerThrottle,
                                          ILogger logger,
-                                         IRetry retry)
+                                         IRetry retry,
+                                         AutoDeleteOnIdleSetting autoDeleteOnIdle)
             : base(
                 subscription.SubscriptionMessagesRedisKey,
                 connectionMultiplexerFunc,
@@ -34,13 +41,30 @@ namespace Nimbus.Transports.Redis.MessageSendersAndReceivers
             _subscription = subscription;
             _databaseFunc = databaseFunc;
             _retry = retry;
+            _autoDeleteOnIdle = autoDeleteOnIdle;
+            _heartbeatRefreshInterval = TimeSpan.FromTicks(autoDeleteOnIdle.Value.Ticks/4);
         }
 
         protected override async Task WarmUp()
         {
             var database = _databaseFunc();
             _retry.Do(() => database.SetAdd(_subscription.TopicSubscribersRedisKey, _subscription.SubscriptionMessagesRedisKey));
+            RefreshHeartbeat(database);
             await base.WarmUp();
+        }
+
+        protected override void OnPoll()
+        {
+            var now = DateTime.UtcNow;
+            if (now < _nextHeartbeatRefreshUtc) return;
+
+            RefreshHeartbeat(_databaseFunc());
+            _nextHeartbeatRefreshUtc = now + _heartbeatRefreshInterval;
+        }
+
+        private void RefreshHeartbeat(IDatabase database)
+        {
+            _retry.Do(() => database.StringSet(_subscription.SubscriberAliveRedisKey, true, _autoDeleteOnIdle.Value));
         }
     }
 }

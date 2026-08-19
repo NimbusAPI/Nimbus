@@ -33,8 +33,8 @@ namespace Barista.Modules
                                                  //     )
 
                                                  // Redis Transport
-                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("bus.iymtwr.0001.apse2.cache.amazonaws.com"))
-                                                 //.WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+                                                 .WithTransport(new RedisTransportConfiguration().WithConnectionString("localhost"))
+                                                 .WithAutoDeleteOnIdle(TimeSpan.FromMinutes(5))
 
                                                  // ActiveMQ Transport
                                                  //.WithTransport(new AMQPTransportConfiguration()
@@ -47,10 +47,10 @@ namespace Barista.Modules
                                                  //    .WithAutoCreateSchema())
 
                                                  // Postgres Transport
-                                                 .WithTransport(new PostgresTransportConfiguration()
-                                                     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
-                                                     .WithAutoCreateSchema())
-
+                                                 // .WithTransport(new PostgresTransportConfiguration()
+                                                 //     .WithConnectionString("Host=localhost;Port=5432;Database=nimbus;Username=nimbus;Password=Nimbus_Dev_123!")
+                                                 //     .WithAutoCreateSchema())
+                                                 
                                                  .WithNames("Barista", Environment.MachineName)
                                                  .WithTypesFrom(handlerTypesProvider)
                                                  .WithAutofacDefaults(componentContext)
