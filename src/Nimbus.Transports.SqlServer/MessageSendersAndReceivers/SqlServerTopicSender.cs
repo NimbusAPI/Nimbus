@@ -3,6 +3,7 @@ using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 
@@ -13,18 +14,23 @@ namespace Nimbus.Transports.SqlServer.MessageSendersAndReceivers
         private readonly string _topicPath;
         private readonly SqlServerTransportConfiguration _configuration;
         private readonly ISerializer _serializer;
+        private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
 
         // Fan-out: one INSERT per subscriber, each with a fresh GUID, all in one atomic statement.
         // NEWID() is evaluated per row, so every subscriber gets a unique MessageId.
         // Filters in NimbusSubscriptions are not evaluated yet (Phase 1 delivers to all subscribers).
+        // Subscriptions whose heartbeat has lapsed are skipped so we don't write messages nobody will read;
+        // SqlServerIdleSubscriptionReaper removes them (and anything already queued for them) later.
         private const string FanOutSql = @"
             INSERT INTO NimbusMessages (MessageId, Destination, Body, VisibleAfter, ExpiresAt)
             SELECT NEWID(), SubscriberQueue, @Body, @VisibleAfter, @ExpiresAt
             FROM NimbusSubscriptions
-            WHERE TopicName = @TopicName";
+            WHERE TopicName = @TopicName
+              AND LastSeenAt > DATEADD(SECOND, -@IdleTimeoutSeconds, SYSUTCDATETIME())";
 
-        public SqlServerTopicSender(string topicPath, SqlServerTransportConfiguration configuration, ISerializer serializer)
+        public SqlServerTopicSender(string topicPath, SqlServerTransportConfiguration configuration, ISerializer serializer, AutoDeleteOnIdleSetting autoDeleteOnIdle)
         {
+            _autoDeleteOnIdle = autoDeleteOnIdle;
             _topicPath = topicPath;
             _configuration = configuration;
             _serializer = serializer;
@@ -44,6 +50,7 @@ namespace Nimbus.Transports.SqlServer.MessageSendersAndReceivers
 
             using var command = new SqlCommand(FanOutSql, connection);
             command.Parameters.Add("@TopicName", SqlDbType.NVarChar, 255).Value = _topicPath;
+            command.Parameters.Add("@IdleTimeoutSeconds", SqlDbType.Int).Value = (int) _autoDeleteOnIdle.Value.TotalSeconds;
             command.Parameters.Add("@Body", SqlDbType.VarBinary, -1).Value = body;
             command.Parameters.Add("@VisibleAfter", SqlDbType.DateTime2).Value = visibleAfter;
             command.Parameters.Add("@ExpiresAt", SqlDbType.DateTime2).Value = (object) message.ExpiresAfter.UtcDateTime ?? DBNull.Value;

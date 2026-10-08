@@ -24,9 +24,15 @@ BEGIN
     (
         TopicName       NVARCHAR(255) NOT NULL,
         SubscriberQueue NVARCHAR(255) NOT NULL,
+        LastSeenAt      DATETIME2     NOT NULL CONSTRAINT DF_NimbusSubscriptions_LastSeenAt DEFAULT SYSUTCDATETIME(),
         CONSTRAINT PK_NimbusSubscriptions PRIMARY KEY (TopicName, SubscriberQueue)
     );
 END
+
+-- Added for idle subscription cleanup; upgrades tables created by earlier versions.
+IF COL_LENGTH('dbo.NimbusSubscriptions', 'LastSeenAt') IS NULL
+    ALTER TABLE dbo.NimbusSubscriptions
+        ADD LastSeenAt DATETIME2 NOT NULL CONSTRAINT DF_NimbusSubscriptions_LastSeenAt DEFAULT SYSUTCDATETIME();
 
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'NimbusDeadLetters' AND schema_id = SCHEMA_ID('dbo'))
 BEGIN

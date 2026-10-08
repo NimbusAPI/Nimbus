@@ -51,6 +51,7 @@ namespace Nimbus.Transports.Postgres
             container.RegisterType<PostgresDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
             container.RegisterType<PostgresNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             container.RegisterType<PostgresSchemaCreator>(ComponentLifetime.SingleInstance);
+            container.RegisterType<PostgresIdleSubscriptionReaper>(ComponentLifetime.SingleInstance);
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof(ILargeMessageBodyStore));
 
             container.RegisterType<PostgresTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));

@@ -1,22 +1,27 @@
+using System;
 using System.Threading.Tasks;
 using Nimbus.Configuration.PoorMansIocContainer;
 using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.Postgres.MessageSendersAndReceivers;
+using Nimbus.Transports.Postgres.QueueManagement;
 using Nimbus.Transports.Postgres.Schema;
 using Npgsql;
 
 namespace Nimbus.Transports.Postgres
 {
-    internal class PostgresTransport : INimbusTransport
+    internal class PostgresTransport : INimbusTransport, IDisposable
     {
         private readonly PoorMansIoC _container;
         private readonly PostgresTransportConfiguration _configuration;
         private readonly PostgresSchemaCreator _schemaCreator;
+        private readonly PostgresIdleSubscriptionReaper _idleSubscriptionReaper;
 
-        public PostgresTransport(PoorMansIoC container, PostgresTransportConfiguration configuration, PostgresSchemaCreator schemaCreator)
+        public PostgresTransport(PoorMansIoC container, PostgresTransportConfiguration configuration, PostgresSchemaCreator schemaCreator,
+                                 PostgresIdleSubscriptionReaper idleSubscriptionReaper)
         {
+            _idleSubscriptionReaper = idleSubscriptionReaper;
             _container = container;
             _configuration = configuration;
             _schemaCreator = schemaCreator;
@@ -29,6 +34,8 @@ namespace Nimbus.Transports.Postgres
 
             if (_configuration.AutoCreateSchema)
                 await _schemaCreator.EnsureSchemaExists();
+
+            _idleSubscriptionReaper.Start();
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -50,6 +57,11 @@ namespace Nimbus.Transports.Postgres
         {
             var subscription = new PostgresSubscription(topicPath, subscriptionName);
             return _container.ResolveWithOverrides<PostgresTopicReceiver>(subscription);
+        }
+
+        public void Dispose()
+        {
+            _idleSubscriptionReaper.Dispose();
         }
     }
 }

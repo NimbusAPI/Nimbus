@@ -16,8 +16,12 @@ CREATE INDEX IF NOT EXISTS ix_nimbus_messages_dequeue
 CREATE TABLE IF NOT EXISTS nimbus_subscriptions (
     topic_name       TEXT NOT NULL,
     subscriber_queue TEXT NOT NULL,
+    last_seen_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT pk_nimbus_subscriptions PRIMARY KEY (topic_name, subscriber_queue)
 );
+
+-- Added for idle subscription cleanup; upgrades tables created by earlier versions.
+ALTER TABLE nimbus_subscriptions ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
 CREATE TABLE IF NOT EXISTS nimbus_dead_letters (
     message_id           UUID        NOT NULL,

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Nimbus.Configuration.PoorMansIocContainer;
@@ -5,18 +6,22 @@ using Nimbus.Infrastructure;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.SqlServer.MessageSendersAndReceivers;
+using Nimbus.Transports.SqlServer.QueueManagement;
 using Nimbus.Transports.SqlServer.Schema;
 
 namespace Nimbus.Transports.SqlServer
 {
-    internal class SqlServerTransport : INimbusTransport
+    internal class SqlServerTransport : INimbusTransport, IDisposable
     {
         private readonly PoorMansIoC _container;
         private readonly SqlServerTransportConfiguration _configuration;
         private readonly SqlServerSchemaCreator _schemaCreator;
+        private readonly SqlServerIdleSubscriptionReaper _idleSubscriptionReaper;
 
-        public SqlServerTransport(PoorMansIoC container, SqlServerTransportConfiguration configuration, SqlServerSchemaCreator schemaCreator)
+        public SqlServerTransport(PoorMansIoC container, SqlServerTransportConfiguration configuration, SqlServerSchemaCreator schemaCreator,
+                                  SqlServerIdleSubscriptionReaper idleSubscriptionReaper)
         {
+            _idleSubscriptionReaper = idleSubscriptionReaper;
             _container = container;
             _configuration = configuration;
             _schemaCreator = schemaCreator;
@@ -29,6 +34,8 @@ namespace Nimbus.Transports.SqlServer
 
             if (_configuration.AutoCreateSchema)
                 await _schemaCreator.EnsureSchemaExists();
+
+            _idleSubscriptionReaper.Start();
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
@@ -50,6 +57,11 @@ namespace Nimbus.Transports.SqlServer
         {
             var subscription = new SqlServerSubscription(topicPath, subscriptionName);
             return _container.ResolveWithOverrides<SqlServerTopicReceiver>(subscription);
+        }
+
+        public void Dispose()
+        {
+            _idleSubscriptionReaper.Dispose();
         }
     }
 }

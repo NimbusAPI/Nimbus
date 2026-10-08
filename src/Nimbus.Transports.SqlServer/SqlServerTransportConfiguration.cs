@@ -51,6 +51,7 @@ namespace Nimbus.Transports.SqlServer
             container.RegisterType<SqlServerDeadLetterOffice>(ComponentLifetime.SingleInstance, typeof(IDeadLetterOffice));
             container.RegisterType<SqlServerNamespaceCleanser>(ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             container.RegisterType<SqlServerSchemaCreator>(ComponentLifetime.SingleInstance);
+            container.RegisterType<SqlServerIdleSubscriptionReaper>(ComponentLifetime.SingleInstance);
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof(ILargeMessageBodyStore));
 
             container.RegisterType<SqlServerTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));
