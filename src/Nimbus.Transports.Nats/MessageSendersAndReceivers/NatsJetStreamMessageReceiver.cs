@@ -26,6 +26,12 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
         protected abstract string ConsumerName { get; }
         protected abstract StreamConfigRetention StreamRetention { get; }
 
+        // When set, the server deletes the consumer once nothing has pulled from it for this long.
+        protected virtual TimeSpan? ConsumerInactiveThreshold => null;
+
+        // When set, the server discards messages older than this from the stream.
+        protected virtual TimeSpan? StreamMaxAge => null;
+
         protected NatsJetStreamMessageReceiver(
             NatsJetStreamContextFactory jsContextFactory,
             ISerializer serializer,
@@ -46,7 +52,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
             // SingleWriter = false: multiple consumer loops (main + retry) write concurrently.
             _channel = Channel.CreateUnbounded<NimbusMessage>(new UnboundedChannelOptions { SingleWriter = false });
 
-            await _jsContextFactory.EnsureStreamAsync(StreamName, Subject, StreamRetention);
+            await _jsContextFactory.EnsureStreamAsync(StreamName, Subject, StreamRetention, StreamMaxAge);
             _mainConsumer = await _jsContextFactory.EnsureConsumerAsync(StreamName, new ConsumerConfig
             {
                 Name = ConsumerName,
@@ -54,6 +60,7 @@ namespace Nimbus.Transports.Nats.MessageSendersAndReceivers
                 FilterSubject = Subject,
                 AckPolicy = ConsumerConfigAckPolicy.Explicit,
                 DeliverPolicy = ConsumerConfigDeliverPolicy.All,
+                InactiveThreshold = ConsumerInactiveThreshold ?? default,
             });
 
             await OnWarmingUp();

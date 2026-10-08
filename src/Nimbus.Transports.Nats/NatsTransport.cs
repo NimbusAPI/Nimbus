@@ -4,14 +4,16 @@ using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts.Filtering.Conditions;
 using Nimbus.Transports.Nats.ConnectionManagement;
 using Nimbus.Transports.Nats.MessageSendersAndReceivers;
+using Nimbus.Transports.Nats.QueueManagement;
 
 namespace Nimbus.Transports.Nats
 {
-    internal class NatsTransport : INimbusTransport
+    internal class NatsTransport : INimbusTransport, IDisposable
     {
         private readonly PoorMansIoC _container;
         private readonly NatsConnectionFactory _connectionFactory;
         private readonly bool _isJetStream;
+        private NatsJetStreamRetryStreamReaper? _retryStreamReaper;
 
         public NatsTransport(PoorMansIoC container, NatsConnectionFactory connectionFactory, NatsTransportConfiguration config)
         {
@@ -20,9 +22,20 @@ namespace Nimbus.Transports.Nats
             _isJetStream = config.IsJetStream;
         }
 
-        public Task TestConnection()
+        public async Task TestConnection()
         {
-            return _connectionFactory.TestConnection();
+            await _connectionFactory.TestConnection();
+
+            if (_isJetStream)
+            {
+                _retryStreamReaper = _container.Resolve<NatsJetStreamRetryStreamReaper>();
+                _retryStreamReaper.Start();
+            }
+        }
+
+        public void Dispose()
+        {
+            _retryStreamReaper?.Dispose();
         }
 
         public INimbusMessageSender GetQueueSender(string queuePath)
