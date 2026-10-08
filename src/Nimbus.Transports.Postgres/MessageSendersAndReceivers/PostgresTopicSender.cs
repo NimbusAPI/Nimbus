@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.MessageSendersAndReceivers;
 using Nimbus.InfrastructureContracts;
 using Npgsql;
@@ -13,17 +14,22 @@ namespace Nimbus.Transports.Postgres.MessageSendersAndReceivers
         private readonly string _topicPath;
         private readonly PostgresTransportConfiguration _configuration;
         private readonly ISerializer _serializer;
+        private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
 
         // Fan-out: one INSERT per subscriber, each with a fresh UUID, all in one atomic statement.
         // gen_random_uuid() is evaluated per row, so every subscriber gets a unique message_id.
+        // Subscriptions whose heartbeat has lapsed are skipped so we don't write messages nobody will read;
+        // PostgresIdleSubscriptionReaper removes them (and anything already queued for them) later.
         private const string FanOutSql = @"
             INSERT INTO nimbus_messages (message_id, destination, body, visible_after, expires_at)
             SELECT gen_random_uuid(), subscriber_queue, @body, @visible_after, @expires_at
             FROM   nimbus_subscriptions
-            WHERE  topic_name = @topic_name";
+            WHERE  topic_name = @topic_name
+              AND  last_seen_at > now() - @idle_timeout";
 
-        public PostgresTopicSender(string topicPath, PostgresTransportConfiguration configuration, ISerializer serializer)
+        public PostgresTopicSender(string topicPath, PostgresTransportConfiguration configuration, ISerializer serializer, AutoDeleteOnIdleSetting autoDeleteOnIdle)
         {
+            _autoDeleteOnIdle = autoDeleteOnIdle;
             _topicPath = topicPath;
             _configuration = configuration;
             _serializer = serializer;
@@ -43,6 +49,7 @@ namespace Nimbus.Transports.Postgres.MessageSendersAndReceivers
 
             using var command = new NpgsqlCommand(FanOutSql, connection);
             command.Parameters.Add("@topic_name", NpgsqlDbType.Text).Value = _topicPath;
+            command.Parameters.Add("@idle_timeout", NpgsqlDbType.Interval).Value = _autoDeleteOnIdle.Value;
             command.Parameters.Add("@body", NpgsqlDbType.Bytea).Value = body;
             command.Parameters.Add("@visible_after", NpgsqlDbType.TimestampTz).Value = visibleAfter;
             command.Parameters.Add("@expires_at", NpgsqlDbType.TimestampTz).Value = (object) message.ExpiresAfter.UtcDateTime ?? DBNull.Value;

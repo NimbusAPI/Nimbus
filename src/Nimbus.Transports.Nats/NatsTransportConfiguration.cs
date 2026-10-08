@@ -66,6 +66,7 @@ namespace Nimbus.Transports.Nats
             if (IsJetStream)
             {
                 container.RegisterType<NatsJetStreamContextFactory>(ComponentLifetime.SingleInstance);
+                container.RegisterType<NatsJetStreamRetryStreamReaper>(ComponentLifetime.SingleInstance);
                 container.RegisterType<NatsJetStreamQueueSender>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsJetStreamQueueReceiver>(ComponentLifetime.InstancePerDependency);
                 container.RegisterType<NatsJetStreamTopicSender>(ComponentLifetime.InstancePerDependency);

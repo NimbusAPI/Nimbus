@@ -43,7 +43,7 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
             await ctx.PublishAsync(subject, data, headers: headers, cancellationToken: ct);
         }
 
-        public async Task EnsureStreamAsync(string streamName, string subject, StreamConfigRetention retention = StreamConfigRetention.Limits, CancellationToken ct = default)
+        public async Task EnsureStreamAsync(string streamName, string subject, StreamConfigRetention retention = StreamConfigRetention.Limits, TimeSpan? maxAge = null, CancellationToken ct = default)
         {
             if (_ensuredStreams.ContainsKey(streamName)) return;
             var streamLock = _streamLocks.GetOrAdd(streamName, _ => new SemaphoreSlim(1, 1));
@@ -58,6 +58,7 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
                     Subjects = [subject, subject + ".sched"],
                     AllowMsgSchedules = true,
                     Retention = retention,
+                    MaxAge = maxAge ?? default,
                 }, ct);
                 _ensuredStreams.TryAdd(streamName, 0);
             }
@@ -106,6 +107,22 @@ namespace Nimbus.Transports.Nats.ConnectionManagement
         {
             var ctx = await GetContextAsync(ct);
             return await ctx.GetStreamAsync(streamName, cancellationToken: ct);
+        }
+
+        public async Task DeleteStreamAsync(string streamName, CancellationToken ct = default)
+        {
+            var ctx = await GetContextAsync(ct);
+            await ctx.DeleteStreamAsync(streamName, ct);
+            _ensuredStreams.TryRemove(streamName, out _);
+        }
+
+        public async Task<IReadOnlyList<StreamInfo>> ListStreamsAsync(CancellationToken ct = default)
+        {
+            var ctx = await GetContextAsync(ct);
+            var streams = new List<StreamInfo>();
+            await foreach (var stream in ctx.ListStreamsAsync(cancellationToken: ct))
+                streams.Add(stream.Info);
+            return streams;
         }
 
         public async Task DeleteAllStreamsAsync(CancellationToken ct = default)
