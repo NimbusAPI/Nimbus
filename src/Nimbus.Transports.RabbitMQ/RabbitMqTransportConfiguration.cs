@@ -70,8 +70,9 @@ namespace Nimbus.Transports.RabbitMQ
             container.RegisterType<RabbitMqQueueReceiver>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<RabbitMqTopicSender>(ComponentLifetime.InstancePerDependency);
             container.RegisterType<RabbitMqTopicReceiver>(ComponentLifetime.InstancePerDependency);
+            container.RegisterType<RabbitMqSubscriptionRetrySender>(ComponentLifetime.InstancePerDependency);
 
-            container.Register(c => new RabbitMqDelayedDeliveryService(c.Resolve<INimbusTransport>(), c.Resolve<ILogger>()),
+            container.Register(c => new RabbitMqDelayedDeliveryService(c.Resolve<RabbitMqTransport>(), c.Resolve<ILogger>()),
                                ComponentLifetime.SingleInstance, typeof(IDelayedDeliveryService));
             container.Register(c => new RabbitMqDeadLetterOffice(
                                    c.Resolve<INimbusTransport>(),
@@ -83,7 +84,7 @@ namespace Nimbus.Transports.RabbitMQ
                                ComponentLifetime.SingleInstance, typeof(INamespaceCleanser));
             container.RegisterType<UnsupportedLargeMessageBodyStore>(ComponentLifetime.SingleInstance, typeof(ILargeMessageBodyStore));
 
-            container.RegisterType<RabbitMqTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport));
+            container.RegisterType<RabbitMqTransport>(ComponentLifetime.SingleInstance, typeof(INimbusTransport), typeof(RabbitMqTransport));
         }
 
         public override IEnumerable<string> Validate()

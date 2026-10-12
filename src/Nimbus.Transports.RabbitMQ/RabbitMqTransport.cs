@@ -18,6 +18,7 @@ namespace Nimbus.Transports.RabbitMQ
         private readonly RabbitMqConnectionManager _connectionManager;
         private readonly ConcurrentDictionary<string, RabbitMqQueueSender> _queueSenders = new();
         private readonly ConcurrentDictionary<string, RabbitMqTopicSender> _topicSenders = new();
+        private readonly ConcurrentDictionary<string, RabbitMqSubscriptionRetrySender> _subscriptionRetrySenders = new();
         private bool _disposed;
 
         public RabbitMqTransport(PoorMansIoC container, ILogger logger, RabbitMqConnectionManager connectionManager)
@@ -36,6 +37,12 @@ namespace Nimbus.Transports.RabbitMQ
         {
             return _queueSenders.GetOrAdd(queuePath, path =>
                 _container.ResolveWithOverrides<RabbitMqQueueSender>(path));
+        }
+
+        public INimbusMessageSender GetSubscriptionRetrySender(string subscriptionName)
+        {
+            return _subscriptionRetrySenders.GetOrAdd(subscriptionName, name =>
+                _container.ResolveWithOverrides<RabbitMqSubscriptionRetrySender>(name));
         }
 
         public INimbusMessageReceiver GetQueueReceiver(string queuePath)
@@ -64,6 +71,9 @@ namespace Nimbus.Transports.RabbitMQ
                 try { sender.DisposeAsync().AsTask().GetAwaiter().GetResult(); } catch { /* ignore */ }
 
             foreach (var sender in _topicSenders.Values)
+                try { sender.DisposeAsync().AsTask().GetAwaiter().GetResult(); } catch { /* ignore */ }
+
+            foreach (var sender in _subscriptionRetrySenders.Values)
                 try { sender.DisposeAsync().AsTask().GetAwaiter().GetResult(); } catch { /* ignore */ }
 
             try { _connectionManager.DisposeAsync().AsTask().GetAwaiter().GetResult(); } catch { /* ignore */ }
