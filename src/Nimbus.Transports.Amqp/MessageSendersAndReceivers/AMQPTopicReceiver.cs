@@ -54,14 +54,8 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
 
             var selector = BuildMessageSelector(_filterCondition);
 
-            if (string.IsNullOrWhiteSpace(selector))
-            {
-                _consumer = await _session.CreateDurableConsumerAsync(topic, _durableSubscriptionName, null, false);
-            }
-            else
-            {
-                _consumer = await _session.CreateDurableConsumerAsync(topic, _durableSubscriptionName, selector, false);
-            }
+            _consumer = await _queueManager.CreateDurableConsumer(_session, topic, _durableSubscriptionName,
+                string.IsNullOrWhiteSpace(selector) ? null : selector);
 
             _logger.Info("Topic receiver for {TopicPath} with subscription {SubscriptionName} is ready",
                 _topicPath, _subscriptionName);
@@ -122,7 +116,7 @@ namespace Nimbus.Transports.AMQP.MessageSendersAndReceivers
 
                 try
                 {
-                    _consumer?.Close();
+                    if (_consumer != null) _queueManager.CloseDurableConsumer(_consumer);
                     _consumer?.Dispose();
                 }
                 catch (Exception ex)

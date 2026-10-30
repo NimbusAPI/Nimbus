@@ -11,6 +11,9 @@ namespace Nimbus.Transports.AMQP.ConnectionManagement
         private readonly NmsConnectionFactory _connectionFactory;
         private readonly ILogger _logger;
         private readonly SemaphoreSlim _connectionLock = new SemaphoreSlim(1, 1);
+        // NMS tracks durable subscriptions per connection in an unsynchronised HashSet, so durable consumers on the
+        // shared connection must be created and closed one at a time. Message pumps start in parallel, which races it.
+        private readonly SemaphoreSlim _durableSubscriptionLock = new SemaphoreSlim(1, 1);
         private IConnection _connection;
         private bool _disposed;
 
@@ -24,6 +27,32 @@ namespace Nimbus.Transports.AMQP.ConnectionManagement
         {
             var connection = await GetOrCreateConnection();
             return await connection.CreateSessionAsync(acknowledgementMode);
+        }
+
+        public async Task<IMessageConsumer> CreateDurableConsumer(ISession session, ITopic topic, string subscriptionName, string selector)
+        {
+            await _durableSubscriptionLock.WaitAsync();
+            try
+            {
+                return await session.CreateDurableConsumerAsync(topic, subscriptionName, selector, false);
+            }
+            finally
+            {
+                _durableSubscriptionLock.Release();
+            }
+        }
+
+        public void CloseDurableConsumer(IMessageConsumer consumer)
+        {
+            _durableSubscriptionLock.Wait();
+            try
+            {
+                consumer.Close();
+            }
+            finally
+            {
+                _durableSubscriptionLock.Release();
+            }
         }
 
         public async Task TestConnection()
@@ -72,6 +101,7 @@ namespace Nimbus.Transports.AMQP.ConnectionManagement
             }
 
             _connectionLock?.Dispose();
+            _durableSubscriptionLock?.Dispose();
         }
     }
 }

@@ -40,5 +40,15 @@ namespace Nimbus.Transports.AMQP.QueueManagement
         {
             return _connectionManager.CreateSession(acknowledgementMode);
         }
+
+        public Task<IMessageConsumer> CreateDurableConsumer(ISession session, ITopic topic, string subscriptionName, string selector)
+        {
+            return _connectionManager.CreateDurableConsumer(session, topic, subscriptionName, selector);
+        }
+
+        public void CloseDurableConsumer(IMessageConsumer consumer)
+        {
+            _connectionManager.CloseDurableConsumer(consumer);
+        }
     }
 }
