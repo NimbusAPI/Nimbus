@@ -12,7 +12,7 @@ namespace Nimbus.Transports.RabbitMQ.MessageSendersAndReceivers
     internal class RabbitMqTopicReceiver : RabbitMqReceiverBase
     {
         private readonly string _topicPath;
-        private readonly string _subscriptionName;
+        private readonly string _queueName;
         private readonly AutoDeleteOnIdleSetting _autoDeleteOnIdle;
 
         public RabbitMqTopicReceiver(RabbitMqSubscription subscription,
@@ -26,28 +26,28 @@ namespace Nimbus.Transports.RabbitMQ.MessageSendersAndReceivers
             : base(concurrentHandlerLimit, globalHandlerThrottle, connectionManager, messageConverter, logger)
         {
             _topicPath = subscription.TopicPath;
-            _subscriptionName = subscription.SubscriptionName;
+            _queueName = subscription.QueueName;
             _autoDeleteOnIdle = autoDeleteOnIdle;
         }
 
-        protected override string ConsumeQueue => _subscriptionName;
-        protected override string ReceiverDescription => $"topic {_topicPath} subscription {_subscriptionName}";
+        protected override string ConsumeQueue => _queueName;
+        protected override string ReceiverDescription => $"topic {_topicPath} subscription queue {_queueName}";
 
         protected override async Task DeclareTopologyAsync(IChannel channel)
         {
             await channel.ExchangeDeclareAsync(_topicPath, type: "fanout", durable: true, autoDelete: false);
             channel = await DeclareSubscriptionQueueAsync(channel);
             // Immediate publishes: fanout exchange delivers to all subscriptions
-            await channel.QueueBindAsync(_subscriptionName, _topicPath, routingKey: "");
+            await channel.QueueBindAsync(_queueName, _topicPath, routingKey: "");
             // Targeted retries: delayed exchange routes to this specific subscription queue
-            await channel.QueueBindAsync(_subscriptionName, RabbitMqConnectionManager.DelayedExchangeName, routingKey: _subscriptionName);
+            await channel.QueueBindAsync(_queueName, RabbitMqConnectionManager.DelayedExchangeName, routingKey: _queueName);
             // Delayed publishes: TopicSender routes through the delayed exchange with the topic path as routing key
-            await channel.QueueBindAsync(_subscriptionName, RabbitMqConnectionManager.DelayedExchangeName, routingKey: _topicPath);
+            await channel.QueueBindAsync(_queueName, RabbitMqConnectionManager.DelayedExchangeName, routingKey: _topicPath);
         }
 
         private async Task<IChannel> DeclareSubscriptionQueueAsync(IChannel channel)
         {
-            channel = await RabbitMqSubscriptionQueue.DeclareAsync(_connectionManager, channel, _subscriptionName, _autoDeleteOnIdle.Value, _logger);
+            channel = await RabbitMqSubscriptionQueue.DeclareAsync(_connectionManager, channel, _queueName, _autoDeleteOnIdle.Value, _logger);
             _channel = channel;
             return channel;
         }
@@ -55,7 +55,7 @@ namespace Nimbus.Transports.RabbitMQ.MessageSendersAndReceivers
         protected override void AfterDeserialize(NimbusMessage message)
         {
             // Tag so retries route directly to this subscription queue, bypassing the fanout
-            message.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _subscriptionName;
+            message.Properties[MessagePropertyKeys.RedeliveryToSubscriptionName] = _queueName;
         }
     }
 }
