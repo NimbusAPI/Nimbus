@@ -43,6 +43,7 @@ jobs:
       uses: cake-build/cake-action@v3
       with:
         script-path: build.cake
+        cake-version: tool-manifest
         target: CI
 
     - name: Push packages to NuGet and tag release

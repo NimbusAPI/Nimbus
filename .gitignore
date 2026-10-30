@@ -16,7 +16,6 @@ tools
 #Mac stuff
 .DS_Store
 
-
 # build stuff
 dist_package/
 **/*/AssemblyInfo.cs
@@ -26,5 +25,4 @@ dist_package/
 data/
 CLAUDE.md
 
-# graft's local graph cache — regenerable, not committed (run `graft build`).
-/graft/
+.trail/

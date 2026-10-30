@@ -27,6 +27,7 @@ jobs:
       uses: cake-build/cake-action@v3
       with:
         script-path: build.cake
+        cake-version: tool-manifest
         target: ci
         arguments: |
           buildNumber: ${{ github.run_number }}
