@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write  # required to push git tags
+  id-token: write # GitHub OIDC for Nuget
 
 jobs:
 
@@ -45,11 +46,18 @@ jobs:
         script-path: build.cake
         cake-version: tool-manifest
         target: CI
+    
+    # Get a short-lived NuGet API key
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USERNAME }}
 
     - name: Push packages to NuGet and tag release
       shell: bash
       env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        NUGET_API_KEY: ${{steps.login.outputs.NUGET_API_KEY}}
         COMPONENT: ${{ inputs.component }}
       run: |
         set -e
