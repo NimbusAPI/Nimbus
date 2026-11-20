@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nimbus.Configuration;
+using Nimbus.Configuration.Settings;
 using Nimbus.Infrastructure.DependencyResolution;
 using Nimbus.Tests.Common.Extensions;
 using Nimbus.Tests.Common.Stubs;
@@ -41,15 +42,20 @@ namespace Nimbus.Tests.Integration.Tests.RequestResponseCorrelationTests
             var testFixtureType = GetType();
             var typeProvider = new TestHarnessTypeProvider(new[] {testFixtureType.Assembly}, new[] {testFixtureType.Namespace});
 
-            _bus = new BusBuilder().Configure()
-                                   .WithNames("CorrelatorSweepTest", Environment.MachineName)
-                                   .WithGlobalPrefix(Guid.NewGuid().ToString())
-                                   .WithTransport(new InProcessTransportConfiguration())
-                                   .WithTypesFrom(typeProvider)
-                                   .WithDependencyResolver(new DependencyResolver(typeProvider))
-                                   .WithDefaultTimeout(RequestTimeout)
-                                   .WithMaxDeliveryAttempts(1)
-                                   .Build();
+            var configuration = new BusBuilder().Configure()
+                                                .WithNames("CorrelatorSweepTest", Environment.MachineName)
+                                                .WithGlobalPrefix(Guid.NewGuid().ToString())
+                                                .WithTransport(new InProcessTransportConfiguration())
+                                                .WithTypesFrom(typeProvider)
+                                                .WithDependencyResolver(new DependencyResolver(typeProvider))
+                                                .WithDefaultTimeout(RequestTimeout)
+                                                .WithMaxDeliveryAttempts(1)
+                                                // The handler limits default to multiples of Environment.ProcessorCount. Every SlowRequest
+                                                // has to be inside its handler at once, with room left over for FastRequests and replies,
+                                                // so set them explicitly or the test only works on machines with enough cores.
+                                                .WithDefaultConcurrentHandlerLimit(SlowRequestCount * 2);
+            configuration.GlobalConcurrentHandlerLimit = new GlobalConcurrentHandlerLimitSetting {Value = SlowRequestCount * 4};
+            _bus = configuration.Build();
             await _bus.Start();
 
             // 1. Put some requests in flight and hold them there.
