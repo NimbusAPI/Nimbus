@@ -78,7 +78,7 @@ namespace Nimbus.Infrastructure.RequestResponse
                          var now = _clock.UtcNow;
 
                          var toRemove = _requestWrappers
-                             .Where(kvp => kvp.Value.ExpiresAfter >= now)
+                             .Where(kvp => kvp.Value.ExpiresAfter < now)
                              .ToArray();
 
                          foreach (var kvp in toRemove)

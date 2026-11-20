@@ -110,6 +110,11 @@ namespace Nimbus.Infrastructure.RequestResponse
                 {
                     exception = exc;
                 }
+                finally
+                {
+                    // Remove the wrapper rather than waiting for expiry
+                    _requestResponseCorrelator.RemoveWrapper(nimbusMessage.MessageId);
+                }
 
                 foreach (var interceptor in interceptors.Reverse())
                 {

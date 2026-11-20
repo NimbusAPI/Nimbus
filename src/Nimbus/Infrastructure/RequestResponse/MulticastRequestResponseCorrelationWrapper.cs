@@ -20,7 +20,14 @@ namespace Nimbus.Infrastructure.RequestResponse
 
         public async Task Reply(object response)
         {
-            await _responses.Add((TResponse) response);
+            try
+            {
+                await _responses.Add((TResponse) response);
+            }
+            catch (ObjectDisposedException)
+            {
+                // The request has expired and been swept; a late reply is harmless.
+            }
         }
 
         public async Task Throw(string exceptionMessage, string exceptionStackTrace)

@@ -24,7 +24,7 @@ namespace Nimbus.Infrastructure.RequestResponse
         {
             _requestWasSuccessful = true;
             _response = (TResponse) response;
-            _semaphore.Release();
+            ReleaseWaiter();
         }
 
         public async Task Throw(string exceptionMessage, string exceptionStackTrace)
@@ -32,7 +32,19 @@ namespace Nimbus.Infrastructure.RequestResponse
             _requestWasSuccessful = false;
             _exceptionStackTrace = exceptionStackTrace;
             _exceptionMessage = exceptionMessage;
-            _semaphore.Release();
+            ReleaseWaiter();
+        }
+
+        private void ReleaseWaiter()
+        {
+            try
+            {
+                _semaphore.Release();
+            }
+            catch (ObjectDisposedException)
+            {
+                // The requester has already given up (timed out) and removed this wrapper; a late reply is harmless.
+            }
         }
 
         public DateTimeOffset ExpiresAfter { get; }
